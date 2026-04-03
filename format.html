@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- deploy-1775108309 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -462,6 +463,65 @@
       opacity: 0.5;
     }
 
+    /* ─── CURRICULUM GRID ─── */
+    .curriculum-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin: 2rem 0;
+      border: 1px solid var(--dark-border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .curriculum-item {
+      display: flex;
+      gap: 1.25rem;
+      align-items: flex-start;
+      padding: 1.25rem 1.5rem;
+      background: var(--dark-card);
+      border-bottom: 1px solid var(--dark-border);
+      transition: background 0.2s;
+    }
+    .curriculum-item:last-child { border-bottom: none; }
+    .curriculum-item:hover { background: #2f3240; }
+    .curriculum-item.curriculum-featured {
+      background: linear-gradient(135deg, rgba(245,200,66,0.08), var(--dark-card));
+      border-left: 3px solid var(--gold);
+    }
+    .curriculum-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--gold-dim);
+      min-width: 28px;
+      margin-top: 0.15rem;
+      flex-shrink: 0;
+    }
+    .curriculum-featured .curriculum-num { color: var(--gold); }
+    .curriculum-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      color: var(--text-main);
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .curriculum-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: var(--gold);
+      color: var(--dark);
+      padding: 0.15rem 0.45rem;
+      border-radius: 2px;
+    }
+    .curriculum-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
     /* ─── MOBILE ─── */
     @media (max-width: 640px) {
       nav { padding: 1rem 1.25rem; }
@@ -483,7 +543,7 @@
   <!-- NAV -->
   <nav>
     <a href="index.html" class="nav-logo">
-      <img src="data:image/png;base64,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" alt="lil' bird" class="nav-bird" style="border-radius:10px;" />
+      <img src="bird-logo.png" alt="lil' bird" class="nav-bird" style="border-radius:10px;" />
       <span class="nav-wordmark">lil'  bird</span>
     </a>
     <a href="book.html" class="nav-cta">Book a Session</a>
@@ -497,20 +557,65 @@
   <!-- PAGE HERO -->
   <div class="page-hero">
     <p class="section-label reveal">the experience</p>
-    <h1 class="page-headline reveal reveal-delay-1">What actually<br/><em>happens</em> in a session.</h1>
-    <p class="page-sub reveal reveal-delay-2">No script, no slide deck. Here's an honest look at how we work — so you know exactly what you're walking into.</p>
+    <h1 class="page-headline reveal reveal-delay-1">What happens in<br/>the <em>First Flight.</em></h1>
+    <p class="page-sub reveal reveal-delay-2">The First Flight is where most people begin — a single 2-hour session that maps your story and finds your next brave step. Here's exactly what you're walking into.</p>
   </div>
+
+  <div class="divider reveal"><div class="divider-line"></div><span class="divider-glyph">✦</span><div class="divider-line"></div></div>
+
+  <!-- JOURNEY PATH -->
+  <section class="content-section" style="padding-bottom: 2rem;">
+    <p class="section-label reveal">the path</p>
+    <h2 class="story-headline reveal reveal-delay-1">
+      Three ways in.<br/><em>One destination.</em>
+    </h2>
+    <p class="story-body reveal reveal-delay-2">
+      Most people start with The First Flight — one session to see if this is for them. If it is, the Life Change Sessions go all the way. Monthly Coaching keeps the momentum going long-term.
+    </p>
+
+    <div class="journey-steps">
+      <div class="journey-step reveal">
+        <div class="step-left">
+          <div class="step-num">01</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <p class="step-title">🐦 The First Flight <span style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;color:var(--gold-dim);margin-left:0.5rem;">— start here</span></p>
+          <p class="step-desc">One 2-hour session. Map your story, find the real issue, leave with your next brave step. No commitment beyond the conversation. <a href="https://calendly.com/lukehaythorpe-orangery/first-flight-session" style="color:var(--gold);text-decoration:none;">Book a First Flight →</a></p>
+        </div>
+      </div>
+      <div class="journey-step reveal reveal-delay-1">
+        <div class="step-left">
+          <div class="step-num">02</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <p class="step-title">Life Change Sessions <span style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;color:var(--gold-dim);margin-left:0.5rem;">— the full journey</span></p>
+          <p class="step-desc">A 7-session deep dive through the full curriculum — your story, your wiring, your relationships, your next chapter. Some people need a little extra runway. We work with that.</p>
+        </div>
+      </div>
+      <div class="journey-step reveal reveal-delay-2">
+        <div class="step-left">
+          <div class="step-num">03</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <p class="step-title">Monthly Coaching <span style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;color:var(--gold-dim);margin-left:0.5rem;">— sustained momentum</span></p>
+          <p class="step-desc">A regular thinking partner. Recurring or once-off. For the ones who want to keep moving once they've found their direction.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <div class="divider reveal"><div class="divider-line"></div><span class="divider-glyph">✦</span><div class="divider-line"></div></div>
 
   <!-- SECTION 1: The Session -->
   <section class="content-section">
-    <p class="section-label reveal">the life change session</p>
+    <p class="section-label reveal">what a session actually looks like</p>
     <h2 class="story-headline reveal reveal-delay-1">Two hours.<br/><em>Story-first.</em> All yours.</h2>
     <p class="story-body reveal reveal-delay-2">
-      A Life Change Session isn't a consultation or a quick check-in. It's a proper deep-dive — structured enough to hold the space, flexible enough to go wherever the real work is.
+      Whether it's your First Flight or you're deep in the Life Change curriculum, every session follows the same human structure — no script, no slide deck. Here's what you're walking into.
     </p>
-
     <div class="session-grid">
       <div class="session-block reveal">
         <p class="session-time">Opening — 20 min</p>
@@ -536,6 +641,69 @@
         <p class="session-time">After the session</p>
         <p class="session-title">Tools you keep</p>
         <p class="session-desc">Visual maps, relationship inventories, writing prompts — whatever we built together is yours. You leave with something tangible. Not just something to think about.</p>
+      </div>
+    </div>
+
+    <!-- The full journey -->
+    <div class="divider" style="margin: 3rem 0;"><div class="divider-line"></div><span class="divider-glyph">✦</span><div class="divider-line"></div></div>
+
+    <p class="section-label reveal">if you want to go deeper</p>
+    <h3 class="story-headline reveal reveal-delay-1" style="font-size: clamp(1.4rem, 2.5vw, 2rem);">
+      The First Flight is just the<br/><em>beginning of the journey.</em>
+    </h3>
+    <p class="story-body reveal reveal-delay-2">
+      For those who want to go all the way through, the full Life Change Sessions curriculum takes you session by session through everything that shapes who you are and where you're going.
+    </p>
+
+    <div class="curriculum-grid reveal reveal-delay-3">
+      <div class="curriculum-item curriculum-featured">
+        <span class="curriculum-num">✦</span>
+        <div>
+          <p class="curriculum-title">First Flight <span class="curriculum-badge">standalone</span></p>
+          <p class="curriculum-desc">Your story, mapped. The real issue, found. Your next brave step, chosen.</p>
+        </div>
+      </div>
+      <div class="curriculum-item">
+        <span class="curriculum-num">01</span>
+        <div>
+          <p class="curriculum-title">Story, Vision &amp; Goals</p>
+          <p class="curriculum-desc">Where have you been, where do you want to go, and what does that actually look like?</p>
+        </div>
+      </div>
+      <div class="curriculum-item">
+        <span class="curriculum-num">02</span>
+        <div>
+          <p class="curriculum-title">Identity &amp; Insight</p>
+          <p class="curriculum-desc">Who are you underneath the roles you play? We go deep on wiring, personality, and the patterns that run your life.</p>
+        </div>
+      </div>
+      <div class="curriculum-item">
+        <span class="curriculum-num">03</span>
+        <div>
+          <p class="curriculum-title">Navigating Transition</p>
+          <p class="curriculum-desc">The in-between is the hardest part. This session gives you tools for living well in the middle of change.</p>
+        </div>
+      </div>
+      <div class="curriculum-item">
+        <span class="curriculum-num">04</span>
+        <div>
+          <p class="curriculum-title">Life Rhythms &amp; Routines</p>
+          <p class="curriculum-desc">The shape of your days shapes your life. We look at energy, pace, and what sustainable actually looks like for you.</p>
+        </div>
+      </div>
+      <div class="curriculum-item">
+        <span class="curriculum-num">05</span>
+        <div>
+          <p class="curriculum-title">Relationships</p>
+          <p class="curriculum-desc">No one grows alone. We explore the connections that shape you — and the ones that are holding you back.</p>
+        </div>
+      </div>
+      <div class="curriculum-item">
+        <span class="curriculum-num">06</span>
+        <div>
+          <p class="curriculum-title">Where to Now?</p>
+          <p class="curriculum-desc">The final session is about integration — pulling everything together into a clear, honest picture of what comes next.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -655,12 +823,12 @@
         <div class="faq-a">Our coach has a ministry background, and that shapes his warmth and approach to human connection — but sessions aren't faith-based by default. If your faith is part of your story, it's absolutely welcome here. If it's not, that's equally fine.</div>
       </div>
       <div class="faq-item">
-        <button class="faq-q">What's the difference between a Life Change Session and Monthly Coaching? <span class="faq-chevron">▾</span></button>
-        <div class="faq-a">A Life Change Session is a single deep-dive — great if you're at a crossroads and need clarity now. Monthly Coaching is for ongoing momentum: regular sessions, accountability, and sustained support across a longer journey. Most people start with a single session to see if we're a fit.</div>
+        <button class="faq-q">What's the difference between all the session types? <span class="faq-chevron">▾</span></button>
+        <div class="faq-a">The First Flight is a single 2-hour session — the lowest barrier entry point, perfect for seeing if this is for you. Life Change Sessions are a 7-session deep dive through the full curriculum. Monthly Coaching is ongoing support for sustained momentum. Most people start with a First Flight and decide from there.</div>
       </div>
       <div class="faq-item">
         <button class="faq-q">I took the assessment — now what? <span class="faq-chevron">▾</span></button>
-        <div class="faq-a">Great first move. Your profile is a starting point — a map of your wiring. A Life Change Session is where we take that and go deep. We use your results as one input into a much bigger picture of who you are and where you're headed.</div>
+        <div class="faq-a">Great first move. Your profile is a starting point — a map of your wiring. The natural next step is a First Flight session, where we take that and go deep. We use your results as one input into a much bigger picture of who you are and where you're headed.</div>
       </div>
     </div>
   </section>
@@ -671,10 +839,10 @@
       <p class="section-label reveal" style="justify-content:center;">you've read enough</p>
       <h2 class="cta-headline reveal reveal-delay-1">The next step is<br/><em>pretty simple.</em></h2>
       <p class="cta-body reveal reveal-delay-2">
-        Book a Life Change Session. Show up as you are. We'll take it from there.
+        Start with a First Flight. Show up as you are. We'll take it from there.
       </p>
       <div class="cta-actions reveal reveal-delay-3">
-        <a href="book.html" class="btn-primary">Book My Session →</a>
+        <a href="book.html" class="btn-primary">Book a First Flight →</a>
         <a href="book.html" class="btn-secondary">Talk First (Discovery Call)</a>
       </div>
     </div>
