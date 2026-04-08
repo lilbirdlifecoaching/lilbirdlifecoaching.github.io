@@ -837,10 +837,29 @@ function retake() {
   goToScreen('screen-intro'); document.getElementById('q-count').style.display = 'none';
 }
 
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.9/iframeResizer.contentWindow.min.js">
 
 
+
+
+
+
+// ── goToScreen override ──────────────────────────────────────────────────────
+function goToScreen(id) {
+  document.querySelectorAll('.screen').forEach(function(s) {
+    s.classList.remove('active', 'entering');
+  });
+  var el = document.getElementById(id);
+  if (!el) return;
+  requestAnimationFrame(function() {
+    el.classList.add('active', 'entering');
+  });
+}
+
+// Wire start button
+document.addEventListener('DOMContentLoaded', function() {
+  var btn = document.getElementById('btn-start');
+  if (btn) btn.addEventListener('click', function() { startAssessment(); });
+});
 </script>
 </body>
 </html>
