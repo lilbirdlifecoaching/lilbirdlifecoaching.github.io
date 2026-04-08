@@ -536,8 +536,8 @@ let resultMBTI = '', resultEnn = 0, resultWing = 0;
 let quizComplete = false;
 
 // ── NAVIGATION ────────────────────────────────────────────────────────────────
-function goToScreen(id) {
-  // Legacy stub - overridden below
+function __goToScreen_legacy(id) {
+  // replaced by mirror-style version below
 }
 
 
@@ -747,7 +747,7 @@ function retake() {
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.9/iframeResizer.contentWindow.min.js">
 
-// ── Override render functions with new Mirror-style UI ──
+// ── Mirror-style UI override ────────────────────────────────────────────────
 
 const SECTION_LABELS = [
   'who drives you',
@@ -758,17 +758,16 @@ const SECTION_LABELS = [
 ];
 
 function goToScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => {
+  document.querySelectorAll('.screen').forEach(function(s) {
     s.classList.remove('active', 'entering');
   });
-  const el = document.getElementById(id);
-  requestAnimationFrame(() => {
+  var el = document.getElementById(id);
+  requestAnimationFrame(function() {
     el.classList.add('active', 'entering');
   });
 }
 
 function startQuiz() {
-  // Reset state
   answers = new Array(85).fill(0);
   currentQ = 0;
   quizComplete = false;
@@ -780,81 +779,90 @@ function startQuiz() {
 }
 
 function updateProgress() {
-  const pct = (currentQ / QUESTIONS.length) * 100;
+  var pct = (currentQ / QUESTIONS.length) * 100;
   document.getElementById('progress-bar').style.width = pct + '%';
-  document.getElementById('q-count').textContent = currentQ + ' / ' + QUESTIONS.length;
+  document.getElementById('q-count').textContent = (currentQ + 1) + ' / ' + QUESTIONS.length;
 }
 
 function renderQuestion() {
   if (currentQ >= QUESTIONS.length) {
     document.getElementById('q-count').style.display = 'none';
     document.getElementById('progress-bar').style.width = '100%';
-    setTimeout(() => {
-      calcResult();
+    if (!quizComplete) {
+      quizComplete = true;
+      computeResult();
       showResult();
       goToScreen('screen-result');
-    }, 300);
+    }
     return;
   }
 
   updateProgress();
-  const q = QUESTIONS[currentQ];
-  const sectionLabel = document.getElementById('q-section-label');
-  const qText = document.getElementById('q-text');
-  const answerArea = document.getElementById('q-answer-area');
+  var q = QUESTIONS[currentQ];
+  var sectionLabel = document.getElementById('q-section-label');
+  var qText = document.getElementById('q-text');
+  var answerArea = document.getElementById('q-answer-area');
 
   sectionLabel.textContent = SECTION_LABELS[q.section] || 'reflect';
-  
-  // Clean question text (remove tag in parens)
-  let cleanText = q.title.replace(/\s*\([^)]+\)\s*$/, '');
-  qText.textContent = '"' + cleanText + '"';
+
+  // Clean question text (strip tag in parens at end)
+  var cleanText = q.title.replace(/\s*\([^)]+\)\s*$/, '');
+  qText.textContent = '\u201C' + cleanText + '\u201D';
 
   answerArea.innerHTML = '';
 
-  // Section 0 = Enneagram agree/disagree scale
   if (q.section === 0) {
-    answerArea.className = '';
-    const scale = document.createElement('div');
+    // Enneagram: 4-point scale
+    var scale = document.createElement('div');
     scale.className = 'q-scale';
-    
-    const opts = [
-      { val: 0, label: 'not me' },
-      { val: 1, label: 'slightly' },
-      { val: 2, label: 'mostly' },
-      { val: 3, label: 'very me' },
+    var opts = [
+      { val: 1, label: 'not me' },
+      { val: 2, label: 'slightly' },
+      { val: 3, label: 'mostly' },
+      { val: 4, label: 'very me' },
     ];
-    
-    opts.forEach(o => {
-      const btn = document.createElement('button');
+    opts.forEach(function(o) {
+      var btn = document.createElement('button');
       btn.className = 'q-scale-btn';
-      btn.innerHTML = `<span class="q-scale-num">${o.val}</span><span class="q-scale-label">${o.label}</span>`;
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.q-scale-btn').forEach(b => b.classList.remove('selected'));
+      btn.innerHTML = '<span class="q-scale-num">' + o.val + '</span><span class="q-scale-label">' + o.label + '</span>';
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.q-scale-btn').forEach(function(b) { b.classList.remove('selected'); });
         btn.classList.add('selected');
-        setTimeout(() => advance(o.val, q.tag, q.section), 280);
+        var capturedQ = currentQ;
+        answers[capturedQ] = o.val;
+        setTimeout(function() {
+          if (currentQ === capturedQ) {
+            currentQ++;
+            renderQuestion();
+          }
+        }, 320);
       });
       scale.appendChild(btn);
     });
     answerArea.appendChild(scale);
 
   } else {
-    // Binary choice questions (MBTI)
+    // MBTI: binary choice
     answerArea.className = 'q-options';
-    answerArea.style.cssText = '';
-
-    const choices = getBinaryChoices(q.tag);
-    const letters = ['A', 'B'];
-    choices.forEach((choice, i) => {
-      const btn = document.createElement('button');
+    var choices = getBinaryChoices(q.tag);
+    var letters = ['A', 'B'];
+    choices.forEach(function(choice, i) {
+      var btn = document.createElement('button');
       btn.className = 'q-opt';
-      btn.innerHTML = `
-        <span class="q-opt-letter">${letters[i]}</span>
-        <span class="q-opt-text">${choice.text}</span>
-      `;
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.q-opt').forEach(b => b.classList.remove('selected'));
+      btn.innerHTML =
+        '<span class="q-opt-letter">' + letters[i] + '</span>' +
+        '<span class="q-opt-text">' + choice.text + '</span>';
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.q-opt').forEach(function(b) { b.classList.remove('selected'); });
         btn.classList.add('selected');
-        setTimeout(() => advance(choice.val, q.tag, q.section), 280);
+        var capturedQ = currentQ;
+        answers[capturedQ] = choice.val;
+        setTimeout(function() {
+          if (currentQ === capturedQ) {
+            currentQ++;
+            renderQuestion();
+          }
+        }, 320);
       });
       answerArea.appendChild(btn);
     });
@@ -862,47 +870,46 @@ function renderQuestion() {
 }
 
 function getBinaryChoices(tag) {
-  const pairs = {
+  var pairs = {
     'E': [
-      { text: 'I get energised by being around people and talking things through', val: 1 },
-      { text: 'I get energised by time alone and prefer to think before I speak', val: 0 },
+      { text: 'I get energised by being around people and talking things through', val: 2 },
+      { text: 'I get energised by time alone and prefer to think before I speak', val: 1 },
     ],
     'I': [
-      { text: 'I prefer quiet, one-on-one conversations over big groups', val: 1 },
-      { text: 'I enjoy lively group settings and find them energising', val: 0 },
+      { text: 'I prefer quiet, one-on-one conversations over big groups', val: 2 },
+      { text: 'I enjoy lively group settings and find them energising', val: 1 },
     ],
     'N': [
-      { text: 'I love exploring ideas, patterns, and what could be', val: 1 },
-      { text: 'I prefer practical, concrete information and what actually is', val: 0 },
+      { text: 'I love exploring ideas, patterns, and what could be', val: 2 },
+      { text: 'I prefer practical, concrete information and what actually is', val: 1 },
     ],
     'S': [
-      { text: 'I trust experience and facts more than hunches and theories', val: 1 },
-      { text: 'I\'m drawn to possibilities and tend to think in the big picture', val: 0 },
+      { text: 'I trust experience and facts more than hunches and theories', val: 2 },
+      { text: "I'm drawn to possibilities and tend to think in the big picture", val: 1 },
     ],
     'F': [
-      { text: 'When making decisions, people and values matter most to me', val: 1 },
-      { text: 'When making decisions, logic and consistency matter most to me', val: 0 },
+      { text: 'When making decisions, people and values matter most to me', val: 2 },
+      { text: 'When making decisions, logic and consistency matter most to me', val: 1 },
     ],
     'T': [
-      { text: 'I tend to prioritise logic and fairness over personal feelings', val: 1 },
-      { text: 'I tend to consider how decisions will affect people emotionally', val: 0 },
+      { text: 'I tend to prioritise logic and fairness over personal feelings', val: 2 },
+      { text: 'I tend to consider how decisions will affect people emotionally', val: 1 },
     ],
     'P': [
-      { text: 'I like to keep options open and adapt as things unfold', val: 1 },
-      { text: 'I prefer to have things settled, planned, and decided', val: 0 },
+      { text: 'I like to keep options open and adapt as things unfold', val: 2 },
+      { text: 'I prefer to have things settled, planned, and decided', val: 1 },
     ],
     'J': [
-      { text: 'I like having structure, schedules, and clear plans', val: 1 },
-      { text: 'I prefer flexibility and like to improvise as I go', val: 0 },
+      { text: 'I like having structure, schedules, and clear plans', val: 2 },
+      { text: 'I prefer flexibility and like to improvise as I go', val: 1 },
     ],
   };
   return pairs[tag] || [
-    { text: 'More like this', val: 1 },
-    { text: 'Less like this', val: 0 },
+    { text: 'More like this', val: 2 },
+    { text: 'Less like this', val: 1 },
   ];
 }
 
-// Intercept showResult to use new design
 function showResult() {
   var mbti = resultMBTI, enn = resultEnn;
   var key = mbti + '_' + enn;
@@ -911,59 +918,58 @@ function showResult() {
 
   var strengths = (profile.strengths || '').split(' | ');
   var challenges = (profile.challenges || '').split(' | ');
+  var voices = (profile.voices || '').split(', ');
 
-  var html = `
-    <div class="result-type-badge">✦ ${mbti} · type ${enn}</div>
-    <h1 class="result-name">${profile.name || 'Your Profile'}</h1>
-    <p class="result-tagline">${profile.tagline || ''}</p>
+  var html =
+    '<div class="result-type-badge">\u2714 ' + mbti + ' \u00B7 type ' + enn + '</div>' +
+    '<h1 class="result-name">' + (profile.name || 'Your Profile') + '</h1>' +
+    '<p class="result-tagline">' + (profile.tagline || '') + '</p>' +
+    '<div class="result-tags">' + voices.map(function(v) { return '<span class="result-tag">' + v + '</span>'; }).join('') + '</div>' +
+    '<div class="result-cards">' +
+      '<div class="result-card">' +
+        '<p class="result-card-label">how you think \u2014 MBTI</p>' +
+        '<p class="result-card-value"><strong>' + mbti + '</strong> ' + (mbtiInfo.title || '') + '<br/><span style="color:var(--text-muted);font-size:.85rem">' + (mbtiInfo.desc || '') + '</span></p>' +
+      '</div>' +
+      '<div class="result-card">' +
+        '<p class="result-card-label">why you do what you do</p>' +
+        '<p class="result-card-value"><strong>Type ' + enn + '</strong><br/><span style="color:var(--text-muted);font-size:.85rem">' + (profile.growth || '') + '</span></p>' +
+      '</div>' +
+      '<div class="result-card full">' +
+        '<p class="result-card-label">your strengths</p>' +
+        '<p class="result-card-value">' + strengths.map(function(s) { return '\u2726 ' + s; }).join('<br/>') + '</p>' +
+      '</div>' +
+      '<div class="result-card full">' +
+        '<p class="result-card-label">what to watch</p>' +
+        '<p class="result-card-value">' + challenges.map(function(c) { return '\u00B7 ' + c; }).join('<br/>') + '</p>' +
+      '</div>' +
+      '<div class="result-card full">' +
+        '<p class="result-card-label">how you see the world</p>' +
+        '<p class="result-card-value">' + (profile.world || '').split(' | ').join('<br/>') + '</p>' +
+      '</div>' +
+      '<div class="result-card full">' +
+        '<p class="result-card-label">under pressure</p>' +
+        '<p class="result-card-value">' + (profile.stress || '') + '</p>' +
+      '</div>' +
+    '</div>' +
+    '<div style="margin-top:1.5rem">' +
+      '<a href="https://calendly.com/lukehaythorpe-orangery/first-flight-session" class="result-cta">Book a First Flight \u2192</a>' +
+      '<button class="result-cta-ghost" onclick="startAssessment()">Retake the assessment</button>' +
+    '</div>';
 
-    <div class="result-tags">
-      ${(profile.voices || '').split(', ').map(v => `<span class="result-tag">${v}</span>`).join('')}
-    </div>
-
-    <div class="result-cards">
-      <div class="result-card">
-        <p class="result-card-label">how you think — MBTI</p>
-        <p class="result-card-value"><strong>${mbti}</strong> ${mbtiInfo.title || ''}<br/><span style="color:var(--text-muted);font-size:0.85rem">${mbtiInfo.desc || ''}</span></p>
-      </div>
-      <div class="result-card">
-        <p class="result-card-label">why you do what you do — Enneagram</p>
-        <p class="result-card-value"><strong>Type ${enn}</strong><br/><span style="color:var(--text-muted);font-size:0.85rem">${profile.growth || ''}</span></p>
-      </div>
-      <div class="result-card full">
-        <p class="result-card-label">your strengths</p>
-        <p class="result-card-value">${strengths.map(s => '✦ ' + s).join('<br/>')}</p>
-      </div>
-      <div class="result-card full">
-        <p class="result-card-label">what to watch</p>
-        <p class="result-card-value">${challenges.map(c => '· ' + c).join('<br/>')}</p>
-      </div>
-      <div class="result-card full">
-        <p class="result-card-label">how you see the world</p>
-        <p class="result-card-value">${(profile.world || '').split(' | ').join('<br/>')}</p>
-      </div>
-      <div class="result-card full">
-        <p class="result-card-label">under pressure</p>
-        <p class="result-card-value">${profile.stress || ''}</p>
-      </div>
-    </div>
-
-    <div style="margin-top:1.5rem">
-      <a href="https://calendly.com/lukehaythorpe-orangery/first-flight-session" class="result-cta">Book a First Flight →</a>
-      <button class="result-cta-ghost" onclick="startQuiz()">Retake the assessment</button>
-    </div>
-  `;
   document.getElementById('result-content').innerHTML = html;
   document.getElementById('result-content').scrollTop = 0;
 }
 
-// ── Wire up button after DOM ready ──────────────────────────────────────────
+// Wire up button after DOM ready
 document.addEventListener('DOMContentLoaded', function() {
   var startBtn = document.getElementById('btn-start');
   if (startBtn) {
-    startBtn.addEventListener('click', startQuiz);
+    startBtn.addEventListener('click', function() {
+      startAssessment();
+    });
   }
 });
+
 </script>
 </body>
 </html>
