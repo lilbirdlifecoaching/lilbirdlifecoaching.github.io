@@ -18,27 +18,25 @@
       --text-muted: #a09880;
       --border: rgba(245,200,66,0.15);
     }
-
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html, body {
-      height: 100%;
+    html { scroll-behavior: smooth; }
+    body {
       background: var(--dark);
       color: var(--text);
       font-family: 'DM Sans', sans-serif;
       font-weight: 300;
-      overflow: hidden;
+      min-height: 100vh;
     }
 
-    /* ── PROGRESS BAR ── */
-    #progress-bar {
+    /* ── GRAIN ── */
+    body::before {
+      content: '';
       position: fixed;
-      top: 0; left: 0;
-      height: 2px;
-      background: var(--gold);
-      width: 0%;
-      transition: width 0.5s ease;
-      z-index: 100;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.5;
     }
 
     /* ── NAV ── */
@@ -50,25 +48,12 @@
       align-items: center;
       justify-content: space-between;
       z-index: 50;
+      background: linear-gradient(to bottom, rgba(30,32,40,0.95), transparent);
     }
-    .nav-logo {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      text-decoration: none;
-    }
-    .nav-logo img {
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
-    }
-    .nav-logo span {
-      font-family: 'Playfair Display', serif;
-      font-style: italic;
-      font-size: 1rem;
-      color: var(--gold);
-    }
-    .nav-count {
+    .nav-logo { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+    .nav-logo img { width: 28px; height: 28px; border-radius: 6px; }
+    .nav-logo span { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1rem; color: var(--gold); }
+    #q-count {
       font-family: 'DM Mono', monospace;
       font-size: 0.65rem;
       letter-spacing: 0.15em;
@@ -76,32 +61,37 @@
       color: var(--text-muted);
     }
 
-    /* ── SCREENS ── */
-    .screen {
+    /* ── PROGRESS ── */
+    .progress-wrap {
       position: fixed;
-      inset: 0;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: rgba(245,200,66,0.1);
+      z-index: 100;
+    }
+    #progress-fill {
+      height: 100%;
+      background: var(--gold);
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    /* ── SCREENS ── */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ── INTRO SCREEN ── */
+    #screen-intro {
+      min-height: 100vh;
       display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      text-align: center;
       padding: 5rem 2rem 3rem;
-      opacity: 0;
-      transition: opacity 0.4s ease;
     }
-    .screen.active {
-      display: flex;
-      opacity: 1;
-    }
-    .screen.entering {
-      animation: screenIn 0.4s ease forwards;
-    }
-    @keyframes screenIn {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ── WELCOME SCREEN ── */
-    .welcome-tag {
+    #screen-intro.active { display: flex; }
+    .intro-tag {
       font-family: 'DM Mono', monospace;
       font-size: 0.62rem;
       letter-spacing: 0.2em;
@@ -112,47 +102,43 @@
       padding: 0.35rem 0.9rem;
       border-radius: 100px;
       margin-bottom: 2rem;
+      display: inline-block;
     }
-    .welcome-headline {
+    .intro-headline {
       font-family: 'Playfair Display', serif;
-      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-size: clamp(1.8rem, 4.5vw, 3rem);
       font-weight: 400;
-      text-align: center;
       line-height: 1.25;
       max-width: 620px;
-      margin-bottom: 1.5rem;
+      margin: 0 auto 1.5rem;
     }
-    .welcome-headline em {
-      font-style: italic;
-      color: var(--gold);
-    }
-    .welcome-body {
+    .intro-headline em { font-style: italic; color: var(--gold); }
+    .intro-body {
       font-size: 1rem;
       line-height: 1.75;
       color: var(--text-muted);
-      text-align: center;
-      max-width: 520px;
-      margin-bottom: 3rem;
+      max-width: 500px;
+      margin: 0 auto 2.5rem;
     }
-    .welcome-meta {
+    .intro-meta {
       display: flex;
-      gap: 1rem;
-      margin-bottom: 3rem;
-      flex-wrap: wrap;
+      gap: 0.75rem;
       justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 2.5rem;
     }
     .meta-pill {
       font-family: 'DM Mono', monospace;
-      font-size: 0.62rem;
+      font-size: 0.6rem;
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--text-muted);
       background: var(--dark-card);
       border: 1px solid var(--border);
-      padding: 0.4rem 0.9rem;
+      padding: 0.35rem 0.85rem;
       border-radius: 100px;
     }
-    .btn-start {
+    .btn-primary {
       background: var(--gold);
       color: var(--dark);
       border: none;
@@ -162,331 +148,438 @@
       font-size: 0.72rem;
       letter-spacing: 0.15em;
       text-transform: uppercase;
-      font-weight: 500;
       cursor: pointer;
       transition: background 0.2s, transform 0.2s;
+      font-weight: 500;
     }
-    .btn-start:hover {
-      background: #fff;
-      transform: translateY(-2px);
-    }
+    .btn-primary:hover { background: #fff; transform: translateY(-2px); }
 
-    /* ── QUESTION SCREEN ── */
-    .q-section-label {
+    /* ── QUESTIONS SCREEN ── */
+    #screen-questions {
+      min-height: 100vh;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 5rem 2rem 5rem;
+    }
+    #screen-questions.active { display: flex; }
+
+    #section-label {
       font-family: 'DM Mono', monospace;
-      font-size: 0.58rem;
+      font-size: 0.6rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
       color: var(--text-muted);
       margin-bottom: 2rem;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.6rem;
     }
-    .q-section-label::before, .q-section-label::after {
+    #section-label::before, #section-label::after {
       content: '';
       display: block;
       height: 1px;
-      width: 24px;
+      width: 20px;
       background: var(--border);
     }
-    .q-text {
+
+    #q-text {
       font-family: 'Playfair Display', serif;
-      font-size: clamp(1.4rem, 3.5vw, 2.2rem);
-      font-weight: 400;
+      font-size: clamp(1.3rem, 3vw, 2rem);
       font-style: italic;
+      font-weight: 400;
       text-align: center;
-      line-height: 1.4;
-      max-width: 640px;
-      margin-bottom: 3rem;
+      line-height: 1.45;
+      max-width: 620px;
+      margin-bottom: 2.5rem;
       color: var(--text);
     }
-    .q-options {
+
+    /* Scale buttons (Enneagram) */
+    #scale-btns {
       display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      width: 100%;
+      gap: 0.6rem;
       max-width: 520px;
+      width: 100%;
+      justify-content: center;
     }
-    .q-opt {
+    .scale-btn {
+      flex: 1;
       background: var(--dark-card);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 1rem 1.4rem;
+      padding: 0.85rem 0.5rem;
       cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      color: var(--text);
+    }
+    .scale-btn:hover { border-color: rgba(245,200,66,0.4); background: rgba(245,200,66,0.05); }
+    .scale-btn.selected { border-color: var(--gold); background: rgba(245,200,66,0.1); }
+    .scale-val {
+      font-family: 'DM Mono', monospace;
+      font-size: 1rem;
+      color: var(--gold);
+    }
+    .scale-lbl {
+      font-size: 0.58rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* Choice buttons (MBTI) */
+    .q-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      max-width: 520px;
+      width: 100%;
+    }
+    .choice-btn {
+      background: var(--dark-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      cursor: pointer;
+      text-align: left;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text);
+      line-height: 1.55;
+      transition: all 0.2s;
       display: flex;
       align-items: center;
-      gap: 1rem;
-      transition: all 0.2s ease;
-      text-align: left;
+      gap: 0.85rem;
     }
-    .q-opt:hover {
-      border-color: rgba(245,200,66,0.4);
-      background: rgba(245,200,66,0.05);
-      transform: translateX(4px);
-    }
-    .q-opt.selected {
-      border-color: var(--gold);
-      background: rgba(245,200,66,0.1);
-    }
-    .q-opt-letter {
-      width: 28px;
-      height: 28px;
+    .choice-btn:hover { border-color: rgba(245,200,66,0.4); background: rgba(245,200,66,0.05); transform: translateX(4px); }
+    .choice-btn.selected { border-color: var(--gold); background: rgba(245,200,66,0.1); }
+    .choice-letter {
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
       border: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: center;
       font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
+      font-size: 0.62rem;
       color: var(--text-muted);
       flex-shrink: 0;
       transition: all 0.2s;
     }
-    .q-opt.selected .q-opt-letter {
-      background: var(--gold);
-      border-color: var(--gold);
-      color: var(--dark);
-    }
-    .q-opt-text {
-      font-size: 0.92rem;
-      line-height: 1.5;
-      color: var(--text);
-    }
+    .choice-btn.selected .choice-letter { background: var(--gold); border-color: var(--gold); color: var(--dark); }
 
-    /* Agree/Disagree scale for section 0 */
-    .q-scale {
-      display: flex;
-      gap: 0.6rem;
-      width: 100%;
-      max-width: 520px;
-      justify-content: center;
-      margin-bottom: 1rem;
-    }
-    .q-scale-btn {
-      flex: 1;
-      background: var(--dark-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 0.9rem 0.5rem;
-      cursor: pointer;
-      text-align: center;
-      transition: all 0.2s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.35rem;
-    }
-    .q-scale-btn:hover {
-      border-color: rgba(245,200,66,0.4);
-      background: rgba(245,200,66,0.05);
-    }
-    .q-scale-btn.selected {
-      border-color: var(--gold);
-      background: rgba(245,200,66,0.1);
-    }
-    .q-scale-num {
+    /* Banner */
+    #q-banner {
       font-family: 'DM Mono', monospace;
-      font-size: 1rem;
-      color: var(--gold);
-    }
-    .q-scale-label {
       font-size: 0.6rem;
-      color: var(--text-muted);
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      color: var(--gold-dim);
+      margin-top: 1.5rem;
+      min-height: 1.2em;
     }
 
-    /* ── RESULT SCREEN ── */
-    .result-wrap {
-      width: 100%;
-      max-width: 680px;
-      overflow-y: auto;
-      max-height: calc(100vh - 8rem);
-      padding-bottom: 3rem;
-    }
-    .result-wrap::-webkit-scrollbar { width: 3px; }
-    .result-wrap::-webkit-scrollbar-thumb { background: var(--border); }
-
-    .result-type-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: rgba(245,200,66,0.08);
-      border: 1px solid rgba(245,200,66,0.2);
-      border-radius: 100px;
-      padding: 0.4rem 1rem;
-      margin-bottom: 1.5rem;
+    /* Nav buttons */
+    #btn-back, #btn-next {
+      display: none;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.6rem 1.25rem;
+      color: var(--text-muted);
       font-family: 'DM Mono', monospace;
       font-size: 0.65rem;
-      letter-spacing: 0.15em;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-top: 1.5rem;
+      transition: all 0.2s;
+    }
+    #btn-next { background: var(--gold); color: var(--dark); border-color: var(--gold); }
+    #btn-back:hover { border-color: var(--gold); color: var(--gold); }
+    #btn-next:hover { background: #fff; }
+
+    /* ── CAPTURE SCREEN ── */
+    #screen-capture {
+      min-height: 100vh;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 5rem 2rem;
+      text-align: center;
+    }
+    #screen-capture.active { display: flex; }
+    #screen-capture h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-style: italic;
+      margin-bottom: 0.75rem;
+    }
+    #screen-capture p { color: var(--text-muted); margin-bottom: 2rem; }
+    .capture-field {
+      width: 100%;
+      max-width: 400px;
+      margin-bottom: 1rem;
+    }
+    .capture-field input {
+      width: 100%;
+      background: var(--dark-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.8rem 1rem;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+    }
+    .capture-field input:focus { border-color: var(--gold); }
+    .capture-field input::placeholder { color: var(--text-muted); }
+    .err-msg { font-size: 0.75rem; color: var(--ember); margin-top: 0.25rem; display: none; }
+
+    /* ── RESULT SCREEN ── */
+    #screen-result {
+      min-height: 100vh;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      padding: 6rem 2rem 4rem;
+    }
+    #screen-result.active { display: flex; }
+    .result-inner { max-width: 680px; width: 100%; }
+
+    #result-emoji { font-size: 2.5rem; margin-bottom: 1rem; }
+    #result-type {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
       color: var(--gold);
+      background: rgba(245,200,66,0.08);
+      border: 1px solid rgba(245,200,66,0.2);
+      padding: 0.35rem 0.9rem;
+      border-radius: 100px;
+      display: inline-block;
+      margin-bottom: 1.25rem;
     }
-    .result-name {
+    #result-name {
       font-family: 'Playfair Display', serif;
       font-size: clamp(1.8rem, 4vw, 2.8rem);
       font-weight: 700;
       line-height: 1.2;
       margin-bottom: 0.5rem;
     }
-    .result-tagline {
+    #result-tagline {
       font-size: 1rem;
       color: var(--text-muted);
       line-height: 1.7;
-      margin-bottom: 2.5rem;
+      margin-bottom: 2rem;
       max-width: 560px;
     }
 
+    /* MBTI + Enn cards */
     .result-cards {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1rem;
+      gap: 0.85rem;
       margin-bottom: 1rem;
     }
-    @media (max-width: 560px) {
-      .result-cards { grid-template-columns: 1fr; }
-    }
+    @media(max-width:560px) { .result-cards { grid-template-columns: 1fr; } }
     .result-card {
       background: var(--dark-card);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 1.25rem;
+      padding: 1.1rem 1.25rem;
     }
     .result-card.full { grid-column: 1 / -1; }
-    .result-card-label {
+    .rc-label {
       font-family: 'DM Mono', monospace;
-      font-size: 0.58rem;
-      letter-spacing: 0.18em;
+      font-size: 0.57rem;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
       color: var(--gold-dim);
-      margin-bottom: 0.6rem;
+      margin-bottom: 0.5rem;
     }
-    .result-card-value {
-      font-size: 0.9rem;
-      line-height: 1.65;
-      color: var(--text);
-    }
-    .result-card-value strong {
+    .rc-title {
+      font-weight: 500;
       color: var(--gold);
+      margin-bottom: 0.25rem;
     }
-
-    .result-tags {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      margin-bottom: 2rem;
-    }
-    .result-tag {
-      background: var(--dark-mid);
-      border: 1px solid var(--border);
-      border-radius: 100px;
-      padding: 0.3rem 0.8rem;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
+    .rc-body {
+      font-size: 0.87rem;
+      line-height: 1.6;
       color: var(--text-muted);
     }
 
-    .result-cta {
+    #result-mbti-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--gold); }
+    #result-mbti-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
+    #result-enn-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--gold); }
+    #result-enn-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
+    #result-growth { font-size: 0.87rem; color: var(--text-muted); line-height: 1.65; }
+
+    #result-sections { margin-top: 0.85rem; display: flex; flex-direction: column; gap: 0.85rem; }
+
+    .result-section {
+      background: var(--dark-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.1rem 1.25rem;
+    }
+    .result-section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.57rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+      margin-bottom: 0.5rem;
+    }
+    .result-section-body {
+      font-size: 0.87rem;
+      line-height: 1.65;
+      color: var(--text-muted);
+    }
+
+    .result-ctas {
+      margin-top: 2rem;
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .btn-cta {
       background: var(--gold);
       color: var(--dark);
       border: none;
-      padding: 0.9rem 2rem;
+      padding: 0.85rem 1.75rem;
       border-radius: 6px;
       font-family: 'DM Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.15em;
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
       cursor: pointer;
-      transition: background 0.2s;
       text-decoration: none;
+      transition: background 0.2s;
       display: inline-block;
-      margin-right: 0.75rem;
-      margin-bottom: 0.75rem;
     }
-    .result-cta:hover { background: #fff; }
-    .result-cta-ghost {
+    .btn-cta:hover { background: #fff; }
+    .btn-cta-ghost {
       background: transparent;
       border: 1px solid var(--border);
       color: var(--text-muted);
-      padding: 0.9rem 2rem;
+      padding: 0.85rem 1.75rem;
       border-radius: 6px;
       font-family: 'DM Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.15em;
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
       cursor: pointer;
       transition: all 0.2s;
-      margin-bottom: 0.75rem;
     }
-    .result-cta-ghost:hover {
-      border-color: var(--gold);
-      color: var(--gold);
-    }
+    .btn-cta-ghost:hover { border-color: var(--gold); color: var(--gold); }
 
-    /* ── GRAIN OVERLAY ── */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 1000;
-      opacity: 0.5;
-    }
-
-    @media (max-width: 480px) {
+    @media(max-width:480px) {
       .nav { padding: 1rem; }
-      .screen { padding: 4.5rem 1.25rem 2rem; }
-      .q-scale { gap: 0.4rem; }
+      #screen-intro, #screen-questions, #screen-capture, #screen-result { padding-left: 1.25rem; padding-right: 1.25rem; }
+      #scale-btns { gap: 0.4rem; }
     }
   </style>
 </head>
 <body>
 
-<div id="progress-bar"></div>
+<div class="progress-wrap"><div id="progress-fill"></div></div>
 
 <nav class="nav">
   <a href="index.html" class="nav-logo">
     <img src="data:image/png;base64,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" alt="lil' bird"/>
     <span>lil' bird</span>
   </a>
-  <span class="nav-count" id="q-count" style="display:none"></span>
+  <span id="q-count"></span>
 </nav>
 
-<!-- WELCOME -->
-<div class="screen active entering" id="screen-welcome">
-  <div class="welcome-tag">✦ deep profile</div>
-  <h1 class="welcome-headline">
+<!-- ── INTRO ── -->
+<div class="screen active" id="screen-intro">
+  <span class="intro-tag">✦ deep profile</span>
+  <h1 class="intro-headline">
     Your MBTI tells you <em>how you think.</em><br/>
     Your Enneagram reveals <em>why.</em>
   </h1>
-  <p class="welcome-body">
-    Put them together and you stop getting generic personality labels — and start getting something specific enough to actually be useful. Knowing you're an ENFP is one thing. Knowing you're an ENFP Type 4w3 is a different thing entirely.
+  <p class="intro-body">
+    Put them together and you stop getting generic labels — and start getting something specific enough to actually be useful.
   </p>
-  <div class="welcome-meta">
+  <div class="intro-meta">
     <span class="meta-pill">⏱ ~8 minutes</span>
     <span class="meta-pill">✦ 144 profiles</span>
     <span class="meta-pill">free</span>
   </div>
-  <button class="btn-start" id="btn-start">Discover your profile →</button>
+  <button class="btn-primary" onclick="startAssessment()">Discover your profile →</button>
 </div>
 
-<!-- QUESTIONS -->
+<!-- ── QUESTIONS ── -->
 <div class="screen" id="screen-questions">
-  <div class="q-section-label" id="q-section-label">section</div>
-  <div class="q-text" id="q-text"></div>
+  <div id="section-label"></div>
+  <div id="q-text"></div>
+  <div id="scale-btns"></div>
   <div id="q-answer-area"></div>
+  <div id="q-banner"></div>
+  <button id="btn-back" onclick="goPrev()">← Back</button>
+  <button id="btn-next" onclick="goNext()">Next →</button>
 </div>
 
-<!-- RESULT -->
+<!-- ── CAPTURE ── -->
+<div class="screen" id="screen-capture">
+  <h2>One last thing</h2>
+  <p>Where should we send your profile?</p>
+  <div class="capture-field">
+    <input id="inp-first" type="text" placeholder="Your first name"/>
+    <div class="err-msg" id="err-first">Please enter your name</div>
+  </div>
+  <div class="capture-field">
+    <input id="inp-email" type="email" placeholder="Your email address"/>
+    <div class="err-msg" id="err-email">Please enter a valid email</div>
+  </div>
+  <button class="btn-primary" onclick="submitCapture()" style="margin-top:0.5rem">See my profile →</button>
+</div>
+
+<!-- ── RESULT ── -->
 <div class="screen" id="screen-result">
-  <div class="result-wrap" id="result-content"></div>
+  <div class="result-inner">
+    <div id="result-emoji"></div>
+    <div id="result-type"></div>
+    <div id="result-name"></div>
+    <div id="result-tagline"></div>
+
+    <div class="result-cards">
+      <div class="result-card">
+        <div class="rc-label">how you think — MBTI</div>
+        <div id="result-mbti-title"></div>
+        <div id="result-mbti-desc"></div>
+      </div>
+      <div class="result-card">
+        <div class="rc-label">why you do what you do</div>
+        <div id="result-enn-title"></div>
+        <div id="result-enn-desc"></div>
+      </div>
+    </div>
+
+    <div id="result-sections"></div>
+
+    <div id="result-growth" style="margin-top:0.85rem;padding:1.1rem 1.25rem;background:var(--dark-card);border:1px solid var(--border);border-radius:10px;font-size:.87rem;color:var(--text-muted);line-height:1.65;"></div>
+
+    <div class="result-ctas">
+      <a href="https://calendly.com/lukehaythorpe-orangery/first-flight-session" class="btn-cta">Book a First Flight →</a>
+      <button class="btn-cta-ghost" onclick="retake()">Retake assessment</button>
+    </div>
+  </div>
 </div>
 
 <script>
+
 
 const QUESTIONS = [{"title": "I value strength and independence in myself and others. (8)", "tag": "8", "section": 0}, {"title": "I\u2019d rather be direct and say what I think than hold back. (8)", "tag": "8", "section": 0}, {"title": "I don\u2019t let people see my weaknesses or vulnerabilities easily. (8)", "tag": "8", "section": 0}, {"title": "I hate being controlled or told what to do. (8)", "tag": "8", "section": 0}, {"title": "I stand up for myself and others when I see something unfair. (8)", "tag": "8", "section": 0}, {"title": "At a party, I love bouncing between groups, chatting with different people. (E)", "tag": "E", "section": 1}, {"title": "When I get excited about something, I can\u2019t wait to talk about it with my friends. (E)", "tag": "E", "section": 1}, {"title": "When I need to make a decision, I like to talk it through with people first. (E)", "tag": "E", "section": 1}, {"title": "I come up with my best ideas when I\u2019m around people, bouncing thoughts off them. (E)", "tag": "E", "section": 1}, {"title": "Being around people, making plans, and jumping into new experiences gives me energy. (E)", "tag": "E", "section": 1}, {"title": "Loyalty is super important to me in friendships and relationships. (6)", "tag": "6", "section": 2}, {"title": "I always want to have a backup plan in case something goes wrong. (6)", "tag": "6", "section": 2}, {"title": "I think through worst-case scenarios so I can be prepared. (6)", "tag": "6", "section": 2}, {"title": "I look for people I can trust to help guide me. (6)", "tag": "6", "section": 2}, {"title": "I second-guess myself a lot and sometimes need reassurance. (6)", "tag": "6", "section": 2}, {"title": "I push myself to stay disciplined and in control. (1)", "tag": "1", "section": 3}, {"title": "I struggle to relax because I always see things that could be improved. (1)", "tag": "1", "section": 3}, {"title": "I feel like things need to be done the \u201cright\u201d way, or it bothers me. (1)", "tag": "1", "section": 3}, {"title": "I often feel like I have to be the responsible one, even if no one else is. (1)", "tag": "1", "section": 3}, {"title": "It frustrates me when people ignore rules or don\u2019t try their best. (1)", "tag": "1", "section": 3}, {"title": "People would describe me as warm, empathetic, and understanding. (F)", "tag": "F", "section": 4}, {"title": "When I give feedback, I make sure to be encouraging and consider people\u2019s feelings. (F)", "tag": "F", "section": 4}, {"title": "When there\u2019s an argument, I try to make sure no one feels left out or hurt. (F)", "tag": "F", "section": 4}, {"title": "Success means doing what I love, feeling fulfilled, and making a difference. (F)", "tag": "F", "section": 4}, {"title": "I make decisions based on what feels right and how it affects people. (F)", "tag": "F", "section": 4}, {"title": "I like keeping things open and deciding in the moment. (P)", "tag": "P", "section": 5}, {"title": "I work best under last-minute pressure and deadlines. (P)", "tag": "P", "section": 5}, {"title": "I feel best when my day is open and I can go with whatever happens. (P)", "tag": "P", "section": 5}, {"title": "When I make a decision, I like to keep my options open as long as possible. (P)", "tag": "P", "section": 5}, {"title": "I prefer when I have freedom to figure things out my own way. (P)", "tag": "P", "section": 5}, {"title": "I feel hurt when I give a lot, but people don\u2019t return the same energy. (2)", "tag": "2", "section": 6}, {"title": "I put others first, even when I\u2019m exhausted or stressed. (2)", "tag": "2", "section": 6}, {"title": "I sometimes feel like I need to be needed to feel important. (2)", "tag": "2", "section": 6}, {"title": "I notice when someone needs help, even if they don\u2019t say anything. (2)", "tag": "2", "section": 6}, {"title": "I feel happiest when I know I\u2019ve made a difference for someone. (2)", "tag": "2", "section": 6}, {"title": "I love exploring creative ideas and imagining new possibilities. (N)", "tag": "N", "section": 7}, {"title": "I feel more comfortable when I can be flexible and go with the flow. (N)", "tag": "N", "section": 7}, {"title": "I trust my gut and the connections I make between ideas, even if I can\u2019t explain them right away. (N)", "tag": "N", "section": 7}, {"title": "I focus more on the bigger picture and what things mean rather than little details. (N)", "tag": "N", "section": 7}, {"title": "I\u2019d rather figure things out in my own way, even if I go off track. (N)", "tag": "N", "section": 7}, {"title": "I feel more comfortable when I have a plan and know what\u2019s coming next. (S)", "tag": "S", "section": 8}, {"title": "I like learning things that are useful and practical in real life. (S)", "tag": "S", "section": 8}, {"title": "I trust things I can see, test, and prove. (S)", "tag": "S", "section": 8}, {"title": "I notice small details and remember things exactly how they happened. (S)", "tag": "S", "section": 8}, {"title": "I like clear steps and instructions so I know exactly what to do. (S)", "tag": "S", "section": 8}, {"title": "When I get excited about something, I sit with it for a while before sharing. (I)", "tag": "I", "section": 9}, {"title": "I come up with my best ideas when I have space to think by myself. (I)", "tag": "I", "section": 9}, {"title": "At a party, I\u2019d rather stick with a few close friends or hang back and observe. (I)", "tag": "I", "section": 9}, {"title": "Having time to myself to chill, think, or focus on my own thing makes me feel recharged. (I)", "tag": "I", "section": 9}, {"title": "When I need to make a decision, I\u2019d rather think it through on my own first. (I)", "tag": "I", "section": 9}, {"title": "I worry about not having enough knowledge or resources to handle situations. (5)", "tag": "5", "section": 10}, {"title": "I need a lot of alone time to think, learn, or focus on my interests. (5)", "tag": "5", "section": 10}, {"title": "I feel drained if people demand too much of my time or emotions. (5)", "tag": "5", "section": 10}, {"title": "I feel uncomfortable if I don\u2019t fully understand something. (5)", "tag": "5", "section": 10}, {"title": "I prefer observing before jumping into social situations. (5)", "tag": "5", "section": 10}, {"title": "I tend to distract myself from hard emotions by staying busy. (7)", "tag": "7", "section": 11}, {"title": "I love being around positive, high-energy people. (7)", "tag": "7", "section": 11}, {"title": "I always have new ideas, goals, or projects I want to start. (7)", "tag": "7", "section": 11}, {"title": "I want to experience as many exciting and fun things as possible. (7)", "tag": "7", "section": 11}, {"title": "I get restless if my life feels boring or repetitive. (7)", "tag": "7", "section": 11}, {"title": "I sometimes go along with what others want just to keep the vibe chill. (9)", "tag": "9", "section": 12}, {"title": "I avoid conflict whenever I can and just want things to be peaceful. (9)", "tag": "9", "section": 12}, {"title": "I like a relaxed, low-stress life where I can go with the flow. (9)", "tag": "9", "section": 12}, {"title": "I can see different sides of a situation and don\u2019t like taking a strong stance. (9)", "tag": "9", "section": 12}, {"title": "I struggle to speak up for myself, even when I know I should. (9)", "tag": "9", "section": 12}, {"title": "When I give feedback, I focus on what could be improved and how to fix it. (T)", "tag": "T", "section": 13}, {"title": "When there\u2019s an argument, I focus on finding the fairest and most logical solution. (T)", "tag": "T", "section": 13}, {"title": "Success means hitting my goals, proving myself, and getting results. (T)", "tag": "T", "section": 13}, {"title": "I make decisions based on logic, facts, and what makes the most sense. (T)", "tag": "T", "section": 13}, {"title": "People would describe me as direct, logical, and objective. (T)", "tag": "T", "section": 13}, {"title": "I can adapt to different situations to make a good impression. (3)", "tag": "3", "section": 14}, {"title": "I get frustrated when I don\u2019t meet my own expectations. (3)", "tag": "3", "section": 14}, {"title": "I set big goals for myself and push hard to succeed. (3)", "tag": "3", "section": 14}, {"title": "I worry that if I don\u2019t accomplish enough, people won\u2019t respect me. (3)", "tag": "3", "section": 14}, {"title": "I like being recognized for my hard work and achievements. (3)", "tag": "3", "section": 14}, {"title": "I feel best when my day is structured and predictable. (J)", "tag": "J", "section": 15}, {"title": "When I make a decision, I like to lock it in and move forward. (J)", "tag": "J", "section": 15}, {"title": "I like finishing tasks early so I can check them off my list. (J)", "tag": "J", "section": 15}, {"title": "I prefer when there are clear rules, expectations, and structure. (J)", "tag": "J", "section": 15}, {"title": "I like having my schedule planned out so I know exactly what\u2019s happening. (J)", "tag": "J", "section": 15}, {"title": "I want to stand out and be different from the crowd. (4)", "tag": "4", "section": 16}, {"title": "I\u2019m drawn to creativity, music, or anything that helps me express emotions. (4)", "tag": "4", "section": 16}, {"title": "I have deep emotions, and I need time alone to process them. (4)", "tag": "4", "section": 16}, {"title": "I often feel misunderstood, like people don\u2019t really see the real me. (4)", "tag": "4", "section": 16}, {"title": "I want to express myself in a way that feels 100% real. (4)", "tag": "4", "section": 16}];
 const BANNERS = ["Section 1 of 17 \u2014 just getting started. Answer with your gut.", "Section 2 of 17 \u2014 no right or wrong answers here. Go with what feels true.", "Section 3 of 17 \u2014 still early. Stay honest and keep going.", "Section 4 of 17 \u2014 you're finding your rhythm now.", "Section 5 of 17 \u2014 almost a third of the way there.", "Section 6 of 17 \u2014 past the first third. Keep trusting your instincts.", "Section 7 of 17 \u2014 getting into the heart of it now.", "Section 8 of 17 \u2014 nearly halfway. You're doing great.", "Section 9 of 17 \u2014 halfway through. Your profile is taking shape.", "Section 10 of 17 \u2014 past the halfway point. Keep going.", "Section 11 of 17 \u2014 more than halfway done. Stay with it.", "Section 12 of 17 \u2014 in the home stretch now.", "Section 13 of 17 \u2014 three quarters done. Nearly there.", "Section 14 of 17 \u2014 just a few sections left.", "Section 15 of 17 \u2014 almost at the finish line.", "Section 16 of 17 \u2014 one more after this. Keep going.", "Section 17 of 17 \u2014 last section. Finish strong."];
@@ -747,228 +840,6 @@ function retake() {
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/4.3.9/iframeResizer.contentWindow.min.js">
 
-// ── Mirror-style UI override ────────────────────────────────────────────────
-
-const SECTION_LABELS = [
-  'who drives you',
-  'your energy',
-  'how you take in the world',
-  'head or heart',
-  'structure or flow',
-];
-
-function goToScreen(id) {
-  document.querySelectorAll('.screen').forEach(function(s) {
-    s.classList.remove('active', 'entering');
-  });
-  var el = document.getElementById(id);
-  requestAnimationFrame(function() {
-    el.classList.add('active', 'entering');
-  });
-}
-
-function startQuiz() {
-  answers = new Array(85).fill(0);
-  currentQ = 0;
-  quizComplete = false;
-  userName = '';
-  userEmail = '';
-  goToScreen('screen-questions');
-  document.getElementById('q-count').style.display = 'block';
-  renderQuestion();
-}
-
-function updateProgress() {
-  var pct = (currentQ / QUESTIONS.length) * 100;
-  document.getElementById('progress-bar').style.width = pct + '%';
-  document.getElementById('q-count').textContent = (currentQ + 1) + ' / ' + QUESTIONS.length;
-}
-
-function renderQuestion() {
-  if (currentQ >= QUESTIONS.length) {
-    document.getElementById('q-count').style.display = 'none';
-    document.getElementById('progress-bar').style.width = '100%';
-    if (!quizComplete) {
-      quizComplete = true;
-      computeResult();
-      showResult();
-      goToScreen('screen-result');
-    }
-    return;
-  }
-
-  updateProgress();
-  var q = QUESTIONS[currentQ];
-  var sectionLabel = document.getElementById('q-section-label');
-  var qText = document.getElementById('q-text');
-  var answerArea = document.getElementById('q-answer-area');
-
-  sectionLabel.textContent = SECTION_LABELS[q.section] || 'reflect';
-
-  // Clean question text (strip tag in parens at end)
-  var cleanText = q.title.replace(/\s*\([^)]+\)\s*$/, '');
-  qText.textContent = '\u201C' + cleanText + '\u201D';
-
-  answerArea.innerHTML = '';
-
-  if (q.section === 0) {
-    // Enneagram: 4-point scale
-    var scale = document.createElement('div');
-    scale.className = 'q-scale';
-    var opts = [
-      { val: 1, label: 'not me' },
-      { val: 2, label: 'slightly' },
-      { val: 3, label: 'mostly' },
-      { val: 4, label: 'very me' },
-    ];
-    opts.forEach(function(o) {
-      var btn = document.createElement('button');
-      btn.className = 'q-scale-btn';
-      btn.innerHTML = '<span class="q-scale-num">' + o.val + '</span><span class="q-scale-label">' + o.label + '</span>';
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('.q-scale-btn').forEach(function(b) { b.classList.remove('selected'); });
-        btn.classList.add('selected');
-        var capturedQ = currentQ;
-        answers[capturedQ] = o.val;
-        setTimeout(function() {
-          if (currentQ === capturedQ) {
-            currentQ++;
-            renderQuestion();
-          }
-        }, 320);
-      });
-      scale.appendChild(btn);
-    });
-    answerArea.appendChild(scale);
-
-  } else {
-    // MBTI: binary choice
-    answerArea.className = 'q-options';
-    var choices = getBinaryChoices(q.tag);
-    var letters = ['A', 'B'];
-    choices.forEach(function(choice, i) {
-      var btn = document.createElement('button');
-      btn.className = 'q-opt';
-      btn.innerHTML =
-        '<span class="q-opt-letter">' + letters[i] + '</span>' +
-        '<span class="q-opt-text">' + choice.text + '</span>';
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('.q-opt').forEach(function(b) { b.classList.remove('selected'); });
-        btn.classList.add('selected');
-        var capturedQ = currentQ;
-        answers[capturedQ] = choice.val;
-        setTimeout(function() {
-          if (currentQ === capturedQ) {
-            currentQ++;
-            renderQuestion();
-          }
-        }, 320);
-      });
-      answerArea.appendChild(btn);
-    });
-  }
-}
-
-function getBinaryChoices(tag) {
-  var pairs = {
-    'E': [
-      { text: 'I get energised by being around people and talking things through', val: 2 },
-      { text: 'I get energised by time alone and prefer to think before I speak', val: 1 },
-    ],
-    'I': [
-      { text: 'I prefer quiet, one-on-one conversations over big groups', val: 2 },
-      { text: 'I enjoy lively group settings and find them energising', val: 1 },
-    ],
-    'N': [
-      { text: 'I love exploring ideas, patterns, and what could be', val: 2 },
-      { text: 'I prefer practical, concrete information and what actually is', val: 1 },
-    ],
-    'S': [
-      { text: 'I trust experience and facts more than hunches and theories', val: 2 },
-      { text: "I'm drawn to possibilities and tend to think in the big picture", val: 1 },
-    ],
-    'F': [
-      { text: 'When making decisions, people and values matter most to me', val: 2 },
-      { text: 'When making decisions, logic and consistency matter most to me', val: 1 },
-    ],
-    'T': [
-      { text: 'I tend to prioritise logic and fairness over personal feelings', val: 2 },
-      { text: 'I tend to consider how decisions will affect people emotionally', val: 1 },
-    ],
-    'P': [
-      { text: 'I like to keep options open and adapt as things unfold', val: 2 },
-      { text: 'I prefer to have things settled, planned, and decided', val: 1 },
-    ],
-    'J': [
-      { text: 'I like having structure, schedules, and clear plans', val: 2 },
-      { text: 'I prefer flexibility and like to improvise as I go', val: 1 },
-    ],
-  };
-  return pairs[tag] || [
-    { text: 'More like this', val: 2 },
-    { text: 'Less like this', val: 1 },
-  ];
-}
-
-function showResult() {
-  var mbti = resultMBTI, enn = resultEnn;
-  var key = mbti + '_' + enn;
-  var profile = PROFILE_CONTENT[key] || {};
-  var mbtiInfo = MBTI_INFO[mbti] || {};
-
-  var strengths = (profile.strengths || '').split(' | ');
-  var challenges = (profile.challenges || '').split(' | ');
-  var voices = (profile.voices || '').split(', ');
-
-  var html =
-    '<div class="result-type-badge">\u2714 ' + mbti + ' \u00B7 type ' + enn + '</div>' +
-    '<h1 class="result-name">' + (profile.name || 'Your Profile') + '</h1>' +
-    '<p class="result-tagline">' + (profile.tagline || '') + '</p>' +
-    '<div class="result-tags">' + voices.map(function(v) { return '<span class="result-tag">' + v + '</span>'; }).join('') + '</div>' +
-    '<div class="result-cards">' +
-      '<div class="result-card">' +
-        '<p class="result-card-label">how you think \u2014 MBTI</p>' +
-        '<p class="result-card-value"><strong>' + mbti + '</strong> ' + (mbtiInfo.title || '') + '<br/><span style="color:var(--text-muted);font-size:.85rem">' + (mbtiInfo.desc || '') + '</span></p>' +
-      '</div>' +
-      '<div class="result-card">' +
-        '<p class="result-card-label">why you do what you do</p>' +
-        '<p class="result-card-value"><strong>Type ' + enn + '</strong><br/><span style="color:var(--text-muted);font-size:.85rem">' + (profile.growth || '') + '</span></p>' +
-      '</div>' +
-      '<div class="result-card full">' +
-        '<p class="result-card-label">your strengths</p>' +
-        '<p class="result-card-value">' + strengths.map(function(s) { return '\u2726 ' + s; }).join('<br/>') + '</p>' +
-      '</div>' +
-      '<div class="result-card full">' +
-        '<p class="result-card-label">what to watch</p>' +
-        '<p class="result-card-value">' + challenges.map(function(c) { return '\u00B7 ' + c; }).join('<br/>') + '</p>' +
-      '</div>' +
-      '<div class="result-card full">' +
-        '<p class="result-card-label">how you see the world</p>' +
-        '<p class="result-card-value">' + (profile.world || '').split(' | ').join('<br/>') + '</p>' +
-      '</div>' +
-      '<div class="result-card full">' +
-        '<p class="result-card-label">under pressure</p>' +
-        '<p class="result-card-value">' + (profile.stress || '') + '</p>' +
-      '</div>' +
-    '</div>' +
-    '<div style="margin-top:1.5rem">' +
-      '<a href="https://calendly.com/lukehaythorpe-orangery/first-flight-session" class="result-cta">Book a First Flight \u2192</a>' +
-      '<button class="result-cta-ghost" onclick="startAssessment()">Retake the assessment</button>' +
-    '</div>';
-
-  document.getElementById('result-content').innerHTML = html;
-  document.getElementById('result-content').scrollTop = 0;
-}
-
-// Wire up button after DOM ready
-document.addEventListener('DOMContentLoaded', function() {
-  var startBtn = document.getElementById('btn-start');
-  if (startBtn) {
-    startBtn.addEventListener('click', function() {
-      startAssessment();
-    });
-  }
-});
 
 </script>
 </body>
