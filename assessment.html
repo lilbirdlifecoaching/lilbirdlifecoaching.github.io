@@ -537,9 +537,7 @@ let quizComplete = false;
 
 // ── NAVIGATION ────────────────────────────────────────────────────────────────
 function goToScreen(id) {
-  document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
-  document.getElementById(id).classList.add('active');
-  window.scrollTo({top: 0, behavior: 'smooth'});
+  // Legacy stub - overridden below
 }
 
 
@@ -772,7 +770,12 @@ function goToScreen(id) {
 }
 
 function startQuiz() {
-  resetQuiz();
+  // Reset state
+  answers = new Array(85).fill(0);
+  currentQ = 0;
+  quizComplete = false;
+  userName = '';
+  userEmail = '';
   goToScreen('screen-questions');
   document.getElementById('q-count').style.display = 'block';
   renderQuestion();
