@@ -471,7 +471,7 @@
     <span class="meta-pill">✦ 144 profiles</span>
     <span class="meta-pill">free</span>
   </div>
-  <button class="btn-start" onclick="startQuiz()">Discover your profile →</button>
+  <button class="btn-start" id="btn-start">Discover your profile →</button>
 </div>
 
 <!-- QUESTIONS -->
@@ -760,10 +760,8 @@ const SECTION_LABELS = [
 function goToScreen(id) {
   document.querySelectorAll('.screen').forEach(s => {
     s.classList.remove('active', 'entering');
-    s.style.display = 'none';
   });
   const el = document.getElementById(id);
-  el.style.display = 'flex';
   requestAnimationFrame(() => {
     el.classList.add('active', 'entering');
   });
@@ -958,6 +956,14 @@ function showResult() {
   document.getElementById('result-content').innerHTML = html;
   document.getElementById('result-content').scrollTop = 0;
 }
+
+// ── Wire up button after DOM ready ──────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  var startBtn = document.getElementById('btn-start');
+  if (startBtn) {
+    startBtn.addEventListener('click', startQuiz);
+  }
+});
 </script>
 </body>
 </html>
