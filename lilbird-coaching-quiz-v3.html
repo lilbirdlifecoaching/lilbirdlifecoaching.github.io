@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>lil' bird | am I a fit?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --dark: #1e2028;
+      --dark-mid: #252830;
+      --dark-card: #2a2d38;
+      --gold: #F5C842;
+      --gold-dim: #c9a130;
+      --ember: #e8734a;
+      --green: #5cba7a;
+      --text: #f0ead8;
+      --text-muted: #a09880;
+      --border: rgba(245,200,66,0.15);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--dark);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 1000; opacity: 0.5;
+    }
+
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      padding: 1.25rem 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      z-index: 50;
+      background: linear-gradient(to bottom, rgba(30,32,40,0.95), transparent);
+    }
+    .nav-logo { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+    .nav-logo img { width: 28px; height: 28px; border-radius: 6px; object-fit: cover; }
+    .nav-logo span { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1rem; color: var(--gold); }
+    #q-count {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--text-muted); display: none;
+    }
+
+    .progress-wrap {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 2px; background: rgba(245,200,66,0.1); z-index: 100;
+    }
+    #progress-fill { height: 100%; background: var(--gold); width: 0%; transition: width 0.4s ease; }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ── INTRO ── */
+    #screen-intro {
+      min-height: 100vh; display: none; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 5rem 2rem 3rem;
+    }
+    #screen-intro.active { display: flex; }
+    .intro-tag {
+      font-family: 'DM Mono', monospace; font-size: 0.62rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--gold); background: rgba(245,200,66,0.08);
+      border: 1px solid rgba(245,200,66,0.2);
+      padding: 0.35rem 0.9rem; border-radius: 100px;
+      margin-bottom: 2rem; display: inline-block;
+    }
+    .intro-headline {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 4.5vw, 3rem); font-weight: 400;
+      line-height: 1.25; max-width: 620px; margin: 0 auto 1.5rem;
+    }
+    .intro-headline em { font-style: italic; color: var(--gold); }
+    .intro-body {
+      font-size: 1rem; line-height: 1.75; color: var(--text-muted);
+      max-width: 500px; margin: 0 auto 2.5rem;
+    }
+    .intro-meta {
+      display: flex; gap: 0.75rem; justify-content: center;
+      flex-wrap: wrap; margin-bottom: 2.5rem;
+    }
+    .meta-pill {
+      font-family: 'DM Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-muted); background: var(--dark-card);
+      border: 1px solid var(--border); padding: 0.35rem 0.85rem; border-radius: 100px;
+    }
+    .btn-primary {
+      background: var(--gold); color: var(--dark); border: none;
+      padding: 0.9rem 2.5rem; border-radius: 6px;
+      font-family: 'DM Mono', monospace; font-size: 0.72rem;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      cursor: pointer; transition: background 0.2s, transform 0.2s; font-weight: 500;
+    }
+    .btn-primary:hover { background: #fff; transform: translateY(-2px); }
+
+    /* ── QUESTIONS ── */
+    #screen-questions {
+      min-height: 100vh; display: none; flex-direction: column;
+      align-items: center; justify-content: center; padding: 5rem 2rem;
+    }
+    #screen-questions.active { display: flex; }
+
+    #section-label {
+      font-family: 'DM Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 2rem;
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    #section-label::before, #section-label::after {
+      content: ''; display: block; height: 1px; width: 20px; background: var(--border);
+    }
+    #q-text {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.3rem, 3vw, 2rem); font-style: italic; font-weight: 400;
+      text-align: center; line-height: 1.45;
+      max-width: 620px; margin-bottom: 2.5rem; color: var(--text);
+    }
+
+    .q-wrap { display: flex; flex-direction: column; gap: 0.75rem; max-width: 520px; width: 100%; }
+    .choice-btn {
+      background: var(--dark-card); border: 1px solid var(--border); border-radius: 10px;
+      padding: 1rem 1.25rem; cursor: pointer; text-align: left;
+      font-family: 'DM Sans', sans-serif; font-size: 0.9rem; color: var(--text);
+      line-height: 1.55; transition: all 0.2s;
+      display: flex; align-items: center; gap: 0.85rem;
+    }
+    .choice-btn:hover { border-color: rgba(245,200,66,0.4); background: rgba(245,200,66,0.05); transform: translateX(4px); }
+    .choice-btn.selected { border-color: var(--gold); background: rgba(245,200,66,0.1); }
+    .choice-letter {
+      width: 26px; height: 26px; border-radius: 50%;
+      border: 1px solid var(--border); display: flex; align-items: center;
+      justify-content: center; font-family: 'DM Mono', monospace;
+      font-size: 0.62rem; color: var(--text-muted); flex-shrink: 0; transition: all 0.2s;
+    }
+    .choice-btn.selected .choice-letter { background: var(--gold); border-color: var(--gold); color: var(--dark); }
+
+    #btn-back, #btn-next {
+      display: none; background: none; border: 1px solid var(--border);
+      border-radius: 6px; padding: 0.6rem 1.25rem; color: var(--text-muted);
+      font-family: 'DM Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: pointer; margin-top: 1.5rem; transition: all 0.2s;
+    }
+    #btn-next { background: var(--gold); color: var(--dark); border-color: var(--gold); }
+    #btn-back:hover { border-color: var(--gold); color: var(--gold); }
+    #btn-next:hover { background: #fff; }
+
+    #q-banner {
+      font-family: 'DM Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--gold-dim); margin-top: 1.5rem; min-height: 1.2em;
+    }
+
+    /* ── CAPTURE ── */
+    #screen-capture {
+      min-height: 100vh; display: none; flex-direction: column;
+      align-items: center; justify-content: center; padding: 5rem 2rem; text-align: center;
+    }
+    #screen-capture.active { display: flex; }
+    #screen-capture h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.5rem, 3vw, 2.2rem); font-style: italic; margin-bottom: 0.75rem;
+    }
+    #screen-capture p { color: var(--text-muted); margin-bottom: 2rem; line-height: 1.7; }
+    .capture-field { width: 100%; max-width: 400px; margin-bottom: 1rem; }
+    .capture-field input {
+      width: 100%; background: var(--dark-card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.8rem 1rem; color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: 0.9rem; outline: none;
+    }
+    .capture-field input:focus { border-color: var(--gold); }
+    .capture-field input::placeholder { color: var(--text-muted); }
+    .err-msg { font-size: 0.75rem; color: var(--ember); margin-top: 0.25rem; display: none; text-align: left; }
+    .capture-note {
+      font-family: 'DM Mono', monospace; font-size: 0.58rem;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--text-muted); margin-top: 1.25rem; opacity: 0.7;
+    }
+
+    /* ── RESULT ── */
+    #screen-result {
+      min-height: 100vh; display: none; flex-direction: column;
+      align-items: center; padding: 6rem 2rem 4rem;
+    }
+    #screen-result.active { display: flex; }
+    .result-inner { max-width: 680px; width: 100%; }
+
+    .result-badge-pill {
+      font-family: 'DM Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      padding: 0.35rem 0.9rem; border-radius: 100px; display: inline-block;
+      margin-bottom: 1.25rem;
+    }
+    .badge-yes { background: rgba(92,186,122,0.1); border: 1px solid rgba(92,186,122,0.3); color: var(--green); }
+    .badge-maybe { background: rgba(232,115,74,0.1); border: 1px solid rgba(232,115,74,0.3); color: var(--ember); }
+    .badge-not-yet { background: rgba(245,200,66,0.08); border: 1px solid rgba(245,200,66,0.2); color: var(--gold-dim); }
+
+    #result-name {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 700; line-height: 1.2; margin-bottom: 0.5rem;
+    }
+    #result-tagline {
+      font-size: 1rem; color: var(--text-muted); line-height: 1.7;
+      margin-bottom: 2rem; max-width: 560px; font-style: italic;
+    }
+
+    .result-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; margin-bottom: 1rem; }
+    @media(max-width:560px) { .result-cards { grid-template-columns: 1fr; } }
+    .result-card {
+      background: var(--dark-card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.1rem 1.25rem;
+    }
+    .result-card.full { grid-column: 1 / -1; }
+    .rc-label {
+      font-family: 'DM Mono', monospace; font-size: 0.57rem;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--gold-dim); margin-bottom: 0.5rem;
+    }
+    .rc-title { font-family: 'Playfair Display', serif; font-size: 1.05rem; color: var(--gold); margin-bottom: 0.25rem; }
+    .rc-body { font-size: 0.87rem; line-height: 1.6; color: var(--text-muted); }
+
+    #result-sections { margin-top: 0.85rem; display: flex; flex-direction: column; gap: 0.85rem; }
+    .result-section {
+      background: var(--dark-card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.1rem 1.25rem;
+    }
+    .result-section-label {
+      font-family: 'DM Mono', monospace; font-size: 0.57rem;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--gold-dim); margin-bottom: 0.5rem;
+    }
+    .result-section-text { font-size: 0.87rem; line-height: 1.65; color: var(--text-muted); }
+
+    .dim-row { margin-bottom: 0.75rem; }
+    .dim-meta { display: flex; justify-content: space-between; margin-bottom: 4px; }
+    .dim-name { font-size: 0.8rem; color: var(--text-muted); }
+    .dim-pct { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--gold-dim); }
+    .dim-track { height: 2px; background: rgba(245,200,66,0.1); border-radius: 1px; overflow: hidden; }
+    .dim-fill { height: 100%; background: var(--gold); border-radius: 1px; width: 0; transition: width 0.7s ease; }
+
+    /* objection card — highlighted */
+    .objection-card {
+      background: rgba(245,200,66,0.05);
+      border: 1px solid rgba(245,200,66,0.25);
+      border-radius: 10px; padding: 1.1rem 1.25rem;
+      margin-top: 0.85rem;
+    }
+    .objection-card .rc-label { color: var(--gold); }
+    .objection-card .rc-body { color: var(--text); font-size: 0.9rem; line-height: 1.65; }
+
+    .result-ctas { margin-top: 2rem; display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .btn-cta {
+      background: var(--gold); color: var(--dark); border: none;
+      padding: 0.85rem 1.75rem; border-radius: 6px;
+      font-family: 'DM Mono', monospace; font-size: 0.68rem;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      cursor: pointer; text-decoration: none; transition: background 0.2s; display: inline-block;
+    }
+    .btn-cta:hover { background: #fff; }
+    .btn-cta-ghost {
+      background: transparent; border: 1px solid var(--border); color: var(--text-muted);
+      padding: 0.85rem 1.75rem; border-radius: 6px;
+      font-family: 'DM Mono', monospace; font-size: 0.68rem;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-cta-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* capture status */
+    #capture-status {
+      font-family: 'DM Mono', monospace; font-size: 0.58rem;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--green); margin-top: 0.5rem; display: none;
+    }
+
+    @media(max-width:480px) {
+      .nav { padding: 1rem; }
+      #screen-intro, #screen-questions, #screen-capture, #screen-result { padding-left: 1.25rem; padding-right: 1.25rem; }
+    }
+
+    /* ── DISCOUNT MODAL ── */
+    #modal-overlay {
+      position: fixed; inset: 0; z-index: 500;
+      background: rgba(10, 11, 15, 0.82);
+      display: none; align-items: center; justify-content: center;
+      padding: 1.5rem;
+    }
+    #modal-overlay.open { display: flex; }
+    #modal-box {
+      background: var(--dark-card);
+      border: 1px solid rgba(245,200,66,0.3);
+      border-radius: 14px;
+      padding: 2.25rem 2rem;
+      max-width: 420px; width: 100%;
+      text-align: center;
+      position: relative;
+    }
+    #modal-close {
+      position: absolute; top: 1rem; right: 1.1rem;
+      background: none; border: none; color: var(--text-muted);
+      font-size: 1.1rem; cursor: pointer; line-height: 1;
+      font-family: 'DM Mono', monospace;
+    }
+    #modal-close:hover { color: var(--text); }
+    .modal-tag {
+      font-family: 'DM Mono', monospace; font-size: 0.58rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--gold); background: rgba(245,200,66,0.08);
+      border: 1px solid rgba(245,200,66,0.2);
+      padding: 0.3rem 0.8rem; border-radius: 100px;
+      display: inline-block; margin-bottom: 1.25rem;
+    }
+    .modal-headline {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; font-weight: 400; line-height: 1.3;
+      margin-bottom: 0.6rem; color: var(--text);
+    }
+    .modal-headline em { font-style: italic; color: var(--gold); }
+    .modal-sub {
+      font-size: 0.87rem; color: var(--text-muted);
+      line-height: 1.65; margin-bottom: 1.75rem;
+    }
+    .modal-code-wrap {
+      background: var(--dark-mid);
+      border: 1px dashed rgba(245,200,66,0.35);
+      border-radius: 8px; padding: 0.85rem 1.25rem;
+      margin-bottom: 1.5rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .modal-code {
+      font-family: 'DM Mono', monospace;
+      font-size: 1.3rem; letter-spacing: 0.15em;
+      color: var(--gold); font-weight: 400;
+    }
+    .modal-copy-btn {
+      font-family: 'DM Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      background: none; border: 1px solid var(--border);
+      color: var(--text-muted); padding: 0.35rem 0.7rem;
+      border-radius: 4px; cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    }
+    .modal-copy-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .modal-copy-btn.copied { border-color: var(--green); color: var(--green); }
+    .modal-saving {
+      font-size: 0.78rem; color: var(--text-muted); margin-bottom: 1.5rem;
+    }
+    .modal-saving strong { color: var(--green); }
+    .modal-cta {
+      display: block; width: 100%;
+      background: var(--gold); color: var(--dark); border: none;
+      padding: 0.9rem; border-radius: 6px;
+      font-family: 'DM Mono', monospace; font-size: 0.7rem;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      cursor: pointer; text-decoration: none;
+      transition: background 0.2s; font-weight: 500;
+    }
+    .modal-cta:hover { background: #fff; }
+    .modal-skip {
+      display: block; margin-top: 1rem;
+      font-family: 'DM Mono', monospace; font-size: 0.58rem;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--text-muted); cursor: pointer;
+      background: none; border: none;
+    }
+    .modal-skip:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+
+<div class="progress-wrap"><div id="progress-fill"></div></div>
+
+<nav class="nav">
+  <a href="#" class="nav-logo">
+    <img src="data:image/png;base64,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" alt="lil' bird"/>
+    <span>lil' bird</span>
+  </a>
+  <span id="q-count"></span>
+</nav>
+
+<!-- INTRO -->
+<div class="screen active" id="screen-intro">
+  <span class="intro-tag">✦ coaching fit quiz</span>
+  <h1 class="intro-headline">
+    Something is pulling you here.<br/>
+    Let's find out <em>if now is the moment.</em>
+  </h1>
+  <p class="intro-body">
+    Seven honest questions. No sales pitch. Just a clear read on where you are and whether coaching could actually move the needle for you right now.
+  </p>
+  <div class="intro-meta">
+    <span class="meta-pill">⏱ ~2 minutes</span>
+    <span class="meta-pill">✦ 3 outcomes</span>
+    <span class="meta-pill">honest results</span>
+  </div>
+  <button class="btn-primary" id="btn-start">Find out if I'm ready →</button>
+</div>
+
+<!-- QUESTIONS -->
+<div class="screen" id="screen-questions">
+  <div id="section-label"></div>
+  <div id="q-text"></div>
+  <div id="q-answer-area"></div>
+  <div id="q-banner"></div>
+  <button id="btn-back" onclick="goPrev()">← Back</button>
+  <button id="btn-next" onclick="goNext()">Next →</button>
+</div>
+
+<!-- CAPTURE -->
+<div class="screen" id="screen-capture">
+  <h2>One last thing</h2>
+  <p>Drop your details and we'll show your results right here.<br/>You'll also get occasional insights from lil' bird — no noise, just the good stuff.</p>
+  <div class="capture-field">
+    <input id="inp-first" type="text" placeholder="Your first name"/>
+    <div class="err-msg" id="err-first">Please enter your name</div>
+  </div>
+  <div class="capture-field">
+    <input id="inp-email" type="email" placeholder="Your email address"/>
+    <div class="err-msg" id="err-email">Please enter a valid email</div>
+  </div>
+  <button class="btn-primary" onclick="submitCapture()" style="margin-top:0.5rem">See my results →</button>
+  <p class="capture-note">No spam. Unsubscribe any time.</p>
+</div>
+
+<!-- RESULT -->
+<div class="screen" id="screen-result">
+  <div class="result-inner">
+    <div id="result-badge"></div>
+    <div id="result-name"></div>
+    <div id="result-tagline"></div>
+    <div class="result-cards" id="result-cards"></div>
+    <div id="result-sections"></div>
+    <div id="objection-block"></div>
+    <div class="result-ctas" id="result-ctas"></div>
+  </div>
+</div>
+
+<!-- DISCOUNT MODAL -->
+<div id="modal-overlay" role="dialog" aria-modal="true" aria-label="First Flight discount">
+  <div id="modal-box">
+    <button id="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
+    <div class="modal-tag">✦ reader discount</div>
+    <h2 class="modal-headline">25% off your<br/><em>First Flight</em></h2>
+    <p class="modal-sub">Because you showed up and did the work. Use this code at checkout on Calendly to take $75 off — bringing your First Flight to <strong style="color:var(--text)">$224</strong>.</p>
+    <div class="modal-code-wrap">
+      <span class="modal-code">IMREADY</span>
+      <button class="modal-copy-btn" id="copy-btn" onclick="copyCode()">Copy code</button>
+    </div>
+    <p class="modal-saving">That's a 2-hour session for <strong>$224</strong> — normally $299.</p>
+    <a href="https://calendly.com/lukehaythorpe-orangery/first-flight-session" target="_blank" class="modal-cta" onclick="closeModal()">Book now with code →</a>
+    <button class="modal-skip" onclick="closeModal()">I'll book without the discount</button>
+  </div>
+</div>
+
+<script>
+
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwaLXyQoERqfQ0Dlj0lGCN0TTy-m9aS2GiUmm5l5mOtTbysX5A2gJ5HZPEb9z9mEAvnQg/exec';
+const BEEHIIV_PUBLICATION_ID = 'YOUR_BEEHIIV_PUBLICATION_ID'; // e.g. pub_xxxxxxxx
+const BEEHIIV_API_KEY        = 'YOUR_BEEHIIV_API_KEY';        // keep private — swap for Apps Script proxy if needed
+
+const FREE_CALL_URL  = 'https://calendly.com/lukehaythorpe-orangery/30min';
+const PAID_CALL_URL  = 'https://calendly.com/lukehaythorpe-orangery/first-flight-session';
+
+// ── QUESTIONS ─────────────────────────────────────────────────────────────────
+const QUESTIONS = [
+  {
+    text: "When you think about where you are right now — which best describes you?",
+    opts: [
+      { text: "I'm in a real season of transition — new role, new chapter, something just shifted", score: 3 },
+      { text: "I'm moving forward but I keep hitting the same wall", score: 2 },
+      { text: "Things are fine on paper, but something feels off underneath", score: 2 },
+      { text: "Honestly, things are pretty good right now", score: 0 }
+    ],
+    dim: "readiness"
+  },
+  {
+    text: "What's your relationship with change?",
+    opts: [
+      { text: "I initiate it — I'm usually ahead of it before it arrives", score: 1 },
+      { text: "I adapt well once I understand why it's happening", score: 2 },
+      { text: "I want to change but I get in my own way", score: 3 },
+      { text: "I avoid it unless I absolutely have to", score: 1 }
+    ],
+    dim: "openness"
+  },
+  {
+    text: "What's your honest relationship with self-awareness?",
+    opts: [
+      { text: "I know myself well — I just need help acting on what I know", score: 3 },
+      { text: "I have blindspots I know I'm not seeing", score: 3 },
+      { text: "I'm not sure — I don't spend much time thinking about it", score: 1 },
+      { text: "I've done a lot of work here and feel pretty grounded", score: 2 }
+    ],
+    dim: "self-awareness"
+  },
+  {
+    text: "What holds you back from getting support like coaching?",
+    opts: [
+      { text: "It feels too expensive for where I'm at right now", score: 1, objection: "cost" },
+      { text: "I don't feel 'bad enough' to need it", score: 2, objection: "threshold" },
+      { text: "I'm used to figuring things out on my own", score: 2, objection: "independence" },
+      { text: "Honestly, not much — I'm open to it", score: 3, objection: "none" }
+    ],
+    dim: "openness",
+    isObjection: true
+  },
+  {
+    text: "When it comes to investing in yourself — how do you think about it?",
+    opts: [
+      { text: "I've invested before and I take it seriously", score: 3 },
+      { text: "I want to but I haven't found the right fit yet", score: 2 },
+      { text: "I'm open to it — this quiz is me testing the waters", score: 2 },
+      { text: "It's hard to justify financially or emotionally right now", score: 0 }
+    ],
+    dim: "investment"
+  },
+  {
+    text: "How honest are you willing to be in a coaching relationship?",
+    opts: [
+      { text: "Fully honest — even if it's uncomfortable", score: 3 },
+      { text: "Mostly honest, with a little guard up at first", score: 2 },
+      { text: "I'd need to build trust first before I really opened up", score: 2 },
+      { text: "I tend to keep things pretty surface-level", score: 0 }
+    ],
+    dim: "openness"
+  },
+  {
+    text: "What's the real reason you're here right now?",
+    opts: [
+      { text: "Something in me knows I need this — I'm ready to do the work", score: 3 },
+      { text: "Someone suggested coaching and I'm curious what it could do", score: 2 },
+      { text: "I'm researching options — not quite decided yet", score: 1 },
+      { text: "Just poking around, no real agenda", score: 0 }
+    ],
+    dim: "readiness"
+  }
+];
+
+const OBJECTION_RESPONSES = {
+  cost: {
+    label: "💬 On the cost question",
+    text: "Coaching is an investment — that's real. But the free discovery call exists precisely for this: to have an honest conversation about what's possible, what it costs, and whether the timing actually works. No pressure, no pitch."
+  },
+  threshold: {
+    label: "💬 You don't have to be in crisis",
+    text: "Coaching isn't triage. The people who get the most out of it aren't falling apart — they're functioning well and ready to go further. You don't need to hit rock bottom to deserve support."
+  },
+  independence: {
+    label: "💬 On figuring things out alone",
+    text: "That's actually a strength. But there's a difference between solving problems and seeing yourself clearly. A good coach isn't there to fix you — they're there to help you see what you can't see when you're inside the picture."
+  },
+  none: {
+    label: "✦ That openness matters",
+    text: "The people who get the most from coaching are the ones willing to show up without already knowing the answer. That's you."
+  }
+};
+
+const LETTERS = ['A','B','C','D'];
+
+let currentQ = 0;
+let answers  = new Array(QUESTIONS.length).fill(null);
+let userName = '', userEmail = '';
+let quizComplete = false;
+let detectedObjection = 'none';
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+function goToScreen(id) {
+  document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+  var el = document.getElementById(id);
+  if (el) el.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function startQuiz() {
+  answers = new Array(QUESTIONS.length).fill(null);
+  currentQ = 0; quizComplete = false;
+  detectedObjection = 'none';
+  userName = ''; userEmail = '';
+  document.getElementById('progress-fill').style.width = '0%';
+  renderQuestion();
+  goToScreen('screen-questions');
+  document.getElementById('q-count').style.display = 'block';
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function renderQuestion() {
+  var q = QUESTIONS[currentQ];
+  var total = QUESTIONS.length;
+  document.getElementById('progress-fill').style.width = Math.max(2, (currentQ / total) * 100) + '%';
+  document.getElementById('q-count').textContent = (currentQ + 1) + ' of ' + total;
+  document.getElementById('section-label').textContent = 'Question ' + (currentQ + 1) + ' of ' + total;
+  document.getElementById('q-text').textContent = q.text;
+  document.getElementById('q-banner').textContent = '';
+
+  var area = document.getElementById('q-answer-area');
+  area.innerHTML = '';
+  var wrap = document.createElement('div');
+  wrap.className = 'q-wrap';
+
+  q.opts.forEach(function(opt, i) {
+    var btn = document.createElement('button');
+    btn.className = 'choice-btn' + (answers[currentQ] === i ? ' selected' : '');
+    btn.innerHTML = '<span class="choice-letter">' + LETTERS[i] + '</span>' + opt.text;
+    btn.addEventListener('click', function() { onChoiceClick(i); });
+    wrap.appendChild(btn);
+  });
+  area.appendChild(wrap);
+
+  document.getElementById('btn-back').style.display = currentQ === 0 ? 'none' : 'inline-block';
+  document.getElementById('btn-next').style.display = answers[currentQ] !== null ? 'inline-block' : 'none';
+}
+
+function onChoiceClick(i) {
+  answers[currentQ] = i;
+  // Track objection answer
+  var q = QUESTIONS[currentQ];
+  if (q.isObjection && q.opts[i].objection) {
+    detectedObjection = q.opts[i].objection;
+  }
+  document.querySelectorAll('.choice-btn').forEach(function(b, idx) {
+    b.classList.toggle('selected', idx === i);
+  });
+  document.getElementById('btn-next').style.display = 'inline-block';
+  var capturedQ = currentQ;
+  setTimeout(function() {
+    if (currentQ === capturedQ && answers[capturedQ] === i) goNext();
+  }, 380);
+}
+
+function goNext() {
+  if (answers[currentQ] === null) return;
+  if (currentQ < QUESTIONS.length - 1) {
+    currentQ++;
+    renderQuestion();
+  } else {
+    if (!quizComplete) {
+      quizComplete = true;
+      document.getElementById('inp-first').value = '';
+      document.getElementById('inp-email').value = '';
+      document.getElementById('err-first').style.display = 'none';
+      document.getElementById('err-email').style.display = 'none';
+      goToScreen('screen-capture');
+      document.getElementById('q-count').style.display = 'none';
+    }
+  }
+}
+
+function goPrev() {
+  if (currentQ > 0) { currentQ--; renderQuestion(); }
+}
+
+// ── CAPTURE ───────────────────────────────────────────────────────────────────
+function submitCapture() {
+  var nameVal  = document.getElementById('inp-first').value.trim();
+  var emailVal = document.getElementById('inp-email').value.trim();
+  var emailOk  = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal);
+
+  document.getElementById('err-first').style.display = nameVal  ? 'none' : 'block';
+  document.getElementById('err-email').style.display = emailOk  ? 'none' : 'block';
+  if (!nameVal || !emailOk) return;
+
+  userName  = nameVal;
+  userEmail = emailVal;
+  showResult();
+}
+
+// ── SCORING ───────────────────────────────────────────────────────────────────
+function totalScore() {
+  return answers.reduce(function(sum, ans, qi) {
+    return ans === null ? sum : sum + QUESTIONS[qi].opts[ans].score;
+  }, 0);
+}
+
+function dimScore(dimName) {
+  var total = 0, max = 0;
+  QUESTIONS.forEach(function(q, qi) {
+    if (q.dim === dimName) {
+      max += 3;
+      if (answers[qi] !== null) total += q.opts[answers[qi]].score;
+    }
+  });
+  return max > 0 ? Math.round((total / max) * 100) : 0;
+}
+
+// ── RESULT ────────────────────────────────────────────────────────────────────
+function showResult() {
+  var score   = totalScore();
+  var maxScore = QUESTIONS.length * 3;
+  var pct     = score / maxScore;
+  var name    = userName.split(' ')[0];
+
+  document.getElementById('progress-fill').style.width = '100%';
+
+  var badgeClass, badgeText, headline, tagline, sections, primaryCta, primaryLabel, ghostLabel;
+
+  if (pct >= 0.68) {
+    badgeClass   = 'badge-yes';
+    badgeText    = '✦ strong fit';
+    headline     = name + ', you\'re ready for this.';
+    tagline      = 'You know what you\'re carrying, you\'re willing to be honest about it, and you\'re in a season where real movement is possible. That\'s not everyone — that\'s someone coaching can actually work with.';
+    primaryCta   = PAID_CALL_URL;
+    primaryLabel = 'Book a First Flight — $299 →';
+    ghostLabel   = 'Retake quiz';
+    sections = [
+      { label: '🌱 What this means', text: 'The gap between where you are and where you want to be is real — but it\'s closeable. You have the self-awareness, the motivation, and the honesty it takes to do real work in coaching.' },
+      { label: '⚡ What coaching could do for you', text: 'Help you see what you can\'t see on your own. Get out of your own way. Stop repeating the same patterns and start moving with clarity and intention.' },
+      { label: '◈ What happens next', text: 'A First Flight is a focused 2-hour coaching session ($299). It\'s the real thing — not a sales call, not a taster. Come ready to go somewhere and we will.' }
+    ];
+  } else if (pct >= 0.42) {
+    badgeClass   = 'badge-maybe';
+    badgeText    = '◈ possible fit';
+    headline     = name + ', you\'re closer than you think.';
+    tagline      = 'There\'s something real pulling you here — you\'re not just browsing. A few things are still in the way, and that\'s okay. Let\'s have an honest conversation and figure out what\'s actually going on.';
+    primaryCta   = FREE_CALL_URL;
+    primaryLabel = 'Book a free discovery call →';
+    ghostLabel   = 'Retake quiz';
+    sections = [
+      { label: '🌱 What this means', text: 'You\'re moving in the right direction — something is shifting and you know it. The question isn\'t whether coaching could help. It\'s whether now is the moment, and what\'s in the way.' },
+      { label: '⚡ What a discovery call does', text: 'It\'s 30 minutes. No commitment, no pitch. Just enough space to get honest about where you are and whether this is actually the right fit — for both of us.' },
+      { label: '◈ Zero pressure', text: 'If it\'s not the right time, I\'ll tell you that. A good coaching relationship only works if both people are in.' }
+    ];
+  } else {
+    badgeClass   = 'badge-not-yet';
+    badgeText    = '— not quite yet';
+    headline     = name + ', the timing might not be right.';
+    tagline      = 'Coaching lands best when you\'re ready to be honest and do the work. It sounds like you\'re still figuring out what you actually want — and that\'s not a problem. Keep exploring.';
+    primaryCta   = FREE_CALL_URL;
+    primaryLabel = 'Still curious? Book a free call →';
+    ghostLabel   = 'Retake quiz';
+    sections = [
+      { label: '🌱 What this means', text: 'You\'re in a season of gathering, not yet acting — and there\'s nothing wrong with that. Awareness always comes before movement.' },
+      { label: '◈ When the moment shifts', text: 'You\'ll know. The door stays open and lil\' bird will be ready when you are. In the meantime, the newsletter is a low-commitment way to stay connected to ideas that might help.' }
+    ];
+  }
+
+  var dims = [
+    { label: 'Readiness to grow',   val: dimScore('readiness') },
+    { label: 'Openness to change',  val: dimScore('openness') },
+    { label: 'Self-awareness',      val: dimScore('self-awareness') },
+    { label: 'Investment mindset',  val: dimScore('investment') }
+  ];
+
+  // Render badge + headline
+  document.getElementById('result-badge').innerHTML =
+    '<span class="result-badge-pill ' + badgeClass + '">' + badgeText + '</span>';
+  document.getElementById('result-name').textContent    = headline;
+  document.getElementById('result-tagline').textContent = tagline;
+
+  // Snapshot card
+  var cardsEl = document.getElementById('result-cards');
+  cardsEl.innerHTML = '<div class="result-card full"><div class="rc-label">your snapshot</div><div id="dim-bars"></div></div>';
+
+  // Sections
+  var sectionsEl = document.getElementById('result-sections');
+  sectionsEl.innerHTML = sections.map(function(s) {
+    return '<div class="result-section"><div class="result-section-label">' + s.label +
+           '</div><div class="result-section-text">' + s.text + '</div></div>';
+  }).join('');
+
+  // Objection block
+  var obj = OBJECTION_RESPONSES[detectedObjection] || OBJECTION_RESPONSES['none'];
+  document.getElementById('objection-block').innerHTML =
+    '<div class="objection-card"><div class="rc-label">' + obj.label +
+    '</div><div class="rc-body">' + obj.text + '</div></div>';
+
+  // CTAs
+  // CTAs — First Flight triggers discount modal, free call goes direct
+  var ctasEl = document.getElementById('result-ctas');
+  if (primaryCta === PAID_CALL_URL) {
+    ctasEl.innerHTML =
+      '<button class="btn-cta" onclick="openModal()">Book a First Flight — $299 →</button>' +
+      '<button class="btn-cta-ghost" onclick="retake()">Retake quiz</button>';
+  } else {
+    ctasEl.innerHTML =
+      '<a href="' + primaryCta + '" class="btn-cta" target="_blank">' + primaryLabel + '</a>' +
+      '<button class="btn-cta-ghost" onclick="retake()">Retake quiz</button>';
+  }
+
+  goToScreen('screen-result');
+  document.getElementById('q-count').style.display = 'none';
+
+  // Animate dim bars after paint
+  setTimeout(function() {
+    var barsEl = document.getElementById('dim-bars');
+    if (!barsEl) return;
+    barsEl.innerHTML = dims.map(function(d) {
+      return '<div class="dim-row">' +
+        '<div class="dim-meta"><span class="dim-name">' + d.label + '</span>' +
+        '<span class="dim-pct">' + d.val + '%</span></div>' +
+        '<div class="dim-track"><div class="dim-fill" style="width:' + d.val + '%"></div></div>' +
+        '</div>';
+    }).join('');
+  }, 120);
+
+  // Fire data capture silently
+  captureData(userName, userEmail, score, pct, badgeText.replace(/[✦◈—]/g, '').trim());
+}
+
+// ── DATA CAPTURE ──────────────────────────────────────────────────────────────
+function captureData(name, email, score, pct, outcome) {
+  var payload = {
+    timestamp:   new Date().toISOString(),
+    name:        name || '',
+    email:       email || '',
+    score:       score,
+    outcome:     outcome,
+    objection:   detectedObjection,
+    readiness:   dimScore('readiness'),
+    openness:    dimScore('openness'),
+    self_awareness: dimScore('self-awareness'),
+    investment:  dimScore('investment')
+  };
+
+  // 1. Google Sheet
+  if (SHEET_WEBHOOK_URL && !SHEET_WEBHOOK_URL.includes('YOUR_GOOGLE')) {
+    fetch(SHEET_WEBHOOK_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).catch(function() {});
+  }
+
+  // 2. Beehiiv — subscribe with custom fields
+  // NOTE: Beehiiv's API requires server-side calls to protect your API key.
+  // The cleanest approach is to add a Beehiiv subscription step to your
+  // existing Google Apps Script webhook (it already handles the Sheet write).
+  // Add this to your Apps Script doPost() function:
+  //
+  //   var beehiivUrl = 'https://api.beehiiv.com/v2/publications/YOUR_PUB_ID/subscriptions';
+  //   var beehiivPayload = {
+  //     email: data.email,
+  //     reactivate_existing: false,
+  //     send_welcome_email: true,
+  //     custom_fields: [
+  //       { name: 'first_name',  value: data.name },
+  //       { name: 'quiz_outcome', value: data.outcome },
+  //       { name: 'quiz_objection', value: data.objection }
+  //     ]
+  //   };
+  //   UrlFetchApp.fetch(beehiivUrl, {
+  //     method: 'post',
+  //     contentType: 'application/json',
+  //     headers: { 'Authorization': 'Bearer YOUR_BEEHIIV_API_KEY' },
+  //     payload: JSON.stringify(beehiivPayload),
+  //     muteHttpExceptions: true
+  //   });
+}
+
+function retake() {
+  answers = new Array(QUESTIONS.length).fill(null);
+  currentQ = 0; quizComplete = false;
+  detectedObjection = 'none';
+  userName = ''; userEmail = '';
+  document.getElementById('progress-fill').style.width = '0%';
+  goToScreen('screen-intro');
+  document.getElementById('q-count').style.display = 'none';
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function openModal() {
+  document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('copy-btn').textContent = 'Copy code';
+  document.getElementById('copy-btn').classList.remove('copied');
+}
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+function copyCode() {
+  navigator.clipboard.writeText('IMREADY').then(function() {
+    var btn = document.getElementById('copy-btn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+  }).catch(function() {
+    // fallback for older browsers
+    var ta = document.createElement('textarea');
+    ta.value = 'IMREADY';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    var btn = document.getElementById('copy-btn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+  });
+}
+// Close modal on overlay click
+document.addEventListener('click', function(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+});
+// Close on Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  var btn = document.getElementById('btn-start');
+  if (btn) btn.addEventListener('click', startQuiz);
+});
+</script>
+</body>
+</html>
