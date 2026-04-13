@@ -711,10 +711,13 @@
       margin: 2.5rem 0;
       position: relative;
     }
+    .carousel-viewport {
+      overflow: hidden;
+      width: 100%;
+    }
     .carousel-track {
       display: flex;
       gap: 1.25rem;
-      overflow: hidden;
       transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
       will-change: transform;
     }
@@ -1492,7 +1495,7 @@
     </p>
 
     <div class="testimonial-carousel reveal reveal-delay-2" id="testimonial-carousel">
-      <div class="carousel-track" id="carousel-track">
+      <div class="carousel-viewport"><div class="carousel-track" id="carousel-track">
 
         <div class="testimonial-card">
           <p class="testimonial-quote">"His coaching gave me the clarity, tools, and confidence to lead with purpose — and the impact showed up in both my personal life and professional recognition."</p>
@@ -1544,7 +1547,7 @@
           </div>
         </div>
 
-      </div>
+      </div></div>
 
       <div class="carousel-controls">
         <button class="carousel-btn" id="carousel-prev" aria-label="Previous">←</button>
