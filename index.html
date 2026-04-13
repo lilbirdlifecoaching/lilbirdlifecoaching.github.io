@@ -712,17 +712,19 @@
       position: relative;
     }
     .carousel-track {
-      display: grid;
-      grid-template-columns: repeat(5, calc(50% - 0.625rem));
+      display: flex;
       gap: 1.25rem;
       overflow: hidden;
       transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: transform;
     }
     .testimonial-card {
       background: var(--dark-card);
       border: 1px solid var(--dark-border);
       border-radius: 4px;
       padding: 2rem 1.75rem;
+      flex: 0 0 calc(50% - 0.625rem);
+      min-width: calc(50% - 0.625rem);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
