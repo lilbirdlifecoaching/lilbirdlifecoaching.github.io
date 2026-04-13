@@ -259,7 +259,7 @@
 // ── AUDIO ──────────────────────────────────────────────────────────────
 const audio    = new Audio();
 // ↓ Replace with your audio URL or base64 data URI once hosted
-audio.src = 'r&w audio full.m4a'; // e.g. 'https://yourdomain.com/promo.m4a' or a base64 data URI
+audio.src = ''; // e.g. 'https://yourdomain.com/promo.m4a' or a base64 data URI
 const progFill = document.getElementById('prog-fill');
 const playIcon = document.getElementById('play-icon');
 const birdWrap = document.getElementById('bird-wrap');
@@ -360,8 +360,8 @@ function rgb(c){ return `rgb(${Math.round(c[0])},${Math.round(c[1])},${Math.roun
 // 1.0  → golden sunrise, orange-warm
 function skyColor(p, stop){
   const keys = [
-    { p:0,    top:[5,4,3],      mid:[7,6,4],       bot:[10,8,5]      },
-    { p:0.25, top:[12,20,55],   mid:[18,30,75],    bot:[26,42,92]    },
+    { p:0,    top:[22,28,40],   mid:[30,36,50],    bot:[38,44,58]    },
+    { p:0.25, top:[18,28,65],   mid:[26,38,85],    bot:[34,50,100]   },
     { p:0.55, top:[25,88,175],  mid:[52,132,198],  bot:[78,158,212]  },
     { p:0.78, top:[45,100,178], mid:[95,150,198],  bot:[135,182,208] },
     { p:1.0,  top:[108,62,20],  mid:[172,108,36],  bot:[208,138,44]  },
@@ -445,7 +445,7 @@ function drawScene(){
     {x:0.46,w:0.26,h:68}, {x:0.66,w:0.36,h:88}, {x:0.88,w:0.22,h:58},
   ];
   drawHills(ctx, W, H, H*0.6, scroll*0.15, farHills,
-    lerpRGB([8,12,6], [70,95,40], hillLight * 0.55));
+    lerpRGB([22,32,18], [70,95,40], hillLight * 0.55));
 
   // ── MID HILLS (parallax 0.3) ──
   const midHills = [
@@ -453,7 +453,7 @@ function drawScene(){
     {x:0.48,w:0.30,h:100},  {x:0.68,w:0.42,h:145}, {x:0.92,w:0.32,h:110},
   ];
   drawHills(ctx, W, H, H*0.57, scroll*0.3, midHills,
-    lerpRGB([10,15,7], [50,72,28], hillLight * 0.65));
+    lerpRGB([16,28,12], [50,72,28], hillLight * 0.65));
 
   // ── DARK FOREST TREES ──
   const treeAlpha = Math.max(0, 1 - p * 2.5);
@@ -465,14 +465,14 @@ function drawScene(){
       const tw = 20 + rnd(i*3+3) * 30;
       const ty = H * 0.55;
       // trunk
-      ctx.fillStyle = `rgb(${6+Math.round(rnd(i)*4)},${4+Math.round(rnd(i)*3)},${3+Math.round(rnd(i)*2)})`;
+      ctx.fillStyle = `rgb(${30+Math.round(rnd(i)*12)},${20+Math.round(rnd(i)*8)},${12+Math.round(rnd(i)*6)})`;
       ctx.fillRect(tx + tw*0.42, ty, tw*0.16, th*0.4);
       // canopy layers
       for (let l=0; l<3; l++){
         const lw = tw*(1.1-l*0.28), lh = th*(0.38-l*0.05);
         const ly = ty - th*(0.3+l*0.2);
-        const d = 5+l*3;
-        ctx.fillStyle = `rgb(${d+2},${d+4},${d})`;
+        const d = 22+l*8;
+        ctx.fillStyle = `rgb(${d-8},${d+6},${d-10})`;
         ctx.beginPath();
         ctx.moveTo(tx+tw/2, ly);
         ctx.lineTo(tx+tw/2-lw/2, ly+lh);
@@ -519,8 +519,8 @@ function drawScene(){
   // ── GROUND ──
   const groundY = H * 0.72;
   const gGrad = ctx.createLinearGradient(0, groundY, 0, H);
-  gGrad.addColorStop(0, rgb(lerpRGB([10,8,5],[55,75,28],p*0.75)));
-  gGrad.addColorStop(1, rgb(lerpRGB([7,6,3], [35,48,18],p*0.75)));
+  gGrad.addColorStop(0, rgb(lerpRGB([35,28,18],[55,75,28],p*0.75)));
+  gGrad.addColorStop(1, rgb(lerpRGB([25,18,12],[35,48,18],p*0.75)));
   ctx.fillStyle = gGrad;
   ctx.fillRect(0, groundY, W, H - groundY);
   // ground line
