@@ -335,7 +335,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 1px;
-      margin: 3rem 0;
+      margin: 2.5rem 0;
       background: var(--dark-border);
       border: 1px solid var(--dark-border);
       border-radius: 4px;
@@ -343,23 +343,31 @@
     }
     .recognition-item {
       background: var(--dark-card);
-      padding: 2rem 1.75rem;
+      padding: 2.5rem 2rem;
       transition: background 0.3s ease;
+      position: relative;
+    }
+    .recognition-item::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px;
+      height: 0;
+      background: var(--gold);
+      transition: height 0.4s ease;
     }
     .recognition-item:hover {
       background: #2f3240;
     }
-    .recognition-icon {
-      font-size: 1.4rem;
-      margin-bottom: 0.75rem;
-      display: block;
+    .recognition-item:hover::before {
+      height: 100%;
     }
     .recognition-text {
       font-family: 'Playfair Display', serif;
       font-style: italic;
-      font-size: 1rem;
+      font-size: 1.15rem;
       color: var(--text-main);
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
     /* ─── JOURNEY STEPS ─── */
@@ -915,7 +923,7 @@
       <em>shouldn't feel like this.</em>
     </h1>
     <p class="hero-sub reveal reveal-delay-2">
-      You feel it before you can name it. A tightness in the chest. A low-grade anxiety that doesn't really lift. The week ahead. A version of your life that looks fine from the outside but feels hollow on the inside.<br/><br/>
+      You feel it before you can name it. A tightness in the chest. A low-grade anxiety that doesn't really lift. The week ahead. The same questions. A version of your life that looks fine from the outside and feels hollow from the inside.<br/><br/>
       One honest conversation changes that. Not because it has all the answers — but because it asks the right ones.
     </p>
     <div class="hero-actions reveal reveal-delay-3">
@@ -938,20 +946,16 @@
     <p class="section-label reveal">does this sound like you?</p>
     <div class="recognition-grid reveal reveal-delay-1">
       <div class="recognition-item">
-        <span class="recognition-icon">🌫</span>
-        <p class="recognition-text">"I know something needs to change. I just can't name what."</p>
+        <p class="recognition-text">"I know something needs to change.<br/>I just can't name what."</p>
       </div>
       <div class="recognition-item">
-        <span class="recognition-icon">🔁</span>
         <p class="recognition-text">"I keep having the same conversations with myself and going nowhere."</p>
       </div>
       <div class="recognition-item">
-        <span class="recognition-icon">📋</span>
-        <p class="recognition-text">"On paper, my life looks fine. From the inside, it doesn't feel like mine."</p>
+        <p class="recognition-text">"On paper, my life looks fine.<br/>From the inside, it doesn't feel like mine."</p>
       </div>
       <div class="recognition-item">
-        <span class="recognition-icon">🪶</span>
-        <p class="recognition-text">"I'm not in crisis. I'm just stuck. And I'm tired of being stuck."</p>
+        <p class="recognition-text">"I'm not in crisis.<br/>I'm just stuck. And I'm tired of it."</p>
       </div>
     </div>
   </section>
@@ -969,11 +973,8 @@
     </h2>
 
     <p class="story-body reveal reveal-delay-2">
-      You can feel it before you can name it. The role, the routine, the version of yourself you've been showing up as — something doesn't fit anymore. Most people arrive here carrying more than they let on.
-    </p>
-
-    <p class="story-body reveal reveal-delay-3">
-      This isn't about fixing you. It's about helping you hear yourself clearly enough to know what's actually next.
+      You feel it before you can name it. A tightness in the chest. A low-grade anxiety that doesn't really lift. The week ahead. A version of your life that looks fine from the outside but feels hollow on the inside.<br/><br/>
+      One honest conversation changes that. Not because it has all the answers — but because it asks the right ones.
     </p>
   </section>
 
@@ -1106,8 +1107,8 @@
   <section class="story-section">
     <p class="section-label reveal">act four — your move</p>
     <h2 class="story-headline reveal reveal-delay-1">
-      Two ways in.<br/>
-      <em>One destination.</em>
+      Begin your<br/>
+      <em>adventure.</em>
     </h2>
     <p class="story-body reveal reveal-delay-2">
       Whether you want to start with a single session or go deeper with monthly support, this is where you take the first actual step.
