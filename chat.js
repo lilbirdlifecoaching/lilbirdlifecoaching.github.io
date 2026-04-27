@@ -1,9 +1,9 @@
 // lil' bird chat widget v4
 (function() {
   var WORKER = 'https://lilbird-chat.cwwq46sn7m.workers.dev/';
-  var FF_URL = 'https://calendly.com/lukehaythorpe-orangery/first-flight-session';
-  var LCS_URL = 'https://calendly.com/lukehaythorpe-orangery/packages/141b4b4c-dca7-46e5-9314-a8fc55f4320f';
-  var DISC_URL = 'https://calendly.com/lukehaythorpe-orangery/30min';
+  var FF_URL = 'https://calendly.com/lilbirdlifecoaching/first-flight-session';
+  var LCS_URL = 'https://calendly.com/lilbirdlifecoaching/packages/141b4b4c-dca7-46e5-9314-a8fc55f4320f';
+  var DISC_URL = 'https://calendly.com/lilbirdlifecoaching/30min';
 
   // ── Styles ──────────────────────────────────────────────────────
   var s = document.createElement('style');
