@@ -1541,6 +1541,33 @@
     win.classList.toggle('open',isOpen);
     if(isOpen){notif.style.display='none';if(!msgs.length)addBot(OPEN_MSG);setTimeout(function(){input.focus();},300);}
   });
+
+  // Delegated click handler for Calendly booking links injected by bot
+  msgsEl.addEventListener('click',function(e){
+    var trigger=e.target.closest('.lb-book-trigger');
+    if(!trigger)return;
+    e.preventDefault();
+    var url=trigger.getAttribute('data-url');
+    if(!url)return;
+    // Open Calendly in a lightweight overlay
+    var overlay=document.createElement('div');
+    overlay.id='lb-calendly-overlay';
+    overlay.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;';
+    var inner=document.createElement('div');
+    inner.style.cssText='position:relative;width:min(680px,95vw);height:min(700px,90vh);background:#fff;border-radius:12px;overflow:hidden;';
+    var closeO=document.createElement('button');
+    closeO.textContent='✕';
+    closeO.style.cssText='position:absolute;top:10px;right:14px;z-index:2;background:none;border:none;font-size:1.2rem;cursor:pointer;color:#555;';
+    closeO.addEventListener('click',function(){overlay.remove();});
+    var iframe=document.createElement('iframe');
+    iframe.src=url;
+    iframe.style.cssText='width:100%;height:100%;border:none;';
+    inner.appendChild(closeO);
+    inner.appendChild(iframe);
+    overlay.appendChild(inner);
+    overlay.addEventListener('click',function(ev){if(ev.target===overlay)overlay.remove();});
+    document.body.appendChild(overlay);
+  });
   closeBtn.addEventListener('click',function(){isOpen=false;win.classList.remove('open');});
   input.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();doSend();}});
   send.addEventListener('click',doSend);
@@ -1571,10 +1598,11 @@
     if(!t||typing)return;
     addUsr(t);input.value='';input.style.height='auto';
     send.disabled=true;typing=true;showTyping();
+    var MAX_HISTORY=6;
     fetch(WORKER,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({messages:msgs.filter(function(m){return m.role==='user'||m.role==='assistant';})})
+      body:JSON.stringify({messages:msgs.filter(function(m){return m.role==='user'||m.role==='assistant';}).slice(-MAX_HISTORY)})
     }).then(function(r){return r.json();}).then(function(d){
       hideTyping();
       if(d.content&&d.content[0])addBot(d.content[0].text);
