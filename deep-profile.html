@@ -3,23 +3,824 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lil' Bird Deep Profile — Know yourself. Find your people.</title>
+<title>lil' bird — Your Deep Profile</title>
 <meta name="description" content="A conversational assessment that discovers who you actually are — through your stories, not multiple choice questions.">
 <link rel="icon" href="bird-logo.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://js.stripe.com/v3/">
-// ═══════════════════════════════════════════════
-// CONFIG
-// ═══════════════════════════════════════════════
-const WORKER_URL = 'https://lilbird-assessment.cwwq46sn7m.workers.dev';
-const STRIPE_PK  = 'pk_live_51QSMYQGAu36WZ7DdlsoNqzwPnsf4HUoOj6F1NZAeGnnH1TPjDEdEQudXIGgTLaUq079aQMI1W2MS6UpMItmTjgxy00HbouBx2g';
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwPoMHcmTKO8JiDt8VS4fVsvGKqw-CQGLktQKImKeUPsfqX7WhH1IJCsG2M2fF7lyL6/exec'; // Paste Apps Script URL here after setup
+<!-- Fonts load non-blocking so they don't delay first paint -->
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"></noscript>
+<!-- Stripe loaded on demand when pay screen opens, not on page load -->
+<style>
+  :root {
+    --gold: #F5C842;
+    --gold-dim: #c9a130;
+    --gold-faint: rgba(245,200,66,0.08);
+    --dark: #1e2028;
+    --dark-mid: #252830;
+    --dark-card: #2a2d38;
+    --dark-border: rgba(245,200,66,0.18);
+    --text-main: #f0ead8;
+    --text-muted: #a09880;
+    --ember: #e8734a;
+    --ember-faint: rgba(232,115,74,0.12);
+    --transition: all 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  }
 
-// ═══════════════════════════════════════════════
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--dark);
+    color: var(--text-main);
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.6;
+  }
+
+  #particles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+  }
+  .particle {
+    position: absolute;
+    bottom: -10px;
+    border-radius: 50%;
+    animation: float-up linear infinite;
+    opacity: 0;
+  }
+  @keyframes float-up {
+    0%   { transform: translateY(0); opacity: 0; }
+    10%  { opacity: 0.7; }
+    50%  { transform: translateY(-50vh) translateX(30px); opacity: 0.4; }
+    90%  { opacity: 0.1; }
+    100% { transform: translateY(-110vh) translateX(-20px); opacity: 0; }
+  }
+
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 1.25rem 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(to bottom, rgba(30,32,40,0.95), transparent);
+    backdrop-filter: blur(2px);
+  }
+  .nav-logo { display: flex; align-items: center; gap: 0.65rem; text-decoration: none; }
+  .nav-bird { width: 36px; height: 36px; border-radius: 8px; }
+  .nav-wordmark { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.1rem; color: var(--gold); }
+  .nav-back { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold-dim); text-decoration: none; transition: color 0.2s; }
+  .nav-back:hover { color: var(--gold); }
+
+  .progress-bar-wrap { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 200; background: rgba(255,255,255,0.06); }
+  .progress-bar-fill { height: 100%; background: linear-gradient(to right, var(--gold), var(--ember)); transition: width 0.6s ease; }
+
+  .screen { display: none; min-height: 100vh; padding: 7rem 1.5rem 4rem; position: relative; z-index: 2; }
+  .screen.active { display: block; }
+  .inner { max-width: 680px; margin: 0 auto; }
+
+  .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .eyebrow::before { content: ''; display: inline-block; width: 20px; height: 1px; background: var(--gold-dim); }
+
+  h1 { font-family: 'Playfair Display', serif; font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 400; line-height: 1.15; color: var(--text-main); margin-bottom: 1.5rem; }
+  h1 em { font-style: italic; color: var(--gold); }
+  h2 { font-family: 'Playfair Display', serif; font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 400; line-height: 1.2; color: var(--text-main); margin-bottom: 1.25rem; }
+  h2 em { font-style: italic; color: var(--gold); }
+  h3 { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 400; color: var(--gold); margin-bottom: 0.5rem; }
+  p { color: var(--text-muted); margin-bottom: 1rem; }
+  p:last-child { margin-bottom: 0; }
+
+  .chapter-card { background: var(--dark-card); border: 1px solid var(--dark-border); border-radius: 16px; padding: 2.5rem; margin-bottom: 2rem; }
+  .chapter-label { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ember); margin-bottom: 1rem; }
+  .prompt-label { font-size: 1.05rem; font-weight: 400; color: var(--text-main); margin-bottom: 0.85rem; line-height: 1.5; }
+
+  textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(245,200,66,0.15);
+    border-radius: 10px;
+    color: var(--text-main);
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+    font-size: 0.95rem;
+    font-weight: 300;
+    line-height: 1.6;
+    padding: 1rem 1.25rem;
+    resize: vertical;
+    min-height: 110px;
+    transition: border-color 0.2s;
+    margin-bottom: 1.5rem;
+  }
+  textarea::placeholder { color: rgba(240,234,216,0.3); }
+  textarea:focus { outline: none; border-color: rgba(245,200,66,0.4); }
+
+  .reflect-pill {
+    display: none;
+    background: var(--gold-faint);
+    border: 1px solid rgba(245,200,66,0.2);
+    border-radius: 100px;
+    padding: 0.3rem 0.9rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--gold-dim);
+    margin-bottom: 1.25rem;
+    max-width: fit-content;
+  }
+
+  .btn { display: inline-flex; align-items: center; gap: 0.5rem; font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; border: none; border-radius: 3px; cursor: pointer; padding: 0.85rem 1.75rem; transition: var(--transition); text-decoration: none; }
+  .btn-gold { background: var(--gold); color: var(--dark); }
+  .btn-gold:hover { background: #fff; transform: translateY(-1px); }
+  .btn-outline { background: transparent; color: var(--gold-dim); border: 1px solid rgba(245,200,66,0.25); }
+  .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+  .btn-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem; }
+
+  #loadingOverlay { display: none; position: fixed; inset: 0; background: rgba(30,32,40,0.92); z-index: 500; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem; backdrop-filter: blur(4px); }
+  #loadingOverlay.active { display: flex; }
+  .loading-bird { font-size: 3rem; animation: bob 1.8s ease-in-out infinite; }
+  @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+  .loading-text { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.15rem; color: var(--gold); text-align: center; }
+  .loading-sub { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); }
+
+  .intro-features { margin: 2.5rem 0; display: flex; flex-direction: column; gap: 1rem; }
+  .intro-feature { display: flex; gap: 1rem; align-items: flex-start; }
+  .intro-icon { width: 36px; height: 36px; min-width: 36px; background: var(--gold-faint); border: 1px solid rgba(245,200,66,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; margin-top: 0.1rem; }
+  .intro-feature p { font-size: 0.92rem; color: var(--text-muted); margin: 0; }
+  .intro-feature strong { color: var(--text-main); font-weight: 400; }
+  .intro-note { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; color: var(--text-muted); opacity: 0.7; margin-top: 1.5rem; }
+
+  .snap-badge { display: inline-flex; align-items: center; gap: 0.75rem; background: var(--gold-faint); border: 1px solid var(--dark-border); border-radius: 100px; padding: 0.5rem 1.25rem 0.5rem 0.75rem; margin-bottom: 2rem; }
+  .snap-badge-mbti { font-family: 'DM Mono', monospace; font-size: 0.9rem; font-weight: 500; color: var(--dark); background: var(--gold); border-radius: 100px; padding: 0.2rem 0.75rem; letter-spacing: 0.1em; }
+  .snap-badge-label { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1rem; color: var(--gold); }
+
+  .snap-preview { background: var(--dark-card); border: 1px solid var(--dark-border); border-radius: 12px; padding: 1.75rem 2rem; margin: 1.5rem 0 2rem; }
+  .snap-preview p { color: var(--text-main); font-size: 1rem; line-height: 1.75; margin-bottom: 1rem; }
+  .snap-preview p:last-child { margin-bottom: 0; }
+
+  .email-capture { background: var(--dark-mid); border: 1px solid rgba(245,200,66,0.12); border-radius: 12px; padding: 1.75rem 2rem; margin-bottom: 2rem; }
+  .email-capture-title { font-size: 1rem; color: var(--text-main); font-weight: 400; margin-bottom: 0.35rem; }
+  .email-capture p { font-size: 0.88rem; margin-bottom: 1.25rem; }
+  .email-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .email-row input { flex: 1; min-width: 220px; background: rgba(255,255,255,0.05); border: 1px solid rgba(245,200,66,0.2); border-radius: 6px; color: var(--text-main); font-family: 'DM Sans', sans-serif; font-size: 0.95rem; padding: 0.7rem 1rem; transition: border-color 0.2s; }
+  .email-row input:focus { outline: none; border-color: var(--gold); }
+  .email-row input::placeholder { color: rgba(240,234,216,0.3); }
+  #email-error { display: none; color: var(--ember); font-size: 0.82rem; margin-top: 0.5rem; }
+  #email-submitted { display: none; color: var(--gold); font-size: 0.9rem; font-family: 'Playfair Display', serif; font-style: italic; margin-top: 0.75rem; }
+
+  .teaser-section { position: relative; margin: 2rem 0; border-radius: 12px; overflow: hidden; }
+  .teaser-blur { filter: blur(5px); pointer-events: none; user-select: none; opacity: 0.6; }
+  .teaser-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem; background: linear-gradient(to bottom, rgba(30,32,40,0.1), rgba(30,32,40,0.8)); }
+  .lock-icon { font-size: 1.5rem; }
+  .teaser-overlay p { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.05rem; color: var(--text-main); text-align: center; margin: 0; }
+  .teaser-content { background: var(--dark-card); border: 1px solid var(--dark-border); border-radius: 12px; padding: 1.75rem 2rem; }
+  .teaser-content p { font-size: 0.9rem; }
+
+  .pay-intro { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 2rem; max-width: 480px; }
+  .pay-amounts { display: flex; gap: 0.75rem; margin-bottom: 2rem; flex-wrap: wrap; }
+  .pay-btn { flex: 1; min-width: 90px; background: var(--dark-card); border: 1px solid var(--dark-border); border-radius: 10px; color: var(--text-main); font-family: 'Playfair Display', serif; font-size: 1.4rem; padding: 1rem; cursor: pointer; transition: var(--transition); text-align: center; }
+  .pay-btn span { display: block; font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-top: 0.2rem; }
+  .pay-btn:hover, .pay-btn.selected { border-color: var(--gold); background: var(--gold-faint); color: var(--gold); }
+  .pay-btn.selected span { color: var(--gold-dim); }
+
+  .offer-codes { background: var(--ember-faint); border: 1px solid rgba(232,115,74,0.2); border-radius: 12px; padding: 1.5rem 1.75rem; margin-bottom: 2rem; }
+  .offer-codes-title { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ember); margin-bottom: 1rem; }
+  .offer-item { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 0.85rem; }
+  .offer-item:last-child { margin-bottom: 0; }
+  .offer-code { font-family: 'DM Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: var(--dark); background: var(--ember); border-radius: 4px; padding: 0.2rem 0.6rem; white-space: nowrap; min-width: fit-content; }
+  .offer-desc { font-size: 0.88rem; color: var(--text-muted); margin: 0; padding-top: 0.15rem; }
+  .offer-desc a { color: var(--gold-dim); text-decoration: none; }
+  .offer-desc a:hover { color: var(--gold); }
+  .offer-note { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; color: var(--text-muted); opacity: 0.7; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(232,115,74,0.15); }
+
+  .stripe-wrap { background: var(--dark-card); border: 1px solid var(--dark-border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem; }
+  #card-element { padding: 0.5rem 0; }
+  #card-errors { color: var(--ember); font-size: 0.85rem; margin-top: 0.5rem; min-height: 1.2rem; }
+  #payButton { width: 100%; justify-content: center; font-size: 0.78rem; padding: 1rem; margin-bottom: 0.75rem; }
+  #payProcessing { display: none; align-items: center; justify-content: center; gap: 0.75rem; padding: 1rem; color: var(--gold); font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; }
+  #payError { display: none; color: var(--ember); font-size: 0.88rem; padding: 0.75rem 1rem; background: var(--ember-faint); border-radius: 8px; margin-top: 0.5rem; }
+  .pay-reassure { font-size: 0.8rem; color: var(--text-muted); opacity: 0.7; text-align: center; margin-top: 0.5rem; }
+
+  .result-header { border-bottom: 1px solid var(--dark-border); padding-bottom: 2rem; margin-bottom: 2.5rem; }
+  .result-tags { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+  .ftag { font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.1em; border-radius: 100px; padding: 0.3rem 0.85rem; border: 1px solid rgba(245,200,66,0.25); color: var(--text-muted); background: var(--gold-faint); }
+  .ftag.gold { color: var(--gold); border-color: rgba(245,200,66,0.4); }
+  .ftag.ember { color: var(--ember); border-color: rgba(232,115,74,0.4); background: var(--ember-faint); }
+  .result-section { margin-bottom: 2.5rem; }
+  .result-section-label { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-dim); margin-bottom: 0.75rem; opacity: 0.8; }
+  .result-section p { color: var(--text-main); font-size: 1rem; line-height: 1.8; margin-bottom: 1rem; }
+
+  #result-quote { background: var(--dark-card); border-left: 3px solid var(--gold); border-radius: 0 12px 12px 0; padding: 1.5rem 1.75rem; margin: 2.5rem 0; }
+  #result-quote blockquote { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.15rem; color: var(--gold); line-height: 1.6; }
+
+  .nest-box { background: var(--dark-mid); border: 1px solid var(--dark-border); border-radius: 12px; padding: 1.75rem 2rem; margin: 2.5rem 0; }
+  .nest-id { font-family: 'DM Mono', monospace; font-size: 0.82rem; color: var(--gold-dim); letter-spacing: 0.05em; margin-top: 0.5rem; word-break: break-all; }
+
+  .result-cta { display: flex; gap: 2rem; flex-wrap: wrap; margin-top: 2.5rem; padding-top: 2.5rem; border-top: 1px solid var(--dark-border); }
+  .result-cta-text { flex: 1; min-width: 260px; }
+  .result-cta-btns { display: flex; flex-direction: column; gap: 0.75rem; justify-content: center; }
+
+  .page-footer { border-top: 1px solid var(--dark-border); padding: 2rem 1.5rem; text-align: center; position: relative; z-index: 2; }
+  .page-footer p { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.12em; color: var(--text-muted); opacity: 0.5; }
+  .page-footer a { color: var(--gold-dim); text-decoration: none; }
+
+  @media (max-width: 600px) {
+    nav { padding: 1rem 1.25rem; }
+    .screen { padding: 6rem 1.25rem 3rem; }
+    .chapter-card { padding: 1.5rem; }
+    .snap-preview, .email-capture, .offer-codes, .stripe-wrap { padding: 1.25rem; }
+    .pay-amounts { gap: 0.5rem; }
+    .email-row { flex-direction: column; }
+    .email-row input { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div id="particles"></div>
+
+<div id="loadingOverlay">
+  <div class="loading-bird">🐦</div>
+  <p class="loading-text">Reading your story…</p>
+  <p class="loading-sub">This takes about 20 seconds</p>
+</div>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="bird-logo.png" alt="lil' bird" class="nav-bird">
+    <span class="nav-wordmark">lil' bird</span>
+  </a>
+  <a href="index.html" class="nav-back">← back to home</a>
+</nav>
+
+<div class="progress-bar-wrap">
+  <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     INTRO
+══════════════════════════════════════ -->
+<div class="screen active" id="screen-intro">
+  <div class="inner">
+    <p class="eyebrow">your deep profile</p>
+    <h1>Know yourself.<br><em>Find your people.</em></h1>
+    <p style="color:var(--text-muted);font-size:1.05rem;max-width:520px;margin-bottom:0.5rem;">Six short conversations. No multiple choice. No checkboxes. Just honest questions about your actual life — and a profile that reflects who you really are.</p>
+    <div class="intro-features">
+      <div class="intro-feature">
+        <div class="intro-icon">✦</div>
+        <div><p><strong>Story-first</strong> — your answers drive the analysis, not a preset algorithm</p></div>
+      </div>
+      <div class="intro-feature">
+        <div class="intro-icon">🧠</div>
+        <div><p><strong>MBTI · Enneagram · Attachment Style</strong> — all three lenses, integrated</p></div>
+      </div>
+      <div class="intro-feature">
+        <div class="intro-icon">🪺</div>
+        <div><p><strong>Your Nest</strong> — a permanent link to your profile you can return to any time</p></div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="goTo('screen-c1a')">Begin → 🐦</button>
+    </div>
+    <p class="intro-note">Takes about 15–20 minutes. The more honest you are, the more accurate it gets.</p>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     CHAPTER 1 — YOUR STORY
+══════════════════════════════════════ -->
+<div class="screen" id="screen-c1a">
+  <div class="inner">
+    <p class="eyebrow">chapter one — your story</p>
+    <h2>Where are you<br><em>right now?</em></h2>
+    <div class="chapter-card">
+      <p class="chapter-label">1 of 3</p>
+      <p class="prompt-label">If someone asked you "how are you, really?" — what would the honest answer be? Not the polished version. The real one.</p>
+      <textarea id="c1a" placeholder="Take your time. There's no wrong answer here." rows="5"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="reflectAndGo('screen-c1b','c1a','pill-c1a')">Next →</button>
+      <button class="btn btn-outline" onclick="goTo('screen-intro')">← Back</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="screen-c1b">
+  <div class="inner">
+    <p class="eyebrow">chapter one — your story</p>
+    <h2>Where are you<br><em>right now?</em></h2>
+    <div class="reflect-pill" id="pill-c1a"></div>
+    <div class="chapter-card">
+      <p class="chapter-label">2 of 3</p>
+      <p class="prompt-label">What's the thing that's been quietly sitting in the background lately — the thing you keep almost thinking about but then don't?</p>
+      <textarea id="c1b" placeholder="Even if it feels small or hard to name..." rows="5"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="reflectAndGo('screen-c1c','c1b','pill-c1b')">Next →</button>
+      <button class="btn btn-outline" onclick="goTo('screen-c1a')">← Back</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="screen-c1c">
+  <div class="inner">
+    <p class="eyebrow">chapter one — your story</p>
+    <h2>Where are you<br><em>right now?</em></h2>
+    <div class="reflect-pill" id="pill-c1b"></div>
+    <div class="chapter-card">
+      <p class="chapter-label">3 of 3</p>
+      <p class="prompt-label">What would need to be true six months from now for you to feel like something has genuinely shifted?</p>
+      <textarea id="c1c" placeholder="Dream a little. Be specific if you can." rows="5"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="reflectAndGo('screen-c2a','c1c','pill-c1c')">Continue →</button>
+      <button class="btn btn-outline" onclick="goTo('screen-c1b')">← Back</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     CHAPTER 2 — HOW YOU'RE WIRED
+══════════════════════════════════════ -->
+<div class="screen" id="screen-c2a">
+  <div class="inner">
+    <p class="eyebrow">chapter two — how you're wired</p>
+    <h2>Your energy.<br><em>Your patterns.</em></h2>
+    <div class="reflect-pill" id="pill-c1c"></div>
+    <div class="chapter-card">
+      <p class="chapter-label">1 of 3</p>
+      <p class="prompt-label">Think about a time you were completely in your element — fully alive, doing something that felt effortless. What were you doing, and what made it feel that way?</p>
+      <textarea id="c2a" placeholder="The more specific, the better..." rows="5"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="reflectAndGo('screen-c2b','c2a','pill-c2a')">Next →</button>
+      <button class="btn btn-outline" onclick="goTo('screen-c1c')">← Back</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="screen-c2b">
+  <div class="inner">
+    <p class="eyebrow">chapter two — how you're wired</p>
+    <h2>Your energy.<br><em>Your patterns.</em></h2>
+    <div class="reflect-pill" id="pill-c2a"></div>
+    <div class="chapter-card">
+      <p class="chapter-label">2 of 3</p>
+      <p class="prompt-label">What drains you most — the kind of situation or interaction that leaves you depleted, even if nothing "went wrong"?</p>
+      <textarea id="c2b" placeholder="Be honest — this matters a lot for your profile..." rows="5"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="reflectAndGo('screen-c2c','c2b','pill-c2b')">Next →</button>
+      <button class="btn btn-outline" onclick="goTo('screen-c2a')">← Back</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="screen-c2c">
+  <div class="inner">
+    <p class="eyebrow">chapter two — how you're wired</p>
+    <h2>Your energy.<br><em>Your patterns.</em></h2>
+    <div class="reflect-pill" id="pill-c2b"></div>
+    <div class="chapter-card">
+      <p class="chapter-label">3 of 3</p>
+      <p class="prompt-label">When you're stressed or overwhelmed, what do you typically do? Not what you know you "should" do — what you actually do.</p>
+      <textarea id="c2c" placeholder="No judgement here — just honesty..." rows="5"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="reflectAndGo('screen-c3a','c2c','pill-c2c')">Continue →</button>
+      <button class="btn btn-outline" onclick="goTo('screen-c2b')">← Back</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     CHAPTER 3 — YOUR RELATIONSHIPS
+══════════════════════════════════════ -->
+<div class="screen" id="screen-c3a">
+  <div class="inner">
+    <p class="eyebrow">chapter three — your relationships</p>
+    <h2>How you connect.<br><em>How you hurt.</em></h2>
+    <div class="reflect-pill" id="pill-c2c"></div>
+    <div class="chapter-card">
+      <p class="chapter-label">1 of 3</p>
+      <p class="prompt-label">Describe a relationship in your life that feels really good — what makes it work?</p>
+      <textarea id="c3a" placeholder="Could be a friendship, family member, partner, colleague..." rows="5"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="reflectAndGo('screen-c3b','c3a','pill-c3a')">Next →</button>
+      <button class="btn btn-outline" onclick="goTo('screen-c2c')">← Back</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="screen-c3b">
+  <div class="inner">
+    <p class="eyebrow">chapter three — your relationships</p>
+    <h2>How you connect.<br><em>How you hurt.</em></h2>
+    <div class="reflect-pill" id="pill-c3a"></div>
+    <div class="chapter-card">
+      <p class="chapter-label">2 of 3</p>
+      <p class="prompt-label">What's the thing you most want people to understand about you — but rarely feel like they do?</p>
+      <textarea id="c3b" placeholder="The thing you wish you could explain once, and have it land..." rows="5"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="reflectAndGo('screen-c3c','c3b','pill-c3b')">Next →</button>
+      <button class="btn btn-outline" onclick="goTo('screen-c3a')">← Back</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="screen-c3c">
+  <div class="inner">
+    <p class="eyebrow">chapter three — your relationships</p>
+    <h2>How you connect.<br><em>How you hurt.</em></h2>
+    <div class="reflect-pill" id="pill-c3b"></div>
+    <div class="chapter-card">
+      <p class="chapter-label">3 of 3</p>
+      <p class="prompt-label">When conflict or distance happens in a relationship, what's your first instinct — and what does it cost you?</p>
+      <textarea id="c3c" placeholder="Think about a recent moment if that helps..." rows="5"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="reflectAndGo('screen-c4a','c3c','pill-c3c')">Continue →</button>
+      <button class="btn btn-outline" onclick="goTo('screen-c3b')">← Back</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     CHAPTER 4 — WHAT DRIVES YOU
+══════════════════════════════════════ -->
+<div class="screen" id="screen-c4a">
+  <div class="inner">
+    <p class="eyebrow">chapter four — what drives you</p>
+    <h2>What you want.<br><em>What you fear.</em></h2>
+    <div class="reflect-pill" id="pill-c3c"></div>
+    <div class="chapter-card">
+      <p class="chapter-label">1 of 2</p>
+      <p class="prompt-label">If you could have any version of your life — no constraints, no expectations from anyone — what would it look like? Don't edit. Just describe.</p>
+      <textarea id="c4a" placeholder="Let yourself want things out loud for a moment..." rows="6"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="reflectAndGo('screen-c4b','c4a','pill-c4a')">Next →</button>
+      <button class="btn btn-outline" onclick="goTo('screen-c3c')">← Back</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="screen-c4b">
+  <div class="inner">
+    <p class="eyebrow">chapter four — what drives you</p>
+    <h2>What you want.<br><em>What you fear.</em></h2>
+    <div class="reflect-pill" id="pill-c4a"></div>
+    <div class="chapter-card">
+      <p class="chapter-label">2 of 2</p>
+      <p class="prompt-label">What's the fear underneath all of this? The one that doesn't always have a name but shapes a lot of your decisions?</p>
+      <textarea id="c4b" placeholder="It might be about worth, failure, belonging, being seen — or something else entirely..." rows="5"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="reflectAndGo('screen-c5a','c4b','pill-c4b')">Continue →</button>
+      <button class="btn btn-outline" onclick="goTo('screen-c4a')">← Back</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     CHAPTER 5 — THE TANGLE
+══════════════════════════════════════ -->
+<div class="screen" id="screen-c5a">
+  <div class="inner">
+    <p class="eyebrow">chapter five — the tangle</p>
+    <h2>Where you get<br><em>stuck.</em></h2>
+    <div class="reflect-pill" id="pill-c4b"></div>
+    <div class="chapter-card">
+      <p class="chapter-label">1 of 3</p>
+      <p class="prompt-label">What's the pattern you keep returning to? The thing where you think "I've been here before" — even if the surface details are different?</p>
+      <textarea id="c5a" placeholder="Even if it's hard to name precisely..." rows="5"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="reflectAndGo('screen-c5b','c5a','pill-c5a')">Next →</button>
+      <button class="btn btn-outline" onclick="goTo('screen-c4b')">← Back</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="screen-c5b">
+  <div class="inner">
+    <p class="eyebrow">chapter five — the tangle</p>
+    <h2>Where you get<br><em>stuck.</em></h2>
+    <div class="reflect-pill" id="pill-c5a"></div>
+    <div class="chapter-card">
+      <p class="chapter-label">2 of 3</p>
+      <p class="prompt-label">What's the version of yourself you're most afraid to become — or most afraid you already are?</p>
+      <textarea id="c5b" placeholder="Be gentle with yourself here. This is important." rows="5"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="reflectAndGo('screen-c5c','c5b','pill-c5b')">Next →</button>
+      <button class="btn btn-outline" onclick="goTo('screen-c5a')">← Back</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="screen-c5c">
+  <div class="inner">
+    <p class="eyebrow">chapter five — the tangle</p>
+    <h2>Where you get<br><em>stuck.</em></h2>
+    <div class="reflect-pill" id="pill-c5b"></div>
+    <div class="chapter-card">
+      <p class="chapter-label">3 of 3</p>
+      <p class="prompt-label">What's one thing you've been avoiding doing or deciding — and what do you think is actually stopping you?</p>
+      <textarea id="c5c" placeholder="Not the excuse. The real thing." rows="5"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="reflectAndGo('screen-c6a','c5c','pill-c5c')">Continue →</button>
+      <button class="btn btn-outline" onclick="goTo('screen-c5b')">← Back</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     CHAPTER 6 — YOUR NEXT CHAPTER
+══════════════════════════════════════ -->
+<div class="screen" id="screen-c6a">
+  <div class="inner">
+    <p class="eyebrow">chapter six — your next chapter</p>
+    <h2>The move<br><em>forward.</em></h2>
+    <div class="reflect-pill" id="pill-c5c"></div>
+    <div class="chapter-card">
+      <p class="chapter-label">1 of 3</p>
+      <p class="prompt-label">What would a "2 degree shift" look like for you — a small but real change that, if you made it, would change the direction of everything?</p>
+      <textarea id="c6a" placeholder="Not a massive overhaul. Just the next honest move." rows="5"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="reflectAndGo('screen-c6b','c6a','pill-c6a')">Next →</button>
+      <button class="btn btn-outline" onclick="goTo('screen-c5c')">← Back</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="screen-c6b">
+  <div class="inner">
+    <p class="eyebrow">chapter six — your next chapter</p>
+    <h2>The move<br><em>forward.</em></h2>
+    <div class="reflect-pill" id="pill-c6a"></div>
+    <div class="chapter-card">
+      <p class="chapter-label">2 of 3</p>
+      <p class="prompt-label">Who's already in your life that sees you clearly — and do you let them? What gets in the way?</p>
+      <textarea id="c6b" placeholder="Think about who actually knows you..." rows="5"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="reflectAndGo('screen-c6c','c6b','pill-c6b')">Next →</button>
+      <button class="btn btn-outline" onclick="goTo('screen-c6a')">← Back</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="screen-c6c">
+  <div class="inner">
+    <p class="eyebrow">chapter six — your next chapter</p>
+    <h2>The move<br><em>forward.</em></h2>
+    <div class="reflect-pill" id="pill-c6b"></div>
+    <div class="chapter-card">
+      <p class="chapter-label">3 of 3 — last one</p>
+      <p class="prompt-label">If the version of you that has already figured this out could send you a message right now — what would they say?</p>
+      <textarea id="c6c" placeholder="Let yourself imagine it. What do they know that you're just starting to?" rows="5"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="finishJourney()">That's it — show me who I am →</button>
+      <button class="btn btn-outline" onclick="goTo('screen-c6b')">← Back</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     LANDING (AI processing)
+══════════════════════════════════════ -->
+<div class="screen" id="screen-landing">
+  <div class="inner" style="text-align:center;padding-top:6rem;">
+    <p class="eyebrow" style="justify-content:center;">almost there</p>
+    <h2>Your story is<br><em>being read.</em></h2>
+    <p style="max-width:420px;margin:1.5rem auto;">Give us about 20 seconds — the AI is working through everything you wrote and building something specific to you.</p>
+    <p style="font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.12em;color:var(--gold-dim);margin-top:2rem;text-transform:uppercase;">Your Nest ID: <span id="nest-id" style="color:var(--gold);">generating…</span></p>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     SNAPSHOT (email capture + teaser)
+══════════════════════════════════════ -->
+<div class="screen" id="screen-snapshot">
+  <div class="inner">
+    <p class="eyebrow">your profile is ready</p>
+    <h2>Here's a<br><em>glimpse.</em></h2>
+
+    <div class="snap-badge">
+      <span class="snap-badge-mbti" id="snap-mbti">ENFJ</span>
+      <span class="snap-badge-label" id="snap-archetype">The Connector</span>
+    </div>
+
+    <div class="snap-preview">
+      <div id="snap-preview">
+        <p style="color:var(--text-muted);font-style:italic;">Your profile is loading…</p>
+      </div>
+    </div>
+
+    <div class="email-capture">
+      <p class="email-capture-title">Want the full picture?</p>
+      <p>Drop your email and we'll send you your free snapshot — and keep a copy for you to return to anytime.</p>
+      <div class="email-row">
+        <input type="email" id="snap-email" placeholder="your@email.com">
+        <button class="btn btn-gold" onclick="submitEmail()" style="white-space:nowrap;">Send it →</button>
+      </div>
+      <p id="email-error">Please enter a valid email address.</p>
+      <p id="email-submitted">🐦 You're in. Check your inbox — and scroll down to see what's waiting.</p>
+    </div>
+
+    <div class="teaser-section">
+      <div class="teaser-content teaser-blur">
+        <h3>How you're wired</h3>
+        <p>Your mind processes the world relationally before it processes it logically. You're energised by people, make decisions through the lens of impact, and carry a quiet but persistent drive to make things better for everyone around you.</p>
+        <h3 style="margin-top:1.25rem;">Your stuck places</h3>
+        <p>Your pattern probably involves saying yes when you mean not yet, or carrying the emotional weight of a room so nobody else has to. The leap from Rescuer to Coach is one of the most significant shifts your type can make.</p>
+        <h3 style="margin-top:1.25rem;">Your attachment style</h3>
+        <p>You lean anxious-secure — capable of deep connection, but under stress you can spiral into "are we okay?" before the other person even knows anything's wrong. You're not needy. You're just paying very close attention.</p>
+      </div>
+      <div class="teaser-overlay">
+        <span class="lock-icon">🔒</span>
+        <p>Your full profile is one step away</p>
+      </div>
+    </div>
+
+    <div class="btn-row" style="margin-top:2rem;">
+      <button class="btn btn-gold" onclick="goTo('screen-pay')">Unlock my full profile →</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     PAYMENT
+══════════════════════════════════════ -->
+<div class="screen" id="screen-pay">
+  <div class="inner">
+    <p class="eyebrow">unlock your nest</p>
+    <h2>Pay what<br><em>feels right.</em></h2>
+    <p class="pay-intro">Your full profile, The Nest, and a permanent link to return to whenever you need it. Choose what feels honest.</p>
+
+    <div class="pay-amounts">
+      <button class="pay-btn" onclick="selectAmount(5,this)">$5<span>just getting started</span></button>
+      <button class="pay-btn selected" onclick="selectAmount(12,this)">$12<span>feels fair</span></button>
+      <button class="pay-btn" onclick="selectAmount(25,this)">$25<span>pay it forward</span></button>
+    </div>
+
+    <div class="offer-codes">
+      <p class="offer-codes-title">🎁 your discount codes — save these</p>
+      <div class="offer-item">
+        <span class="offer-code">IMREADY</span>
+        <p class="offer-desc">25% off your first <a href="https://calendly.com/lilbirdlifecoaching/first-flight-session" target="_blank">First Flight coaching session →</a></p>
+      </div>
+      <div class="offer-item">
+        <span class="offer-code">SOLO50</span>
+        <p class="offer-desc">50% off Life Change Sessions: Solo — our self-guided course (coming soon)</p>
+      </div>
+      <p class="offer-note">These codes are yours — no expiry, no pressure. Use them whenever you're ready.</p>
+    </div>
+
+    <div class="stripe-wrap">
+      <div id="card-element"></div>
+      <div id="card-errors"></div>
+    </div>
+
+    <button class="btn btn-gold" id="payButton" onclick="processPayment()">Unlock my full profile →</button>
+    <div id="payProcessing"><span>🐦</span><span>Processing payment…</span></div>
+    <div id="payError"></div>
+    <p class="pay-reassure">Secured by Stripe · My bias is you — if something goes wrong, email hello@lilbird.life</p>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     RESULTS — THE NEST
+══════════════════════════════════════ -->
+<div class="screen" id="screen-results">
+  <div class="inner">
+
+    <div class="result-header">
+      <p class="eyebrow">your nest</p>
+      <h1 id="result-archetype" style="margin-bottom:0.25rem;">The Connector</h1>
+      <p id="result-archetype-sub" style="color:var(--gold-dim);font-family:'Playfair Display',serif;font-style:italic;font-size:1.05rem;margin-bottom:1.25rem;"></p>
+      <div class="result-tags" id="result-tags"></div>
+    </div>
+
+    <div class="result-section">
+      <p class="result-section-label">who you are</p>
+      <div id="result-who"></div>
+    </div>
+
+    <div class="result-section">
+      <p class="result-section-label">how you're wired</p>
+      <div id="result-wired"></div>
+    </div>
+
+    <div class="result-section">
+      <p class="result-section-label">your attachment style</p>
+      <div id="result-attachment"></div>
+    </div>
+
+    <div id="result-quote">
+      <blockquote>"Clarity changes everything."</blockquote>
+    </div>
+
+    <div class="result-section">
+      <p class="result-section-label">things to remember</p>
+      <div id="result-remember"></div>
+    </div>
+
+    <div class="result-section">
+      <p class="result-section-label">where you get stuck</p>
+      <div id="result-stuck"></div>
+    </div>
+
+    <div class="result-section">
+      <p class="result-section-label" id="result-wing-title">your wing</p>
+      <div id="result-wing"></div>
+    </div>
+
+    <div class="nest-box">
+      <p class="eyebrow" style="margin-bottom:0.5rem;">your nest id</p>
+      <p style="color:var(--text-muted);font-size:0.88rem;margin-bottom:0.5rem;">This link is yours forever. Bookmark it, save it — come back any time.</p>
+      <p class="nest-id" id="result-nest-id"></p>
+      <div class="btn-row" style="margin-top:1.25rem;">
+        <button class="btn btn-outline" onclick="copyNestLink()">Copy my Nest link</button>
+        <button class="btn btn-outline" onclick="restartAssessment()">Retake (free, once)</button>
+      </div>
+    </div>
+
+    <div class="result-cta">
+      <div class="result-cta-text">
+        <p class="eyebrow" style="margin-bottom:0.75rem;">ready to go deeper?</p>
+        <h3 style="color:var(--text-main);font-family:'Playfair Display',serif;font-size:1.15rem;margin-bottom:0.5rem;">This is just the beginning.</h3>
+        <p style="font-size:0.9rem;">A First Flight session with Luke takes everything you've just discovered and turns it into a real conversation — and a real next step.</p>
+        <p style="font-size:0.82rem;color:var(--gold-dim);margin-top:0.5rem;font-family:'DM Mono',monospace;">Use code IMREADY for 25% off.</p>
+      </div>
+      <div class="result-cta-btns">
+        <a href="https://calendly.com/lilbirdlifecoaching/first-flight-session" target="_blank" class="btn btn-gold">Book a First Flight →</a>
+        <a href="index.html" class="btn btn-outline">← Back to home</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer class="page-footer">
+  <p>lil' bird life coaching · <a href="index.html">lilbird.life</a> · hello@lilbird.life</p>
+</footer>
+
+
+<script>
+// ═══════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════
+const WORKER_URL     = 'https://lilbird-assessment.cwwq46sn7m.workers.dev';
+const STRIPE_PK      = 'pk_live_51QSMYQGAu36WZ7DdlsoNqzwPnsf4HUoOj6F1NZAeGnnH1TPjDEdEQudXIGgTLaUq079aQMI1W2MS6UpMItmTjgxy00HbouBx2g';
+const SHEETS_URL     = ''; // paste Apps Script URL here
+const BEEHIIV_PUB_ID = '53a4cafc-9b30-41d5-bd5e-4dc0026b4308';
+
+// ═══════════════════════════════════════
 // STATE
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════
 let selectedAmount = 12;
 let stripeInstance = null;
 let cardElement    = null;
@@ -27,450 +828,333 @@ let nestId         = null;
 let hasRetake      = false;
 let profileData    = null;
 
-// ═══════════════════════════════════════════════
+const PROGRESS = {
+  'screen-intro':0,'screen-c1a':8,'screen-c1b':14,'screen-c1c':20,
+  'screen-c2a':28,'screen-c2b':34,'screen-c2c':40,
+  'screen-c3a':48,'screen-c3b':54,'screen-c3c':60,
+  'screen-c4a':67,'screen-c4b':73,
+  'screen-c5a':78,'screen-c5b':83,'screen-c5c':88,
+  'screen-c6a':91,'screen-c6b':94,'screen-c6c':97,
+  'screen-landing':99,'screen-snapshot':100,'screen-pay':100,'screen-results':100,
+};
+
+// ═══════════════════════════════════════
 // PARTICLES
-// ═══════════════════════════════════════════════
-(function spawnParticles() {
-  const container = document.getElementById('particles');
-  for (let i = 0; i < 12; i++) {
+// ═══════════════════════════════════════
+(function(){
+  const c = document.getElementById('particles');
+  for(let i=0;i<12;i++){
     const p = document.createElement('div');
     p.className = 'particle';
-    p.style.left = Math.random() * 100 + 'vw';
-    p.style.animationDuration = (8 + Math.random() * 12) + 's';
-    p.style.animationDelay    = (Math.random() * 10) + 's';
-    p.style.width = p.style.height = (2 + Math.random() * 3) + 'px';
-    p.style.background = Math.random() > 0.5 ? '#F5C842' : '#e8734a';
-    container.appendChild(p);
+    p.style.left = Math.random()*100+'vw';
+    p.style.animationDuration = (8+Math.random()*12)+'s';
+    p.style.animationDelay = (Math.random()*10)+'s';
+    p.style.width = p.style.height = (2+Math.random()*3)+'px';
+    p.style.background = Math.random()>0.5?'#F5C842':'#e8734a';
+    c.appendChild(p);
   }
 })();
 
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════
 // NAVIGATION
-// ═══════════════════════════════════════════════
-function goTo(screenId) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  const target = document.getElementById(screenId);
-  if (target) {
-    target.classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  // Init Stripe when pay screen appears
-  if (screenId === 'screen-pay' && !stripeInstance) {
-    initStripe();
-  }
-
-  // Run analysis when landing screen appears
-  if (screenId === 'screen-landing') {
-    runAnalysis();
-  }
-  // Populate snapshot when shown
-  if (screenId === 'screen-snapshot' && profileData) {
-    populateSnapshot(profileData);
-  }
+// ═══════════════════════════════════════
+function goTo(screenId){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const t = document.getElementById(screenId);
+  if(t){ t.classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }
+  document.getElementById('progressBar').style.width=(PROGRESS[screenId]??0)+'%';
+  if(screenId==='screen-pay' && !stripeInstance) initStripe();
+  if(screenId==='screen-landing') runAnalysis();
+  if(screenId==='screen-snapshot' && profileData) populateSnapshot(profileData);
 }
 
-function reflectAndGo(nextScreen, inputId, pillId) {
-  const val = document.getElementById(inputId)?.value?.trim() || '';
-  if (val.length > 3) {
-    const words = val.split(' ').slice(0, 10).join(' ');
-    const pill  = document.getElementById(pillId);
-    if (pill) {
-      pill.textContent = '"' + words + (val.split(' ').length > 10 ? '..."' : '"');
-      pill.style.display = 'inline-block';
-    }
+function reflectAndGo(next, inputId, pillId){
+  const val = document.getElementById(inputId)?.value?.trim()||'';
+  if(val.length>3){
+    const words = val.split(' ').slice(0,10).join(' ');
+    const pill = document.getElementById(pillId);
+    if(pill){ pill.textContent='"'+words+(val.split(' ').length>10?'..."':'"'); pill.style.display='inline-block'; }
   }
-  goTo(nextScreen);
+  goTo(next);
 }
 
-// ═══════════════════════════════════════════════
-// PAYMENT — AMOUNT SELECTION
-// ═══════════════════════════════════════════════
-function selectAmount(amount, el) {
+function finishJourney(){
+  const val = document.getElementById('c6c')?.value?.trim()||'';
+  const pill = document.getElementById('pill-c6b');
+  if(val.length>3 && pill){ pill.textContent='"'+val.split(' ').slice(0,10).join(' ')+(val.split(' ').length>10?'..."':'"'); pill.style.display='inline-block'; }
+  goTo('screen-landing');
+}
+
+// ═══════════════════════════════════════
+// PAYMENT
+// ═══════════════════════════════════════
+function selectAmount(amount, el){
   selectedAmount = amount;
-  document.querySelectorAll('.pay-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('.pay-btn').forEach(b=>b.classList.remove('selected'));
   el.classList.add('selected');
 }
 
-// ═══════════════════════════════════════════════
-// STRIPE INIT
-// ═══════════════════════════════════════════════
-function initStripe() {
+function initStripe(){
+  // Load Stripe JS on demand — only when pay screen is shown
+  if (typeof Stripe === 'undefined') {
+    var s = document.createElement('script');
+    s.src = 'https://js.stripe.com/v3/';
+    s.onload = function() { _initStripeElements(); };
+    document.head.appendChild(s);
+    return;
+  }
+  _initStripeElements();
+}
+function _initStripeElements(){
   stripeInstance = Stripe(STRIPE_PK);
   const elements = stripeInstance.elements({
-    appearance: {
-      theme: 'night',
-      variables: {
-        colorPrimary: '#F5C842',
-        colorBackground: '#2d3040',
-        colorText: '#f0ece4',
-        colorDanger: '#e8734a',
-        fontFamily: 'DM Sans, sans-serif',
-        borderRadius: '10px',
-      }
+    appearance:{
+      theme:'night',
+      variables:{colorPrimary:'#F5C842',colorBackground:'#2d3040',colorText:'#f0ece4',colorDanger:'#e8734a',fontFamily:'DM Sans, sans-serif',borderRadius:'10px'}
     }
   });
-  cardElement = elements.create('card', {
-    style: {
-      base: {
-        color: '#f0ece4',
-        fontFamily: 'DM Sans, sans-serif',
-        fontSize: '15px',
-        fontWeight: '300',
-        '::placeholder': { color: 'rgba(240,236,228,0.35)' }
-      }
-    }
-  });
+  cardElement = elements.create('card',{style:{base:{color:'#f0ece4',fontFamily:'DM Sans, sans-serif',fontSize:'15px',fontWeight:'300','::placeholder':{color:'rgba(240,236,228,0.35)'}}}});
   cardElement.mount('#card-element');
-  cardElement.on('change', evt => {
-    document.getElementById('card-errors').textContent = evt.error ? evt.error.message : '';
-  });
+  cardElement.on('change',evt=>{ document.getElementById('card-errors').textContent=evt.error?evt.error.message:''; });
 }
 
-// ═══════════════════════════════════════════════
-// PROCESS PAYMENT
-// ═══════════════════════════════════════════════
-async function processPayment() {
-  const btn = document.getElementById('payButton');
-  const processing = document.getElementById('payProcessing');
-  const errBox = document.getElementById('payError');
-
-  btn.style.display = 'none';
-  processing.style.display = 'flex';
-  errBox.style.display = 'none';
-
-  try {
-    // 1. Create PaymentIntent via Worker
-    const intentRes = await fetch(`${WORKER_URL}/create-payment-intent`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount: selectedAmount * 100, nestId })
-    });
-
-    if (!intentRes.ok) throw new Error('Payment setup failed. Please try again.');
-    const { clientSecret } = await intentRes.json();
-
-    // 2. Confirm payment with Stripe
-    const { error, paymentIntent } = await stripeInstance.confirmCardPayment(clientSecret, {
-      payment_method: { card: cardElement }
-    });
-
-    if (error) throw new Error(error.message);
-    if (paymentIntent.status !== 'succeeded') throw new Error('Payment did not complete. Please try again.');
-
-    // 3. Log to Google Sheet
-    if (SHEETS_URL && profileData) {
-      logToSheet(profileData, selectedAmount, collectResponses());
-    }
-
-    // 4. Show results
+async function processPayment(){
+  const btn=document.getElementById('payButton');
+  const proc=document.getElementById('payProcessing');
+  const err=document.getElementById('payError');
+  btn.style.display='none'; proc.style.display='flex'; err.style.display='none';
+  try{
+    const r=await fetch(`${WORKER_URL}/create-payment-intent`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:selectedAmount*100,nestId})});
+    if(!r.ok) throw new Error('Payment setup failed. Please try again.');
+    const {clientSecret}=await r.json();
+    const {error,paymentIntent}=await stripeInstance.confirmCardPayment(clientSecret,{payment_method:{card:cardElement}});
+    if(error) throw new Error(error.message);
+    if(paymentIntent.status!=='succeeded') throw new Error('Payment did not complete. Please try again.');
+    if(SHEETS_URL && profileData) logToSheet(profileData,selectedAmount,collectResponses());
     renderResults(profileData);
     goTo('screen-results');
-
-  } catch (err) {
-    errBox.textContent = err.message || 'Something went wrong. Please try again.';
-    errBox.style.display = 'block';
-    btn.style.display = 'flex';
-    processing.style.display = 'none';
+  }catch(e){
+    err.textContent=e.message||'Something went wrong. Please try again.';
+    err.style.display='block'; btn.style.display='flex'; proc.style.display='none';
   }
 }
 
-// ═══════════════════════════════════════════════
-// COLLECT RESPONSES
-// ═══════════════════════════════════════════════
-function collectResponses() {
-  return {
-    ch1a: document.getElementById('c1a')?.value?.trim() || '',
-    ch1b: document.getElementById('c1b')?.value?.trim() || '',
-    ch1c: document.getElementById('c1c')?.value?.trim() || '',
-    ch2a: document.getElementById('c2a')?.value?.trim() || '',
-    ch2b: document.getElementById('c2b')?.value?.trim() || '',
-    ch2c: document.getElementById('c2c')?.value?.trim() || '',
-    ch3a: document.getElementById('c3a')?.value?.trim() || '',
-    ch3b: document.getElementById('c3b')?.value?.trim() || '',
-    ch3c: document.getElementById('c3c')?.value?.trim() || '',
-    ch4a: document.getElementById('c4a')?.value?.trim() || '',
-    ch4b: document.getElementById('c4b')?.value?.trim() || '',
-    ch5a: document.getElementById('c5a')?.value?.trim() || '',
-    ch5b: document.getElementById('c5b')?.value?.trim() || '',
-    ch5c: document.getElementById('c5c')?.value?.trim() || '',
-    ch6a: document.getElementById('c6a')?.value?.trim() || '',
-    ch6b: document.getElementById('c6b')?.value?.trim() || '',
-    ch6c: document.getElementById('c6c')?.value?.trim() || '',
-  };
+// ═══════════════════════════════════════
+// RESPONSES
+// ═══════════════════════════════════════
+function collectResponses(){
+  const ids=['c1a','c1b','c1c','c2a','c2b','c2c','c3a','c3b','c3c','c4a','c4b','c5a','c5b','c5c','c6a','c6b','c6c'];
+  const r={};
+  ids.forEach(id=>{ r['ch'+id.replace(/[a-z]/,(m)=>m)]=document.getElementById(id)?.value?.trim()||''; });
+  return r;
 }
 
-// ═══════════════════════════════════════════════
-// RUN AI ANALYSIS (called at landing screen)
-// ═══════════════════════════════════════════════
-async function runAnalysis() {
-  const responses = collectResponses();
-  nestId = generateNestId();
-  document.getElementById('nest-id').textContent = nestId;
-
-  // Show loading overlay during AI processing
+// ═══════════════════════════════════════
+// AI ANALYSIS
+// ═══════════════════════════════════════
+async function runAnalysis(){
+  const responses=collectResponses();
+  nestId=generateNestId();
+  document.getElementById('nest-id').textContent=nestId;
   document.getElementById('loadingOverlay').classList.add('active');
-
-  try {
-    const res = await fetch(`${WORKER_URL}/analyze`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ responses, nestId })
-    });
-
-    if (!res.ok) throw new Error('Analysis failed');
-    profileData = await res.json();
-
-    // Store in KV via worker (results only, no raw responses)
-    await fetch(`${WORKER_URL}/store-profile`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nestId, profile: profileData })
-    });
-
-  } catch (err) {
-    console.error('Analysis error:', err);
-    // Fallback: use a sensible default profile structure
-    profileData = getFallbackProfile();
+  try{
+    const r=await fetch(`${WORKER_URL}/analyze`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({responses,nestId})});
+    if(!r.ok) throw new Error('Analysis failed');
+    profileData=await r.json();
+    await fetch(`${WORKER_URL}/store-profile`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nestId,profile:profileData})});
+  }catch(e){
+    console.error('Analysis error — using fallback:',e);
+    profileData=getFallbackProfile();
   }
-
   document.getElementById('loadingOverlay').classList.remove('active');
+
+  // Log completion to Sheet immediately — amount 0 means they completed but haven't paid yet
+  if(SHEETS_URL && profileData) logToSheet(profileData, 0, collectResponses());
+
+  goTo('screen-snapshot');
 }
 
-// ═══════════════════════════════════════════════
-// RENDER RESULTS
-// ═══════════════════════════════════════════════
-function renderResults(profile) {
-  if (!profile) return;
-
-  // Header
-  document.getElementById('result-archetype').textContent = profile.archetype || 'The Connector';
-  document.getElementById('result-archetype-sub').textContent = profile.archetypeSub || '';
-
-  // Tags
-  const tags = document.getElementById('result-tags');
-  tags.innerHTML = '';
-  if (profile.mbti) tags.innerHTML += `<span class="ftag gold">${profile.mbti}</span>`;
-  if (profile.enneagram) tags.innerHTML += `<span class="ftag ember">${profile.enneagram}</span>`;
-  if (profile.attachment) tags.innerHTML += `<span class="ftag">${profile.attachment}</span>`;
-
-  // Sections
-  setSection('result-who', profile.whoYouAre);
-  setSection('result-wired', profile.howWired);
-  setSection('result-attachment', profile.attachmentDetail);
-  setSection('result-remember', profile.thingsToRemember);
-  setSection('result-stuck', profile.stuckPlaces);
-
-  if (profile.wing) {
-    document.getElementById('result-wing-title').textContent = profile.wingTitle || 'Your wing';
-    setSection('result-wing', profile.wing);
-  }
-
-  // Quote
-  if (profile.quote) {
-    document.querySelector('#result-quote blockquote').textContent = `"${profile.quote}"`;
-  }
-
-  // Nest ID in URL
-  if (nestId) {
-    const url = new URL(window.location);
-    url.searchParams.set('nest', nestId);
-    window.history.replaceState({}, '', url);
+// ═══════════════════════════════════════
+// SNAPSHOT
+// ═══════════════════════════════════════
+function populateSnapshot(profile){
+  if(!profile) return;
+  const m=document.getElementById('snap-mbti');
+  if(m && profile.mbti) m.textContent=profile.mbti;
+  const a=document.getElementById('snap-archetype');
+  if(a) a.textContent=(profile.archetype||'Your Type')+(profile.archetypeSub?' — '+profile.archetypeSub:'');
+  const prev=document.getElementById('snap-preview');
+  if(prev && profile.whoYouAre){
+    const paras=profile.whoYouAre.split(/\n\n/).slice(0,2);
+    prev.innerHTML=paras.map(p=>`<p>${p}</p>`).join('');
   }
 }
 
-function setSection(id, content) {
-  const el = document.getElementById(id);
-  if (!el || !content) return;
-  if (typeof content === 'string') {
-    el.innerHTML = `<p>${content.replace(/\n\n/g, '</p><p>')}</p>`;
-  }
-}
-
-// ═══════════════════════════════════════════════
-// GOOGLE SHEETS LOGGING
-// ═══════════════════════════════════════════════
-function logToSheet(profile, amount, responses) {
-  if (!SHEETS_URL) return;
-  fetch(SHEETS_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      nestId,
-      timestamp: new Date().toISOString(),
-      archetype: profile.archetype || '',
-      mbti: profile.mbti || '',
-      enneagram: profile.enneagram || '',
-      attachment: profile.attachment || '',
-      amount: amount || 0,
-      // Raw answers as safety backup
-      answers: responses ? JSON.stringify(responses) : '',
-    })
-  }).catch(() => {}); // Silent fail — don't block UX
-}
-
-// ═══════════════════════════════════════════════
-// UTILITIES
-// ═══════════════════════════════════════════════
-function generateNestId() {
-  return 'nest-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7);
-}
-
-function restartAssessment() {
-  if (hasRetake) {
-    alert('You have already used your free retake. Email hello@lilbird.life if you need help.');
+// ═══════════════════════════════════════
+// EMAIL → BEEHIIV
+// ═══════════════════════════════════════
+async function submitEmail(){
+  const emailEl=document.getElementById('snap-email');
+  const errorEl=document.getElementById('email-error');
+  const doneEl=document.getElementById('email-submitted');
+  const email=emailEl?emailEl.value.trim():'';
+  if(!email||!email.includes('@')||!email.includes('.')){
+    if(errorEl) errorEl.style.display='block';
     return;
   }
-  hasRetake = true;
-  document.querySelectorAll('textarea').forEach(t => t.value = '');
-  document.querySelectorAll('.reflect-pill').forEach(p => { p.textContent = ''; p.style.display = 'none'; });
-  goTo('screen-c1a');
-}
-
-function getFallbackProfile() {
-  return {
-    archetype: 'The Connector',
-    archetypeSub: 'with a strong Nurturer influence',
-    mbti: 'ENFJ',
-    enneagram: 'Enneagram 2w3',
-    attachment: 'Anxious-Secure',
-    whoYouAre: 'You are the person who walks into a room and immediately, almost involuntarily, takes its temperature. Not for danger — for who looks like they need someone to talk to. Your warmth is structural. People feel seen around you faster than they can explain why.',
-    howWired: 'Your mind processes the world relationally before it processes it logically. You\'re energised by people, make decisions through the lens of impact, and carry a quiet but persistent drive to make things better for everyone around you.',
-    attachmentDetail: 'You lean anxious-secure — capable of deep connection, but under stress you can spiral into "are we okay?" before the other person even knows anything\'s wrong. You\'re not needy. You\'re just paying close attention.',
-    thingsToRemember: 'You give far more than you take. That\'s a gift and it\'s also worth watching. A 2 degree shift toward receiving as generously as you give changes everything downstream.',
-    stuckPlaces: 'Your pattern probably involves saying yes when you mean not yet, or carrying the emotional weight of a room so nobody else has to. The leap from Rescuer to Coach is one of the most significant shifts your type can make.',
-    wingTitle: 'Your wing — the Achiever',
-    wing: 'Your 3 wing means you\'re not just motivated by love and connection, you\'re also quietly tracking whether things are working. The shadow of this wing is performing warmth instead of feeling it. You\'ll know when it happens — it feels slightly hollow. Trust that instinct.',
-    quote: 'Clarity changes everything. And you already have more of it than you think — you just haven\'t given yourself permission to act on it yet.',
-  };
-}
-
-// ═══════════════════════════════════════════════
-// LOAD EXISTING PROFILE (if ?nest= in URL)
-// ═══════════════════════════════════════════════
-// TEST MODE — add ?testpay=1 to URL to skip to payment (remove before final launch)
-window.addEventListener('DOMContentLoaded', function() {
-  const params = new URLSearchParams(window.location.search);
-  if (params.get("testpay") === "1") {
-    nestId = generateNestId();
-    profileData = getFallbackProfile();
-    document.getElementById("nest-id").textContent = nestId;
-    initStripe();
-    populateSnapshot(profileData);
-    goTo("screen-snapshot");
-  }
-});
-
-(async function checkExistingProfile() {
-  const params = new URLSearchParams(window.location.search);
-  const existingNest = params.get('nest');
-  if (!existingNest) return;
-
-  try {
-    const res = await fetch(`${WORKER_URL}/get-profile?nestId=${existingNest}`);
-    if (!res.ok) return;
-    const data = await res.json();
-    if (data.profile) {
-      nestId = existingNest;
-      profileData = data.profile;
-      document.getElementById('nest-id').textContent = nestId;
-      renderResults(profileData);
-      goTo('screen-results');
-    }
-  } catch (e) {
-    // No existing profile found, start fresh
-  }
-})();
-
-// ═══════════════════════════════════════════════
-// BEEHIIV CONFIG
-// ═══════════════════════════════════════════════
-const BEEHIIV_PUB_ID = '53a4cafc-9b30-41d5-bd5e-4dc0026b4308';
-
-// ═══════════════════════════════════════════════
-// POPULATE SNAPSHOT SCREEN
-// ═══════════════════════════════════════════════
-function populateSnapshot(profile) {
-  if (!profile) return;
-
-  // MBTI badge
-  const mbtiEl = document.getElementById('snap-mbti');
-  if (mbtiEl && profile.mbti) mbtiEl.textContent = profile.mbti;
-
-  // Archetype
-  const archEl = document.getElementById('snap-archetype');
-  if (archEl) {
-    archEl.textContent = (profile.archetype || 'Your Type') +
-      (profile.archetypeSub ? ' — ' + profile.archetypeSub : '');
-  }
-
-  // Preview — first 2 paragraphs of whoYouAre
-  const previewEl = document.getElementById('snap-preview');
-  if (previewEl && profile.whoYouAre) {
-    const paras = profile.whoYouAre.split(/\n\n/).slice(0, 2);
-    previewEl.innerHTML = paras.map(p => `<p>${p}</p>`).join('');
-  }
-}
-
-// ═══════════════════════════════════════════════
-// SUBMIT EMAIL → BEEHIIV
-// ═══════════════════════════════════════════════
-async function submitEmail() {
-  const emailEl = document.getElementById('snap-email');
-  const errorEl = document.getElementById('email-error');
-  const submittedEl = document.getElementById('email-submitted');
-  const email = emailEl ? emailEl.value.trim() : '';
-
-  // Validate
-  if (!email || !email.includes('@') || !email.includes('.')) {
-    if (errorEl) { errorEl.style.display = 'block'; }
-    return;
-  }
-  if (errorEl) errorEl.style.display = 'none';
-
-  // Disable input during submit
-  if (emailEl) emailEl.disabled = true;
-
-  try {
-    await fetch('https://api.beehiiv.com/v2/publications/' + BEEHIIV_PUB_ID + '/subscriptions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email,
-        reactivate_existing: true,
-        send_welcome_email: true,
-        custom_fields: [
-          { name: 'archetype',   value: profileData?.archetype   || '' },
-          { name: 'mbti',        value: profileData?.mbti        || '' },
-          { name: 'enneagram',   value: profileData?.enneagram   || '' },
-          { name: 'attachment',  value: profileData?.attachment  || '' },
-          { name: 'nest_id',     value: nestId                   || '' },
-          { name: 'source',      value: 'deep-profile-snapshot'        },
+  if(errorEl) errorEl.style.display='none';
+  if(emailEl) emailEl.disabled=true;
+  try{
+    await fetch('https://api.beehiiv.com/v2/publications/'+BEEHIIV_PUB_ID+'/subscriptions',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        email,reactivate_existing:true,send_welcome_email:true,
+        custom_fields:[
+          {name:'archetype',value:profileData?.archetype||''},
+          {name:'mbti',value:profileData?.mbti||''},
+          {name:'enneagram',value:profileData?.enneagram||''},
+          {name:'attachment',value:profileData?.attachment||''},
+          {name:'nest_id',value:nestId||''},
+          {name:'source',value:'deep-profile-snapshot'},
         ]
       })
     });
-  } catch (e) {
-    // Silent fail — don't block the experience
-    console.warn('Beehiiv error:', e);
-  }
-
-  // Show confirmation regardless
-  if (submittedEl) submittedEl.style.display = 'block';
-  if (emailEl) emailEl.closest('.email-row').style.display = 'none';
+  }catch(e){ console.warn('Beehiiv error (silent):',e); }
+  if(doneEl) doneEl.style.display='block';
+  if(emailEl) emailEl.closest('.email-row').style.display='none';
 }
 
-// ═══════════════════════════════════════════════
-// OVERRIDE goTo to populate snapshot when shown
-// ═══════════════════════════════════════════════
-const _originalGoTo = goTo;
-goTo = function(screenId) {
-  _originalGoTo(screenId);
-  if (screenId === 'screen-snapshot' && profileData) {
-    populateSnapshot(profileData);
+// ═══════════════════════════════════════
+// RENDER RESULTS
+// ═══════════════════════════════════════
+function renderResults(profile){
+  if(!profile) return;
+  document.getElementById('result-archetype').textContent=profile.archetype||'The Connector';
+  document.getElementById('result-archetype-sub').textContent=profile.archetypeSub||'';
+  const tags=document.getElementById('result-tags');
+  tags.innerHTML='';
+  if(profile.mbti)       tags.innerHTML+=`<span class="ftag gold">${profile.mbti}</span>`;
+  if(profile.enneagram)  tags.innerHTML+=`<span class="ftag ember">${profile.enneagram}</span>`;
+  if(profile.attachment) tags.innerHTML+=`<span class="ftag">${profile.attachment}</span>`;
+  setSection('result-who',profile.whoYouAre);
+  setSection('result-wired',profile.howWired);
+  setSection('result-attachment',profile.attachmentDetail);
+  setSection('result-remember',profile.thingsToRemember);
+  setSection('result-stuck',profile.stuckPlaces);
+  if(profile.wing){ document.getElementById('result-wing-title').textContent=profile.wingTitle||'Your wing'; setSection('result-wing',profile.wing); }
+  if(profile.quote) document.querySelector('#result-quote blockquote').textContent=`"${profile.quote}"`;
+  if(nestId){
+    document.getElementById('result-nest-id').textContent=`lilbird.life/deep-profile.html?nest=${nestId}`;
+    const url=new URL(window.location);
+    url.searchParams.set('nest',nestId);
+    window.history.replaceState({},'',url);
   }
-};
+}
 
+function setSection(id,content){
+  const el=document.getElementById(id);
+  if(!el||!content) return;
+  el.innerHTML=`<p>${content.replace(/\n\n/g,'</p><p>')}</p>`;
+}
+
+// ═══════════════════════════════════════
+// SHEETS LOGGING
+// ═══════════════════════════════════════
+function logToSheet(profile,amount,responses){
+  if(!SHEETS_URL) return;
+  fetch(SHEETS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+    nestId,
+    timestamp:new Date().toISOString(),
+    archetype:profile.archetype||'',
+    mbti:profile.mbti||'',
+    enneagram:profile.enneagram||'',
+    attachment:profile.attachment||'',
+    amount:amount||0,
+    paid: amount > 0 ? 'yes' : 'no',
+    answers:responses?JSON.stringify(responses):''
+  })}).catch(()=>{});
+}
+
+// ═══════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════
+function generateNestId(){ return 'nest-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7); }
+
+function copyNestLink(){
+  const link=nestId?`https://lilbird.life/deep-profile.html?nest=${nestId}`:window.location.href;
+  navigator.clipboard.writeText(link).then(()=>{
+    const btn=event.target; const orig=btn.textContent;
+    btn.textContent='✓ Copied!';
+    setTimeout(()=>btn.textContent=orig,2000);
+  });
+}
+
+function restartAssessment(){
+  if(hasRetake){ alert('You have already used your free retake. Email hello@lilbird.life if you need help.'); return; }
+  hasRetake=true;
+  document.querySelectorAll('textarea').forEach(t=>t.value='');
+  document.querySelectorAll('.reflect-pill').forEach(p=>{ p.textContent=''; p.style.display='none'; });
+  goTo('screen-c1a');
+}
+
+function getFallbackProfile(){
+  return {
+    archetype:'The Connector',
+    archetypeSub:'with a strong Nurturer influence',
+    mbti:'ENFJ',
+    enneagram:'Enneagram 2w3',
+    attachment:'Anxious-Secure',
+    whoYouAre:'You are the person who walks into a room and immediately, almost involuntarily, takes its temperature. Not for danger — for who looks like they need someone to talk to. Your warmth is structural. People feel seen around you faster than they can explain why.\n\nThis isn\'t performance. It\'s just how you\'re made. And it\'s one of your most significant gifts — even when it costs you.',
+    howWired:'Your mind processes the world relationally before it processes it logically. You\'re energised by people, make decisions through the lens of impact, and carry a quiet but persistent drive to make things better for everyone around you.',
+    attachmentDetail:'You lean anxious-secure — capable of deep connection, but under stress you can spiral into "are we okay?" before the other person even knows anything\'s wrong. You\'re not needy. You\'re just paying close attention.',
+    thingsToRemember:'You give far more than you take. That\'s a gift and it\'s also worth watching. A 2 degree shift toward receiving as generously as you give changes everything downstream.',
+    stuckPlaces:'Your pattern probably involves saying yes when you mean not yet, or carrying the emotional weight of a room so nobody else has to. The leap from Rescuer to Coach is one of the most significant shifts your type can make.',
+    wingTitle:'Your wing — the Achiever',
+    wing:'Your 3 wing means you\'re not just motivated by love and connection — you\'re also quietly tracking whether things are working. The shadow of this wing is performing warmth instead of feeling it. You\'ll know when it happens. Trust that instinct.',
+    quote:'Clarity changes everything. And you already have more of it than you think — you just haven\'t given yourself permission to act on it yet.',
+  };
+}
+
+// ═══════════════════════════════════════
+// INIT — check for existing profile or test mode
+// ═══════════════════════════════════════
+// Init — deferred so page renders immediately first
+window.addEventListener('DOMContentLoaded', function() {
+  const params = new URLSearchParams(window.location.search);
+
+  // Test mode: skip to snapshot with fallback profile
+  if (params.get('testpay') === '1') {
+    nestId = generateNestId();
+    profileData = getFallbackProfile();
+    document.getElementById('nest-id').textContent = nestId;
+    populateSnapshot(profileData);
+    goTo('screen-snapshot');
+    return;
+  }
+
+  // Only hit the Worker if a ?nest= param is in the URL
+  const existingNest = params.get('nest');
+  if (!existingNest) return; // No nest param — show intro, nothing to load
+
+  // Warm up Worker with a tiny ping first to reduce cold-start delay
+  fetch(WORKER_URL + '/ping', { method: 'GET', mode: 'no-cors' }).catch(() => {});
+
+  // Fetch the existing profile
+  (async function() {
+    try {
+      const r = await fetch(`${WORKER_URL}/get-profile?nestId=${existingNest}`);
+      if (!r.ok) return;
+      const data = await r.json();
+      if (data.profile) {
+        nestId = existingNest;
+        profileData = data.profile;
+        document.getElementById('nest-id').textContent = nestId;
+        renderResults(profileData);
+        goTo('screen-results');
+      }
+    } catch(e) { /* no profile found — start fresh */ }
+  })();
+});
 </script>
 </body>
 </html>
