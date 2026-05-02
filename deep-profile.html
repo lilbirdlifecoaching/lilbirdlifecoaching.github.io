@@ -1133,6 +1133,7 @@ const PROGRESS = {
 // NAVIGATION
 // ═══════════════════════════════════════
 function goTo(screenId){
+  if(typeof stopMic === 'function' && activeRecognitionId) stopMic();
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   const t = document.getElementById(screenId);
   if(t){ t.classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }
@@ -1550,12 +1551,7 @@ function stopMic(){
   activeRecognitionId = null;
 }
 
-// Stop mic when navigating between screens
-const _origGoTo = goTo;
-function goTo(screenId){
-  if(activeRecognitionId) stopMic();
-  _origGoTo(screenId);
-}
+// Stop mic when navigating — called directly inside goTo
 
 // ═══════════════════════════════════════
 // PARTNER DYNAMIC
