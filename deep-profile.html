@@ -249,6 +249,126 @@
   .page-footer p { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.12em; color: var(--text-muted); opacity: 0.5; }
   .page-footer a { color: var(--gold-dim); text-decoration: none; }
 
+  /* VOICE INPUT */
+  .input-wrap { position: relative; }
+  .mic-btn {
+    position: absolute;
+    bottom: 1.75rem;
+    right: 0.75rem;
+    background: none;
+    border: 1px solid rgba(245,200,66,0.2);
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 1rem;
+    color: var(--gold-dim);
+    padding: 0;
+    z-index: 10;
+  }
+  .mic-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .mic-btn.recording {
+    border-color: var(--ember);
+    color: var(--ember);
+    animation: pulse-mic 1s ease-in-out infinite;
+  }
+  @keyframes pulse-mic {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(232,115,74,0.4); }
+    50% { box-shadow: 0 0 0 6px rgba(232,115,74,0); }
+  }
+  .mic-hint {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    opacity: 0.6;
+    margin-top: -1rem;
+    margin-bottom: 1.25rem;
+  }
+  .no-speech .mic-btn { display: none; }
+  .no-speech .mic-hint { display: none; }
+
+  /* PARTNER DYNAMIC */
+  .partner-section {
+    background: var(--dark-mid);
+    border: 1px solid rgba(245,200,66,0.12);
+    border-radius: 12px;
+    padding: 1.75rem 2rem;
+    margin: 2.5rem 0;
+  }
+  .partner-section h3 {
+    color: var(--text-main);
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+  .partner-section p { font-size: 0.9rem; margin-bottom: 1rem; }
+  .partner-input { margin-bottom: 1rem; }
+  .partner-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 0.4rem;
+    display: block;
+  }
+  .partner-input input, .partner-input select {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(245,200,66,0.15);
+    border-radius: 8px;
+    color: var(--text-main);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    padding: 0.65rem 1rem;
+    transition: border-color 0.2s;
+  }
+  .partner-input input:focus, .partner-input select:focus { outline: none; border-color: rgba(245,200,66,0.4); }
+  .partner-input input::placeholder { color: rgba(240,234,216,0.3); }
+  .partner-input select option { background: var(--dark-card); }
+  .partner-result {
+    background: var(--dark-card);
+    border: 1px solid var(--dark-border);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    display: none;
+  }
+  .partner-result h4 {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--gold);
+    margin-bottom: 1rem;
+  }
+  .partner-result p { font-size: 0.92rem; color: var(--text-main); line-height: 1.7; margin-bottom: 0.85rem; }
+  .partner-result p:last-child { margin-bottom: 0; }
+
+  /* EXTRA RESULT SECTIONS */
+  .result-section p { color: var(--text-main); font-size: 1rem; line-height: 1.8; margin-bottom: 1rem; }
+  .role-reflection {
+    background: var(--gold-faint);
+    border: 1px solid rgba(245,200,66,0.15);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    margin: 2rem 0;
+  }
+  .role-reflection-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 0.75rem;
+    opacity: 0.8;
+  }
+  .role-reflection p { font-size: 0.92rem; color: var(--text-main); line-height: 1.75; margin-bottom: 0.75rem; }
+
   @media (max-width: 600px) {
     nav { padding: 1rem 1.25rem; }
     .screen { padding: 6rem 1.25rem 3rem; }
@@ -323,7 +443,11 @@
     <div class="chapter-card">
       <p class="chapter-label">1 of 3</p>
       <p class="prompt-label">If someone asked you "how are you, really?" — what would the honest answer be? Not the polished version. The real one.</p>
+      <div class="input-wrap">
       <textarea id="c1a" placeholder="Take your time. There's no wrong answer here." rows="5"></textarea>
+      <button class="mic-btn" onclick="toggleMic('c1a')" title="Speak your answer" type="button">🎤</button>
+      </div>
+      <p class="mic-hint">or tap 🎤 to speak</p>
     </div>
     <div class="btn-row">
       <button class="btn btn-gold" onclick="reflectAndGo('screen-c1b','c1a','pill-c1a')">Next →</button>
@@ -340,7 +464,11 @@
     <div class="chapter-card">
       <p class="chapter-label">2 of 3</p>
       <p class="prompt-label">What's the thing that's been quietly sitting in the background lately — the thing you keep almost thinking about but then don't?</p>
+      <div class="input-wrap">
       <textarea id="c1b" placeholder="Even if it feels small or hard to name..." rows="5"></textarea>
+      <button class="mic-btn" onclick="toggleMic('c1b')" title="Speak your answer" type="button">🎤</button>
+      </div>
+      <p class="mic-hint">or tap 🎤 to speak</p>
     </div>
     <div class="btn-row">
       <button class="btn btn-gold" onclick="reflectAndGo('screen-c1c','c1b','pill-c1b')">Next →</button>
@@ -357,7 +485,11 @@
     <div class="chapter-card">
       <p class="chapter-label">3 of 3</p>
       <p class="prompt-label">What would need to be true six months from now for you to feel like something has genuinely shifted?</p>
+      <div class="input-wrap">
       <textarea id="c1c" placeholder="Dream a little. Be specific if you can." rows="5"></textarea>
+      <button class="mic-btn" onclick="toggleMic('c1c')" title="Speak your answer" type="button">🎤</button>
+      </div>
+      <p class="mic-hint">or tap 🎤 to speak</p>
     </div>
     <div class="btn-row">
       <button class="btn btn-gold" onclick="reflectAndGo('screen-c2a','c1c','pill-c1c')">Continue →</button>
@@ -378,7 +510,11 @@
     <div class="chapter-card">
       <p class="chapter-label">1 of 3</p>
       <p class="prompt-label">Think about a time you were completely in your element — fully alive, doing something that felt effortless. What were you doing, and what made it feel that way?</p>
+      <div class="input-wrap">
       <textarea id="c2a" placeholder="The more specific, the better..." rows="5"></textarea>
+      <button class="mic-btn" onclick="toggleMic('c2a')" title="Speak your answer" type="button">🎤</button>
+      </div>
+      <p class="mic-hint">or tap 🎤 to speak</p>
     </div>
     <div class="btn-row">
       <button class="btn btn-gold" onclick="reflectAndGo('screen-c2b','c2a','pill-c2a')">Next →</button>
@@ -395,7 +531,11 @@
     <div class="chapter-card">
       <p class="chapter-label">2 of 3</p>
       <p class="prompt-label">What drains you most — the kind of situation or interaction that leaves you depleted, even if nothing "went wrong"?</p>
+      <div class="input-wrap">
       <textarea id="c2b" placeholder="Be honest — this matters a lot for your profile..." rows="5"></textarea>
+      <button class="mic-btn" onclick="toggleMic('c2b')" title="Speak your answer" type="button">🎤</button>
+      </div>
+      <p class="mic-hint">or tap 🎤 to speak</p>
     </div>
     <div class="btn-row">
       <button class="btn btn-gold" onclick="reflectAndGo('screen-c2c','c2b','pill-c2b')">Next →</button>
@@ -412,7 +552,11 @@
     <div class="chapter-card">
       <p class="chapter-label">3 of 3</p>
       <p class="prompt-label">When you're stressed or overwhelmed, what do you typically do? Not what you know you "should" do — what you actually do.</p>
+      <div class="input-wrap">
       <textarea id="c2c" placeholder="No judgement here — just honesty..." rows="5"></textarea>
+      <button class="mic-btn" onclick="toggleMic('c2c')" title="Speak your answer" type="button">🎤</button>
+      </div>
+      <p class="mic-hint">or tap 🎤 to speak</p>
     </div>
     <div class="btn-row">
       <button class="btn btn-gold" onclick="reflectAndGo('screen-c3a','c2c','pill-c2c')">Continue →</button>
@@ -433,7 +577,11 @@
     <div class="chapter-card">
       <p class="chapter-label">1 of 3</p>
       <p class="prompt-label">Describe a relationship in your life that feels really good — what makes it work?</p>
+      <div class="input-wrap">
       <textarea id="c3a" placeholder="Could be a friendship, family member, partner, colleague..." rows="5"></textarea>
+      <button class="mic-btn" onclick="toggleMic('c3a')" title="Speak your answer" type="button">🎤</button>
+      </div>
+      <p class="mic-hint">or tap 🎤 to speak</p>
     </div>
     <div class="btn-row">
       <button class="btn btn-gold" onclick="reflectAndGo('screen-c3b','c3a','pill-c3a')">Next →</button>
@@ -450,7 +598,11 @@
     <div class="chapter-card">
       <p class="chapter-label">2 of 3</p>
       <p class="prompt-label">What's the thing you most want people to understand about you — but rarely feel like they do?</p>
+      <div class="input-wrap">
       <textarea id="c3b" placeholder="The thing you wish you could explain once, and have it land..." rows="5"></textarea>
+      <button class="mic-btn" onclick="toggleMic('c3b')" title="Speak your answer" type="button">🎤</button>
+      </div>
+      <p class="mic-hint">or tap 🎤 to speak</p>
     </div>
     <div class="btn-row">
       <button class="btn btn-gold" onclick="reflectAndGo('screen-c3c','c3b','pill-c3b')">Next →</button>
@@ -467,7 +619,11 @@
     <div class="chapter-card">
       <p class="chapter-label">3 of 3</p>
       <p class="prompt-label">When conflict or distance happens in a relationship, what's your first instinct — and what does it cost you?</p>
+      <div class="input-wrap">
       <textarea id="c3c" placeholder="Think about a recent moment if that helps..." rows="5"></textarea>
+      <button class="mic-btn" onclick="toggleMic('c3c')" title="Speak your answer" type="button">🎤</button>
+      </div>
+      <p class="mic-hint">or tap 🎤 to speak</p>
     </div>
     <div class="btn-row">
       <button class="btn btn-gold" onclick="reflectAndGo('screen-c4a','c3c','pill-c3c')">Continue →</button>
@@ -488,7 +644,11 @@
     <div class="chapter-card">
       <p class="chapter-label">1 of 2</p>
       <p class="prompt-label">If you could have any version of your life — no constraints, no expectations from anyone — what would it look like? Don't edit. Just describe.</p>
+      <div class="input-wrap">
       <textarea id="c4a" placeholder="Let yourself want things out loud for a moment..." rows="6"></textarea>
+      <button class="mic-btn" onclick="toggleMic('c4a')" title="Speak your answer" type="button">🎤</button>
+      </div>
+      <p class="mic-hint">or tap 🎤 to speak</p>
     </div>
     <div class="btn-row">
       <button class="btn btn-gold" onclick="reflectAndGo('screen-c4b','c4a','pill-c4a')">Next →</button>
@@ -505,7 +665,11 @@
     <div class="chapter-card">
       <p class="chapter-label">2 of 2</p>
       <p class="prompt-label">What's the fear underneath all of this? The one that doesn't always have a name but shapes a lot of your decisions?</p>
+      <div class="input-wrap">
       <textarea id="c4b" placeholder="It might be about worth, failure, belonging, being seen — or something else entirely..." rows="5"></textarea>
+      <button class="mic-btn" onclick="toggleMic('c4b')" title="Speak your answer" type="button">🎤</button>
+      </div>
+      <p class="mic-hint">or tap 🎤 to speak</p>
     </div>
     <div class="btn-row">
       <button class="btn btn-gold" onclick="reflectAndGo('screen-c5a','c4b','pill-c4b')">Continue →</button>
@@ -526,7 +690,11 @@
     <div class="chapter-card">
       <p class="chapter-label">1 of 3</p>
       <p class="prompt-label">What's the pattern you keep returning to? The thing where you think "I've been here before" — even if the surface details are different?</p>
+      <div class="input-wrap">
       <textarea id="c5a" placeholder="Even if it's hard to name precisely..." rows="5"></textarea>
+      <button class="mic-btn" onclick="toggleMic('c5a')" title="Speak your answer" type="button">🎤</button>
+      </div>
+      <p class="mic-hint">or tap 🎤 to speak</p>
     </div>
     <div class="btn-row">
       <button class="btn btn-gold" onclick="reflectAndGo('screen-c5b','c5a','pill-c5a')">Next →</button>
@@ -543,7 +711,11 @@
     <div class="chapter-card">
       <p class="chapter-label">2 of 3</p>
       <p class="prompt-label">What's the version of yourself you're most afraid to become — or most afraid you already are?</p>
+      <div class="input-wrap">
       <textarea id="c5b" placeholder="Be gentle with yourself here. This is important." rows="5"></textarea>
+      <button class="mic-btn" onclick="toggleMic('c5b')" title="Speak your answer" type="button">🎤</button>
+      </div>
+      <p class="mic-hint">or tap 🎤 to speak</p>
     </div>
     <div class="btn-row">
       <button class="btn btn-gold" onclick="reflectAndGo('screen-c5c','c5b','pill-c5b')">Next →</button>
@@ -560,7 +732,11 @@
     <div class="chapter-card">
       <p class="chapter-label">3 of 3</p>
       <p class="prompt-label">What's one thing you've been avoiding doing or deciding — and what do you think is actually stopping you?</p>
+      <div class="input-wrap">
       <textarea id="c5c" placeholder="Not the excuse. The real thing." rows="5"></textarea>
+      <button class="mic-btn" onclick="toggleMic('c5c')" title="Speak your answer" type="button">🎤</button>
+      </div>
+      <p class="mic-hint">or tap 🎤 to speak</p>
     </div>
     <div class="btn-row">
       <button class="btn btn-gold" onclick="reflectAndGo('screen-c6a','c5c','pill-c5c')">Continue →</button>
@@ -581,7 +757,11 @@
     <div class="chapter-card">
       <p class="chapter-label">1 of 3</p>
       <p class="prompt-label">What would a "2 degree shift" look like for you — a small but real change that, if you made it, would change the direction of everything?</p>
+      <div class="input-wrap">
       <textarea id="c6a" placeholder="Not a massive overhaul. Just the next honest move." rows="5"></textarea>
+      <button class="mic-btn" onclick="toggleMic('c6a')" title="Speak your answer" type="button">🎤</button>
+      </div>
+      <p class="mic-hint">or tap 🎤 to speak</p>
     </div>
     <div class="btn-row">
       <button class="btn btn-gold" onclick="reflectAndGo('screen-c6b','c6a','pill-c6a')">Next →</button>
@@ -598,7 +778,11 @@
     <div class="chapter-card">
       <p class="chapter-label">2 of 3</p>
       <p class="prompt-label">Who's already in your life that sees you clearly — and do you let them? What gets in the way?</p>
+      <div class="input-wrap">
       <textarea id="c6b" placeholder="Think about who actually knows you..." rows="5"></textarea>
+      <button class="mic-btn" onclick="toggleMic('c6b')" title="Speak your answer" type="button">🎤</button>
+      </div>
+      <p class="mic-hint">or tap 🎤 to speak</p>
     </div>
     <div class="btn-row">
       <button class="btn btn-gold" onclick="reflectAndGo('screen-c6c','c6b','pill-c6b')">Next →</button>
@@ -613,13 +797,41 @@
     <h2>The move<br><em>forward.</em></h2>
     <div class="reflect-pill" id="pill-c6b"></div>
     <div class="chapter-card">
-      <p class="chapter-label">3 of 3 — last one</p>
+      <p class="chapter-label">3 of 4</p>
       <p class="prompt-label">If the version of you that has already figured this out could send you a message right now — what would they say?</p>
+      <div class="input-wrap">
       <textarea id="c6c" placeholder="Let yourself imagine it. What do they know that you're just starting to?" rows="5"></textarea>
+      <button class="mic-btn" onclick="toggleMic('c6c')" title="Speak your answer" type="button">🎤</button>
+      </div>
+      <p class="mic-hint">or tap 🎤 to speak</p>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gold" onclick="reflectAndGo('screen-c6d','c6c','pill-c6c')">Next →</button>
+      <button class="btn btn-outline" onclick="goTo('screen-c6b')">← Back</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     CHAPTER 6d — ROLE CAPTURE
+══════════════════════════════════════ -->
+<div class="screen" id="screen-c6d">
+  <div class="inner">
+    <p class="eyebrow">chapter six — your next chapter</p>
+    <h2>The move<br><em>forward.</em></h2>
+    <div class="reflect-pill" id="pill-c6c"></div>
+    <div class="chapter-card">
+      <p class="chapter-label">4 of 4 — last one</p>
+      <p class="prompt-label">Last one. What does your work life look like right now — and honestly, how does it feel? Your role, what you do day-to-day, what energises or drains you about it.</p>
+      <div class="input-wrap">
+      <textarea id="c6d" placeholder="Could be great, could be complicated — either way, it helps build a more accurate picture of you." rows="5"></textarea>
+      <button class="mic-btn" onclick="toggleMic('c6d')" title="Speak your answer" type="button">🎤</button>
+      </div>
+      <p class="mic-hint">or tap 🎤 to speak</p>
     </div>
     <div class="btn-row">
       <button class="btn btn-gold" onclick="finishJourney()">That's it — show me who I am →</button>
-      <button class="btn btn-outline" onclick="goTo('screen-c6b')">← Back</button>
+      <button class="btn btn-outline" onclick="goTo('screen-c6c')">← Back</button>
     </div>
   </div>
 </div>
@@ -755,8 +967,28 @@
     </div>
 
     <div class="result-section">
+      <p class="result-section-label" id="result-wing-title">your enneagram wings</p>
+      <div id="result-wing"></div>
+    </div>
+
+    <div class="result-section" id="result-subtype-section">
+      <p class="result-section-label">your subtype</p>
+      <div id="result-subtype"></div>
+    </div>
+
+    <div class="result-section">
+      <p class="result-section-label">your gift — and its shadow</p>
+      <div id="result-wound"></div>
+    </div>
+
+    <div class="result-section">
       <p class="result-section-label">your attachment style</p>
       <div id="result-attachment"></div>
+    </div>
+
+    <div class="result-section" id="result-health-section">
+      <p class="result-section-label">right now</p>
+      <div id="result-health"></div>
     </div>
 
     <div id="result-quote">
@@ -773,9 +1005,41 @@
       <div id="result-stuck"></div>
     </div>
 
-    <div class="result-section">
-      <p class="result-section-label" id="result-wing-title">your wing</p>
-      <div id="result-wing"></div>
+    <!-- Role reflection — shown only if work context was shared -->
+    <div class="role-reflection" id="result-role" style="display:none;">
+      <p class="role-reflection-label">your work life — a gentle reflection</p>
+      <div id="result-role-content"></div>
+    </div>
+
+    <!-- Partner dynamic — shown after unlock -->
+    <div class="partner-section" id="partner-section" style="display:none;">
+      <h3>How do you work with someone you know? 🪺</h3>
+      <p>If there's someone in your life you're curious about — a partner, a friend, a colleague — put in what you know about their personality and we'll synthesise what this pairing tends to look like.</p>
+
+      <div class="partner-input">
+        <label class="partner-label">Who is this person to you?</label>
+        <select id="partner-relationship">
+          <option value="partner">Romantic partner</option>
+          <option value="friend">Close friend</option>
+          <option value="colleague">Colleague or collaborator</option>
+          <option value="family">Family member</option>
+          <option value="manager">Manager or leader</option>
+        </select>
+      </div>
+
+      <div class="partner-input">
+        <label class="partner-label">Their personality types (if you know them)</label>
+        <input type="text" id="partner-types" placeholder="e.g. INFJ, Enneagram 9, Nurturer — anything you know">
+      </div>
+
+      <div class="partner-input">
+        <label class="partner-label">Describe them in a few words</label>
+        <input type="text" id="partner-description" placeholder="e.g. very calm, hates conflict, always thinking about others...">
+      </div>
+
+      <button class="btn btn-outline" id="partner-btn" onclick="generatePartnerDynamic()" style="margin-top:0.5rem;">See the dynamic →</button>
+
+      <div class="partner-result" id="partner-result"></div>
     </div>
 
     <div class="nest-box">
@@ -834,7 +1098,7 @@ const PROGRESS = {
   'screen-c3a':48,'screen-c3b':54,'screen-c3c':60,
   'screen-c4a':67,'screen-c4b':73,
   'screen-c5a':78,'screen-c5b':83,'screen-c5c':88,
-  'screen-c6a':91,'screen-c6b':94,'screen-c6c':97,
+  'screen-c6a':91,'screen-c6b':94,'screen-c6c':96,'screen-c6d':98,
   'screen-landing':99,'screen-snapshot':100,'screen-pay':100,'screen-results':100,
 };
 
@@ -879,9 +1143,6 @@ function reflectAndGo(next, inputId, pillId){
 }
 
 function finishJourney(){
-  const val = document.getElementById('c6c')?.value?.trim()||'';
-  const pill = document.getElementById('pill-c6b');
-  if(val.length>3 && pill){ pill.textContent='"'+val.split(' ').slice(0,10).join(' ')+(val.split(' ').length>10?'..."':'"'); pill.style.display='inline-block'; }
   goTo('screen-landing');
 }
 
@@ -945,7 +1206,8 @@ async function processPayment(){
 function collectResponses(){
   const ids=['c1a','c1b','c1c','c2a','c2b','c2c','c3a','c3b','c3c','c4a','c4b','c5a','c5b','c5c','c6a','c6b','c6c'];
   const r={};
-  ids.forEach(id=>{ r['ch'+id.replace(/[a-z]/,(m)=>m)]=document.getElementById(id)?.value?.trim()||''; });
+  ids.forEach(id=>{ r['ch'+id]=document.getElementById(id)?.value?.trim()||''; });
+  r.currentRole = document.getElementById('c6d')?.value?.trim()||'';
   return r;
 }
 
@@ -980,7 +1242,11 @@ async function runAnalysis(){
 function populateSnapshot(profile){
   if(!profile) return;
   const m=document.getElementById('snap-mbti');
-  if(m && profile.mbti) m.textContent=profile.mbti;
+  if(m && profile.mbti){
+    m.textContent=profile.mbti;
+    // Also show enneagram in badge if available
+    if(profile.enneagram) m.textContent=profile.mbti+' · '+profile.enneagram;
+  }
   const a=document.getElementById('snap-archetype');
   if(a) a.textContent=(profile.archetype||'Your Type')+(profile.archetypeSub?' — '+profile.archetypeSub:'');
   const prev=document.getElementById('snap-preview');
@@ -1029,20 +1295,49 @@ async function submitEmail(){
 // ═══════════════════════════════════════
 function renderResults(profile){
   if(!profile) return;
+
   document.getElementById('result-archetype').textContent=profile.archetype||'The Connector';
   document.getElementById('result-archetype-sub').textContent=profile.archetypeSub||'';
+
   const tags=document.getElementById('result-tags');
   tags.innerHTML='';
-  if(profile.mbti)       tags.innerHTML+=`<span class="ftag gold">${profile.mbti}</span>`;
-  if(profile.enneagram)  tags.innerHTML+=`<span class="ftag ember">${profile.enneagram}</span>`;
-  if(profile.attachment) tags.innerHTML+=`<span class="ftag">${profile.attachment}</span>`;
-  setSection('result-who',profile.whoYouAre);
-  setSection('result-wired',profile.howWired);
+  if(profile.mbti)              tags.innerHTML+=`<span class="ftag gold">${profile.mbti}</span>`;
+  if(profile.enneagram)         tags.innerHTML+=`<span class="ftag ember">${profile.enneagram}</span>`;
+  if(profile.enneagramSubtype)  tags.innerHTML+=`<span class="ftag ember" style="opacity:0.75;">${profile.enneagramSubtype} subtype</span>`;
+  if(profile.attachment)        tags.innerHTML+=`<span class="ftag">${profile.attachment}</span>`;
+  if(profile.centerOfIntelligence) tags.innerHTML+=`<span class="ftag" style="color:var(--gold-dim);">${profile.centerOfIntelligence} Centre</span>`;
+  if(profile.fiveVoicesNod)     tags.innerHTML+=`<span class="ftag" style="color:var(--text-muted);opacity:0.7;">5V: ${profile.fiveVoicesNod}</span>`;
+
+  setSection('result-who',       profile.whoYouAre);
+  setSection('result-wired',     profile.howWired);
+  setSection('result-wing',      profile.wingProfile || profile.wing);
+  setSection('result-subtype',   profile.subtypeProfile);
+  setSection('result-wound',     profile.coreWoundAndGift);
   setSection('result-attachment',profile.attachmentDetail);
-  setSection('result-remember',profile.thingsToRemember);
-  setSection('result-stuck',profile.stuckPlaces);
-  if(profile.wing){ document.getElementById('result-wing-title').textContent=profile.wingTitle||'Your wing'; setSection('result-wing',profile.wing); }
+  setSection('result-health',    profile.healthReflection);
+  setSection('result-remember',  profile.thingsToRemember);
+  setSection('result-stuck',     profile.stuckPlaces);
+
+  // Wing title
+  if(profile.wingTitle) document.getElementById('result-wing-title').textContent=profile.wingTitle;
+
+  // Quote
   if(profile.quote) document.querySelector('#result-quote blockquote').textContent=`"${profile.quote}"`;
+
+  // Role reflection — show box only if content exists
+  if(profile.roleReflection && profile.roleReflection.trim()){
+    const roleBox = document.getElementById('result-role');
+    if(roleBox){
+      roleBox.style.display='block';
+      setSection('result-role-content', profile.roleReflection);
+    }
+  }
+
+  // Partner dynamic section — always show
+  const partnerSection = document.getElementById('partner-section');
+  if(partnerSection) partnerSection.style.display='block';
+
+  // Nest ID
   if(nestId){
     document.getElementById('result-nest-id').textContent=`lilbird.life/deep-profile.html?nest=${nestId}`;
     const url=new URL(window.location);
@@ -1094,25 +1389,159 @@ function restartAssessment(){
   hasRetake=true;
   document.querySelectorAll('textarea').forEach(t=>t.value='');
   document.querySelectorAll('.reflect-pill').forEach(p=>{ p.textContent=''; p.style.display='none'; });
+  if(activeRecognitionId) stopMic();
   goTo('screen-c1a');
 }
 
 function getFallbackProfile(){
   return {
     archetype:'The Connector',
-    archetypeSub:'with a strong Nurturer influence',
+    archetypeSub:'with a strong Dreamer influence',
     mbti:'ENFJ',
-    enneagram:'Enneagram 2w3',
+    enneagram:'Enneagram 3w4',
+    enneagramSubtype:'Social',
     attachment:'Anxious-Secure',
+    centerOfIntelligence:'Heart',
+    healthLevel:'growing',
+    fiveVoicesNod:'Connector',
     whoYouAre:'You are the person who walks into a room and immediately, almost involuntarily, takes its temperature. Not for danger — for who looks like they need someone to talk to. Your warmth is structural. People feel seen around you faster than they can explain why.\n\nThis isn\'t performance. It\'s just how you\'re made. And it\'s one of your most significant gifts — even when it costs you.',
-    howWired:'Your mind processes the world relationally before it processes it logically. You\'re energised by people, make decisions through the lens of impact, and carry a quiet but persistent drive to make things better for everyone around you.',
-    attachmentDetail:'You lean anxious-secure — capable of deep connection, but under stress you can spiral into "are we okay?" before the other person even knows anything\'s wrong. You\'re not needy. You\'re just paying close attention.',
-    thingsToRemember:'You give far more than you take. That\'s a gift and it\'s also worth watching. A 2 degree shift toward receiving as generously as you give changes everything downstream.',
-    stuckPlaces:'Your pattern probably involves saying yes when you mean not yet, or carrying the emotional weight of a room so nobody else has to. The leap from Rescuer to Coach is one of the most significant shifts your type can make.',
-    wingTitle:'Your wing — the Achiever',
-    wing:'Your 3 wing means you\'re not just motivated by love and connection — you\'re also quietly tracking whether things are working. The shadow of this wing is performing warmth instead of feeling it. You\'ll know when it happens. Trust that instinct.',
+    howWired:'Your mind processes the world relationally before it processes it logically. You\'re energised by people, make decisions through the lens of impact, and carry a quiet but persistent drive to make things better for everyone around you.\n\nIf you\'ve come across 5 Voices, the Connector voice probably feels very familiar — the one who builds bridges between people and ideas before anyone else has noticed there\'s a gap.',
+    wingProfile:'You\'re a 3 with both wings present in different contexts — your 4 wing shows up in your interior life, the part of you that sits with the deeper questions and craves meaning and authenticity. Your 2 wing comes forward in how you relate — warm, generous, attuned to what others need. This makes you more complex than most 3 descriptions give you credit for.',
+    subtypeProfile:'There\'s a social subtype flavour to how you move through the world — you\'re aware of your role within groups, attuned to belonging and contribution, and energised by being part of something that matters.',
+    coreWoundAndGift:'Your gift is authentic inspiration — the ability to show people what\'s possible and make them feel like they can actually do it. Under pressure, that same gift can quietly become performing worth rather than living it. The shift from doing to being is your ongoing invitation.\n\nYou probably already notice when it flips. Trust that noticing.',
+    attachmentDetail:'You lean anxious-secure — capable of deep connection, but under stress you can spiral into "are we okay?" before the other person even knows anything\'s wrong. You\'re not needy. You\'re just paying very close attention.',
+    healthReflection:'Something in how you\'re answering these questions suggests you might be in a reaching season — not crisis, but a kind of stretch. Like you know something needs to shift and you\'re not quite sure which lever to pull. That restlessness is actually a signal. Pay attention to it.',
+    thingsToRemember:'You give far more than you take. That\'s a gift and it\'s also worth watching. A 2 degree shift toward receiving as generously as you give changes everything downstream.\n\nYou can\'t give what you don\'t have. Full stop.',
+    stuckPlaces:'Your pattern probably involves saying yes when you mean not yet, or carrying the emotional weight of a room so nobody else has to. The leap from Rescuer to Coach is one of the most significant shifts your type can make — and it starts with one honest conversation.',
+    roleReflection:'',
+    wingTitle:'Your Enneagram wings',
+    wing:'',
     quote:'Clarity changes everything. And you already have more of it than you think — you just haven\'t given yourself permission to act on it yet.',
+    partnerDynamicReady:true,
   };
+}
+
+// ═══════════════════════════════════════
+// VOICE INPUT — Web Speech API
+// ═══════════════════════════════════════
+let recognition = null;
+let activeRecognitionId = null;
+
+(function setupSpeech(){
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SpeechRecognition){ document.body.classList.add('no-speech'); return; }
+  recognition = new SpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+
+  recognition.onresult = function(e){
+    const textarea = document.getElementById(activeRecognitionId);
+    if(!textarea) return;
+    let transcript = '';
+    for(let i=0; i<e.results.length; i++){
+      transcript += e.results[i][0].transcript;
+    }
+    textarea.value = transcript;
+  };
+
+  recognition.onerror = function(e){
+    console.warn('Speech error:', e.error);
+    stopMic();
+  };
+
+  recognition.onend = function(){
+    stopMic();
+  };
+})();
+
+function toggleMic(textareaId){
+  if(!recognition){ return; }
+  if(activeRecognitionId === textareaId){
+    stopMic();
+    return;
+  }
+  // Stop any existing
+  if(activeRecognitionId) stopMic();
+
+  activeRecognitionId = textareaId;
+  const btn = document.querySelector(`button[onclick="toggleMic('${textareaId}')"]`);
+  if(btn) btn.classList.add('recording');
+
+  try{
+    recognition.start();
+  }catch(e){
+    console.warn('Recognition start error:', e);
+    stopMic();
+  }
+}
+
+function stopMic(){
+  if(recognition && activeRecognitionId){
+    try{ recognition.stop(); }catch(e){}
+  }
+  if(activeRecognitionId){
+    const btn = document.querySelector(`button[onclick="toggleMic('${activeRecognitionId}')"]`);
+    if(btn) btn.classList.remove('recording');
+  }
+  activeRecognitionId = null;
+}
+
+// Stop mic when navigating between screens
+const _origGoTo = goTo;
+function goTo(screenId){
+  if(activeRecognitionId) stopMic();
+  _origGoTo(screenId);
+}
+
+// ═══════════════════════════════════════
+// PARTNER DYNAMIC
+// ═══════════════════════════════════════
+async function generatePartnerDynamic(){
+  if(!profileData) return;
+
+  const rel   = document.getElementById('partner-relationship')?.value || 'partner';
+  const types = document.getElementById('partner-types')?.value?.trim() || '';
+  const desc  = document.getElementById('partner-description')?.value?.trim() || '';
+
+  if(!types && !desc){
+    alert('Tell us a little about this person first — even just their Enneagram type or a brief description.');
+    return;
+  }
+
+  const btn = document.getElementById('partner-btn');
+  const result = document.getElementById('partner-result');
+  if(btn){ btn.textContent = 'Reading the dynamic…'; btn.disabled = true; }
+
+  try{
+    const r = await fetch(`${WORKER_URL}/partner-dynamic`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        userProfile: profileData,
+        partnerInput: { relationship: rel, types, description: desc }
+      })
+    });
+    if(!r.ok) throw new Error('Failed');
+    const dynamic = await r.json();
+
+    if(result){
+      result.style.display = 'block';
+      result.innerHTML = `
+        <h4>${dynamic.pairingTitle || 'Your Dynamic'}</h4>
+        <p>${dynamic.dynamicSummary || ''}</p>
+        <p><strong style="color:var(--gold-dim);font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;">What they bring to you</strong><br>${dynamic.theyBringToYou || ''}</p>
+        <p><strong style="color:var(--gold-dim);font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;">What you bring to them</strong><br>${dynamic.youBringToThem || ''}</p>
+        <p><strong style="color:var(--gold-dim);font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;">Watch out for</strong><br>${dynamic.watchOutFor || ''}</p>
+        <p><strong style="color:var(--gold-dim);font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;">The invitation</strong><br>${dynamic.growthInvitation || ''}</p>
+        ${dynamic.promptToShare ? `<p style="font-style:italic;color:var(--gold-dim);font-size:0.88rem;">${dynamic.promptToShare}</p>` : ''}
+      `;
+    }
+  }catch(e){
+    if(result){ result.style.display='block'; result.innerHTML='<p style="color:var(--ember);">Something went wrong. Try again in a moment.</p>'; }
+  }finally{
+    if(btn){ btn.textContent = 'See the dynamic →'; btn.disabled = false; }
+  }
 }
 
 // ═══════════════════════════════════════
