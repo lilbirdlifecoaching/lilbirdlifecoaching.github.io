@@ -930,6 +930,13 @@
       <p class="offer-note">These codes are yours — no expiry, no pressure. Use them whenever you're ready.</p>
     </div>
 
+    <!-- Email for profile delivery -->
+    <div style="margin-bottom:1.25rem;">
+      <p style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:0.5rem;">Send my profile to</p>
+      <input type="email" id="pay-email" placeholder="your@email.com" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(245,200,66,0.2);border-radius:6px;color:var(--text-main);font-family:'DM Sans',sans-serif;font-size:0.95rem;padding:0.7rem 1rem;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(245,200,66,0.2)'">
+      <p style="font-size:0.78rem;color:var(--text-muted);opacity:0.7;margin-top:0.4rem;">We'll email you your Nest link so you can always find your way back.</p>
+    </div>
+
     <div class="stripe-wrap">
       <div id="card-element"></div>
       <div id="card-errors"></div>
@@ -1048,7 +1055,7 @@
       <p class="nest-id" id="result-nest-id"></p>
       <div class="btn-row" style="margin-top:1.25rem;">
         <button class="btn btn-outline" onclick="copyNestLink()">Copy my Nest link</button>
-        <button class="btn btn-outline" onclick="restartAssessment()">Retake (free, once)</button>
+        <button class="btn btn-outline" id="retake-btn" onclick="restartAssessment()">Retake ↺</button>
       </div>
     </div>
 
@@ -1081,6 +1088,7 @@ const WORKER_URL     = 'https://lilbird-assessment.cwwq46sn7m.workers.dev';
 const STRIPE_PK      = 'pk_live_51QSMYQGAu36WZ7DdlsoNqzwPnsf4HUoOj6F1NZAeGnnH1TPjDEdEQudXIGgTLaUq079aQMI1W2MS6UpMItmTjgxy00HbouBx2g';
 const SHEETS_URL     = ''; // paste Apps Script URL here
 const BEEHIIV_PUB_ID = '53a4cafc-9b30-41d5-bd5e-4dc0026b4308';
+// RESEND_API_KEY is stored as a Cloudflare Worker env var (never in frontend code)
 
 // ═══════════════════════════════════════
 // STATE
@@ -1090,6 +1098,8 @@ let stripeInstance = null;
 let cardElement    = null;
 let nestId         = null;
 let hasRetake      = false;
+let hasPaid        = false;
+let userEmail      = '';
 let profileData    = null;
 
 const PROGRESS = {
@@ -1183,15 +1193,41 @@ async function processPayment(){
   const btn=document.getElementById('payButton');
   const proc=document.getElementById('payProcessing');
   const err=document.getElementById('payError');
+
+  // Validate email
+  const emailVal = document.getElementById('pay-email')?.value?.trim() || '';
+  if(!emailVal || !emailVal.includes('@') || !emailVal.includes('.')){
+    if(err){ err.textContent='Please enter your email so we can send you your profile.'; err.style.display='block'; }
+    return;
+  }
+
   btn.style.display='none'; proc.style.display='flex'; err.style.display='none';
   try{
-    const r=await fetch(`${WORKER_URL}/create-payment-intent`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:selectedAmount*100,nestId})});
+    const r=await fetch(`${WORKER_URL}/create-payment-intent`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:selectedAmount*100,nestId,email:emailVal})});
     if(!r.ok) throw new Error('Payment setup failed. Please try again.');
     const {clientSecret}=await r.json();
     const {error,paymentIntent}=await stripeInstance.confirmCardPayment(clientSecret,{payment_method:{card:cardElement}});
     if(error) throw new Error(error.message);
     if(paymentIntent.status!=='succeeded') throw new Error('Payment did not complete. Please try again.');
+
+    // Log to Sheet
     if(SHEETS_URL && profileData) logToSheet(profileData,selectedAmount,collectResponses());
+
+    // Send profile email + mark as paid in KV
+    try{
+      await fetch(`${WORKER_URL}/send-profile-email`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({email:emailVal, nestId, profile:profileData})
+      });
+    }catch(emailErr){
+      console.warn('Email send failed (non-fatal):', emailErr);
+    }
+
+    // Store email locally for retake logic
+    userEmail = emailVal;
+    hasPaid = true;
+
     renderResults(profileData);
     goTo('screen-results');
   }catch(e){
@@ -1384,12 +1420,39 @@ function copyNestLink(){
   });
 }
 
-function restartAssessment(){
-  if(hasRetake){ alert('You have already used your free retake. Email hello@lilbird.life if you need help.'); return; }
-  hasRetake=true;
+async function restartAssessment(){
+  // Paid users get unlimited retakes — check local flag first, then KV
+  if(hasPaid){
+    clearAndRestart();
+    return;
+  }
+  // Check KV in case they returned via Nest link
+  if(nestId){
+    try{
+      const r = await fetch(`${WORKER_URL}/check-paid?nestId=${nestId}`);
+      const data = await r.json();
+      if(data.paid){
+        hasPaid = true;
+        clearAndRestart();
+        return;
+      }
+    }catch(e){}
+  }
+  // Free retake — one time only
+  if(hasRetake){
+    alert('You have already used your free retake. Unlock your profile to get unlimited retakes — or email hello@lilbird.life if you need help.');
+    return;
+  }
+  hasRetake = true;
+  clearAndRestart();
+}
+
+function clearAndRestart(){
   document.querySelectorAll('textarea').forEach(t=>t.value='');
   document.querySelectorAll('.reflect-pill').forEach(p=>{ p.textContent=''; p.style.display='none'; });
   if(activeRecognitionId) stopMic();
+  profileData = null;
+  nestId = generateNestId();
   goTo('screen-c1a');
 }
 
