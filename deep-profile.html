@@ -369,6 +369,211 @@
   }
   .role-reflection p { font-size: 0.92rem; color: var(--text-main); line-height: 1.75; margin-bottom: 0.75rem; }
 
+
+  /* ══════════════════════════════════════
+     LIFE CANVAS
+  ══════════════════════════════════════ */
+  .canvas-screen-header {
+    margin-bottom: 2rem;
+  }
+  .canvas-intro {
+    background: var(--dark-card);
+    border: 1px solid var(--dark-border);
+    border-radius: 12px;
+    padding: 1.5rem 1.75rem;
+    margin-bottom: 2rem;
+  }
+  .canvas-intro p {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin: 0;
+  }
+  .canvas-intro p em { color: var(--text-main); font-style: italic; }
+
+  .canvas-dimension {
+    background: var(--dark-card);
+    border: 1px solid var(--dark-border);
+    border-radius: 16px;
+    padding: 2rem 2.25rem;
+    margin-bottom: 1.5rem;
+  }
+  .canvas-dim-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-bottom: 0.35rem;
+  }
+  .canvas-dim-key {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+  }
+  .canvas-dim-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    color: var(--text-main);
+    font-weight: 400;
+  }
+  .canvas-dim-question {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    line-height: 1.65;
+    margin-bottom: 1.5rem;
+  }
+  .canvas-dim-question em { color: var(--text-main); font-style: italic; }
+
+  /* Slider */
+  .canvas-slider-wrap {
+    margin-bottom: 1.25rem;
+  }
+  .canvas-slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    opacity: 0.6;
+    margin-bottom: 0.5rem;
+  }
+  .canvas-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(to right, var(--gold) 0%, var(--gold) 50%, rgba(245,200,66,0.15) 50%, rgba(245,200,66,0.15) 100%);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+    margin-bottom: 0.75rem;
+  }
+  .canvas-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    background: var(--gold);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 0 3px rgba(245,200,66,0.2);
+    transition: box-shadow 0.2s;
+  }
+  .canvas-slider::-webkit-slider-thumb:hover {
+    box-shadow: 0 0 0 6px rgba(245,200,66,0.2);
+  }
+  .canvas-slider::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    background: var(--gold);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+  }
+  .canvas-score-display {
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 0.25rem;
+  }
+  .canvas-score-label {
+    text-align: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    opacity: 0.6;
+  }
+  .canvas-dim-textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(245,200,66,0.12);
+    border-radius: 8px;
+    color: var(--text-main);
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+    font-size: 0.92rem;
+    font-weight: 300;
+    line-height: 1.6;
+    padding: 0.85rem 1rem;
+    resize: vertical;
+    min-height: 80px;
+    transition: border-color 0.2s;
+    margin-top: 0.75rem;
+  }
+  .canvas-dim-textarea::placeholder { color: rgba(240,234,216,0.25); }
+  .canvas-dim-textarea:focus { outline: none; border-color: rgba(245,200,66,0.35); }
+
+  /* Results canvas */
+  /* CANVAS RESULT */
+  .canvas-result-wrap {
+    margin: 2.5rem 0;
+    background: var(--dark-card);
+    border: 1px solid var(--dark-border);
+    border-radius: 16px;
+    padding: 2rem;
+  }
+  .canvas-result-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    color: var(--text-main);
+    margin-bottom: 0.25rem;
+  }
+  .canvas-result-score {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 1.25rem;
+  }
+  .canvas-chart-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+  #canvas-sunburst { border-radius: 50%; display: block; }
+  .canvas-toggle-row {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 1.5rem;
+  }
+  .canvas-toggle-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 8px 22px;
+    border: 1px solid rgba(245,200,66,0.35);
+    background: rgba(245,200,66,0.04);
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .canvas-toggle-btn:first-child { border-radius: 4px 0 0 4px; border-right: none; }
+  .canvas-toggle-btn:last-child  { border-radius: 0 4px 4px 0; }
+  .canvas-toggle-btn.active { background: rgba(245,200,66,0.18); color: var(--gold); border-color: var(--gold); }
+  .canvas-toggle-btn:hover:not(.active) { background: rgba(245,200,66,0.08); color: var(--gold); }
+  .canvas-bar-view { display: none; padding: 0.5rem 0; }
+  .canvas-bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .canvas-bar-label { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; width: 50px; min-width: 50px; }
+  .canvas-bar-track { flex: 1; height: 5px; background: rgba(245,200,66,0.08); border-radius: 3px; overflow: hidden; }
+  .canvas-bar-fill { height: 100%; border-radius: 3px; transition: width 1s cubic-bezier(0.22,1,0.36,1); }
+  .canvas-bar-num { font-family: 'DM Mono', monospace; font-size: 0.72rem; width: 28px; text-align: right; }
+  .canvas-synthesis {
+    font-size: 0.95rem;
+    color: var(--text-main);
+    line-height: 1.75;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--dark-border);
+    font-style: italic;
+  }
+
   @media (max-width: 600px) {
     nav { padding: 1rem 1.25rem; }
     .screen { padding: 6rem 1.25rem 3rem; }
@@ -838,6 +1043,106 @@
 
 
 <!-- ══════════════════════════════════════
+     LIFE CANVAS — INTRO + 5 DIMENSIONS
+══════════════════════════════════════ -->
+<div class="screen" id="screen-canvas">
+  <div class="inner">
+    <p class="eyebrow">the life canvas</p>
+    <h2>The season<br><em>you're in.</em></h2>
+
+    <div class="canvas-intro">
+      <p>Your personality tells us <em>who you are.</em> The Life Canvas tells us <em>the conditions you're operating in right now.</em> Both matter — and together they tell a much more honest story.</p>
+      <p style="margin-top:0.75rem;">Five areas. Five sliders. No right answers. This is just for you.</p>
+    </div>
+
+    <!-- WHY -->
+    <div class="canvas-dimension">
+      <div class="canvas-dim-header">
+        <span class="canvas-dim-key">WHY</span>
+        <span class="canvas-dim-title">My place in the world</span>
+      </div>
+      <p class="canvas-dim-question">Do you wake up with a sense of direction — or does it feel like you're moving through fog? Think about your work, your calling, whatever gets you out of bed. When you imagine it, does it light something up or quietly drain you? Are you <em>running toward something</em> or away from it — or honestly, not sure?</p>
+      <div class="canvas-slider-wrap">
+        <div class="canvas-slider-labels"><span>Lost in the fog</span><span>Fully on fire</span></div>
+        <input type="range" class="canvas-slider" id="canvas-why" min="0" max="100" value="50" oninput="updateSlider('canvas-why','score-why')">
+        <div class="canvas-score-display" id="score-why">50</div>
+        <div class="canvas-score-label">out of 100</div>
+      </div>
+      <textarea class="canvas-dim-textarea" id="canvas-why-text" placeholder="Describe it in your own words — even a few sentences helps..."></textarea>
+    </div>
+
+    <!-- WHO -->
+    <div class="canvas-dimension">
+      <div class="canvas-dim-header">
+        <span class="canvas-dim-key">WHO</span>
+        <span class="canvas-dim-title">The people around me</span>
+      </div>
+      <p class="canvas-dim-question">Who actually makes up your daily life? Partners, family, friends, flatmates, colleagues. Are they filling you up or quietly emptying you? If you had to name the one relationship having the <em>biggest impact on you right now</em> — positive or negative — what's it doing to you?</p>
+      <div class="canvas-slider-wrap">
+        <div class="canvas-slider-labels"><span>Draining & difficult</span><span>Nourishing & close</span></div>
+        <input type="range" class="canvas-slider" id="canvas-who" min="0" max="100" value="50" oninput="updateSlider('canvas-who','score-who')">
+        <div class="canvas-score-display" id="score-who">50</div>
+        <div class="canvas-score-label">out of 100</div>
+      </div>
+      <textarea class="canvas-dim-textarea" id="canvas-who-text" placeholder="Tell us about your people..."></textarea>
+    </div>
+
+    <!-- WHERE -->
+    <div class="canvas-dimension">
+      <div class="canvas-dim-header">
+        <span class="canvas-dim-key">WHERE</span>
+        <span class="canvas-dim-title">Where I've landed</span>
+      </div>
+      <p class="canvas-dim-question">Look around you — literally. Your city, your street, your home. Does it feel like <em>yours</em>, or like somewhere you're just passing through? If your soul needs trees, do you have trees? If it needs ocean, is it close? When you walk through your front door at the end of a hard day — does the space hold you, or add to the weight?</p>
+      <div class="canvas-slider-wrap">
+        <div class="canvas-slider-labels"><span>Wrong place entirely</span><span>Exactly where I belong</span></div>
+        <input type="range" class="canvas-slider" id="canvas-where" min="0" max="100" value="50" oninput="updateSlider('canvas-where','score-where')">
+        <div class="canvas-score-display" id="score-where">50</div>
+        <div class="canvas-score-label">out of 100</div>
+      </div>
+      <textarea class="canvas-dim-textarea" id="canvas-where-text" placeholder="Describe your place..."></textarea>
+    </div>
+
+    <!-- WHAT -->
+    <div class="canvas-dimension">
+      <div class="canvas-dim-header">
+        <span class="canvas-dim-key">WHAT</span>
+        <span class="canvas-dim-title">What I have to work with</span>
+      </div>
+      <p class="canvas-dim-question">Be honest here — with yourself, not with us. How are you doing financially, materially? Not the polished version. Do you feel like you have enough, or is there a <em>low-level hum of worry</em> that follows you around? Are you building something, holding steady, or quietly sliding?</p>
+      <div class="canvas-slider-wrap">
+        <div class="canvas-slider-labels"><span>Depleted & worried</span><span>Resourced & building</span></div>
+        <input type="range" class="canvas-slider" id="canvas-what" min="0" max="100" value="50" oninput="updateSlider('canvas-what','score-what')">
+        <div class="canvas-score-display" id="score-what">50</div>
+        <div class="canvas-score-label">out of 100</div>
+      </div>
+      <textarea class="canvas-dim-textarea" id="canvas-what-text" placeholder="Describe where you actually are..."></textarea>
+    </div>
+
+    <!-- HOW -->
+    <div class="canvas-dimension">
+      <div class="canvas-dim-header">
+        <span class="canvas-dim-key">HOW</span>
+        <span class="canvas-dim-title">How I'm actually doing</span>
+      </div>
+      <p class="canvas-dim-question">Last one — and the most important. How are you doing? Not "fine." <em>Actually.</em> Are you sleeping? Moving? Does your body feel like an ally or something you're managing? And mentally — are you okay, or are you carrying something heavy right now? If you fudge this answer, everything else in your profile will be slightly off. So be real. <em>Are you trending up or spiraling down?</em></p>
+      <div class="canvas-slider-wrap">
+        <div class="canvas-slider-labels"><span>Barely holding on</span><span>Genuinely thriving</span></div>
+        <input type="range" class="canvas-slider" id="canvas-how" min="0" max="100" value="50" oninput="updateSlider('canvas-how','score-how')">
+        <div class="canvas-score-display" id="score-how">50</div>
+        <div class="canvas-score-label">out of 100</div>
+      </div>
+      <textarea class="canvas-dim-textarea" id="canvas-how-text" placeholder="Be honest. This is just for you."></textarea>
+    </div>
+
+    <div class="btn-row" style="margin-top:1rem;">
+      <button class="btn btn-gold" onclick="submitCanvas()">That's everything — read me →</button>
+      <button class="btn btn-outline" onclick="goTo('screen-c6d')">← Back</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
      LANDING (AI processing)
 ══════════════════════════════════════ -->
 <div class="screen" id="screen-landing">
@@ -961,6 +1266,31 @@
       <h1 id="result-archetype" style="margin-bottom:0.25rem;">The Connector</h1>
       <p id="result-archetype-sub" style="color:var(--gold-dim);font-family:'Playfair Display',serif;font-style:italic;font-size:1.05rem;margin-bottom:1.25rem;"></p>
       <div class="result-tags" id="result-tags"></div>
+    </div>
+
+    <!-- LIFE CANVAS RESULTS -->
+    <div class="canvas-result-wrap" id="canvas-result-wrap">
+      <p class="eyebrow" style="margin-bottom:0.5rem;">your life canvas</p>
+      <p class="canvas-result-title">The season you're in</p>
+      <p class="canvas-result-score">Overall: <span id="canvas-overall-score">—</span>/100</p>
+
+      <!-- Sunburst chart -->
+      <div class="canvas-chart-wrap" id="canvas-sunburst-wrap">
+        <canvas id="canvas-sunburst"></canvas>
+      </div>
+
+      <!-- Bar breakdown -->
+      <div class="canvas-bar-view" id="canvas-bar-view">
+        <div id="canvas-bars"></div>
+      </div>
+
+      <!-- Toggle -->
+      <div class="canvas-toggle-row">
+        <button class="canvas-toggle-btn active" id="canvas-btn-sun" onclick="setCanvasView('sun')">Canvas</button>
+        <button class="canvas-toggle-btn" id="canvas-btn-bar" onclick="setCanvasView('bar')">Breakdown</button>
+      </div>
+
+      <p class="canvas-synthesis" id="canvas-synthesis"></p>
     </div>
 
     <div class="result-section">
@@ -1108,7 +1438,7 @@ const PROGRESS = {
   'screen-c3a':48,'screen-c3b':54,'screen-c3c':60,
   'screen-c4a':67,'screen-c4b':73,
   'screen-c5a':78,'screen-c5b':83,'screen-c5c':88,
-  'screen-c6a':91,'screen-c6b':94,'screen-c6c':96,'screen-c6d':98,
+  'screen-c6a':88,'screen-c6b':91,'screen-c6c':94,'screen-c6d':97,'screen-canvas':99,
   'screen-landing':99,'screen-snapshot':100,'screen-pay':100,'screen-results':100,
 };
 
@@ -1154,7 +1484,7 @@ function reflectAndGo(next, inputId, pillId){
 }
 
 function finishJourney(){
-  goTo('screen-landing');
+  goTo('screen-canvas');
 }
 
 // ═══════════════════════════════════════
@@ -1244,7 +1574,9 @@ function collectResponses(){
   const ids=['c1a','c1b','c1c','c2a','c2b','c2c','c3a','c3b','c3c','c4a','c4b','c5a','c5b','c5c','c6a','c6b','c6c'];
   const r={};
   ids.forEach(id=>{ r['ch'+id]=document.getElementById(id)?.value?.trim()||''; });
-  r.currentRole = document.getElementById('c6d')?.value?.trim()||'';
+  r.currentRole   = document.getElementById('c6d')?.value?.trim()||'';
+  r.canvasScores  = canvasScores;
+  r.canvasTexts   = canvasTexts;
   return r;
 }
 
@@ -1266,6 +1598,13 @@ async function runAnalysis(){
     profileData=getFallbackProfile();
   }
   document.getElementById('loadingOverlay').classList.remove('active');
+
+  // Render canvas results immediately (shown after payment)
+  if(profileData && profileData.canvasSynthesis){
+    renderCanvasResults(canvasScores, profileData.canvasSynthesis);
+  } else {
+    renderCanvasResults(canvasScores, '');
+  }
 
   // Log completion to Sheet immediately — amount 0 means they completed but haven't paid yet
   if(SHEETS_URL && profileData) logToSheet(profileData, 0, collectResponses());
@@ -1373,6 +1712,11 @@ function renderResults(profile){
   // Partner dynamic section — always show
   const partnerSection = document.getElementById('partner-section');
   if(partnerSection) partnerSection.style.display='block';
+
+  // Canvas — re-render with synthesis from profile
+  if(profileData && profileData.canvasSynthesis){
+    renderCanvasResults(canvasScores, profileData.canvasSynthesis);
+  }
 
   // Nest ID
   if(nestId){
@@ -1483,6 +1827,222 @@ function getFallbackProfile(){
     quote:'Clarity changes everything. And you already have more of it than you think — you just haven\'t given yourself permission to act on it yet.',
     partnerDynamicReady:true,
   };
+}
+
+
+// ═══════════════════════════════════════
+// LIFE CANVAS
+// ═══════════════════════════════════════
+let canvasScores = { why:50, who:50, where:50, what:50, how:50 };
+let canvasTexts  = { why:'', who:'', where:'', what:'', how:'' };
+
+function updateSlider(sliderId, scoreId) {
+  const val = document.getElementById(sliderId)?.value || 50;
+  const scoreEl = document.getElementById(scoreId);
+  if(scoreEl) scoreEl.textContent = val;
+
+  // Update gradient fill
+  const slider = document.getElementById(sliderId);
+  if(slider) {
+    slider.style.background = `linear-gradient(to right, var(--gold) 0%, var(--gold) ${val}%, rgba(245,200,66,0.15) ${val}%, rgba(245,200,66,0.15) 100%)`;
+  }
+
+  // Store score
+  const dim = sliderId.replace('canvas-','');
+  if(canvasScores.hasOwnProperty(dim)) canvasScores[dim] = parseInt(val);
+}
+
+function collectCanvasData() {
+  ['why','who','where','what','how'].forEach(dim => {
+    const slider = document.getElementById('canvas-'+dim);
+    const text   = document.getElementById('canvas-'+dim+'-text');
+    if(slider) canvasScores[dim] = parseInt(slider.value);
+    if(text)   canvasTexts[dim]  = text.value.trim();
+  });
+}
+
+function submitCanvas() {
+  collectCanvasData();
+  goTo('screen-landing');
+}
+
+function setCanvasView(v){
+  const sunWrap = document.getElementById('canvas-sunburst-wrap');
+  const barWrap = document.getElementById('canvas-bar-view');
+  const btnSun  = document.getElementById('canvas-btn-sun');
+  const btnBar  = document.getElementById('canvas-btn-bar');
+  if(sunWrap) sunWrap.style.display = v==='sun' ? 'flex' : 'none';
+  if(barWrap) barWrap.style.display = v==='bar' ? 'block' : 'none';
+  if(btnSun)  btnSun.classList.toggle('active',  v==='sun');
+  if(btnBar)  btnBar.classList.toggle('active',  v==='bar');
+}
+
+function renderCanvasResults(scores, synthesis) {
+  const dimDefs = [
+    { key:'why',   label:'WHY',   color:'#F5C842' },
+    { key:'who',   label:'WHO',   color:'#4adea8' },
+    { key:'where', label:'WHERE', color:'#5ab4f0' },
+    { key:'what',  label:'WHAT',  color:'#e8734a' },
+    { key:'how',   label:'HOW',   color:'#c94aad' },
+  ];
+
+  const overall = Math.round(Object.values(scores).reduce((a,b)=>a+b,0)/5);
+  const overallEl = document.getElementById('canvas-overall-score');
+  if(overallEl) overallEl.textContent = overall;
+
+  // ── Build bar view ──────────────────────────────────────────────────
+  const barsEl = document.getElementById('canvas-bars');
+  if(barsEl){
+    barsEl.innerHTML = dimDefs.map(d=>`
+      <div class="canvas-bar-row">
+        <span class="canvas-bar-label" style="color:${d.color}">${d.label}</span>
+        <div class="canvas-bar-track">
+          <div class="canvas-bar-fill" id="cbf-${d.key}" style="width:0%;background:${d.color};opacity:0.85;"></div>
+        </div>
+        <span class="canvas-bar-num" style="color:${d.color}">${scores[d.key]||50}</span>
+      </div>`).join('');
+    setTimeout(()=>{
+      dimDefs.forEach(d=>{
+        const el=document.getElementById('cbf-'+d.key);
+        if(el) el.style.width=(scores[d.key]||50)+'%';
+      });
+    },350);
+  }
+
+  // ── Build sunburst ──────────────────────────────────────────────────
+  const canvas = document.getElementById('canvas-sunburst');
+  if(!canvas) return;
+
+  const dpr = window.devicePixelRatio||1;
+  const SIZE = 300;
+  canvas.width  = SIZE*dpr;
+  canvas.height = SIZE*dpr;
+  canvas.style.width  = SIZE+'px';
+  canvas.style.height = SIZE+'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+  const cx=SIZE/2, cy=SIZE/2;
+  const innerR=40, maxR=118;
+  const segAngle=(Math.PI*2)/dimDefs.length;
+  const startOff=-Math.PI/2;
+
+  let seed=12345;
+  function rand(min=0,max=1){
+    seed=(seed*1664525+1013904223)&0xffffffff;
+    return min+((seed>>>0)/0xffffffff)*(max-min);
+  }
+  function arcFill(r1,r2,sa,ea,col,alpha){
+    ctx.beginPath();ctx.arc(cx,cy,r2,sa,ea);ctx.arc(cx,cy,r1,ea,sa,true);
+    ctx.closePath();ctx.fillStyle=col;ctx.globalAlpha=alpha;ctx.fill();ctx.globalAlpha=1;
+  }
+  function arcStroke(r,sa,ea,col,lw,alpha,dash=[]){
+    ctx.beginPath();ctx.arc(cx,cy,r,sa,ea);
+    ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.globalAlpha=alpha;
+    ctx.setLineDash(dash);ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
+  }
+  function spk(a,r1,r2,col,lw,alpha){
+    ctx.beginPath();
+    ctx.moveTo(cx+Math.cos(a)*r1,cy+Math.sin(a)*r1);
+    ctx.lineTo(cx+Math.cos(a)*r2,cy+Math.sin(a)*r2);
+    ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.globalAlpha=alpha;ctx.stroke();ctx.globalAlpha=1;
+  }
+
+  // Dark bg — fills entire canvas; border-radius:50% in CSS clips to circle
+  ctx.fillStyle='#12141a';
+  ctx.fillRect(0,0,SIZE,SIZE);
+
+  // Grid rings
+  for(let p=0.2;p<=1.01;p+=0.2){
+    arcStroke(innerR+(maxR-innerR)*p,0,Math.PI*2,'rgba(255,255,255,0.03)',0.5,1);
+  }
+
+  dimDefs.forEach((dim,i)=>{
+    seed=1000+i*9973;
+    const sa=startOff+i*segAngle;
+    const ea=startOff+(i+1)*segAngle;
+    const score=scores[dim.key]||50;
+    const outerR=innerR+(maxR-innerR)*(score/100);
+    const midA=(sa+ea)/2;
+    const span=ea-sa;
+    const col=dim.color;
+
+    arcFill(innerR,maxR,sa,ea,col,0.04);
+
+    const ringCount=Math.ceil(score/4);
+    const ringH=(outerR-innerR)/ringCount;
+    for(let r=0;r<ringCount;r++){
+      const rI=innerR+r*ringH, rO=rI+ringH*0.72;
+      const rPct=r/ringCount;
+      arcFill(rI,rO,sa,ea,col,0.18+rPct*0.22+(r%2)*0.06);
+      arcStroke(rO,sa,ea,col,0.5,0.25+rPct*0.3);
+      arcStroke((rI+rO)/2,sa,ea,col,0.4,0.15,[1.5,4]);
+    }
+
+    // Inner glow ring
+    ctx.save();ctx.shadowColor=col;ctx.shadowBlur=8;
+    arcStroke(innerR+1,sa,ea,col,1.5,0.7);
+    ctx.restore();
+
+    // Fine spikes
+    const fc=Math.floor(score*1.1)+12;
+    for(let s=0;s<fc;s++){
+      const sA=sa+span*(s/fc)+rand(0,span/fc*0.6);
+      spk(sA,outerR,outerR+rand(1,8)+rand(0,score/10),col,rand(0.3,1.2),rand(0.25,0.75));
+    }
+    // Mid spikes
+    const mc=Math.floor(score*0.5)+5;
+    for(let s=0;s<mc;s++){
+      const sA=sa+span*rand(0,1);
+      const sL=rand(8,20)+rand(0,score/8);
+      spk(sA,outerR,outerR+sL,col,rand(0.5,1.5),rand(0.3,0.65));
+      spk(sA+rand(-0.02,0.02),outerR+rand(0,3),outerR+sL*rand(0.3,0.7),col,rand(0.3,0.7),rand(0.15,0.4));
+    }
+    // Tall statement spikes
+    const tc=Math.floor(rand(2,5));
+    for(let s=0;s<tc;s++){
+      const sA=sa+span*rand(0.05,0.95);
+      const sL=rand(20,40);
+      spk(sA,outerR,outerR+sL,col,rand(0.6,1.5),rand(0.45,0.8));
+      spk(sA+rand(-0.025,0.025),outerR,outerR+sL*rand(0.5,0.85),col,rand(0.4,0.9),rand(0.2,0.45));
+      spk(sA+rand(-0.04,0.04),outerR+rand(2,6),outerR+sL*rand(0.2,0.5),col,rand(0.3,0.6),rand(0.15,0.3));
+    }
+    // Inner texture
+    for(let s=0;s<10;s++){
+      const sA=sa+span*rand(0,1);
+      const fR=innerR+rand(4,(outerR-innerR)*0.5);
+      spk(sA,fR,Math.min(fR+rand(5,18),outerR-1),col,rand(0.3,0.9),rand(0.1,0.3));
+    }
+
+    // Labels inside canvas bounds
+    const lR=maxR-12;
+    const lx=cx+Math.cos(midA)*lR, ly=cy+Math.sin(midA)*lR;
+    ctx.save();ctx.shadowColor=col;ctx.shadowBlur=5;
+    ctx.font='bold 10px monospace';ctx.fillStyle=col;ctx.globalAlpha=0.95;
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(dim.label,lx,ly-5);
+    ctx.restore();
+    ctx.font='9px monospace';ctx.fillStyle='rgba(240,234,216,0.55)';
+    ctx.globalAlpha=1;ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(score,lx,ly+7);
+  });
+
+  // Centre circle
+  ctx.beginPath();ctx.arc(cx,cy,innerR-1,0,Math.PI*2);
+  ctx.fillStyle='#12141a';ctx.fill();
+  ctx.save();
+  ctx.shadowColor='rgba(245,200,66,0.5)';ctx.shadowBlur=10;
+  ctx.beginPath();ctx.arc(cx,cy,innerR-1,0,Math.PI*2);
+  ctx.strokeStyle='rgba(245,200,66,0.35)';ctx.lineWidth=1;ctx.stroke();
+  ctx.restore();
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.font='500 20px Georgia, serif';ctx.fillStyle='#F5C842';
+  ctx.fillText(overall,cx,cy-6);
+  ctx.font='9px monospace';ctx.fillStyle='rgba(245,200,66,0.4)';
+  ctx.fillText('/ 100',cx,cy+9);
+
+  // Synthesis
+  const synthEl=document.getElementById('canvas-synthesis');
+  if(synthEl && synthesis) synthEl.textContent=synthesis;
 }
 
 // ═══════════════════════════════════════
