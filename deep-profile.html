@@ -218,8 +218,9 @@
   .offer-desc a:hover { color: var(--gold); }
   .offer-note { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; color: var(--text-muted); opacity: 0.7; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(232,115,74,0.15); }
 
-  .stripe-wrap { background: var(--dark-card); border: 1px solid var(--dark-border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem; }
-  #card-element { padding: 0.5rem 0; }
+  .stripe-wrap { background: var(--dark-card); border: 1px solid var(--dark-border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem; overflow: hidden; }
+  #card-element { padding: 0.65rem 0.25rem; min-height: 48px; width: 100%; box-sizing: border-box; }
+  #card-element iframe { width: 100% !important; }
   #card-errors { color: var(--ember); font-size: 0.85rem; margin-top: 0.5rem; min-height: 1.2rem; }
   #payButton { width: 100%; justify-content: center; font-size: 0.78rem; padding: 1rem; margin-bottom: 0.75rem; }
   #payProcessing { display: none; align-items: center; justify-content: center; gap: 0.75rem; padding: 1rem; color: var(--gold); font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; }
@@ -1509,15 +1510,27 @@ function initStripe(){
 }
 function _initStripeElements(){
   stripeInstance = Stripe(STRIPE_PK);
-  const elements = stripeInstance.elements({
-    appearance:{
-      theme:'night',
-      variables:{colorPrimary:'#F5C842',colorBackground:'#2d3040',colorText:'#f0ece4',colorDanger:'#e8734a',fontFamily:'DM Sans, sans-serif',borderRadius:'10px'}
+  const elements = stripeInstance.elements();
+  cardElement = elements.create('card', {
+    style: {
+      base: {
+        color: '#f0ece4',
+        fontFamily: '"DM Sans", sans-serif',
+        fontSize: '15px',
+        fontWeight: '300',
+        iconColor: '#F5C842',
+        '::placeholder': { color: 'rgba(240,236,228,0.35)' }
+      },
+      invalid: {
+        color: '#e8734a',
+        iconColor: '#e8734a'
+      }
     }
   });
-  cardElement = elements.create('card',{style:{base:{color:'#f0ece4',fontFamily:'DM Sans, sans-serif',fontSize:'15px',fontWeight:'300','::placeholder':{color:'rgba(240,236,228,0.35)'}}}});
   cardElement.mount('#card-element');
-  cardElement.on('change',evt=>{ document.getElementById('card-errors').textContent=evt.error?evt.error.message:''; });
+  cardElement.on('change', evt => {
+    document.getElementById('card-errors').textContent = evt.error ? evt.error.message : '';
+  });
 }
 
 async function processPayment(){
