@@ -785,7 +785,7 @@
   .canvas-toggle-btn:hover:not(.active) { background: rgba(245,200,66,0.08); color: var(--gold); }
   .canvas-bar-view { display: none; padding: 0.5rem 0; }
   .canvas-bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
-  .canvas-bar-label { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; width: 50px; min-width: 50px; }
+  .canvas-bar-label { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; }
   .canvas-bar-track { flex: 1; height: 5px; background: rgba(245,200,66,0.08); border-radius: 3px; overflow: hidden; }
   .canvas-bar-fill { height: 100%; border-radius: 3px; transition: width 1s cubic-bezier(0.22,1,0.36,1); }
   .canvas-bar-num { font-family: 'DM Mono', monospace; font-size: 0.72rem; width: 28px; text-align: right; }
@@ -1303,7 +1303,7 @@
     <div class="canvas-dimension">
       <div class="canvas-dim-header">
         <span class="canvas-dim-key">WHY</span>
-        <span class="canvas-dim-title">My place in the world</span>
+        <span class="canvas-dim-title">Purpose — My place in the world</span>
       </div>
       <p class="canvas-dim-question">Do you wake up with a sense of direction — or does it feel like you're moving through fog? Think about your work, your calling, whatever gets you out of bed. When you imagine it, does it light something up or quietly drain you? Are you <em>running toward something</em> or away from it — or honestly, not sure?</p>
       <div class="canvas-slider-wrap">
@@ -1319,7 +1319,7 @@
     <div class="canvas-dimension">
       <div class="canvas-dim-header">
         <span class="canvas-dim-key">WHO</span>
-        <span class="canvas-dim-title">The people around me</span>
+        <span class="canvas-dim-title">People — The people around me</span>
       </div>
       <p class="canvas-dim-question">Who actually makes up your daily life? Partners, family, friends, flatmates, colleagues. Are they filling you up or quietly emptying you? If you had to name the one relationship having the <em>biggest impact on you right now</em> — positive or negative — what's it doing to you?</p>
       <div class="canvas-slider-wrap">
@@ -1335,7 +1335,7 @@
     <div class="canvas-dimension">
       <div class="canvas-dim-header">
         <span class="canvas-dim-key">WHERE</span>
-        <span class="canvas-dim-title">Where I've landed</span>
+        <span class="canvas-dim-title">Place — Where I've landed</span>
       </div>
       <p class="canvas-dim-question">Look around you — literally. Your city, your street, your home. Does it feel like <em>yours</em>, or like somewhere you're just passing through? If your soul needs trees, do you have trees? If it needs ocean, is it close? When you walk through your front door at the end of a hard day — does the space hold you, or add to the weight?</p>
       <div class="canvas-slider-wrap">
@@ -1351,7 +1351,7 @@
     <div class="canvas-dimension">
       <div class="canvas-dim-header">
         <span class="canvas-dim-key">WHAT</span>
-        <span class="canvas-dim-title">What I have to work with</span>
+        <span class="canvas-dim-title">Provision — What I have to work with</span>
       </div>
       <p class="canvas-dim-question">Be honest here — with yourself, not with us. How are you doing financially, materially? Not the polished version. Do you feel like you have enough, or is there a <em>low-level hum of worry</em> that follows you around? Are you building something, holding steady, or quietly sliding?</p>
       <div class="canvas-slider-wrap">
@@ -1367,7 +1367,7 @@
     <div class="canvas-dimension">
       <div class="canvas-dim-header">
         <span class="canvas-dim-key">HOW</span>
-        <span class="canvas-dim-title">How I'm actually doing</span>
+        <span class="canvas-dim-title">Wellbeing — How I'm actually doing</span>
       </div>
       <p class="canvas-dim-question">Last one — and the most important. How are you doing? Not "fine." <em>Actually.</em> Are you sleeping? Moving? Does your body feel like an ally or something you're managing? And mentally — are you okay, or are you carrying something heavy right now? If you fudge this answer, everything else in your profile will be slightly off. So be real. <em>Are you trending up or spiraling down?</em></p>
       <div class="canvas-slider-wrap">
@@ -2358,11 +2358,11 @@ function setCanvasView(v){
 
 function renderCanvasResults(scores, synthesis) {
   const dimDefs = [
-    { key:'why',   label:'WHY',   color:'#F5C842' },
-    { key:'who',   label:'WHO',   color:'#4adea8' },
-    { key:'where', label:'WHERE', color:'#5ab4f0' },
-    { key:'what',  label:'WHAT',  color:'#e8734a' },
-    { key:'how',   label:'HOW',   color:'#c94aad' },
+    { key:'why',   label:'WHY',   sub:'Purpose',   color:'#F5C842' },
+    { key:'who',   label:'WHO',   sub:'People',    color:'#4adea8' },
+    { key:'where', label:'WHERE', sub:'Place',     color:'#5ab4f0' },
+    { key:'what',  label:'WHAT',  sub:'Provision', color:'#e8734a' },
+    { key:'how',   label:'HOW',   sub:'Wellbeing', color:'#c94aad' },
   ];
 
   const overall = Math.round(Object.values(scores).reduce((a,b)=>a+b,0)/5);
