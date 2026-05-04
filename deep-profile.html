@@ -1652,8 +1652,8 @@ async function processPayment(){
   const proc=document.getElementById('payProcessing');
   const err=document.getElementById('payError');
 
-  // Validate email
-  const emailVal = document.getElementById('pay-email')?.value?.trim() || '';
+  // Get email — prefer userEmail state var (already validated), fall back to DOM
+  const emailVal = userEmail || document.getElementById('pay-email')?.value?.trim() || '';
   if(!emailVal || !emailVal.includes('@') || !emailVal.includes('.')){
     if(err){ err.textContent='Please enter your email so we can send you your profile.'; err.style.display='block'; }
     return;
@@ -1665,10 +1665,12 @@ async function processPayment(){
     if(promoApplied && promoDiscount >= 1.0){
       if(SHEETS_URL && profileData) logToSheet(profileData, 0, collectResponses(), 'promo');
       try{
-        await fetch(`${WORKER_URL}/send-profile-email`,{
+        console.log('Sending promo profile email to:', emailVal);
+        const emailRes = await fetch(`${WORKER_URL}/send-profile-email`,{
           method:'POST',headers:{'Content-Type':'application/json'},
           body:JSON.stringify({email:emailVal, nestId, profile:profileData})
         });
+        console.log('Promo email result:', await emailRes.json());
       }catch(emailErr){ console.warn('Email send failed (non-fatal):', emailErr); }
       userEmail=emailVal; hasPaid=true;
       renderResults(profileData);
@@ -1693,11 +1695,14 @@ async function processPayment(){
 
     // Send profile email + mark as paid in KV
     try{
-      await fetch(`${WORKER_URL}/send-profile-email`,{
+      console.log('Sending profile email to:', emailVal, 'nestId:', nestId);
+      const emailRes = await fetch(`${WORKER_URL}/send-profile-email`,{
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({email:emailVal, nestId, profile:profileData})
       });
+      const emailData = await emailRes.json();
+      console.log('Email send result:', emailData);
     }catch(emailErr){
       console.warn('Email send failed (non-fatal):', emailErr);
     }
