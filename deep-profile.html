@@ -175,6 +175,56 @@
   .intro-feature strong { color: var(--text-main); font-weight: 400; }
   .intro-note { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; color: var(--text-muted); opacity: 0.7; margin-top: 1.5rem; }
 
+  /* EMAIL GATE */
+  .email-gate {
+    background: var(--dark-card);
+    border: 1px solid var(--dark-border);
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  .email-gate h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--text-main);
+    margin-bottom: 0.5rem;
+  }
+  .email-gate h3 em { font-style: italic; color: var(--gold); }
+  .email-gate p {
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+    max-width: 380px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .email-gate-row {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    max-width: 440px;
+    margin: 0 auto;
+  }
+  .email-gate-row input {
+    flex: 1;
+    min-width: 200px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(245,200,66,0.2);
+    border-radius: 6px;
+    color: var(--text-main);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    padding: 0.75rem 1rem;
+    transition: border-color 0.2s;
+  }
+  .email-gate-row input:focus { outline: none; border-color: var(--gold); }
+  .email-gate-row input::placeholder { color: rgba(240,234,216,0.3); }
+  #gate-error { display: none; color: var(--ember); font-size: 0.82rem; margin-top: 0.75rem; }
+  .snap-content { display: none; }
+  .snap-content.revealed { display: block; }
+
   .snap-badge { display: inline-flex; align-items: center; gap: 0.75rem; background: var(--gold-faint); border: 1px solid var(--dark-border); border-radius: 100px; padding: 0.5rem 1.25rem 0.5rem 0.75rem; margin-bottom: 2rem; }
   .snap-badge-mbti { font-family: 'DM Mono', monospace; font-size: 0.9rem; font-weight: 500; color: var(--dark); background: var(--gold); border-radius: 100px; padding: 0.2rem 0.75rem; letter-spacing: 0.1em; }
   .snap-badge-label { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1rem; color: var(--gold); }
@@ -1182,47 +1232,52 @@
 <div class="screen" id="screen-snapshot">
   <div class="inner">
     <p class="eyebrow">your profile is ready</p>
-    <h2>Here's a<br><em>glimpse.</em></h2>
+    <h2>Almost.<br><em>One quick thing.</em></h2>
 
-    <div class="snap-badge">
-      <span class="snap-badge-mbti" id="snap-mbti">ENFJ</span>
-      <span class="snap-badge-label" id="snap-archetype">The Connector</span>
+    <!-- EMAIL GATE — shown until email submitted -->
+    <div class="email-gate" id="email-gate">
+      <h3>Drop your email to<br><em>see your snapshot.</em></h3>
+      <p>We'll keep a copy safe for you — no inbox clutter, just your profile waiting whenever you need it.</p>
+      <div class="email-gate-row">
+        <input type="email" id="snap-email" placeholder="your@email.com" onkeydown="if(event.key==='Enter') submitEmail()">
+        <button class="btn btn-gold" onclick="submitEmail()" style="white-space:nowrap;">Show me →</button>
+      </div>
+      <p id="gate-error">Please enter a valid email address.</p>
     </div>
 
-    <div class="snap-preview">
-      <div id="snap-preview">
-        <p style="color:var(--text-muted);font-style:italic;">Your profile is loading…</p>
-      </div>
-    </div>
+    <!-- SNAPSHOT CONTENT — hidden until email submitted -->
+    <div class="snap-content" id="snap-content">
 
-    <div class="email-capture">
-      <p class="email-capture-title">Want the full picture?</p>
-      <p>Drop your email and we'll send you your free snapshot — and keep a copy for you to return to anytime.</p>
-      <div class="email-row">
-        <input type="email" id="snap-email" placeholder="your@email.com">
-        <button class="btn btn-gold" onclick="submitEmail()" style="white-space:nowrap;">Send it →</button>
+      <div class="snap-badge">
+        <span class="snap-badge-mbti" id="snap-mbti">ENFJ</span>
+        <span class="snap-badge-label" id="snap-archetype">The Connector</span>
       </div>
-      <p id="email-error">Please enter a valid email address.</p>
-      <p id="email-submitted">🐦 You're in. Check your inbox — and scroll down to see what's waiting.</p>
-    </div>
 
-    <div class="teaser-section">
-      <div class="teaser-content teaser-blur">
-        <h3>How you're wired</h3>
-        <p>Your mind processes the world relationally before it processes it logically. You're energised by people, make decisions through the lens of impact, and carry a quiet but persistent drive to make things better for everyone around you.</p>
-        <h3 style="margin-top:1.25rem;">Your stuck places</h3>
-        <p>Your pattern probably involves saying yes when you mean not yet, or carrying the emotional weight of a room so nobody else has to. The leap from Rescuer to Coach is one of the most significant shifts your type can make.</p>
-        <h3 style="margin-top:1.25rem;">Your attachment style</h3>
-        <p>You lean anxious-secure — capable of deep connection, but under stress you can spiral into "are we okay?" before the other person even knows anything's wrong. You're not needy. You're just paying very close attention.</p>
+      <div class="snap-preview">
+        <div id="snap-preview">
+          <p style="color:var(--text-muted);font-style:italic;">Your profile is loading…</p>
+        </div>
       </div>
-      <div class="teaser-overlay">
-        <span class="lock-icon">🔒</span>
-        <p>Your full profile is one step away</p>
-      </div>
-    </div>
 
-    <div class="btn-row" style="margin-top:2rem;">
-      <button class="btn btn-gold" onclick="goTo('screen-pay')">Unlock my full profile →</button>
+      <div class="teaser-section">
+        <div class="teaser-content teaser-blur">
+          <h3>How you're wired</h3>
+          <p>Your mind processes the world relationally before it processes it logically. You're energised by people, make decisions through the lens of impact, and carry a quiet but persistent drive to make things better for everyone around you.</p>
+          <h3 style="margin-top:1.25rem;">Your stuck places</h3>
+          <p>Your pattern probably involves saying yes when you mean not yet, or carrying the emotional weight of a room so nobody else has to. The leap from Rescuer to Coach is one of the most significant shifts your type can make.</p>
+          <h3 style="margin-top:1.25rem;">Your attachment style</h3>
+          <p>You lean anxious-secure — capable of deep connection, but under stress you can spiral into "are we okay?" before the other person even knows anything's wrong. You're not needy. You're just paying very close attention.</p>
+        </div>
+        <div class="teaser-overlay">
+          <span class="lock-icon">🔒</span>
+          <p>Your full profile is one step away</p>
+        </div>
+      </div>
+
+      <div class="btn-row" style="margin-top:2rem;">
+        <button class="btn btn-gold" onclick="goTo('screen-pay')">Unlock my full profile →</button>
+      </div>
+
     </div>
   </div>
 </div>
@@ -1502,7 +1557,7 @@ function goTo(screenId){
   if(screenId==='screen-pay' && !stripeInstance) initStripe();
   if(screenId==='screen-pay') prefillPayEmail();
   if(screenId==='screen-landing') runAnalysis();
-  if(screenId==='screen-snapshot' && profileData) populateSnapshot(profileData);
+  // Don't populate snapshot until email gate is passed — submitEmail handles that
 }
 
 function prefillPayEmail(){
@@ -1788,38 +1843,45 @@ function populateSnapshot(profile){
 // EMAIL → BEEHIIV
 // ═══════════════════════════════════════
 async function submitEmail(){
-  const emailEl=document.getElementById('snap-email');
-  const errorEl=document.getElementById('email-error');
-  const doneEl=document.getElementById('email-submitted');
-  const email=emailEl?emailEl.value.trim():'';
-  if(!email||!email.includes('@')||!email.includes('.')){
-    if(errorEl) errorEl.style.display='block';
+  const emailEl = document.getElementById('snap-email');
+  const errorEl = document.getElementById('gate-error');
+  const email   = emailEl ? emailEl.value.trim() : '';
+
+  if(!email || !email.includes('@') || !email.includes('.')){
+    if(errorEl) errorEl.style.display = 'block';
     return;
   }
-  if(errorEl) errorEl.style.display='none';
-  if(emailEl) emailEl.disabled=true;
+  if(errorEl) errorEl.style.display = 'none';
 
-  // Store for re-use on pay screen — no need to ask twice
+  // Store for pay screen — no second ask needed
   userEmail = email;
 
+  // Subscribe to Beehiiv silently
   try{
     await fetch('https://api.beehiiv.com/v2/publications/'+BEEHIIV_PUB_ID+'/subscriptions',{
-      method:'POST',headers:{'Content-Type':'application/json'},
+      method:'POST', headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        email,reactivate_existing:true,send_welcome_email:true,
+        email, reactivate_existing:true, send_welcome_email:true,
         custom_fields:[
-          {name:'archetype',value:profileData?.archetype||''},
-          {name:'mbti',value:profileData?.mbti||''},
-          {name:'enneagram',value:profileData?.enneagram||''},
-          {name:'attachment',value:profileData?.attachment||''},
-          {name:'nest_id',value:nestId||''},
-          {name:'source',value:'deep-profile-snapshot'},
+          {name:'archetype',  value:profileData?.archetype  || ''},
+          {name:'mbti',       value:profileData?.mbti       || ''},
+          {name:'enneagram',  value:profileData?.enneagram  || ''},
+          {name:'attachment', value:profileData?.attachment  || ''},
+          {name:'nest_id',    value:nestId                   || ''},
+          {name:'source',     value:'deep-profile-snapshot'       },
         ]
       })
     });
   }catch(e){ console.warn('Beehiiv error (silent):',e); }
-  if(doneEl) doneEl.style.display='block';
-  if(emailEl) emailEl.closest('.email-row').style.display='none';
+
+  // Hide gate, reveal snapshot content
+  const gate    = document.getElementById('email-gate');
+  const snapContent = document.getElementById('snap-content');
+  if(gate)        gate.style.display = 'none';
+  if(snapContent) snapContent.classList.add('revealed');
+
+  // Populate snapshot now it's visible
+  if(profileData) populateSnapshot(profileData);
 }
 
 // ═══════════════════════════════════════
