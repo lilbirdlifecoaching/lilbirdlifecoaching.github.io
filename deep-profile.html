@@ -1720,6 +1720,9 @@ async function processPayment(){
     if(promoApplied && promoDiscount >= 1.0){
       if(SHEETS_URL && profileData) logToSheet(profileData, 0, collectResponses(), 'promo');
       try{
+        // Store profile in KV first so Nest link works
+        await fetch(`${WORKER_URL}/store-profile`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nestId,profile:profileData})});
+        // Then send email (which also marks as paid in KV)
         console.log('Sending promo profile email to:', emailVal);
         const emailRes = await fetch(`${WORKER_URL}/send-profile-email`,{
           method:'POST',headers:{'Content-Type':'application/json'},
