@@ -560,6 +560,179 @@
   .canvas-dim-textarea:focus { outline: none; border-color: rgba(245,200,66,0.35); }
 
   /* Results canvas */
+
+  /* ══════════════════════════════════════
+     DASHBOARD LAYOUT
+  ══════════════════════════════════════ */
+  .inner-wide {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+  .dashboard-layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 2rem;
+    align-items: start;
+    margin-top: 2rem;
+  }
+  .dashboard-main { min-width: 0; }
+  .dashboard-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    position: sticky;
+    top: 5rem;
+  }
+
+  /* SIDEBAR CARDS */
+  .sidebar-card {
+    background: var(--dark-card);
+    border: 1px solid var(--dark-border);
+    border-radius: 14px;
+    padding: 1.5rem;
+  }
+  .sidebar-card-ember {
+    background: var(--ember-faint);
+    border-color: rgba(232,115,74,0.25);
+  }
+  .sidebar-card-locked {
+    background: var(--dark-mid);
+    border-color: rgba(245,200,66,0.08);
+    opacity: 0.85;
+    position: relative;
+  }
+  .sidebar-locked-badge {
+    position: absolute;
+    top: -10px;
+    right: 1rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    background: var(--dark-mid);
+    border: 1px solid var(--dark-border);
+    border-radius: 100px;
+    padding: 0.2rem 0.6rem;
+    color: var(--text-muted);
+  }
+  .sidebar-card-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 0.4rem;
+    display: block;
+  }
+  .sidebar-card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    font-weight: 400;
+    color: var(--text-main);
+    margin-bottom: 0.5rem;
+  }
+  .sidebar-card-body {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    line-height: 1.65;
+    margin-bottom: 0;
+  }
+  .sidebar-code {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    color: var(--ember);
+    margin-top: 0.75rem;
+    margin-bottom: 0;
+  }
+  .sidebar-action-btn {
+    width: 100%;
+    background: rgba(245,200,66,0.08);
+    border: 1px solid rgba(245,200,66,0.2);
+    border-radius: 6px;
+    color: var(--gold-dim);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.65rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .sidebar-action-btn:hover {
+    background: rgba(245,200,66,0.15);
+    color: var(--gold);
+    border-color: rgba(245,200,66,0.4);
+  }
+
+  /* CANVAS REDO */
+  .canvas-redo-dim {
+    margin-bottom: 1.1rem;
+  }
+  .canvas-redo-label {
+    font-size: 0.82rem;
+    margin-bottom: 0.35rem;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.08em;
+  }
+
+  /* CANVAS HISTORY */
+  .canvas-history-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid rgba(245,200,66,0.08);
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .canvas-history-item:last-child { border-bottom: none; }
+  .canvas-history-item:hover { opacity: 0.8; }
+  .canvas-history-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    min-width: 70px;
+  }
+  .canvas-history-score {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--gold);
+    min-width: 36px;
+  }
+  .canvas-history-bar {
+    flex: 1;
+    height: 4px;
+    background: rgba(245,200,66,0.1);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .canvas-history-bar-fill {
+    height: 100%;
+    background: linear-gradient(to right, var(--ember), var(--gold));
+    border-radius: 2px;
+  }
+  .canvas-history-delta {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    min-width: 32px;
+    text-align: right;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 860px) {
+    .dashboard-layout {
+      grid-template-columns: 1fr;
+    }
+    .dashboard-sidebar {
+      position: static;
+      order: -1;
+    }
+    .inner-wide { padding: 0 1.25rem; }
+  }
+
   /* CANVAS RESULT */
   .canvas-result-wrap {
     margin: 2.5rem 0;
@@ -1342,11 +1515,12 @@
 
 
 <!-- ══════════════════════════════════════
-     RESULTS — THE NEST
+     RESULTS — THE NEST DASHBOARD
 ══════════════════════════════════════ -->
 <div class="screen" id="screen-results">
-  <div class="inner">
+  <div class="inner inner-wide">
 
+    <!-- HEADER -->
     <div class="result-header">
       <p class="eyebrow">your nest</p>
       <h1 id="result-archetype" style="margin-bottom:0.25rem;">The Connector</h1>
@@ -1354,140 +1528,198 @@
       <div class="result-tags" id="result-tags"></div>
     </div>
 
-    <!-- LIFE CANVAS RESULTS -->
-    <div class="canvas-result-wrap" id="canvas-result-wrap">
-      <p class="eyebrow" style="margin-bottom:0.5rem;">your life canvas</p>
-      <p class="canvas-result-title">The season you're in</p>
-      <p class="canvas-result-score">Overall: <span id="canvas-overall-score">—</span>/100</p>
+    <!-- DASHBOARD LAYOUT — profile + sidebar -->
+    <div class="dashboard-layout">
 
-      <!-- Sunburst chart -->
-      <div class="canvas-chart-wrap" id="canvas-sunburst-wrap">
-        <canvas id="canvas-sunburst"></canvas>
+      <!-- MAIN PROFILE COLUMN -->
+      <div class="dashboard-main">
+
+        <div class="result-section">
+          <p class="result-section-label">who you are</p>
+          <div id="result-who"></div>
+        </div>
+
+        <div class="result-section">
+          <p class="result-section-label">how you're wired</p>
+          <div id="result-wired"></div>
+        </div>
+
+        <div class="result-section">
+          <p class="result-section-label" id="result-wing-title">your enneagram wings</p>
+          <div id="result-wing"></div>
+        </div>
+
+        <div class="result-section" id="result-subtype-section">
+          <p class="result-section-label">your subtype</p>
+          <div id="result-subtype"></div>
+        </div>
+
+        <div class="result-section">
+          <p class="result-section-label">your gift — and its shadow</p>
+          <div id="result-wound"></div>
+        </div>
+
+        <div class="result-section">
+          <p class="result-section-label">your attachment style</p>
+          <div id="result-attachment"></div>
+        </div>
+
+        <div class="result-section" id="result-health-section">
+          <p class="result-section-label">right now</p>
+          <div id="result-health"></div>
+        </div>
+
+        <div id="result-quote">
+          <blockquote>"Clarity changes everything."</blockquote>
+        </div>
+
+        <div class="result-section">
+          <p class="result-section-label">things to remember</p>
+          <div id="result-remember"></div>
+        </div>
+
+        <div class="result-section">
+          <p class="result-section-label">where you get stuck</p>
+          <div id="result-stuck"></div>
+        </div>
+
+        <div class="role-reflection" id="result-role" style="display:none;">
+          <p class="role-reflection-label">your work life — a gentle reflection</p>
+          <div id="result-role-content"></div>
+        </div>
+
+        <!-- Partner dynamic -->
+        <div class="partner-section" id="partner-section" style="display:none;">
+          <h3>How do you work with someone you know? 🪺</h3>
+          <p>Put in what you know about someone in your life — a partner, colleague, friend — and we'll read the dynamic.</p>
+          <div class="partner-input">
+            <label class="partner-label">Who is this person to you?</label>
+            <select id="partner-relationship">
+              <option value="partner">Romantic partner</option>
+              <option value="friend">Close friend</option>
+              <option value="colleague">Colleague or collaborator</option>
+              <option value="family">Family member</option>
+              <option value="manager">Manager or leader</option>
+            </select>
+          </div>
+          <div class="partner-input">
+            <label class="partner-label">Their personality types (if you know them)</label>
+            <input type="text" id="partner-types" placeholder="e.g. INFJ, Enneagram 9, Nurturer — anything you know">
+          </div>
+          <div class="partner-input">
+            <label class="partner-label">Describe them in a few words</label>
+            <input type="text" id="partner-description" placeholder="e.g. very calm, hates conflict, always thinking about others...">
+          </div>
+          <button class="btn btn-outline" id="partner-btn" onclick="generatePartnerDynamic()" style="margin-top:0.5rem;">See the dynamic →</button>
+          <div class="partner-result" id="partner-result"></div>
+        </div>
+
       </div>
 
-      <!-- Bar breakdown -->
-      <div class="canvas-bar-view" id="canvas-bar-view">
-        <div id="canvas-bars"></div>
-      </div>
+      <!-- SIDEBAR -->
+      <div class="dashboard-sidebar">
 
-      <!-- Toggle -->
-      <div class="canvas-toggle-row">
-        <button class="canvas-toggle-btn active" id="canvas-btn-sun" onclick="setCanvasView('sun')">Canvas</button>
-        <button class="canvas-toggle-btn" id="canvas-btn-bar" onclick="setCanvasView('bar')">Breakdown</button>
-      </div>
+        <!-- LIFE CANVAS CARD -->
+        <div class="sidebar-card" id="canvas-result-wrap">
+          <p class="sidebar-card-eyebrow">your life canvas</p>
+          <p class="canvas-result-title">The season you're in</p>
+          <p class="canvas-result-score">Overall: <span id="canvas-overall-score">—</span>/100</p>
+          <div class="canvas-chart-wrap" id="canvas-sunburst-wrap">
+            <canvas id="canvas-sunburst"></canvas>
+          </div>
+          <div class="canvas-bar-view" id="canvas-bar-view">
+            <div id="canvas-bars"></div>
+          </div>
+          <div class="canvas-toggle-row">
+            <button class="canvas-toggle-btn active" id="canvas-btn-sun" onclick="setCanvasView('sun')">Canvas</button>
+            <button class="canvas-toggle-btn" id="canvas-btn-bar" onclick="setCanvasView('bar')">Breakdown</button>
+          </div>
+          <p class="canvas-synthesis" id="canvas-synthesis"></p>
 
-      <p class="canvas-synthesis" id="canvas-synthesis"></p>
-    </div>
+          <!-- Redo canvas button -->
+          <button class="sidebar-action-btn" onclick="showCanvasRedo()" style="margin-top:1.25rem;">
+            ↻ Update my Canvas
+          </button>
 
-    <div class="result-section">
-      <p class="result-section-label">who you are</p>
-      <div id="result-who"></div>
-    </div>
+          <!-- Canvas history -->
+          <div id="canvas-history-wrap" style="display:none;">
+            <p class="sidebar-card-eyebrow" style="margin-top:1.5rem;margin-bottom:0.75rem;">canvas history</p>
+            <div id="canvas-history-list"></div>
+          </div>
+        </div>
 
-    <div class="result-section">
-      <p class="result-section-label">how you're wired</p>
-      <div id="result-wired"></div>
-    </div>
+        <!-- CANVAS REDO PANEL (hidden until triggered) -->
+        <div class="sidebar-card" id="canvas-redo-panel" style="display:none;">
+          <p class="sidebar-card-eyebrow">how are you doing today?</p>
+          <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:1.25rem;">Drag each slider to reflect where you are right now. Takes 2 minutes.</p>
 
-    <div class="result-section">
-      <p class="result-section-label" id="result-wing-title">your enneagram wings</p>
-      <div id="result-wing"></div>
-    </div>
+          <div class="canvas-redo-dim">
+            <div class="canvas-redo-label"><span style="color:#F5C842;font-weight:500;">WHY</span> <span style="opacity:0.6;">Purpose & Direction</span></div>
+            <input type="range" class="canvas-slider" id="redo-why" min="0" max="100" value="50" oninput="updateSlider('redo-why','redo-score-why')">
+            <div class="canvas-score-display" id="redo-score-why" style="font-size:1.4rem;">50</div>
+          </div>
+          <div class="canvas-redo-dim">
+            <div class="canvas-redo-label"><span style="color:#4adea8;font-weight:500;">WHO</span> <span style="opacity:0.6;">People & Relationships</span></div>
+            <input type="range" class="canvas-slider" id="redo-who" min="0" max="100" value="50" oninput="updateSlider('redo-who','redo-score-who')">
+            <div class="canvas-score-display" id="redo-score-who" style="font-size:1.4rem;">50</div>
+          </div>
+          <div class="canvas-redo-dim">
+            <div class="canvas-redo-label"><span style="color:#5ab4f0;font-weight:500;">WHERE</span> <span style="opacity:0.6;">Place & Environment</span></div>
+            <input type="range" class="canvas-slider" id="redo-where" min="0" max="100" value="50" oninput="updateSlider('redo-where','redo-score-where')">
+            <div class="canvas-score-display" id="redo-score-where" style="font-size:1.4rem;">50</div>
+          </div>
+          <div class="canvas-redo-dim">
+            <div class="canvas-redo-label"><span style="color:#e8734a;font-weight:500;">WHAT</span> <span style="opacity:0.6;">Resources & Provision</span></div>
+            <input type="range" class="canvas-slider" id="redo-what" min="0" max="100" value="50" oninput="updateSlider('redo-what','redo-score-what')">
+            <div class="canvas-score-display" id="redo-score-what" style="font-size:1.4rem;">50</div>
+          </div>
+          <div class="canvas-redo-dim">
+            <div class="canvas-redo-label"><span style="color:#c94aad;font-weight:500;">HOW</span> <span style="opacity:0.6;">Personal Health</span></div>
+            <input type="range" class="canvas-slider" id="redo-how" min="0" max="100" value="50" oninput="updateSlider('redo-how','redo-score-how')">
+            <div class="canvas-score-display" id="redo-score-how" style="font-size:1.4rem;">50</div>
+          </div>
 
-    <div class="result-section" id="result-subtype-section">
-      <p class="result-section-label">your subtype</p>
-      <div id="result-subtype"></div>
-    </div>
+          <div class="btn-row" style="margin-top:1.25rem;">
+            <button class="btn btn-gold" onclick="saveCanvasUpdate()" style="flex:1;justify-content:center;">Save update →</button>
+            <button class="btn btn-outline" onclick="hideCanvasRedo()">Cancel</button>
+          </div>
+        </div>
 
-    <div class="result-section">
-      <p class="result-section-label">your gift — and its shadow</p>
-      <div id="result-wound"></div>
-    </div>
+        <!-- COACHING CTA -->
+        <div class="sidebar-card sidebar-card-ember">
+          <p class="sidebar-card-eyebrow" style="color:var(--ember);">ready to go deeper?</p>
+          <h3 class="sidebar-card-title">Book a First Flight</h3>
+          <p class="sidebar-card-body">A one-to-one session with Luke that takes everything in your profile and turns it into a real conversation — and a real next step.</p>
+          <p class="sidebar-code">Use code <strong>IMREADY</strong> for 25% off</p>
+          <a href="https://calendly.com/lilbirdlifecoaching/first-flight-session" target="_blank" class="btn btn-gold" style="width:100%;justify-content:center;margin-top:1rem;">Book now →</a>
+        </div>
 
-    <div class="result-section">
-      <p class="result-section-label">your attachment style</p>
-      <div id="result-attachment"></div>
-    </div>
+        <!-- SOLO COURSE — coming soon -->
+        <div class="sidebar-card sidebar-card-locked">
+          <div class="sidebar-locked-badge">Coming Soon</div>
+          <p class="sidebar-card-eyebrow">self-guided course</p>
+          <h3 class="sidebar-card-title">Life Change Sessions: Solo</h3>
+          <p class="sidebar-card-body">Six sessions. Your pace. The same depth as working with a coach — in a format you can return to whenever you're ready.</p>
+          <p class="sidebar-code">Your code <strong>SOLO50</strong> = 50% off at launch</p>
+          <button class="btn btn-outline" style="width:100%;justify-content:center;margin-top:1rem;opacity:0.5;cursor:default;">Notify me when it's ready</button>
+        </div>
 
-    <div class="result-section" id="result-health-section">
-      <p class="result-section-label">right now</p>
-      <div id="result-health"></div>
-    </div>
+        <!-- NEST LINK -->
+        <div class="sidebar-card">
+          <p class="sidebar-card-eyebrow">your nest</p>
+          <p class="sidebar-card-body" style="margin-bottom:0.75rem;">This is your permanent link. Bookmark it — your profile and canvas history live here.</p>
+          <p class="nest-id" id="result-nest-id" style="font-size:0.72rem;margin-bottom:1rem;word-break:break-all;"></p>
+          <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+            <button class="btn btn-outline" onclick="copyNestLink()" style="flex:1;justify-content:center;">Copy link</button>
+            <button class="btn btn-outline" id="retake-btn" onclick="restartAssessment()" style="flex:1;justify-content:center;">Retake ↺</button>
+          </div>
+        </div>
 
-    <div id="result-quote">
-      <blockquote>"Clarity changes everything."</blockquote>
-    </div>
+        <!-- BACK HOME -->
+        <a href="index.html" class="btn btn-outline" style="width:100%;justify-content:center;text-align:center;">← Back to lilbird.life</a>
 
-    <div class="result-section">
-      <p class="result-section-label">things to remember</p>
-      <div id="result-remember"></div>
-    </div>
-
-    <div class="result-section">
-      <p class="result-section-label">where you get stuck</p>
-      <div id="result-stuck"></div>
-    </div>
-
-    <!-- Role reflection — shown only if work context was shared -->
-    <div class="role-reflection" id="result-role" style="display:none;">
-      <p class="role-reflection-label">your work life — a gentle reflection</p>
-      <div id="result-role-content"></div>
-    </div>
-
-    <!-- Partner dynamic — shown after unlock -->
-    <div class="partner-section" id="partner-section" style="display:none;">
-      <h3>How do you work with someone you know? 🪺</h3>
-      <p>If there's someone in your life you're curious about — a partner, a friend, a colleague — put in what you know about their personality and we'll synthesise what this pairing tends to look like.</p>
-
-      <div class="partner-input">
-        <label class="partner-label">Who is this person to you?</label>
-        <select id="partner-relationship">
-          <option value="partner">Romantic partner</option>
-          <option value="friend">Close friend</option>
-          <option value="colleague">Colleague or collaborator</option>
-          <option value="family">Family member</option>
-          <option value="manager">Manager or leader</option>
-        </select>
-      </div>
-
-      <div class="partner-input">
-        <label class="partner-label">Their personality types (if you know them)</label>
-        <input type="text" id="partner-types" placeholder="e.g. INFJ, Enneagram 9, Nurturer — anything you know">
-      </div>
-
-      <div class="partner-input">
-        <label class="partner-label">Describe them in a few words</label>
-        <input type="text" id="partner-description" placeholder="e.g. very calm, hates conflict, always thinking about others...">
-      </div>
-
-      <button class="btn btn-outline" id="partner-btn" onclick="generatePartnerDynamic()" style="margin-top:0.5rem;">See the dynamic →</button>
-
-      <div class="partner-result" id="partner-result"></div>
-    </div>
-
-    <div class="nest-box">
-      <p class="eyebrow" style="margin-bottom:0.5rem;">your nest id</p>
-      <p style="color:var(--text-muted);font-size:0.88rem;margin-bottom:0.5rem;">This link is yours forever. Bookmark it, save it — come back any time.</p>
-      <p class="nest-id" id="result-nest-id"></p>
-      <div class="btn-row" style="margin-top:1.25rem;">
-        <button class="btn btn-outline" onclick="copyNestLink()">Copy my Nest link</button>
-        <button class="btn btn-outline" id="retake-btn" onclick="restartAssessment()">Retake ↺</button>
       </div>
     </div>
-
-    <div class="result-cta">
-      <div class="result-cta-text">
-        <p class="eyebrow" style="margin-bottom:0.75rem;">ready to go deeper?</p>
-        <h3 style="color:var(--text-main);font-family:'Playfair Display',serif;font-size:1.15rem;margin-bottom:0.5rem;">This is just the beginning.</h3>
-        <p style="font-size:0.9rem;">A First Flight session with Luke takes everything you've just discovered and turns it into a real conversation — and a real next step.</p>
-        <p style="font-size:0.82rem;color:var(--gold-dim);margin-top:0.5rem;font-family:'DM Mono',monospace;">Use code IMREADY for 25% off.</p>
-      </div>
-      <div class="result-cta-btns">
-        <a href="https://calendly.com/lilbirdlifecoaching/first-flight-session" target="_blank" class="btn btn-gold">Book a First Flight →</a>
-        <a href="index.html" class="btn btn-outline">← Back to home</a>
-      </div>
-    </div>
-
   </div>
 </div>
 
@@ -1721,7 +1953,7 @@ async function processPayment(){
       if(SHEETS_URL && profileData) logToSheet(profileData, 0, collectResponses(), 'promo');
       try{
         // Store profile in KV first so Nest link works
-        await fetch(`${WORKER_URL}/store-profile`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nestId,profile:profileData})});
+        await fetch(`${WORKER_URL}/store-profile`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nestId,profile:profileData,canvasScores,canvasHistory:[]})});
         // Then send email (which also marks as paid in KV)
         console.log('Sending promo profile email to:', emailVal);
         const emailRes = await fetch(`${WORKER_URL}/send-profile-email`,{
@@ -1813,7 +2045,7 @@ async function runAnalysis(){
       console.error('Profile JSON parse error:', parseErr.message, 'Raw:', raw.slice(0,300));
       throw new Error('Profile parsing failed');
     }
-    await fetch(`${WORKER_URL}/store-profile`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nestId,profile:profileData})});
+    await fetch(`${WORKER_URL}/store-profile`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nestId,profile:profileData,canvasScores,canvasHistory:[]})});
   }catch(e){
     console.error('Analysis error — using fallback:', e.message);
     profileData=getFallbackProfile();
@@ -1946,9 +2178,16 @@ function renderResults(profile){
   if(partnerSection) partnerSection.style.display='block';
 
   // Canvas — re-render with synthesis from profile
-  if(profileData && profileData.canvasSynthesis){
-    renderCanvasResults(canvasScores, profileData.canvasSynthesis);
+  // If returning via Nest link, load stored canvas scores
+  if(profile.canvasScores && Object.keys(canvasScores).every(k => canvasScores[k] === 50)){
+    canvasScores = profile.canvasScores;
   }
+  if(profile.canvasHistory && profile.canvasHistory.length > 0){
+    canvasHistory = profile.canvasHistory;
+  }
+  const synthesis = profile.canvasSynthesis || '';
+  renderCanvasResults(canvasScores, synthesis);
+  renderCanvasHistory();
 
   // Nest ID
   if(nestId){
@@ -2285,6 +2524,87 @@ function renderCanvasResults(scores, synthesis) {
   if(synthEl && synthesis) synthEl.textContent=synthesis;
 }
 
+
+// ═══════════════════════════════════════
+// CANVAS REDO + HISTORY
+// ═══════════════════════════════════════
+let canvasHistory = []; // array of {scores, date, overall}
+
+function showCanvasRedo(){
+  const panel = document.getElementById('canvas-redo-panel');
+  if(panel){ panel.style.display = 'block'; panel.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+}
+function hideCanvasRedo(){
+  const panel = document.getElementById('canvas-redo-panel');
+  if(panel) panel.style.display = 'none';
+}
+
+async function saveCanvasUpdate(){
+  const newScores = {
+    why:   parseInt(document.getElementById('redo-why')?.value   || 50),
+    who:   parseInt(document.getElementById('redo-who')?.value   || 50),
+    where: parseInt(document.getElementById('redo-where')?.value || 50),
+    what:  parseInt(document.getElementById('redo-what')?.value  || 50),
+    how:   parseInt(document.getElementById('redo-how')?.value   || 50),
+  };
+  const overall = Math.round(Object.values(newScores).reduce((a,b)=>a+b,0)/5);
+  const entry = { scores: newScores, overall, date: new Date().toISOString() };
+
+  // Add to history
+  canvasHistory.unshift(entry); // newest first
+  if(canvasHistory.length > 12) canvasHistory = canvasHistory.slice(0,12); // keep last 12
+
+  // Update display
+  canvasScores = newScores;
+  renderCanvasResults(newScores, '');
+  renderCanvasHistory();
+  hideCanvasRedo();
+
+  // Save to KV
+  if(nestId && profileData){
+    try{
+      const stored = { profile: profileData, paid: hasPaid, canvasHistory, canvasScores: newScores, email: userEmail };
+      await fetch(`${WORKER_URL}/store-profile`, {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({nestId, profile: profileData, canvasHistory, canvasScores: newScores})
+      });
+    }catch(e){ console.warn('Canvas save failed:', e); }
+  }
+}
+
+function renderCanvasHistory(){
+  if(!canvasHistory || canvasHistory.length < 2){
+    document.getElementById('canvas-history-wrap').style.display = 'none';
+    return;
+  }
+  document.getElementById('canvas-history-wrap').style.display = 'block';
+  const list = document.getElementById('canvas-history-list');
+  if(!list) return;
+
+  list.innerHTML = canvasHistory.map((entry, i) => {
+    const date = new Date(entry.date);
+    const dateStr = date.toLocaleDateString('en-AU', {day:'numeric',month:'short',year:'numeric'});
+    const prev = canvasHistory[i+1];
+    const delta = prev ? entry.overall - prev.overall : null;
+    const deltaStr = delta !== null ? (delta > 0 ? `+${delta}` : `${delta}`) : '';
+    const deltaColor = delta > 0 ? '#4adea8' : delta < 0 ? '#e8734a' : '#a09880';
+    return `<div class="canvas-history-item" onclick="viewHistoricalCanvas(${i})">
+      <span class="canvas-history-date">${dateStr}</span>
+      <span class="canvas-history-score">${entry.overall}</span>
+      <div class="canvas-history-bar"><div class="canvas-history-bar-fill" style="width:${entry.overall}%"></div></div>
+      ${deltaStr ? `<span class="canvas-history-delta" style="color:${deltaColor}">${deltaStr}</span>` : '<span class="canvas-history-delta"></span>'}
+    </div>`;
+  }).join('');
+}
+
+function viewHistoricalCanvas(idx){
+  const entry = canvasHistory[idx];
+  if(!entry) return;
+  renderCanvasResults(entry.scores, '');
+  const overallEl = document.getElementById('canvas-overall-score');
+  if(overallEl) overallEl.textContent = entry.overall + ' (historical)';
+}
+
 // ═══════════════════════════════════════
 // VOICE INPUT — Web Speech API
 // ═══════════════════════════════════════
@@ -2436,6 +2756,10 @@ window.addEventListener('DOMContentLoaded', function() {
       if (data.profile) {
         nestId = existingNest;
         profileData = data.profile;
+        // Load stored canvas data
+        if(data.canvasScores) canvasScores = data.canvasScores;
+        if(data.canvasHistory) canvasHistory = data.canvasHistory;
+        hasPaid = data.paid === true;
         document.getElementById('nest-id').textContent = nestId;
         renderResults(profileData);
         goTo('screen-results');
