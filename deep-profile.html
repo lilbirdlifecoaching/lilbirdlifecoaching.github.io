@@ -1867,13 +1867,14 @@ async function submitEmail(){
   // Store for pay screen — no second ask needed
   userEmail = email;
 
-  // Subscribe to Beehiiv silently
+  // Subscribe via worker (avoids CORS)
   try{
-    await fetch('https://api.beehiiv.com/v2/publications/'+BEEHIIV_PUB_ID+'/subscriptions',{
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        email, reactivate_existing:true, send_welcome_email:true,
-        custom_fields:[
+    await fetch(`${WORKER_URL}/subscribe-email`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        email,
+        pubId: BEEHIIV_PUB_ID,
+        customFields: [
           {name:'archetype',  value:profileData?.archetype  || ''},
           {name:'mbti',       value:profileData?.mbti       || ''},
           {name:'enneagram',  value:profileData?.enneagram  || ''},
