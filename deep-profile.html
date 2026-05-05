@@ -561,6 +561,163 @@
 
   /* Results canvas */
 
+
+  /* ══════════════════════════════════════
+     CONVERSATIONAL CHAT FORMAT
+  ══════════════════════════════════════ */
+  .chat-screen {
+    max-width: 640px;
+    margin: 0 auto;
+    padding-top: 2rem;
+  }
+  .chat-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-bottom: 1.75rem;
+    min-height: 120px;
+  }
+  .chat-bubble {
+    display: flex;
+    gap: 0.85rem;
+    align-items: flex-start;
+    animation: bubble-in 0.4s cubic-bezier(0.22,1,0.36,1);
+  }
+  @keyframes bubble-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .chat-avatar {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    background: var(--gold-faint);
+    border: 1px solid rgba(245,200,66,0.25);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    margin-top: 2px;
+  }
+  .chat-bubble-content {
+    background: var(--dark-card);
+    border: 1px solid var(--dark-border);
+    border-radius: 4px 16px 16px 16px;
+    padding: 1rem 1.25rem;
+    flex: 1;
+  }
+  .chat-bubble-content p {
+    font-size: 1rem;
+    color: var(--text-main);
+    line-height: 1.65;
+    margin: 0;
+  }
+  .chat-bubble-content p + p {
+    margin-top: 0.6rem;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    font-style: italic;
+  }
+  .chat-ack {
+    background: rgba(245,200,66,0.06);
+    border-color: rgba(245,200,66,0.15);
+  }
+  .chat-ack p { color: var(--text-muted); font-size: 0.92rem; font-style: italic; }
+
+  .chat-input-area {
+    position: relative;
+  }
+  .chat-textarea {
+    width: 100%;
+    background: var(--dark-card);
+    border: 1px solid rgba(245,200,66,0.2);
+    border-radius: 12px;
+    color: var(--text-main);
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+    font-size: 0.98rem;
+    font-weight: 300;
+    line-height: 1.6;
+    padding: 1rem 4.5rem 1rem 1.25rem;
+    resize: none;
+    min-height: 100px;
+    transition: border-color 0.2s;
+  }
+  .chat-textarea::placeholder { color: rgba(240,234,216,0.25); }
+  .chat-textarea:focus { outline: none; border-color: rgba(245,200,66,0.45); }
+  .chat-send-btn {
+    position: absolute;
+    bottom: 0.85rem;
+    right: 0.85rem;
+    background: var(--gold);
+    color: var(--dark);
+    border: none;
+    border-radius: 8px;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+  .chat-send-btn:hover { background: #fff; transform: scale(1.05); }
+  .chat-send-btn:disabled { background: rgba(245,200,66,0.3); cursor: not-allowed; transform: none; }
+  .chat-mic-btn {
+    position: absolute;
+    bottom: 0.85rem;
+    right: 3.5rem;
+    background: none;
+    border: 1px solid rgba(245,200,66,0.2);
+    border-radius: 8px;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1rem;
+    color: var(--gold-dim);
+    transition: all 0.2s;
+  }
+  .chat-mic-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .chat-mic-btn.recording { border-color: var(--ember); color: var(--ember); animation: pulse-mic 1s ease-in-out infinite; }
+  .chat-hint {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    opacity: 0.5;
+    margin-top: 0.5rem;
+    text-align: center;
+  }
+  .chat-thinking {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+  }
+  .chat-thinking.active { display: flex; }
+  .chat-thinking-dot {
+    width: 6px; height: 6px;
+    background: var(--gold-dim);
+    border-radius: 50%;
+    animation: thinking 1.2s ease-in-out infinite;
+  }
+  .chat-thinking-dot:nth-child(2) { animation-delay: 0.2s; }
+  .chat-thinking-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes thinking {
+    0%,80%,100% { transform: scale(0.6); opacity: 0.4; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+  .chat-nav-row {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+  }
+
   /* ══════════════════════════════════════
      DASHBOARD LAYOUT
   ══════════════════════════════════════ */
@@ -855,7 +1012,7 @@
       </div>
     </div>
     <div class="btn-row">
-      <button class="btn btn-gold" onclick="goTo('screen-c1a')">Begin → 🐦</button>
+      <button class="btn btn-gold" onclick="startChat()">Begin → 🐦</button>
     </div>
     <p class="intro-note">Takes about 15–20 minutes. The more honest you are, the more accurate it gets.</p>
   </div>
@@ -863,427 +1020,36 @@
 
 
 <!-- ══════════════════════════════════════
-     CHAPTER 1 — YOUR CANVAS (season data)
+     CHAT ASSESSMENT — single unified screen
 ══════════════════════════════════════ -->
-<div class="screen" id="screen-c1a">
-  <div class="inner">
-    <p class="eyebrow">chapter one — your season</p>
-    <h2>Before we get into<br><em>who you are.</em></h2>
-    <div class="chapter-card" style="border-color:rgba(232,115,74,0.25);background:rgba(232,115,74,0.04);">
-      <p class="chapter-label" style="color:var(--ember);">CANVAS DATA — 1 of 3</p>
-      <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1rem;font-family:'DM Mono',monospace;letter-spacing:0.06em;">These three questions feed your Life Canvas — the season you're in right now, not who you are at your core.</p>
-      <p class="prompt-label">If someone who knows you well asked how life is actually going right now — what would the honest answer be? Not the edited version.</p>
-      <div class="input-wrap">
-      <textarea id="c1a" placeholder="Take your time. There's no wrong answer here." rows="5"></textarea>
-      <button class="mic-btn" onclick="toggleMic('c1a')" title="Speak your answer" type="button">🎤</button>
-      </div>
-      <p class="mic-hint">or tap 🎤 to speak</p>
+<div class="screen" id="screen-chat">
+  <div class="chat-screen">
+
+    <div class="chat-messages" id="chat-messages">
+      <!-- Messages rendered by JS -->
     </div>
-    <div class="btn-row">
-      <button class="btn btn-gold" onclick="reflectAndGo('screen-c1b','c1a','pill-c1a')">Next →</button>
-      <button class="btn btn-outline" onclick="goTo('screen-intro')">← Back</button>
+
+    <div class="chat-thinking" id="chat-thinking">
+      <div class="chat-thinking-dot"></div>
+      <div class="chat-thinking-dot"></div>
+      <div class="chat-thinking-dot"></div>
     </div>
+
+    <div class="chat-input-area" id="chat-input-area">
+      <textarea
+        class="chat-textarea"
+        id="chat-textarea"
+        placeholder="Type your answer here..."
+        rows="4"
+        onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); sendChatAnswer(); }"
+      ></textarea>
+      <button class="chat-mic-btn no-speech-hide" id="chat-mic" onclick="toggleChatMic()" type="button" title="Speak your answer">🎤</button>
+      <button class="chat-send-btn" id="chat-send" onclick="sendChatAnswer()" type="button">→</button>
+    </div>
+    <p class="chat-hint">Press Enter to send · Shift+Enter for new line · 🎤 to speak</p>
+
   </div>
 </div>
-
-<div class="screen" id="screen-c1b">
-  <div class="inner">
-    <p class="eyebrow">chapter one — your season</p>
-    <h2>Before we get into<br><em>who you are.</em></h2>
-    <div class="reflect-pill" id="pill-c1a"></div>
-    <div class="chapter-card" style="border-color:rgba(232,115,74,0.25);background:rgba(232,115,74,0.04);">
-      <p class="chapter-label" style="color:var(--ember);">CANVAS DATA — 2 of 3</p>
-      <p class="prompt-label">What's taking up the most mental or emotional space for you at the moment?</p>
-      <div class="input-wrap">
-      <textarea id="c1b" placeholder="Even if it's a few different things..." rows="5"></textarea>
-      <button class="mic-btn" onclick="toggleMic('c1b')" title="Speak your answer" type="button">🎤</button>
-      </div>
-      <p class="mic-hint">or tap 🎤 to speak</p>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-gold" onclick="reflectAndGo('screen-c1c','c1b','pill-c1b')">Next →</button>
-      <button class="btn btn-outline" onclick="goTo('screen-c1a')">← Back</button>
-    </div>
-  </div>
-</div>
-
-<div class="screen" id="screen-c1c">
-  <div class="inner">
-    <p class="eyebrow">chapter one — your season</p>
-    <h2>Before we get into<br><em>who you are.</em></h2>
-    <div class="reflect-pill" id="pill-c1b"></div>
-    <div class="chapter-card" style="border-color:rgba(232,115,74,0.25);background:rgba(232,115,74,0.04);">
-      <p class="chapter-label" style="color:var(--ember);">CANVAS DATA — 3 of 3</p>
-      <p class="prompt-label">Finish this sentence honestly: "Six months from now, I'd feel like something had genuinely shifted if ___."</p>
-      <div class="input-wrap">
-      <textarea id="c1c" placeholder="Let yourself want something specific..." rows="5"></textarea>
-      <button class="mic-btn" onclick="toggleMic('c1c')" title="Speak your answer" type="button">🎤</button>
-      </div>
-      <p class="mic-hint">or tap 🎤 to speak</p>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-gold" onclick="reflectAndGo('screen-c2a','c1c','pill-c1c')">Continue →</button>
-      <button class="btn btn-outline" onclick="goTo('screen-c1b')">← Back</button>
-    </div>
-  </div>
-</div>
-
-
-<!-- ══════════════════════════════════════
-     CHAPTER 2 — HOW YOU'RE WIRED
-══════════════════════════════════════ -->
-<div class="screen" id="screen-c2a">
-  <div class="inner">
-    <p class="eyebrow">chapter two — how you're wired</p>
-    <h2>Your energy.<br><em>Your patterns.</em></h2>
-    <div class="reflect-pill" id="pill-c1c"></div>
-    <div class="chapter-card">
-      <p class="chapter-label">1 of 3</p>
-      <p class="prompt-label">Walk me through what a genuinely good day looks like for you — specific activities, who's there if anyone, what you're doing. Make it real.</p>
-      <div class="input-wrap">
-      <textarea id="c2a" placeholder="The more specific the better — actual activities, actual people..." rows="5"></textarea>
-      <button class="mic-btn" onclick="toggleMic('c2a')" title="Speak your answer" type="button">🎤</button>
-      </div>
-      <p class="mic-hint">or tap 🎤 to speak</p>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-gold" onclick="reflectAndGo('screen-c2b','c2a','pill-c2a')">Next →</button>
-      <button class="btn btn-outline" onclick="goTo('screen-c1c')">← Back</button>
-    </div>
-  </div>
-</div>
-
-<div class="screen" id="screen-c2b">
-  <div class="inner">
-    <p class="eyebrow">chapter two — how you're wired</p>
-    <h2>Your energy.<br><em>Your patterns.</em></h2>
-    <div class="reflect-pill" id="pill-c2a"></div>
-    <div class="chapter-card">
-      <p class="chapter-label">2 of 3</p>
-      <p class="prompt-label">Think of a decision you made recently that felt right. How did you actually make it — walk me through the process, not the outcome.</p>
-      <div class="input-wrap">
-      <textarea id="c2b" placeholder="Big or small decision — what actually happened inside your head..." rows="5"></textarea>
-      <button class="mic-btn" onclick="toggleMic('c2b')" title="Speak your answer" type="button">🎤</button>
-      </div>
-      <p class="mic-hint">or tap 🎤 to speak</p>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-gold" onclick="reflectAndGo('screen-c2c','c2b','pill-c2b')">Next →</button>
-      <button class="btn btn-outline" onclick="goTo('screen-c2a')">← Back</button>
-    </div>
-  </div>
-</div>
-
-<div class="screen" id="screen-c2c">
-  <div class="inner">
-    <p class="eyebrow">chapter two — how you're wired</p>
-    <h2>Your energy.<br><em>Your patterns.</em></h2>
-    <div class="reflect-pill" id="pill-c2b"></div>
-    <div class="chapter-card">
-      <p class="chapter-label">3 of 3</p>
-      <p class="prompt-label">After a full day of being around a lot of people — a party, a big work day, a social event — what do you actually want to do? Be specific.</p>
-      <div class="input-wrap">
-      <textarea id="c2c" placeholder="Not what you think you should want. What you actually do or crave..." rows="5"></textarea>
-      <button class="mic-btn" onclick="toggleMic('c2c')" title="Speak your answer" type="button">🎤</button>
-      </div>
-      <p class="mic-hint">or tap 🎤 to speak</p>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-gold" onclick="reflectAndGo('screen-c3a','c2c','pill-c2c')">Continue →</button>
-      <button class="btn btn-outline" onclick="goTo('screen-c2b')">← Back</button>
-    </div>
-  </div>
-</div>
-
-
-<!-- ══════════════════════════════════════
-     CHAPTER 3 — YOUR RELATIONSHIPS
-══════════════════════════════════════ -->
-<div class="screen" id="screen-c3a">
-  <div class="inner">
-    <p class="eyebrow">chapter three — your relationships</p>
-    <h2>How you connect.<br><em>How you land.</em></h2>
-    <div class="reflect-pill" id="pill-c2c"></div>
-    <div class="chapter-card">
-      <p class="chapter-label">1 of 3</p>
-      <p class="prompt-label">Describe someone in your life whose way of operating is completely different from yours — what specifically puzzles or frustrates you about how they work?</p>
-      <div class="input-wrap">
-      <textarea id="c3a" placeholder="Could be a colleague, family member, friend — what is it about them that baffles you..." rows="5"></textarea>
-      <button class="mic-btn" onclick="toggleMic('c3a')" title="Speak your answer" type="button">🎤</button>
-      </div>
-      <p class="mic-hint">or tap 🎤 to speak</p>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-gold" onclick="reflectAndGo('screen-c3b','c3a','pill-c3a')">Next →</button>
-      <button class="btn btn-outline" onclick="goTo('screen-c2c')">← Back</button>
-    </div>
-  </div>
-</div>
-
-<div class="screen" id="screen-c3b">
-  <div class="inner">
-    <p class="eyebrow">chapter three — your relationships</p>
-    <h2>How you connect.<br><em>How you land.</em></h2>
-    <div class="reflect-pill" id="pill-c3a"></div>
-    <div class="chapter-card">
-      <p class="chapter-label">2 of 3</p>
-      <p class="prompt-label">Think about the last time you felt genuinely understood by someone. What did they do or say that made you feel that way?</p>
-      <div class="input-wrap">
-      <textarea id="c3b" placeholder="What specifically happened — what made it land..." rows="5"></textarea>
-      <button class="mic-btn" onclick="toggleMic('c3b')" title="Speak your answer" type="button">🎤</button>
-      </div>
-      <p class="mic-hint">or tap 🎤 to speak</p>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-gold" onclick="reflectAndGo('screen-c3c','c3b','pill-c3b')">Next →</button>
-      <button class="btn btn-outline" onclick="goTo('screen-c3a')">← Back</button>
-    </div>
-  </div>
-</div>
-
-<div class="screen" id="screen-c3c">
-  <div class="inner">
-    <p class="eyebrow">chapter three — your relationships</p>
-    <h2>How you connect.<br><em>How you land.</em></h2>
-    <div class="reflect-pill" id="pill-c3b"></div>
-    <div class="chapter-card">
-      <p class="chapter-label">3 of 3</p>
-      <p class="prompt-label">When something goes wrong between you and someone you care about — walk me through what you typically do. Specifically.</p>
-      <div class="input-wrap">
-      <textarea id="c3c" placeholder="What actually happens — not what you wish you did..." rows="5"></textarea>
-      <button class="mic-btn" onclick="toggleMic('c3c')" title="Speak your answer" type="button">🎤</button>
-      </div>
-      <p class="mic-hint">or tap 🎤 to speak</p>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-gold" onclick="reflectAndGo('screen-c4a','c3c','pill-c3c')">Continue →</button>
-      <button class="btn btn-outline" onclick="goTo('screen-c3b')">← Back</button>
-    </div>
-  </div>
-</div>
-
-
-<!-- ══════════════════════════════════════
-     CHAPTER 4 — WHAT DRIVES YOU
-══════════════════════════════════════ -->
-<div class="screen" id="screen-c4a">
-  <div class="inner">
-    <p class="eyebrow">chapter four — what drives you</p>
-    <h2>What you want.<br><em>What moves you.</em></h2>
-    <div class="reflect-pill" id="pill-c3c"></div>
-    <div class="chapter-card">
-      <p class="chapter-label">1 of 3</p>
-      <p class="prompt-label">Think about the last time you got genuinely frustrated — not mildly annoyed, but properly frustrated. What triggered it and what did you do with it?</p>
-      <div class="input-wrap">
-      <textarea id="c4a" placeholder="Be specific — what actually happened and how did you respond..." rows="5"></textarea>
-      <button class="mic-btn" onclick="toggleMic('c4a')" title="Speak your answer" type="button">🎤</button>
-      </div>
-      <p class="mic-hint">or tap 🎤 to speak</p>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-gold" onclick="reflectAndGo('screen-c4b','c4a','pill-c4a')">Next →</button>
-      <button class="btn btn-outline" onclick="goTo('screen-c3c')">← Back</button>
-    </div>
-  </div>
-</div>
-
-<div class="screen" id="screen-c4b">
-  <div class="inner">
-    <p class="eyebrow">chapter four — what drives you</p>
-    <h2>What you want.<br><em>What moves you.</em></h2>
-    <div class="reflect-pill" id="pill-c4a"></div>
-    <div class="chapter-card">
-      <p class="chapter-label">2 of 3 — curveball</p>
-      <p class="prompt-label">Describe your ideal birthday. Who's there, what happens, how does it feel. Don't edit it — just describe what you'd actually want.</p>
-      <div class="input-wrap">
-      <textarea id="c4b" placeholder="Big party? Quiet dinner? Alone? Somewhere specific? Just describe it..." rows="5"></textarea>
-      <button class="mic-btn" onclick="toggleMic('c4b')" title="Speak your answer" type="button">🎤</button>
-      </div>
-      <p class="mic-hint">or tap 🎤 to speak</p>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-gold" onclick="reflectAndGo('screen-c4c','c4b','pill-c4b')">Next →</button>
-      <button class="btn btn-outline" onclick="goTo('screen-c4a')">← Back</button>
-    </div>
-  </div>
-</div>
-
-<div class="screen" id="screen-c4c">
-  <div class="inner">
-    <p class="eyebrow">chapter four — what drives you</p>
-    <h2>What you want.<br><em>What moves you.</em></h2>
-    <div class="reflect-pill" id="pill-c4b"></div>
-    <div class="chapter-card">
-      <p class="chapter-label">3 of 3</p>
-      <p class="prompt-label">What's something you want that you don't often say out loud? Not what you think you should want — what you actually want.</p>
-      <div class="input-wrap">
-      <textarea id="c4c" placeholder="Let yourself want it out loud for a moment..." rows="5"></textarea>
-      <button class="mic-btn" onclick="toggleMic('c4c')" title="Speak your answer" type="button">🎤</button>
-      </div>
-      <p class="mic-hint">or tap 🎤 to speak</p>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-gold" onclick="reflectAndGo('screen-c5a','c4c','pill-c4c')">Continue →</button>
-      <button class="btn btn-outline" onclick="goTo('screen-c4b')">← Back</button>
-    </div>
-  </div>
-</div>
-
-
-<!-- ══════════════════════════════════════
-     CHAPTER 5 — YOUR PATTERNS
-══════════════════════════════════════ -->
-<div class="screen" id="screen-c5a">
-  <div class="inner">
-    <p class="eyebrow">chapter five — your patterns</p>
-    <h2>The tangle.<br><em>The thread.</em></h2>
-    <div class="reflect-pill" id="pill-c4c"></div>
-    <div class="chapter-card">
-      <p class="chapter-label">1 of 3</p>
-      <p class="prompt-label">What's a pattern you notice in yourself that keeps showing up regardless of the situation — something you'd change if you could?</p>
-      <div class="input-wrap">
-      <textarea id="c5a" placeholder="The thing where you think — there it is again..." rows="5"></textarea>
-      <button class="mic-btn" onclick="toggleMic('c5a')" title="Speak your answer" type="button">🎤</button>
-      </div>
-      <p class="mic-hint">or tap 🎤 to speak</p>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-gold" onclick="reflectAndGo('screen-c5b','c5a','pill-c5a')">Next →</button>
-      <button class="btn btn-outline" onclick="goTo('screen-c4c')">← Back</button>
-    </div>
-  </div>
-</div>
-
-<div class="screen" id="screen-c5b">
-  <div class="inner">
-    <p class="eyebrow">chapter five — your patterns</p>
-    <h2>The tangle.<br><em>The thread.</em></h2>
-    <div class="reflect-pill" id="pill-c5a"></div>
-    <div class="chapter-card">
-      <p class="chapter-label">2 of 3 — curveball</p>
-      <p class="prompt-label">What do the people closest to you say about you when they're being genuinely honest — the good bits and the harder bits?</p>
-      <div class="input-wrap">
-      <textarea id="c5b" placeholder="What do they actually say — not what you wish they'd say..." rows="5"></textarea>
-      <button class="mic-btn" onclick="toggleMic('c5b')" title="Speak your answer" type="button">🎤</button>
-      </div>
-      <p class="mic-hint">or tap 🎤 to speak</p>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-gold" onclick="reflectAndGo('screen-c5c','c5b','pill-c5b')">Next →</button>
-      <button class="btn btn-outline" onclick="goTo('screen-c5a')">← Back</button>
-    </div>
-  </div>
-</div>
-
-<div class="screen" id="screen-c5c">
-  <div class="inner">
-    <p class="eyebrow">chapter five — your patterns</p>
-    <h2>The tangle.<br><em>The thread.</em></h2>
-    <div class="reflect-pill" id="pill-c5b"></div>
-    <div class="chapter-card">
-      <p class="chapter-label">3 of 3 — curveball</p>
-      <p class="prompt-label">What's a compliment you receive regularly that secretly lands a little wrong — or doesn't quite fit how you see yourself?</p>
-      <div class="input-wrap">
-      <textarea id="c5c" placeholder="The compliment that makes you go 'hmm, not quite'..." rows="5"></textarea>
-      <button class="mic-btn" onclick="toggleMic('c5c')" title="Speak your answer" type="button">🎤</button>
-      </div>
-      <p class="mic-hint">or tap 🎤 to speak</p>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-gold" onclick="reflectAndGo('screen-c6a','c5c','pill-c5c')">Continue →</button>
-      <button class="btn btn-outline" onclick="goTo('screen-c5b')">← Back</button>
-    </div>
-  </div>
-</div>
-
-
-<!-- ══════════════════════════════════════
-     CHAPTER 6 — YOUR NEXT CHAPTER
-══════════════════════════════════════ -->
-<div class="screen" id="screen-c6a">
-  <div class="inner">
-    <p class="eyebrow">chapter six — your next chapter</p>
-    <h2>The move<br><em>forward.</em></h2>
-    <div class="reflect-pill" id="pill-c5c"></div>
-    <div class="chapter-card">
-      <p class="chapter-label">1 of 4 — curveball</p>
-      <p class="prompt-label">You have an unexpected free Saturday — no obligations, nobody waiting on you. Walk me through the day. What actually happens?</p>
-      <div class="input-wrap">
-      <textarea id="c6a" placeholder="From morning to evening — what do you actually do..." rows="5"></textarea>
-      <button class="mic-btn" onclick="toggleMic('c6a')" title="Speak your answer" type="button">🎤</button>
-      </div>
-      <p class="mic-hint">or tap 🎤 to speak</p>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-gold" onclick="reflectAndGo('screen-c6b','c6a','pill-c6a')">Next →</button>
-      <button class="btn btn-outline" onclick="goTo('screen-c5c')">← Back</button>
-    </div>
-  </div>
-</div>
-
-<div class="screen" id="screen-c6b">
-  <div class="inner">
-    <p class="eyebrow">chapter six — your next chapter</p>
-    <h2>The move<br><em>forward.</em></h2>
-    <div class="reflect-pill" id="pill-c6a"></div>
-    <div class="chapter-card">
-      <p class="chapter-label">2 of 4</p>
-      <p class="prompt-label">When was the last time you genuinely changed your mind about something important? What shifted?</p>
-      <div class="input-wrap">
-      <textarea id="c6b" placeholder="What made you actually reconsider — not just give in..." rows="5"></textarea>
-      <button class="mic-btn" onclick="toggleMic('c6b')" title="Speak your answer" type="button">🎤</button>
-      </div>
-      <p class="mic-hint">or tap 🎤 to speak</p>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-gold" onclick="reflectAndGo('screen-c6c','c6b','pill-c6b')">Next →</button>
-      <button class="btn btn-outline" onclick="goTo('screen-c6a')">← Back</button>
-    </div>
-  </div>
-</div>
-
-<div class="screen" id="screen-c6c">
-  <div class="inner">
-    <p class="eyebrow">chapter six — your next chapter</p>
-    <h2>The move<br><em>forward.</em></h2>
-    <div class="reflect-pill" id="pill-c6b"></div>
-    <div class="chapter-card">
-      <p class="chapter-label">3 of 4</p>
-      <p class="prompt-label">What would you do differently if you were completely sure it would work?</p>
-      <div class="input-wrap">
-      <textarea id="c6c" placeholder="Don't edit it. What actually comes up..." rows="5"></textarea>
-      <button class="mic-btn" onclick="toggleMic('c6c')" title="Speak your answer" type="button">🎤</button>
-      </div>
-      <p class="mic-hint">or tap 🎤 to speak</p>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-gold" onclick="reflectAndGo('screen-c6d','c6c','pill-c6c')">Next →</button>
-      <button class="btn btn-outline" onclick="goTo('screen-c6b')">← Back</button>
-    </div>
-  </div>
-</div>
-
-<div class="screen" id="screen-c6d">
-  <div class="inner">
-    <p class="eyebrow">chapter six — your next chapter</p>
-    <h2>The move<br><em>forward.</em></h2>
-    <div class="reflect-pill" id="pill-c6c"></div>
-    <div class="chapter-card">
-      <p class="chapter-label">4 of 4 — last one</p>
-      <p class="prompt-label">Tell me about your work right now — what you do, how it feels day to day, and honestly whether it fits.</p>
-      <div class="input-wrap">
-      <textarea id="c6d" placeholder="Role, how it feels, what's working and what isn't..." rows="5"></textarea>
-      <button class="mic-btn" onclick="toggleMic('c6d')" title="Speak your answer" type="button">🎤</button>
-      </div>
-      <p class="mic-hint">or tap 🎤 to speak</p>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-gold" onclick="finishJourney()">That's everything — read me →</button>
-      <button class="btn btn-outline" onclick="goTo('screen-c6c')">← Back</button>
-    </div>
-  </div>
-</div>
-
 
 
 <!-- ══════════════════════════════════════
@@ -1751,12 +1517,9 @@ let userEmail      = '';
 let profileData    = null;
 
 const PROGRESS = {
-  'screen-intro':0,'screen-c1a':8,'screen-c1b':14,'screen-c1c':20,
-  'screen-c2a':28,'screen-c2b':34,'screen-c2c':40,
-  'screen-c3a':48,'screen-c3b':54,'screen-c3c':60,
-  'screen-c4a':65,'screen-c4b':70,'screen-c4c':75,
-  'screen-c5a':78,'screen-c5b':83,'screen-c5c':88,
-  'screen-c6a':88,'screen-c6b':91,'screen-c6c':94,'screen-c6d':97,'screen-canvas':99,
+  'screen-intro':0,
+  'screen-chat':5,
+  'screen-canvas':99,
   'screen-landing':99,'screen-snapshot':100,'screen-pay':100,'screen-results':100,
 };
 
@@ -2013,6 +1776,8 @@ async function processPayment(){
 // RESPONSES
 // ═══════════════════════════════════════
 function collectResponses(){
+  // Use chat answers if available, otherwise fall back to old textarea system
+  if(Object.keys(chatAnswers).length > 0) return collectChatResponses();
   const ids=['c1a','c1b','c1c','c2a','c2b','c2c','c3a','c3b','c3c','c4a','c4b','c4c','c5a','c5b','c5c','c6a','c6b','c6c'];
   const r={};
   ids.forEach(id=>{ r['ch'+id]=document.getElementById(id)?.value?.trim()||''; });
@@ -2272,12 +2037,15 @@ async function restartAssessment(){
 }
 
 function clearAndRestart(){
-  document.querySelectorAll('textarea').forEach(t=>t.value='');
-  document.querySelectorAll('.reflect-pill').forEach(p=>{ p.textContent=''; p.style.display='none'; });
+  // Reset chat state
+  chatAnswers = {};
+  currentQIndex = 0;
+  const messagesEl = document.getElementById('chat-messages');
+  if(messagesEl) messagesEl.innerHTML = '';
   if(activeRecognitionId) stopMic();
   profileData = null;
   nestId = generateNestId();
-  goTo('screen-c1a');
+  goTo('screen-intro');
 }
 
 function getFallbackProfile(){
@@ -2307,6 +2075,246 @@ function getFallbackProfile(){
     partnerDynamicReady:true,
   };
 }
+
+
+// ═══════════════════════════════════════
+// CONVERSATIONAL CHAT ASSESSMENT
+// ═══════════════════════════════════════
+
+// ── QUESTION SEQUENCE ──────────────────
+const QUESTIONS = [
+  // Chapter 1 — Opening (personality + canvas)
+  { id:'q01', text:"If your brain had browser tabs open right now — what are the ones you can't seem to close?", placeholder:"Whatever comes up first..." },
+  { id:'q02', text:"What are you pretending is fine when it isn't?", placeholder:"Be honest. Nobody's grading this." },
+  { id:'q03', text:"If a future version of you sent a postcard from six months ahead — what would it say, and what's the postmark?", placeholder:"Let yourself imagine it..." },
+
+  // Chapter 2 — How you're wired
+  { id:'q04', text:"Walk me through what your days actually look like right now — not the ideal version, the real one.", placeholder:"Morning to evening. The actual version." },
+  { id:'q05', text:"Think of a decision you made recently that felt right. How did you actually make it — walk me through the process, not the outcome.", placeholder:"Big or small decision — what happened inside your head..." },
+  { id:'q06', text:"After a full day of being around a lot of people — what do you actually want to do? Be specific.", placeholder:"Not what you think you should want. What you actually crave." },
+
+  // Chapter 3 — Relationships
+  { id:'q07', text:"Describe someone in your life whose way of operating is completely different from yours — what specifically puzzles or frustrates you about how they work?", placeholder:"Could be anyone — colleague, family, friend..." },
+  { id:'q08', text:"Who would you call at 2am if something went wrong — and would you actually call them?", placeholder:"And what does that say about you?" },
+  { id:'q09', text:"Tell me about a friendship or relationship that surprised you — one you didn't expect to matter as much as it does.", placeholder:"What made it different from what you expected?" },
+
+  // Chapter 4 — What drives you
+  { id:'q10', text:"Think about the last time you got genuinely frustrated — not mildly annoyed, properly frustrated. What triggered it and what did you do with it?", placeholder:"Be specific — what actually happened..." },
+  { id:'q11', text:"Describe your ideal birthday. Who's there, what happens, how does it feel. Don't edit it.", placeholder:"Big party? Quiet dinner? Alone? Just describe it." },
+  { id:'q12', text:"What's something you want that you don't often say out loud?", placeholder:"Let yourself want it out loud for a moment..." },
+
+  // Chapter 5 — The tangle
+  { id:'q13', text:"What's the thing you do that you know isn't serving you — but you do it anyway?", placeholder:"The thing where you catch yourself and think — there it is again." },
+  { id:'q14', text:"What do the people closest to you say about you when they're being genuinely honest — the good bits and the harder bits?", placeholder:"What do they actually say, not what you wish they'd say..." },
+  { id:'q15', text:"Think about the last time something didn't work out the way you hoped. And the time before that. Is there a thread?", placeholder:"Even if it's hard to name precisely..." },
+
+  // Chapter 6 — Forward
+  { id:'q16', text:"You have an unexpected free Saturday — no obligations, nobody waiting on you. Walk me through the day. What actually happens?", placeholder:"From morning to evening — what do you actually do..." },
+  { id:'q17', text:"The last time you completely lost track of time doing something — what were you doing, and what does that tell you?", placeholder:"That feeling of flow where hours disappear..." },
+  { id:'q18', text:"What would you do differently if you were completely sure it would work?", placeholder:"Don't edit it. What actually comes up..." },
+  { id:'q19', text:"Tell me about your work right now — what you do, how it feels day to day, and honestly whether it fits.", placeholder:"Role, how it feels, what's working and what isn't..." },
+];
+
+// ── STATE ──────────────────────────────
+let chatAnswers = {};
+let currentQIndex = 0;
+let chatMicActive = false;
+
+// ── INIT CHAT ──────────────────────────
+function startChat() {
+  currentQIndex = 0;
+  chatAnswers = {};
+  renderChatQuestion(0);
+  goTo('screen-chat');
+}
+
+// ── RENDER QUESTION ────────────────────
+function renderChatQuestion(idx) {
+  const q = QUESTIONS[idx];
+  if(!q) return;
+
+  const messagesEl = document.getElementById('chat-messages');
+  const textareaEl = document.getElementById('chat-textarea');
+  const sendBtn    = document.getElementById('chat-send');
+
+  if(!messagesEl) return;
+
+  // Add question bubble
+  const bubble = document.createElement('div');
+  bubble.className = 'chat-bubble';
+  bubble.innerHTML = `
+    <div class="chat-avatar">🐦</div>
+    <div class="chat-bubble-content">
+      <p>${q.text}</p>
+    </div>
+  `;
+  messagesEl.appendChild(bubble);
+
+  // Scroll to bottom
+  setTimeout(() => {
+    bubble.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 100);
+
+  // Reset textarea
+  if(textareaEl) {
+    textareaEl.value = '';
+    textareaEl.placeholder = q.placeholder || 'Your answer...';
+    textareaEl.focus();
+  }
+  if(sendBtn) sendBtn.disabled = false;
+
+  // Update progress bar
+  const pct = Math.round((idx / QUESTIONS.length) * 97);
+  const pb = document.getElementById('progressBar');
+  if(pb) pb.style.width = pct + '%';
+}
+
+// ── SEND ANSWER ────────────────────────
+async function sendChatAnswer() {
+  const textareaEl = document.getElementById('chat-textarea');
+  const sendBtn    = document.getElementById('chat-send');
+  const messagesEl = document.getElementById('chat-messages');
+  const thinkingEl = document.getElementById('chat-thinking');
+
+  const answer = textareaEl?.value?.trim() || '';
+  if(answer.length < 2) return;
+
+  // Store answer
+  const q = QUESTIONS[currentQIndex];
+  chatAnswers[q.id] = answer;
+
+  // Show user bubble
+  const userBubble = document.createElement('div');
+  userBubble.className = 'chat-bubble';
+  userBubble.style.flexDirection = 'row-reverse';
+  userBubble.innerHTML = `
+    <div class="chat-bubble-content" style="border-radius:16px 4px 16px 16px;background:rgba(245,200,66,0.08);border-color:rgba(245,200,66,0.2);">
+      <p>${answer.replace(/\n/g,'<br>')}</p>
+    </div>
+  `;
+  messagesEl.appendChild(userBubble);
+  userBubble.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  // Disable input while processing
+  if(sendBtn) sendBtn.disabled = true;
+  if(textareaEl) textareaEl.value = '';
+
+  // Last question — go to canvas
+  if(currentQIndex >= QUESTIONS.length - 1) {
+    setTimeout(() => {
+      finishChat();
+    }, 600);
+    return;
+  }
+
+  // Show thinking dots
+  if(thinkingEl) thinkingEl.classList.add('active');
+
+  // Get acknowledgment from AI
+  const ack = await getAcknowledgment(q.text, answer, QUESTIONS[currentQIndex + 1]?.text);
+
+  // Hide thinking
+  if(thinkingEl) thinkingEl.classList.remove('active');
+
+  // Show acknowledgment bubble
+  if(ack) {
+    const ackBubble = document.createElement('div');
+    ackBubble.className = 'chat-bubble';
+    ackBubble.innerHTML = `
+      <div class="chat-avatar">🐦</div>
+      <div class="chat-bubble-content chat-ack">
+        <p>${ack}</p>
+      </div>
+    `;
+    messagesEl.appendChild(ackBubble);
+    ackBubble.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    await sleep(800);
+  }
+
+  // Next question
+  currentQIndex++;
+  renderChatQuestion(currentQIndex);
+}
+
+// ── GET ACKNOWLEDGMENT FROM AI ─────────
+async function getAcknowledgment(question, answer, nextQuestion) {
+  try {
+    const res = await fetch(`${WORKER_URL}/acknowledge`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question, answer, nextQuestion })
+    });
+    if(!res.ok) return null;
+    const data = await res.json();
+    return data.acknowledgment || null;
+  } catch(e) {
+    console.warn('Acknowledgment failed (silent):', e);
+    return null;
+  }
+}
+
+// ── FINISH CHAT ────────────────────────
+function finishChat() {
+  goTo('screen-canvas');
+}
+
+// ── COLLECT CHAT RESPONSES ─────────────
+function collectChatResponses() {
+  return {
+    ch1a: chatAnswers.q01 || '',
+    ch1b: chatAnswers.q02 || '',
+    ch1c: chatAnswers.q03 || '',
+    ch2a: chatAnswers.q04 || '',
+    ch2b: chatAnswers.q05 || '',
+    ch2c: chatAnswers.q06 || '',
+    ch3a: chatAnswers.q07 || '',
+    ch3b: chatAnswers.q08 || '',
+    ch3c: chatAnswers.q09 || '',
+    ch4a: chatAnswers.q10 || '',
+    ch4b: chatAnswers.q11 || '',
+    ch4c: chatAnswers.q12 || '',
+    ch5a: chatAnswers.q13 || '',
+    ch5b: chatAnswers.q14 || '',
+    ch5c: chatAnswers.q15 || '',
+    ch6a: chatAnswers.q16 || '',
+    ch6b: chatAnswers.q17 || '',
+    ch6c: chatAnswers.q18 || '',
+    ch6d: chatAnswers.q19 || '',
+    currentRole: chatAnswers.q19 || '',
+    canvasScores,
+    canvasTexts,
+  };
+}
+
+// ── CHAT MIC ───────────────────────────
+function toggleChatMic() {
+  if(!recognition) return;
+  const btn = document.getElementById('chat-mic');
+  if(chatMicActive) {
+    try { recognition.stop(); } catch(e) {}
+    chatMicActive = false;
+    if(btn) btn.classList.remove('recording');
+  } else {
+    activeRecognitionId = 'chat-textarea';
+    chatMicActive = true;
+    if(btn) btn.classList.add('recording');
+    recognition.onresult = function(e) {
+      const textarea = document.getElementById('chat-textarea');
+      if(!textarea) return;
+      let t = '';
+      for(let i=0;i<e.results.length;i++) t += e.results[i][0].transcript;
+      textarea.value = t;
+    };
+    recognition.onend = function() {
+      chatMicActive = false;
+      if(btn) btn.classList.remove('recording');
+    };
+    try { recognition.start(); } catch(e) {}
+  }
+}
+
+// ── UTILITY ────────────────────────────
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 
 // ═══════════════════════════════════════
@@ -2374,7 +2382,10 @@ function renderCanvasResults(scores, synthesis) {
   if(barsEl){
     barsEl.innerHTML = dimDefs.map(d=>`
       <div class="canvas-bar-row">
-        <span class="canvas-bar-label" style="color:${d.color}">${d.label}</span>
+        <div style="min-width:72px;display:flex;flex-direction:column;gap:1px;">
+          <span class="canvas-bar-label" style="color:${d.color};font-weight:700;">${d.label}</span>
+          <span style="font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--text-muted);opacity:0.65;letter-spacing:0.04em;">${d.sub}</span>
+        </div>
         <div class="canvas-bar-track">
           <div class="canvas-bar-fill" id="cbf-${d.key}" style="width:0%;background:${d.color};opacity:0.85;"></div>
         </div>
@@ -2734,7 +2745,13 @@ window.addEventListener('DOMContentLoaded', function() {
   if (params.get('testpay') === '1') {
     nestId = generateNestId();
     profileData = getFallbackProfile();
+    userEmail = 'test@lilbird.life';
     document.getElementById('nest-id').textContent = nestId;
+    // Skip email gate in test mode
+    const gate = document.getElementById('email-gate');
+    const snapContent = document.getElementById('snap-content');
+    if(gate) gate.style.display = 'none';
+    if(snapContent) snapContent.classList.add('revealed');
     populateSnapshot(profileData);
     goTo('screen-snapshot');
     return;
