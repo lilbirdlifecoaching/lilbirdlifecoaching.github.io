@@ -973,8 +973,7 @@
     }
 
     // ── Auth state listener ───────────────────────────────────
-    // This is the ONLY place auth state is checked.
-    // The top-level getSession() call has been removed entirely.
+    // Primary auth handler — fires on login, logout, and most page loads
     sb.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         currentUser = session.user;
@@ -987,6 +986,24 @@
         showScreen('screen-auth');
       }
     });
+
+    // ── Fallback init ─────────────────────────────────────────
+    // onAuthStateChange sometimes doesn't fire on return navigation
+    // (e.g. coming back from a session page). This catches that case.
+    setTimeout(async () => {
+      if (currentUser) return; // already loaded — do nothing
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        if (session?.user) {
+          currentUser = session.user;
+          await loadDashboard();
+        } else {
+          showScreen('screen-auth');
+        }
+      } catch {
+        showScreen('screen-auth');
+      }
+    }, 3000);
 
     // ── Render dashboard ──────────────────────────────────────
     function renderDashboard() {
