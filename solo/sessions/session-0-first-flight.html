@@ -967,14 +967,16 @@
     async function init() {
       createParticles();
 
-      const { data: { session } } = await sb.auth.getSession();
-
-      if (!session?.user) {
-        window.history.back();
+      // Read user directly from localStorage — avoids Supabase auth
+      // calls which corrupt the token and break dashboard navigation
+      const tokenKey  = Object.keys(localStorage).find(k => k.startsWith('sb-'));
+      const tokenData = tokenKey ? JSON.parse(localStorage.getItem(tokenKey)) : null;
+      const user      = tokenData?.user ?? null;
+      if (!user) {
+        window.location.href = '/solo/index.html';
         return;
       }
-
-      currentUser = session.user;
+      currentUser = { id: user.id, email: user.email };
 
       const { data: profile } = await sb
         .from('course_users')
