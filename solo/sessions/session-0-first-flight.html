@@ -699,10 +699,10 @@
     // ── State ─────────────────────────────────────────────────
     let currentUser   = null;
     let userName      = null;
-    let messages      = [];   // full conversation history
+    let messages      = [];
     let isTyping      = false;
-    let exchangeCount = 0;    // track depth of conversation
-    const MIN_EXCHANGES = 4;  // minimum back-and-forth before complete button shows
+    let exchangeCount = 0;
+    const MIN_EXCHANGES = 4;
 
     // ── DOM refs ──────────────────────────────────────────────
     const chatMessages  = document.getElementById('chat-messages');
@@ -769,13 +769,11 @@
       isTyping = true;
       btnSend.disabled = true;
 
-      // Add user message to UI and history
       renderMessage('user', userText);
       messages.push({ role: 'user', content: userText });
       chatInput.value = '';
       chatInput.style.height = 'auto';
 
-      // Show typing
       showTyping();
 
       try {
@@ -799,7 +797,6 @@
         renderMessage('assistant', reply);
         messages.push({ role: 'assistant', content: reply });
 
-        // Save messages to Supabase
         if (currentUser) {
           await sb.from('ai_memory').upsert({
             user_id:        currentUser.id,
@@ -807,7 +804,6 @@
             messages:       messages,
           }, { onConflict: 'user_id,session_number' });
 
-          // Mark session as in_progress if not already
           await sb.from('session_progress')
             .update({ status: 'in_progress', started_at: new Date().toISOString() })
             .eq('user_id', currentUser.id)
@@ -817,7 +813,6 @@
 
         exchangeCount++;
 
-        // Show complete button after minimum exchanges
         if (exchangeCount >= MIN_EXCHANGES) {
           completePanel.classList.add('visible');
         }
@@ -825,7 +820,7 @@
       } catch (err) {
         hideTyping();
         renderMessage('assistant', 'Something got in the way there. Take a breath — try sending your message again.');
-        messages.pop(); // remove the failed user message from history
+        messages.pop();
       }
 
       isTyping = false;
@@ -834,104 +829,104 @@
     }
 
     // ── Complete session ───────────────────────────────────────
-async function completeSession() {
-  if (!currentUser) return;
+    async function completeSession() {
+      if (!currentUser) return;
 
-  btnComplete.disabled = true;
-  btnComplete.textContent = 'Saving your session...';
+      btnComplete.disabled = true;
+      btnComplete.textContent = 'Saving your session...';
 
-  // Timeout helper — resolves with null after ms
-  const withTimeout = (promise, ms) => Promise.race([
-    promise,
-    new Promise(resolve => setTimeout(() => resolve(null), ms))
-  ]);
+      // Timeout helper — never blocks completion
+      const withTimeout = (promise, ms) => Promise.race([
+        promise,
+        new Promise(resolve => setTimeout(() => resolve(null), ms))
+      ]);
 
-  try {
-    // Generate summary — 8 second timeout, never blocks completion
-    let summary  = '';
-    let keyWords = [];
+      try {
+        // Generate summary — 8 second timeout
+        let summary  = '';
+        let keyWords = [];
 
-    const summaryResult = await withTimeout(
-      fetch(`${WORKER_URL}/summarise`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          session_number: SESSION_NUMBER,
-          messages:       messages,
-          user_name:      userName,
-        }),
-      }).then(r => r.ok ? r.json() : null),
-      8000
-    );
-
-    if (summaryResult) {
-      summary  = summaryResult.summary   || '';
-      keyWords = summaryResult.key_words || [];
-    }
-
-    // Save to Supabase — messages + summary (even if summary is empty)
-    await sb.from('ai_memory').upsert({
-      user_id:        currentUser.id,
-      session_number: SESSION_NUMBER,
-      messages:       messages,
-      summary:        summary,
-      key_words:      keyWords,
-    }, { onConflict: 'user_id,session_number' });
-
-    // Mark session complete
-    await sb.from('session_progress')
-      .update({
-        status:       'complete',
-        completed_at: new Date().toISOString(),
-      })
-      .eq('user_id', currentUser.id)
-      .eq('session_number', SESSION_NUMBER);
-
-    // Set 48hr unlock for session 1
-    const unlockAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
-    await sb.from('session_progress')
-      .update({ unlocks_at: unlockAt })
-      .eq('user_id', currentUser.id)
-      .eq('session_number', 1);
-
-    // Fire-and-forget email — never blocks redirect
-    sb.from('course_users')
-      .select('email, full_name')
-      .eq('id', currentUser.id)
-      .single()
-      .then(({ data: profile }) => {
-        if (profile?.email) {
-          fetch(`${WORKER_URL}/session-email`, {
+        const summaryResult = await withTimeout(
+          fetch(`${WORKER_URL}/summarise`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              email:              profile.email,
-              user_name:          profile.full_name || '',
-              session_number:     SESSION_NUMBER,
-              summary:            summary,
-              action_point:       extractActionPoint(messages),
-              next_session_title: 'Story — Before you take flight, know where you\'ve been.',
+              session_number: SESSION_NUMBER,
+              messages:       messages,
+              user_name:      userName,
             }),
-          }).catch(() => {});
+          }).then(r => r.ok ? r.json() : null),
+          8000
+        );
+
+        if (summaryResult) {
+          summary  = summaryResult.summary   || '';
+          keyWords = summaryResult.key_words || [];
         }
-      }).catch(() => {});
 
-    // Redirect — happens regardless of email
-    window.location.href = '../index.html';
+        // Save to Supabase — even if summary is empty
+        await sb.from('ai_memory').upsert({
+          user_id:        currentUser.id,
+          session_number: SESSION_NUMBER,
+          messages:       messages,
+          summary:        summary,
+          key_words:      keyWords,
+        }, { onConflict: 'user_id,session_number' });
 
-  } catch (err) {
-    console.error('Complete session error:', err);
-    btnComplete.disabled    = false;
-    btnComplete.textContent = 'Mark complete & continue →';
-  }
-  // ── Extract action point from conversation ─────────────────
+        // Mark session complete
+        await sb.from('session_progress')
+          .update({
+            status:       'complete',
+            completed_at: new Date().toISOString(),
+          })
+          .eq('user_id', currentUser.id)
+          .eq('session_number', SESSION_NUMBER);
+
+        // Set 48hr unlock for session 1
+        const unlockAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+        await sb.from('session_progress')
+          .update({ unlocks_at: unlockAt })
+          .eq('user_id', currentUser.id)
+          .eq('session_number', 1);
+
+        // Fire-and-forget email — never blocks redirect
+        sb.from('course_users')
+          .select('email, full_name')
+          .eq('id', currentUser.id)
+          .single()
+          .then(({ data: profile }) => {
+            if (profile?.email) {
+              fetch(`${WORKER_URL}/session-email`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  email:              profile.email,
+                  user_name:          profile.full_name || '',
+                  session_number:     SESSION_NUMBER,
+                  summary:            summary,
+                  action_point:       extractActionPoint(messages),
+                  next_session_title: 'Story — Before you take flight, know where you\'ve been.',
+                }),
+              }).catch(() => {});
+            }
+          }).catch(() => {});
+
+        // Redirect immediately
+        window.location.href = '../index.html';
+
+      } catch (err) {
+        console.error('Complete session error:', err);
+        btnComplete.disabled    = false;
+        btnComplete.textContent = 'Mark complete & continue →';
+      }
+    }
+
+    // ── Extract action point from conversation ─────────────────
     function extractActionPoint(msgs) {
-      // Find the last assistant message that mentions a commitment or step
       const assistantMsgs = msgs
         .filter(m => m.role === 'assistant')
         .map(m => m.content);
 
-      // Simple heuristic — find a message mentioning a step or action
       const actionMsg = assistantMsgs
         .reverse()
         .find(m =>
@@ -972,7 +967,6 @@ async function completeSession() {
     async function init() {
       createParticles();
 
-      // Get current user
       const { data: { session } } = await sb.auth.getSession();
 
       if (!session?.user) {
@@ -982,7 +976,6 @@ async function completeSession() {
 
       currentUser = session.user;
 
-      // Get user profile
       const { data: profile } = await sb
         .from('course_users')
         .select('full_name')
@@ -991,7 +984,6 @@ async function completeSession() {
 
       userName = profile?.full_name?.split(' ')[0] || null;
 
-      // Load existing messages if resuming
       const { data: memory } = await sb
         .from('ai_memory')
         .select('messages')
@@ -1000,7 +992,6 @@ async function completeSession() {
         .single();
 
       if (memory?.messages?.length) {
-        // Restore previous conversation
         messages = memory.messages;
         messages.forEach(m => renderMessage(m.role, m.content));
         exchangeCount = messages.filter(m => m.role === 'user').length;
@@ -1008,12 +999,10 @@ async function completeSession() {
           completePanel.classList.add('visible');
         }
       } else {
-        // Opening message from lil' bird
         const greeting = userName
           ? `${userName}. You made it here — and that already says something about you.\n\nI'm lil' bird. Think of me as a guide — I'm not going to tell you what to do or hand you a plan. My job is to ask the right questions and stay curious with you as you figure out what's actually true for your life.\n\nBefore we go anywhere — tell me what brought you here. What's alive for you right now?`
           : `You made it here — and that already says something about you.\n\nI'm lil' bird. Think of me as a guide — I'm not going to tell you what to do or hand you a plan. My job is to ask the right questions and stay curious with you as you figure out what's actually true for your life.\n\nBefore we go anywhere — tell me what brought you here. What's alive for you right now?`;
 
-        // Small delay for effect
         setTimeout(() => {
           renderMessage('assistant', greeting);
           messages.push({ role: 'assistant', content: greeting });
