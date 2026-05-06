@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Roots & Feathers Practice · lil' bird</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --dark:           #1e2028;
+      --dark-mid:       #252830;
+      --dark-card:      #2a2d38;
+      --session-col:    #7a9e7e;
+      --session-dim:    rgba(122,158,126,0.1);
+      --session-border: rgba(122,158,126,0.22);
+      --roots-col:      #a89060;   /* amber — what stays, grounded */
+      --roots-dim:      rgba(168,144,96,0.12);
+      --roots-border:   rgba(168,144,96,0.25);
+      --feathers-col:   #7eb8c9;   /* sky blue — what lifts, releases */
+      --feathers-dim:   rgba(126,184,201,0.12);
+      --feathers-border:rgba(126,184,201,0.25);
+      --text:           #f0ece4;
+      --text-dim:       rgba(240,236,228,0.58);
+      --text-muted:     rgba(240,236,228,0.3);
+      --font-display:   'Playfair Display', Georgia, serif;
+      --font-body:      'DM Sans', system-ui, sans-serif;
+      --font-mono:      'DM Mono', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--dark);
+      color: var(--text);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.5;
+    }
+
+    .particles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0;
+      animation: drift linear infinite;
+    }
+
+    @keyframes drift {
+      0%   { opacity: 0; transform: translateY(0) translateX(0) rotate(0deg); }
+      20%  { opacity: 0.25; }
+      80%  { opacity: 0.08; }
+      100% { opacity: 0; transform: translateY(-70vh) translateX(var(--drift)) rotate(180deg); }
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 6rem;
+    }
+
+    /* ── Nav ── */
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 3rem;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .nav-bird {
+      width: 28px;
+      height: 28px;
+      background: var(--session-col);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+    }
+
+    .nav-back {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 5px;
+      padding: 0.3rem 0.65rem;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .nav-back:hover { color: var(--session-col); border-color: var(--session-border); }
+
+    /* ── Header ── */
+    .tool-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--session-col);
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .tool-eyebrow::before {
+      content: '';
+      width: 16px;
+      height: 1px;
+      background: var(--session-col);
+    }
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: clamp(1.75rem, 3.5vw, 2.4rem);
+      font-weight: 400;
+      font-style: italic;
+      line-height: 1.2;
+      margin-bottom: 0.75rem;
+    }
+
+    .intro-text {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      line-height: 1.8;
+      margin-bottom: 1rem;
+      max-width: 540px;
+    }
+
+    /* ── Opening prompt from lil' bird ── */
+    .opening-prompt {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 3rem;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .speaker-avatar {
+      width: 32px;
+      height: 32px;
+      background: var(--session-col);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .speaker-bubble {
+      background: var(--dark-card);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      border-top-left-radius: 4px;
+      padding: 0.875rem 1.1rem;
+      font-size: 0.92rem;
+      line-height: 1.75;
+      color: var(--text);
+      flex: 1;
+    }
+
+    /* ── Two column layout: Roots | Feathers ── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    /* ── Section card ── */
+    .section-card {
+      background: var(--dark-card);
+      border-radius: 20px;
+      padding: 1.5rem;
+      border: 1px solid transparent;
+    }
+
+    .section-card.roots   { border-color: var(--roots-border); }
+    .section-card.feathers { border-color: var(--feathers-border); }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-icon {
+      font-size: 1.1rem;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 400;
+      font-style: italic;
+    }
+
+    .roots .section-title   { color: var(--roots-col); }
+    .feathers .section-title { color: var(--feathers-col); }
+
+    .section-subtitle {
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .roots .section-subtitle   { color: rgba(168,144,96,0.6); }
+    .feathers .section-subtitle { color: rgba(126,184,201,0.6); }
+
+    .section-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    /* Entry items */
+    .entries-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+      min-height: 40px;
+    }
+
+    .entry-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      background: var(--dark-mid);
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+      animation: fadeUp 0.3s ease both;
+    }
+
+    .roots .entry-item   { border-left: 2px solid var(--roots-border); }
+    .feathers .entry-item { border-left: 2px solid var(--feathers-border); }
+
+    .entry-remove {
+      margin-left: auto;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0 2px;
+      flex-shrink: 0;
+      transition: color 0.2s;
+      line-height: 1.5;
+    }
+
+    .entry-remove:hover { color: #c4956a; }
+
+    /* Add entry input */
+    .add-entry-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .entry-input {
+      flex: 1;
+      background: var(--dark-mid);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 7px;
+      padding: 0.5rem 0.75rem;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 0.82rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .roots .entry-input:focus   { border-color: var(--roots-col); }
+    .feathers .entry-input:focus { border-color: var(--feathers-col); }
+    .entry-input::placeholder { color: var(--text-muted); font-style: italic; font-size: 0.78rem; }
+
+    .btn-add-entry {
+      border: none;
+      border-radius: 7px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+
+    .roots .btn-add-entry   { background: var(--roots-col); color: var(--dark); }
+    .feathers .btn-add-entry { background: var(--feathers-col); color: var(--dark); }
+    .roots .btn-add-entry:hover   { background: #c4ae80; }
+    .feathers .btn-add-entry:hover { background: #9ecfde; }
+
+    /* ── Reflection prompt ── */
+    .reflection-section {
+      margin-bottom: 2rem;
+      animation: fadeUp 0.5s 0.2s ease both;
+    }
+
+    .reflection-card {
+      background: var(--dark-card);
+      border: 1px solid var(--session-border);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+
+    .reflection-label {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--session-col);
+      margin-bottom: 0.6rem;
+    }
+
+    .reflection-prompt {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      line-height: 1.7;
+      margin-bottom: 1rem;
+      font-style: italic;
+    }
+
+    .reflection-area {
+      width: 100%;
+      background: var(--dark-mid);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px;
+      padding: 0.875rem 1rem;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      line-height: 1.7;
+      resize: none;
+      outline: none;
+      min-height: 90px;
+      transition: border-color 0.2s;
+    }
+
+    .reflection-area:focus { border-color: var(--session-col); }
+    .reflection-area::placeholder { color: var(--text-muted); font-style: italic; }
+
+    /* ── Save section ── */
+    .save-section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .save-info {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 360px;
+    }
+
+    .save-actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .save-status {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--session-col);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .save-status.visible { opacity: 1; }
+
+    .btn-save {
+      background: var(--session-col);
+      border: none;
+      border-radius: 8px;
+      padding: 0.75rem 1.75rem;
+      color: var(--dark);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .btn-save:hover { background: #9dc4a2; transform: translateY(-1px); }
+
+    .btn-back {
+      background: none;
+      border: 1px solid var(--session-border);
+      border-radius: 8px;
+      padding: 0.75rem 1.5rem;
+      color: var(--session-col);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.2s;
+    }
+
+    .btn-back:hover { background: var(--session-dim); }
+
+    @media (max-width: 580px) {
+      .two-col { grid-template-columns: 1fr; }
+      .save-section { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="particles" id="particles"></div>
+
+  <div class="page">
+
+    <!-- Nav -->
+    <nav class="nav">
+      <div class="nav-left">
+        <div class="nav-bird">🌿</div>
+        lil' bird · Session 1 Tool
+      </div>
+      <a href="javascript:history.back()" class="nav-back">← Back to session</a>
+    </nav>
+
+    <!-- Header -->
+    <div class="tool-eyebrow">Session 01 · Story</div>
+    <h1>Roots & Feathers<br>Practice</h1>
+    <p class="intro-text">
+      Not everything you inherited is yours to keep. And not everything you want to become requires leaving the past behind. This practice helps you name what stays — and what you're ready to release.
+    </p>
+
+    <!-- Opening prompt from lil' bird -->
+    <div class="opening-prompt">
+      <div class="speaker-avatar">🌿</div>
+      <div class="speaker-bubble">
+        Think about your story so far — the people, the seasons, the things you've carried. Some of what shaped you has become a genuine part of who you are. Some of it might be ready to let go of.<br><br>
+        In the <strong style="color:var(--roots-col)">Roots</strong> column, name the things you want to keep — values, strengths, ways of being that truly belong to you. In the <strong style="color:var(--feathers-col)">Feathers</strong> column, name the things you're ready to release — beliefs, patterns, expectations that were never really yours.
+      </div>
+    </div>
+
+    <!-- Two column entry -->
+    <div class="two-col">
+
+      <!-- Roots -->
+      <div class="section-card roots">
+        <div class="section-header">
+          <span class="section-icon">🌱</span>
+          <span class="section-title">Roots</span>
+        </div>
+        <div class="section-subtitle">What I'm keeping</div>
+        <p class="section-desc">Values, strengths, and ways of being that genuinely belong to you and deserve to stay.</p>
+        <div class="entries-list" id="roots-list"></div>
+        <div class="add-entry-row">
+          <input
+            class="entry-input"
+            id="roots-input"
+            type="text"
+            placeholder="Add something to keep..."
+            maxlength="100"
+          />
+          <button class="btn-add-entry" id="roots-add">+</button>
+        </div>
+      </div>
+
+      <!-- Feathers -->
+      <div class="section-card feathers">
+        <div class="section-header">
+          <span class="section-icon">🪶</span>
+          <span class="section-title">Feathers</span>
+        </div>
+        <div class="section-subtitle">What I'm releasing</div>
+        <p class="section-desc">Beliefs, patterns, or expectations that were inherited but may not be truly yours to carry.</p>
+        <div class="entries-list" id="feathers-list"></div>
+        <div class="add-entry-row">
+          <input
+            class="entry-input"
+            id="feathers-input"
+            type="text"
+            placeholder="Add something to release..."
+            maxlength="100"
+          />
+          <button class="btn-add-entry" id="feathers-add">+</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Reflection prompt -->
+    <div class="reflection-section">
+      <div class="reflection-card">
+        <div class="reflection-label">One more question from lil' bird</div>
+        <p class="reflection-prompt">
+          Looking at what you've written — is there anything that surprised you? Something you thought would go in Roots that ended up in Feathers, or vice versa? What does that tell you?
+        </p>
+        <textarea
+          class="reflection-area"
+          id="reflection-area"
+          placeholder="What surprised you, if anything..."
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Save section -->
+    <div class="save-section">
+      <div class="save-info">
+        Your roots and feathers are saved as you go. When you're ready, head back to your session.
+      </div>
+      <div class="save-actions">
+        <span class="save-status" id="save-status">✓ Saved</span>
+        <a href="javascript:history.back()" class="btn-back">Back to session</a>
+        <button class="btn-save" id="btn-save">Save my practice</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+    const SUPABASE_URL  = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
+
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+    let currentUser = null;
+    let roots       = [];   // [{ id, text }]
+    let feathers    = [];   // [{ id, text }]
+    let saveTimer   = null;
+
+    // ── Particles ────────────────────────────────────────────
+    function createParticles() {
+      const container = document.getElementById('particles');
+      const colours   = ['#7a9e7e', '#a89060', '#7eb8c9', '#9dbf8a'];
+      for (let i = 0; i < 12; i++) {
+        const p     = document.createElement('div');
+        p.className = 'particle';
+        const size  = 2 + Math.random() * 3;
+        const drift = (Math.random() - 0.5) * 100;
+        p.style.cssText = `
+          left: ${Math.random() * 100}%;
+          bottom: ${Math.random() * 40}%;
+          width: ${size}px;
+          height: ${size}px;
+          background: ${colours[Math.floor(Math.random() * colours.length)]};
+          --drift: ${drift}px;
+          animation-duration: ${16 + Math.random() * 22}s;
+          animation-delay: ${Math.random() * 16}s;
+          opacity: 0.15;
+        `;
+        container.appendChild(p);
+      }
+    }
+
+    // ── Render entries ────────────────────────────────────────
+    function renderList(type) {
+      const list    = type === 'roots' ? roots : feathers;
+      const listEl  = document.getElementById(`${type}-list`);
+      listEl.innerHTML = '';
+
+      list.forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'entry-item';
+        el.innerHTML = `
+          <span style="flex:1">${item.text}</span>
+          <span class="entry-remove" data-id="${item.id}" data-type="${type}">✕</span>
+        `;
+        el.querySelector('.entry-remove').addEventListener('click', () => {
+          removeEntry(type, item.id);
+        });
+        listEl.appendChild(el);
+      });
+    }
+
+    function removeEntry(type, id) {
+      if (type === 'roots')    roots    = roots.filter(i => i.id !== id);
+      if (type === 'feathers') feathers = feathers.filter(i => i.id !== id);
+      renderList(type);
+      autoSave();
+    }
+
+    // ── Add entry ─────────────────────────────────────────────
+    function addEntry(type) {
+      const input = document.getElementById(`${type}-input`);
+      const text  = input.value.trim();
+      if (!text) return;
+
+      const entry = { id: crypto.randomUUID(), text };
+      if (type === 'roots')    roots.push(entry);
+      if (type === 'feathers') feathers.push(entry);
+
+      input.value = '';
+      input.focus();
+      renderList(type);
+      autoSave();
+    }
+
+    // ── Bind add buttons + enter key ─────────────────────────
+    ['roots', 'feathers'].forEach(type => {
+      document.getElementById(`${type}-add`).addEventListener('click', () => addEntry(type));
+      document.getElementById(`${type}-input`).addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); addEntry(type); }
+      });
+    });
+
+    // ── Auto-save on reflection typing ───────────────────────
+    document.getElementById('reflection-area').addEventListener('input', () => {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(autoSave, 1200);
+    });
+
+    // ── Save ─────────────────────────────────────────────────
+    async function autoSave() {
+      if (!currentUser) return;
+      try {
+        await sb.from('tool_outputs').upsert({
+          user_id:     currentUser.id,
+          tool_name:   'roots_feathers',
+          output_data: {
+            roots,
+            feathers,
+            reflection: document.getElementById('reflection-area').value,
+          },
+          updated_at:  new Date().toISOString(),
+        }, { onConflict: 'user_id,tool_name' });
+      } catch {
+        // silent fail
+      }
+    }
+
+    document.getElementById('btn-save').addEventListener('click', async () => {
+      await autoSave();
+      const status = document.getElementById('save-status');
+      status.classList.add('visible');
+      setTimeout(() => status.classList.remove('visible'), 2500);
+    });
+
+    // ── Init ─────────────────────────────────────────────────
+    async function init() {
+      createParticles();
+
+      const { data: { session } } = await sb.auth.getSession();
+      if (session?.user) {
+        currentUser = session.user;
+
+        const { data: toolData } = await sb
+          .from('tool_outputs')
+          .select('output_data')
+          .eq('user_id', currentUser.id)
+          .eq('tool_name', 'roots_feathers')
+          .single();
+
+        if (toolData?.output_data) {
+          roots    = toolData.output_data.roots    || [];
+          feathers = toolData.output_data.feathers || [];
+          const reflection = toolData.output_data.reflection || '';
+          document.getElementById('reflection-area').value = reflection;
+        }
+      }
+
+      renderList('roots');
+      renderList('feathers');
+    }
+
+    init();
+  </script>
+
+</body>
+</html>
