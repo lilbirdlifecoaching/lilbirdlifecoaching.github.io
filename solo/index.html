@@ -824,7 +824,11 @@
 
     const SUPABASE_URL  = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
-    const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+    // Singleton — reuse existing client if already initialised
+    // Prevents auth token corruption from multiple createClient calls
+    const sb = globalThis.__supabaseClient ||
+      (globalThis.__supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON));
 
     const SESSIONS = [
       { number: 0, tag: 'orientation',  title: 'First Flight',          teaser: 'Name where you are. Glimpse where you could be. Take one real step.',                         file: 'sessions/session-0-first-flight.html',   color: 'var(--s0)' },
@@ -973,12 +977,13 @@
     }
 
     // ── Auth state listener ───────────────────────────────────
-    // Primary auth handler — fires on login, logout, and most page loads
+    // Only handles explicit sign-in and sign-out events.
+    // Page load init is handled by init() below instead.
     sb.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user) {
+      if (event === 'SIGNED_IN' && session?.user && !currentUser) {
         currentUser = session.user;
         await loadDashboard();
-      } else {
+      } else if (event === 'SIGNED_OUT') {
         currentUser      = null;
         userProfile      = null;
         sessionData      = [];
@@ -987,23 +992,26 @@
       }
     });
 
-    // ── Fallback init ─────────────────────────────────────────
-    // onAuthStateChange sometimes doesn't fire on return navigation
-    // (e.g. coming back from a session page). This catches that case.
-    setTimeout(async () => {
-      if (currentUser) return; // already loaded — do nothing
+    // ── Page load init ────────────────────────────────────────
+    // Runs on every page load — reads session from localStorage directly.
+    // This is the reliable path for return navigation from session pages.
+    async function init() {
       try {
-        const { data: { session } } = await sb.auth.getSession();
+        const { data: { session }, error } = await sb.auth.getSession();
+        if (error) throw error;
         if (session?.user) {
           currentUser = session.user;
           await loadDashboard();
         } else {
           showScreen('screen-auth');
         }
-      } catch {
+      } catch (err) {
+        console.error('Init error:', err);
         showScreen('screen-auth');
       }
-    }, 3000);
+    }
+
+    init();
 
     // ── Render dashboard ──────────────────────────────────────
     function renderDashboard() {
