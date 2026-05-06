@@ -992,9 +992,16 @@
       }
     });
 
+    // ── Token cleanup helper ─────────────────────────────────
+    function clearSupabaseTokens() {
+      Object.keys(localStorage)
+        .filter(k => k.startsWith('sb-'))
+        .forEach(k => localStorage.removeItem(k));
+    }
+
     // ── Page load init ────────────────────────────────────────
-    // Runs on every page load — reads session from localStorage directly.
-    // This is the reliable path for return navigation from session pages.
+    // Reads the Supabase session from localStorage directly.
+    // On any failure, clears corrupted tokens and shows login.
     async function init() {
       try {
         const { data: { session }, error } = await sb.auth.getSession();
@@ -1006,7 +1013,8 @@
           showScreen('screen-auth');
         }
       } catch (err) {
-        console.error('Init error:', err);
+        console.error('Init error — clearing tokens:', err);
+        clearSupabaseTokens();
         showScreen('screen-auth');
       }
     }
