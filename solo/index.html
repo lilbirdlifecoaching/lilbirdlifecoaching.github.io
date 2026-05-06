@@ -1192,10 +1192,11 @@
     }
 
     // ── Open session ──────────────────────────────────────────
+    // Opens in a new tab — keeps dashboard loaded and auth intact
     function openSession(sessionNumber) {
       const session = SESSIONS[sessionNumber];
       if (!session) return;
-      window.location.href = `${session.file}?uid=${currentUser.id}`;
+      window.open(`${session.file}?uid=${currentUser.id}`, '_blank');
     }
 
     // ── Bypass gate ───────────────────────────────────────────
