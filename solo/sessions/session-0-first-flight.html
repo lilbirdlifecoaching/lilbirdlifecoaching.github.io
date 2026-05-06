@@ -971,9 +971,12 @@
       // calls which corrupt the token and break dashboard navigation
       const tokenKey  = Object.keys(localStorage).find(k => k.startsWith('sb-'));
       const tokenData = tokenKey ? JSON.parse(localStorage.getItem(tokenKey)) : null;
-      const user      = tokenData?.user ?? null;
+      // Supabase v2 stores user under either .user or .currentSession.user
+      const user = tokenData?.user
+                ?? tokenData?.currentSession?.user
+                ?? null;
       if (!user) {
-        window.location.href = '/solo/index.html';
+        window.history.back();
         return;
       }
       currentUser = { id: user.id, email: user.email };
