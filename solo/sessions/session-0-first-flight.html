@@ -912,7 +912,7 @@
           }).catch(() => {});
 
         // Redirect immediately
-        window.location.href = '../index.html';
+        setTimeout(() => {   window.location.href = '/solo/index.html'; }, 500);
 
       } catch (err) {
         console.error('Complete session error:', err);
@@ -970,7 +970,7 @@
       const { data: { session } } = await sb.auth.getSession();
 
       if (!session?.user) {
-        window.location.href = '../index.html';
+        setTimeout(() => {   window.location.href = '/solo/index.html'; }, 500);
         return;
       }
 
