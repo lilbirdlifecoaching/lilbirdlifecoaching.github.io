@@ -834,92 +834,97 @@
     }
 
     // ── Complete session ───────────────────────────────────────
-    async function completeSession() {
-      if (!currentUser) return;
+async function completeSession() {
+  if (!currentUser) return;
 
-      btnComplete.disabled = true;
-      btnComplete.textContent = 'Saving your session...';
+  btnComplete.disabled = true;
+  btnComplete.textContent = 'Saving your session...';
 
-      try {
-        // Generate summary
-        const summaryResponse = await fetch(`${WORKER_URL}/summarise`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            session_number: SESSION_NUMBER,
-            messages:       messages,
-            user_name:      userName,
-          }),
-        });
+  // Timeout helper — resolves with null after ms
+  const withTimeout = (promise, ms) => Promise.race([
+    promise,
+    new Promise(resolve => setTimeout(() => resolve(null), ms))
+  ]);
 
-        let summary   = '';
-        let keyWords  = [];
+  try {
+    // Generate summary — 8 second timeout, never blocks completion
+    let summary  = '';
+    let keyWords = [];
 
-        if (summaryResponse.ok) {
-          const summaryData = await summaryResponse.json();
-          summary   = summaryData.summary   || '';
-          keyWords  = summaryData.key_words || [];
-        }
-
-        // Save summary to Supabase
-        await sb.from('ai_memory').upsert({
-          user_id:        currentUser.id,
+    const summaryResult = await withTimeout(
+      fetch(`${WORKER_URL}/summarise`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           session_number: SESSION_NUMBER,
           messages:       messages,
-          summary:        summary,
-          key_words:      keyWords,
-        }, { onConflict: 'user_id,session_number' });
+          user_name:      userName,
+        }),
+      }).then(r => r.ok ? r.json() : null),
+      8000
+    );
 
-        // Mark session complete + set unlock for session 1
-        const unlockAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+    if (summaryResult) {
+      summary  = summaryResult.summary   || '';
+      keyWords = summaryResult.key_words || [];
+    }
 
-        await sb.from('session_progress')
-          .update({
-            status:       'complete',
-            completed_at: new Date().toISOString(),
-          })
-          .eq('user_id', currentUser.id)
-          .eq('session_number', SESSION_NUMBER);
+    // Save to Supabase — messages + summary (even if summary is empty)
+    await sb.from('ai_memory').upsert({
+      user_id:        currentUser.id,
+      session_number: SESSION_NUMBER,
+      messages:       messages,
+      summary:        summary,
+      key_words:      keyWords,
+    }, { onConflict: 'user_id,session_number' });
 
-        // Set session 1 unlock time
-        await sb.from('session_progress')
-          .update({ unlocks_at: unlockAt })
-          .eq('user_id', currentUser.id)
-          .eq('session_number', 1);
+    // Mark session complete
+    await sb.from('session_progress')
+      .update({
+        status:       'complete',
+        completed_at: new Date().toISOString(),
+      })
+      .eq('user_id', currentUser.id)
+      .eq('session_number', SESSION_NUMBER);
 
-        // Send completion email
-        const userProfile = await sb
-          .from('course_users')
-          .select('email, full_name')
-          .eq('id', currentUser.id)
-          .single();
+    // Set 48hr unlock for session 1
+    const unlockAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+    await sb.from('session_progress')
+      .update({ unlocks_at: unlockAt })
+      .eq('user_id', currentUser.id)
+      .eq('session_number', 1);
 
-        if (userProfile.data?.email) {
-          await fetch(`${WORKER_URL}/session-email`, {
+    // Fire-and-forget email — never blocks redirect
+    sb.from('course_users')
+      .select('email, full_name')
+      .eq('id', currentUser.id)
+      .single()
+      .then(({ data: profile }) => {
+        if (profile?.email) {
+          fetch(`${WORKER_URL}/session-email`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              email:              userProfile.data.email,
-              user_name:          userProfile.data.full_name || '',
+              email:              profile.email,
+              user_name:          profile.full_name || '',
               session_number:     SESSION_NUMBER,
               summary:            summary,
               action_point:       extractActionPoint(messages),
               next_session_title: 'Story — Before you take flight, know where you\'ve been.',
             }),
-          });
+          }).catch(() => {});
         }
+      }).catch(() => {});
 
-        // Back to dashboard
-        window.location.href = '../index.html';
+    // Redirect — happens regardless of email
+    window.location.href = '../index.html';
 
-      } catch (err) {
-        console.error('Complete session error:', err);
-        btnComplete.disabled  = false;
-        btnComplete.textContent = 'Mark complete & continue →';
-      }
-    }
-
-    // ── Extract action point from conversation ─────────────────
+  } catch (err) {
+    console.error('Complete session error:', err);
+    btnComplete.disabled    = false;
+    btnComplete.textContent = 'Mark complete & continue →';
+  }
+  // ── Extract action point from conversation ─────────────────
     function extractActionPoint(msgs) {
       // Find the last assistant message that mentions a commitment or step
       const assistantMsgs = msgs
