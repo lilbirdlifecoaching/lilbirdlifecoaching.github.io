@@ -979,28 +979,36 @@
       btnComplete.disabled = true;
       btnComplete.textContent = 'Saving your session...';
 
-      try {
-        // Generate summary
-        const summaryResponse = await fetch(`${WORKER_URL}/summarise`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            session_number: SESSION_NUMBER,
-            messages:       messages,
-            user_name:      userName,
-          }),
-        });
+      // Timeout helper — never blocks completion
+      const withTimeout = (promise, ms) => Promise.race([
+        promise,
+        new Promise(resolve => setTimeout(() => resolve(null), ms))
+      ]);
 
+      try {
+        // Generate summary — 8 second timeout
         let summary  = '';
         let keyWords = [];
 
-        if (summaryResponse.ok) {
-          const summaryData = await summaryResponse.json();
-          summary  = summaryData.summary   || '';
-          keyWords = summaryData.key_words || [];
+        const summaryResult = await withTimeout(
+          fetch(`${WORKER_URL}/summarise`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              session_number: SESSION_NUMBER,
+              messages:       messages,
+              user_name:      userName,
+            }),
+          }).then(r => r.ok ? r.json() : null),
+          8000
+        );
+
+        if (summaryResult) {
+          summary  = summaryResult.summary   || '';
+          keyWords = summaryResult.key_words || [];
         }
 
-        // Save summary
+        // Save to Supabase — even if summary is empty
         await sb.from('ai_memory').upsert({
           user_id:        currentUser.id,
           session_number: SESSION_NUMBER,
@@ -1025,28 +1033,29 @@
           .eq('user_id', currentUser.id)
           .eq('session_number', 2);
 
-        // Send completion email
-        const { data: profile } = await sb
-          .from('course_users')
+        // Fire-and-forget email — never blocks redirect
+        sb.from('course_users')
           .select('email, full_name')
           .eq('id', currentUser.id)
-          .single();
+          .single()
+          .then(({ data: profile }) => {
+            if (profile?.email) {
+              fetch(`${WORKER_URL}/session-email`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  email:              profile.email,
+                  user_name:          profile.full_name || '',
+                  session_number:     SESSION_NUMBER,
+                  summary:            summary,
+                  action_point:       extractActionPoint(messages),
+                  next_session_title: 'Vision & Goals — Clarify where you\'re going by discovering what matters most.',
+                }),
+              }).catch(() => {});
+            }
+          }).catch(() => {});
 
-        if (profile?.email) {
-          await fetch(`${WORKER_URL}/session-email`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email:              profile.email,
-              user_name:          profile.full_name || '',
-              session_number:     SESSION_NUMBER,
-              summary:            summary,
-              action_point:       extractActionPoint(messages),
-              next_session_title: 'Vision & Goals — Clarify where you\'re going by discovering what matters most.',
-            }),
-          });
-        }
-
+        // Redirect immediately — doesn't wait for email
         window.location.href = '../index.html';
 
       } catch (err) {
