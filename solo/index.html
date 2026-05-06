@@ -27,15 +27,14 @@
       --text-dim:   rgba(240,236,228,0.55);
       --text-muted: rgba(240,236,228,0.3);
 
-      /* Session palette — shifts per session */
-      --s0: #F5C842;  /* First Flight — gold */
-      --s1: #7a9e7e;  /* Story — forest green */
-      --s2: #7eb8c9;  /* Vision — horizon blue */
-      --s3: #a89060;  /* Identity — dappled amber */
-      --s4: #8a9ab0;  /* Transitions — mist blue */
-      --s5: #9dbf8a;  /* Rhythms — sage */
-      --s6: #c4956a;  /* Relationships — warm amber */
-      --s7: #F5C842;  /* Full Flight — gold again, full circle */
+      --s0: #F5C842;
+      --s1: #7a9e7e;
+      --s2: #7eb8c9;
+      --s3: #a89060;
+      --s4: #8a9ab0;
+      --s5: #9dbf8a;
+      --s6: #c4956a;
+      --s7: #F5C842;
 
       --font-display: 'Playfair Display', Georgia, serif;
       --font-body:    'DM Sans', system-ui, sans-serif;
@@ -47,9 +46,6 @@
       --radius-xl:  32px;
     }
 
-    /* ============================================================
-       RESET & BASE
-       ============================================================ */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
 
@@ -63,7 +59,6 @@
       overflow-x: hidden;
     }
 
-    /* Grain overlay */
     body::before {
       content: '';
       position: fixed;
@@ -74,9 +69,6 @@
       opacity: 0.6;
     }
 
-    /* ============================================================
-       LAYOUT SCREENS
-       ============================================================ */
     .screen {
       display: none;
       position: relative;
@@ -85,9 +77,7 @@
     }
     .screen.active { display: flex; }
 
-    /* ============================================================
-       AUTH SCREEN
-       ============================================================ */
+    /* ── AUTH ── */
     #screen-auth {
       align-items: center;
       justify-content: center;
@@ -164,9 +154,7 @@
       position: relative;
     }
 
-    .auth-tab.active {
-      color: var(--gold);
-    }
+    .auth-tab.active { color: var(--gold); }
 
     .auth-tab.active::after {
       content: '';
@@ -204,10 +192,7 @@
       width: 100%;
     }
 
-    .form-group input:focus {
-      border-color: var(--gold);
-    }
-
+    .form-group input:focus { border-color: var(--gold); }
     .form-group input::placeholder { color: var(--text-muted); }
 
     .btn-primary {
@@ -249,14 +234,9 @@
       line-height: 1.5;
     }
 
-    .auth-footer a {
-      color: var(--gold);
-      text-decoration: none;
-    }
+    .auth-footer a { color: var(--gold); text-decoration: none; }
 
-    /* ============================================================
-       LOADING SCREEN
-       ============================================================ */
+    /* ── LOADING ── */
     #screen-loading {
       align-items: center;
       justify-content: center;
@@ -277,15 +257,12 @@
       color: var(--text-dim);
     }
 
-    /* ============================================================
-       DASHBOARD SCREEN
-       ============================================================ */
+    /* ── DASHBOARD ── */
     #screen-dashboard {
       flex-direction: column;
       min-height: 100vh;
     }
 
-    /* Top nav */
     .dash-nav {
       display: flex;
       align-items: center;
@@ -351,7 +328,6 @@
 
     .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
 
-    /* Dashboard body */
     .dash-body {
       flex: 1;
       max-width: 900px;
@@ -360,7 +336,6 @@
       padding: 3rem 2rem 5rem;
     }
 
-    /* Welcome header */
     .dash-welcome {
       margin-bottom: 3rem;
       animation: fadeUp 0.5s ease both;
@@ -391,7 +366,6 @@
       line-height: 1.7;
     }
 
-    /* Progress bar */
     .dash-progress {
       margin-bottom: 3rem;
       animation: fadeUp 0.5s 0.1s ease both;
@@ -432,14 +406,12 @@
       transition: width 0.8s ease;
     }
 
-    /* Session grid */
     .sessions-grid {
       display: grid;
       grid-template-columns: 1fr;
       gap: 1rem;
     }
 
-    /* Session card */
     .session-card {
       background: var(--dark-card);
       border: 1px solid rgba(255,255,255,0.06);
@@ -455,7 +427,6 @@
       cursor: default;
     }
 
-    /* Stagger cards */
     .session-card:nth-child(1) { animation-delay: 0.1s; }
     .session-card:nth-child(2) { animation-delay: 0.15s; }
     .session-card:nth-child(3) { animation-delay: 0.2s; }
@@ -465,7 +436,6 @@
     .session-card:nth-child(7) { animation-delay: 0.4s; }
     .session-card:nth-child(8) { animation-delay: 0.45s; }
 
-    /* Available card */
     .session-card.available {
       border-color: var(--gold-border);
       cursor: pointer;
@@ -477,7 +447,6 @@
       border-color: var(--gold);
     }
 
-    /* Active glow on available */
     .session-card.available::before {
       content: '';
       position: absolute;
@@ -490,7 +459,6 @@
 
     .session-card.available:hover::before { opacity: 1; }
 
-    /* In-progress card */
     .session-card.in-progress {
       border-color: var(--gold);
       cursor: pointer;
@@ -501,22 +469,15 @@
       transform: translateY(-2px);
     }
 
-    /* Completed card */
     .session-card.complete {
       opacity: 0.65;
       cursor: pointer;
     }
 
-    .session-card.complete:hover {
-      opacity: 0.85;
-    }
+    .session-card.complete:hover { opacity: 0.85; }
 
-    /* Locked card */
-    .session-card.locked {
-      opacity: 0.4;
-    }
+    .session-card.locked { opacity: 0.4; }
 
-    /* Session number badge */
     .session-num {
       width: 44px;
       height: 44px;
@@ -531,7 +492,6 @@
       letter-spacing: 0.05em;
     }
 
-    /* Session content */
     .session-content { flex: 1; min-width: 0; }
 
     .session-eyebrow {
@@ -557,7 +517,6 @@
       font-style: italic;
     }
 
-    /* Session status / arrow */
     .session-status {
       flex-shrink: 0;
       display: flex;
@@ -566,10 +525,7 @@
       gap: 0.4rem;
     }
 
-    .status-icon {
-      font-size: 1.1rem;
-      line-height: 1;
-    }
+    .status-icon { font-size: 1.1rem; line-height: 1; }
 
     .status-pill {
       font-family: var(--font-mono);
@@ -580,31 +536,11 @@
       border-radius: 99px;
     }
 
-    .pill-available {
-      background: var(--gold-dim);
-      color: var(--gold);
-      border: 1px solid var(--gold-border);
-    }
+    .pill-available  { background: var(--gold-dim);  color: var(--gold);  border: 1px solid var(--gold-border); }
+    .pill-progress   { background: var(--ember-dim); color: var(--ember); border: 1px solid rgba(232,115,74,0.3); }
+    .pill-complete   { background: rgba(122,158,126,0.15); color: #7a9e7e; border: 1px solid rgba(122,158,126,0.25); }
+    .pill-locked     { background: var(--mist); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.06); }
 
-    .pill-progress {
-      background: var(--ember-dim);
-      color: var(--ember);
-      border: 1px solid rgba(232,115,74,0.3);
-    }
-
-    .pill-complete {
-      background: rgba(122,158,126,0.15);
-      color: #7a9e7e;
-      border: 1px solid rgba(122,158,126,0.25);
-    }
-
-    .pill-locked {
-      background: var(--mist);
-      color: var(--text-muted);
-      border: 1px solid rgba(255,255,255,0.06);
-    }
-
-    /* Unlock timer */
     .unlock-timer {
       font-size: 0.72rem;
       color: var(--text-muted);
@@ -612,7 +548,6 @@
       margin-top: 0.25rem;
     }
 
-    /* Gate card — shown when user completes a session but next is gated */
     .gate-card {
       background: var(--dark-card);
       border: 1px solid var(--gold-border);
@@ -650,7 +585,6 @@
 
     .btn-ready:hover { background: var(--gold); color: var(--dark); }
 
-    /* Purchase gate */
     .purchase-gate {
       background: linear-gradient(135deg, var(--dark-card), var(--dark-mid));
       border: 1px solid var(--gold-border);
@@ -776,9 +710,6 @@
 
     .btn-purchase:hover { background: #fff; transform: translateY(-2px); }
 
-    /* ============================================================
-       ANIMATIONS
-       ============================================================ */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(16px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -789,9 +720,6 @@
       50%       { transform: translateY(-8px); }
     }
 
-    /* ============================================================
-       RESPONSIVE
-       ============================================================ */
     @media (max-width: 600px) {
       .dash-nav { padding: 1rem; }
       .dash-body { padding: 2rem 1rem 4rem; }
@@ -803,33 +731,25 @@
 
 <body>
 
-  <!-- ============================================================
-       SCREEN: LOADING
-       ============================================================ -->
+  <!-- LOADING -->
   <div id="screen-loading" class="screen active">
     <div class="loading-bird">🪶</div>
     <div class="loading-text">finding your nest...</div>
   </div>
 
-
-  <!-- ============================================================
-       SCREEN: AUTH (Login / Signup)
-       ============================================================ -->
+  <!-- AUTH -->
   <div id="screen-auth" class="screen">
     <div class="auth-wrap">
-
       <div class="auth-logo">
         <div class="bird-mark">🪶</div>
         <h1>lil' bird</h1>
         <p>Life Change Sessions · Solo</p>
       </div>
-
       <div class="auth-card">
         <div class="auth-tabs">
           <button class="auth-tab active" data-tab="signin">Sign in</button>
           <button class="auth-tab" data-tab="signup">Create account</button>
         </div>
-
         <!-- Sign In -->
         <form class="auth-form active" id="form-signin" novalidate>
           <div class="form-group">
@@ -843,7 +763,6 @@
           <div class="auth-error" id="signin-error"></div>
           <button type="submit" class="btn-primary" id="btn-signin">Sign in →</button>
         </form>
-
         <!-- Sign Up -->
         <form class="auth-form" id="form-signup" novalidate>
           <div class="form-group">
@@ -862,21 +781,14 @@
           <button type="submit" class="btn-primary" id="btn-signup">Create account →</button>
         </form>
       </div>
-
       <div class="auth-footer">
         By continuing you agree to lil' bird's <a href="https://lilbird.life/terms" target="_blank">terms</a> and <a href="https://lilbird.life/privacy" target="_blank">privacy policy</a>.
       </div>
-
     </div>
   </div>
 
-
-  <!-- ============================================================
-       SCREEN: DASHBOARD
-       ============================================================ -->
+  <!-- DASHBOARD -->
   <div id="screen-dashboard" class="screen">
-
-    <!-- Nav -->
     <nav class="dash-nav">
       <div class="nav-brand">
         <div class="nav-bird">🪶</div>
@@ -887,18 +799,12 @@
         <button class="btn-ghost" id="btn-signout">Sign out</button>
       </div>
     </nav>
-
-    <!-- Body -->
     <div class="dash-body">
-
-      <!-- Welcome -->
       <div class="dash-welcome">
         <div class="dash-eyebrow">your journey</div>
         <h2 id="dash-greeting">Welcome back.</h2>
         <p id="dash-subtext">Pick up where you left off — or begin when you're ready. There's no rush here.</p>
       </div>
-
-      <!-- Progress -->
       <div class="dash-progress" id="dash-progress" style="display:none;">
         <div class="progress-meta">
           <span class="progress-label">Course progress</span>
@@ -908,115 +814,49 @@
           <div class="progress-fill" id="progress-fill" style="width:0%"></div>
         </div>
       </div>
-
-      <!-- Sessions or Purchase Gate -->
-      <div id="dash-content">
-        <!-- Populated by JS -->
-      </div>
-
+      <div id="dash-content"></div>
     </div>
   </div>
 
 
-  <!-- ============================================================
-       JAVASCRIPT
-       ============================================================ -->
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-    // ── Supabase ─────────────────────────────────────────────────
     const SUPABASE_URL  = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
     const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
 
-    // ── Session definitions ───────────────────────────────────────
     const SESSIONS = [
-      {
-        number: 0,
-        tag: 'orientation',
-        title: 'First Flight',
-        teaser: 'Name where you are. Glimpse where you could be. Take one real step.',
-        file: 'sessions/session-0-first-flight.html',
-        color: 'var(--s0)',
-      },
-      {
-        number: 1,
-        tag: 'session 1',
-        title: 'Story',
-        teaser: 'Before you take flight, know where you\'ve been.',
-        file: 'sessions/session-1-story.html',
-        color: 'var(--s1)',
-      },
-      {
-        number: 2,
-        tag: 'session 2',
-        title: 'Vision & Your Why',
-        teaser: 'Clarify where you\'re going by discovering what actually drives you.',
-        file: 'sessions/session-2-vision.html',
-        color: 'var(--s2)',
-      },
-      {
-        number: 3,
-        tag: 'session 3',
-        title: 'Identity & Insight',
-        teaser: 'Know who you are so you can rise with clarity.',
-        file: 'sessions/session-3-identity.html',
-        color: 'var(--s3)',
-      },
-      {
-        number: 4,
-        tag: 'session 4',
-        title: 'Navigating Transitions',
-        teaser: 'When the path gets foggy — slow down, look inward, choose your next step.',
-        file: 'sessions/session-4-transitions.html',
-        color: 'var(--s4)',
-      },
-      {
-        number: 5,
-        tag: 'session 5',
-        title: 'Life Rhythms & Routines',
-        teaser: 'Find your rhythm. Root where you need to stay. Move where you\'re meant to grow.',
-        file: 'sessions/session-5-rhythms.html',
-        color: 'var(--s5)',
-      },
-      {
-        number: 6,
-        tag: 'session 6',
-        title: 'Relationships',
-        teaser: 'No season of growth happens in isolation. Look at who\'s in your forest.',
-        file: 'sessions/session-6-relationships.html',
-        color: 'var(--s6)',
-      },
-      {
-        number: 7,
-        tag: 'session 7',
-        title: 'Full Flight',
-        teaser: 'Your story. Your vision. Your plan. All of it — yours.',
-        file: 'sessions/session-7-full-flight.html',
-        color: 'var(--s7)',
-      },
+      { number: 0, tag: 'orientation',  title: 'First Flight',          teaser: 'Name where you are. Glimpse where you could be. Take one real step.',                         file: 'sessions/session-0-first-flight.html',   color: 'var(--s0)' },
+      { number: 1, tag: 'session 1',    title: 'Story',                  teaser: 'Before you take flight, know where you\'ve been.',                                              file: 'sessions/session-1-story.html',           color: 'var(--s1)' },
+      { number: 2, tag: 'session 2',    title: 'Vision & Your Why',      teaser: 'Clarify where you\'re going by discovering what actually drives you.',                          file: 'sessions/session-2-vision.html',          color: 'var(--s2)' },
+      { number: 3, tag: 'session 3',    title: 'Identity & Insight',     teaser: 'Know who you are so you can rise with clarity.',                                                file: 'sessions/session-3-identity.html',        color: 'var(--s3)' },
+      { number: 4, tag: 'session 4',    title: 'Navigating Transitions', teaser: 'When the path gets foggy — slow down, look inward, choose your next step.',                    file: 'sessions/session-4-transitions.html',     color: 'var(--s4)' },
+      { number: 5, tag: 'session 5',    title: 'Life Rhythms & Routines',teaser: 'Find your rhythm. Root where you need to stay. Move where you\'re meant to grow.',             file: 'sessions/session-5-rhythms.html',         color: 'var(--s5)' },
+      { number: 6, tag: 'session 6',    title: 'Relationships',          teaser: 'No season of growth happens in isolation. Look at who\'s in your forest.',                     file: 'sessions/session-6-relationships.html',   color: 'var(--s6)' },
+      { number: 7, tag: 'session 7',    title: 'Full Flight',            teaser: 'Your story. Your vision. Your plan. All of it — yours.',                                        file: 'sessions/session-7-full-flight.html',     color: 'var(--s7)' },
     ];
 
-    // ── Promo codes ───────────────────────────────────────────────
     const PROMO_CODES = {
-      'SOLO50':   { discount: 0.5,  label: '50% off applied — $48.50' },
-      'IMREADY':  { discount: 0.25, label: '25% off applied — $72.75' },
+      'SOLO50':  { discount: 0.5,  label: '50% off applied — $48.50' },
+      'IMREADY': { discount: 0.25, label: '25% off applied — $72.75' },
     };
     const BASE_PRICE = 97;
     let activePromo = null;
 
-    // ── State ─────────────────────────────────────────────────────
-    let currentUser   = null;
-    let userProfile   = null;
-    let sessionData   = [];
+    // ── State ─────────────────────────────────────────────────
+    let currentUser      = null;
+    let userProfile      = null;
+    let sessionData      = [];
+    let dashboardLoading = false;  // ← GUARD: prevents double-load
 
-    // ── Screen helpers ────────────────────────────────────────────
+    // ── Screen helpers ────────────────────────────────────────
     function showScreen(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
     }
 
-    // ── Auth tab switching ────────────────────────────────────────
+    // ── Auth tab switching ────────────────────────────────────
     document.querySelectorAll('.auth-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
@@ -1026,7 +866,7 @@
       });
     });
 
-    // ── Sign In ───────────────────────────────────────────────────
+    // ── Sign In ───────────────────────────────────────────────
     document.getElementById('form-signin').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('btn-signin');
@@ -1040,7 +880,7 @@
         const password = document.getElementById('signin-password').value;
         const { error } = await sb.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        // onAuthStateChange will handle the rest
+        // onAuthStateChange handles the rest
       } catch (error) {
         err.textContent = error.message || 'Something went wrong. Try again.';
         err.classList.add('visible');
@@ -1049,7 +889,7 @@
       }
     });
 
-    // ── Sign Up ───────────────────────────────────────────────────
+    // ── Sign Up ───────────────────────────────────────────────
     document.getElementById('form-signup').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('btn-signup');
@@ -1062,13 +902,9 @@
         const name     = document.getElementById('signup-name').value.trim();
         const email    = document.getElementById('signup-email').value.trim();
         const password = document.getElementById('signup-password').value;
-
         if (password.length < 8) throw new Error('Password must be at least 8 characters.');
-
         const { data, error } = await sb.auth.signUp({ email, password });
         if (error) throw error;
-
-        // Update name
         if (data.user) {
           await sb.from('course_users').update({ full_name: name }).eq('id', data.user.id);
         }
@@ -1080,38 +916,31 @@
       }
     });
 
-    // ── Sign Out ──────────────────────────────────────────────────
+    // ── Sign Out ──────────────────────────────────────────────
     document.getElementById('btn-signout').addEventListener('click', async () => {
       await sb.auth.signOut();
     });
 
-    // ── Auth state listener ───────────────────────────────────────
-    sb.auth.onAuthStateChange(async (_event, session) => {
-      if (session?.user) {
-        currentUser = session.user;
-        await loadDashboard();
-      } else {
-        currentUser = null;
-        userProfile = null;
-        sessionData = [];
-        showScreen('screen-auth');
-      }
-    });
-
-    // ── Load dashboard ────────────────────────────────────────────
+    // ── Load dashboard ────────────────────────────────────────
     async function loadDashboard() {
+      // GUARD — never run two simultaneous loads
+      if (dashboardLoading) return;
+      dashboardLoading = true;
+
       showScreen('screen-loading');
 
       try {
         // Fetch profile
-        const { data: profile } = await sb
+        const { data: profile, error: profileError } = await sb
           .from('course_users')
           .select('*')
           .eq('id', currentUser.id)
           .single();
-        userProfile = profile;
 
-        // Auto-unlock any sessions whose timer has passed
+        // Profile may not exist yet for brand new users — that's fine
+        userProfile = profile || null;
+
+        // Auto-unlock sessions whose timer has passed
         const now = new Date().toISOString();
         await sb
           .from('session_progress')
@@ -1127,34 +956,53 @@
           .select('*')
           .eq('user_id', currentUser.id)
           .order('session_number');
+
         sessionData = progress || [];
 
         renderDashboard();
         showScreen('screen-dashboard');
+
       } catch (err) {
         console.error('Dashboard load error:', err);
+        // On any error fall back to auth screen cleanly
         showScreen('screen-auth');
+      } finally {
+        // Always release the guard so future loads can proceed
+        dashboardLoading = false;
       }
     }
 
-    // ── Render dashboard ──────────────────────────────────────────
+    // ── Auth state listener ───────────────────────────────────
+    // This is the ONLY place auth state is checked.
+    // The top-level getSession() call has been removed entirely.
+    sb.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        currentUser = session.user;
+        await loadDashboard();
+      } else {
+        currentUser      = null;
+        userProfile      = null;
+        sessionData      = [];
+        dashboardLoading = false;
+        showScreen('screen-auth');
+      }
+    });
+
+    // ── Render dashboard ──────────────────────────────────────
     function renderDashboard() {
       const name = userProfile?.full_name?.split(' ')[0] || '';
 
-      // Greeting
       const hour = new Date().getHours();
       const timeGreeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
       document.getElementById('dash-greeting').textContent =
         name ? `${timeGreeting}, ${name}.` : `${timeGreeting}.`;
 
-      // Nav email
       document.getElementById('nav-user-email').textContent = currentUser.email;
 
       const purchased = !!userProfile?.purchased_at;
       const content   = document.getElementById('dash-content');
 
       if (!purchased) {
-        // Show purchase gate
         document.getElementById('dash-progress').style.display = 'none';
         document.getElementById('dash-subtext').textContent =
           'Seven sessions. Your pace. The same depth as working with a coach — in a format built around you.';
@@ -1163,18 +1011,15 @@
         return;
       }
 
-      // Has purchased — show sessions
       document.getElementById('dash-subtext').textContent =
         'Pick up where you left off. The work you do between sessions matters as much as the sessions themselves.';
 
-      // Progress bar
       const completed = sessionData.filter(s => s.status === 'complete').length;
       const total     = 8;
       document.getElementById('dash-progress').style.display = 'block';
       document.getElementById('progress-count').textContent = `${completed} of ${total} sessions`;
       document.getElementById('progress-fill').style.width  = `${(completed / total) * 100}%`;
 
-      // Session cards
       let html = '<div class="sessions-grid">';
       SESSIONS.forEach(session => {
         const progress = sessionData.find(s => s.session_number === session.number);
@@ -1184,7 +1029,6 @@
       html += '</div>';
       content.innerHTML = html;
 
-      // Bind card clicks
       document.querySelectorAll('.session-card.available, .session-card.in-progress, .session-card.complete').forEach(card => {
         card.addEventListener('click', () => {
           const num = parseInt(card.dataset.session);
@@ -1192,7 +1036,6 @@
         });
       });
 
-      // Bind bypass buttons
       document.querySelectorAll('.btn-ready').forEach(btn => {
         btn.addEventListener('click', async (e) => {
           e.stopPropagation();
@@ -1202,7 +1045,7 @@
       });
     }
 
-    // ── Render session card ───────────────────────────────────────
+    // ── Render session card ───────────────────────────────────
     function renderSessionCard(session, status, progress) {
       const statusLabels = {
         available:   { pill: 'pill-available', label: 'Ready',       icon: '→' },
@@ -1212,7 +1055,6 @@
       };
       const s = statusLabels[status] || statusLabels.locked;
 
-      // Unlock timer
       let timerHtml = '';
       if (status === 'locked' && progress?.unlocks_at) {
         const unlockTime = new Date(progress.unlocks_at);
@@ -1221,13 +1063,9 @@
           const hrs  = Math.floor(diffMs / 3600000);
           const mins = Math.floor((diffMs % 3600000) / 60000);
           timerHtml = `<div class="unlock-timer">unlocks in ${hrs}h ${mins}m</div>`;
-
-          // Show bypass button on previous card
-          // (handled separately below)
         }
       }
 
-      // Bypass button — shown below a completed card if next is on timer
       let bypassHtml = '';
       if (status === 'complete' && session.number < 7) {
         const nextProgress = sessionData.find(s => s.session_number === session.number + 1);
@@ -1269,39 +1107,33 @@
       `;
     }
 
-    // ── Render purchase gate ──────────────────────────────────────
+    // ── Purchase gate ─────────────────────────────────────────
     function renderPurchaseGate() {
       return `
         <div class="purchase-gate">
           <span class="bird-glyph">🪶</span>
           <h3>Ready to begin?</h3>
           <p>Seven sessions. Fully self-paced. An AI coaching guide that actually listens — and a set of tools that help you see yourself clearly. This is the work.</p>
-
           <div class="purchase-price">
             <div class="price-amount" id="display-price">$97</div>
             <div class="price-label">one-time · lifetime access</div>
           </div>
-
           <div class="promo-input-wrap">
             <input class="promo-input" id="promo-input" type="text" placeholder="Have a promo code?" />
             <button class="btn-apply-promo" id="btn-apply-promo">Apply</button>
           </div>
-
           <div class="promo-message" id="promo-message"></div>
-
           <button class="btn-purchase" id="btn-purchase">Begin my journey →</button>
         </div>
       `;
     }
 
-    // ── Purchase gate logic ───────────────────────────────────────
     function bindPurchaseGate() {
       document.getElementById('btn-apply-promo').addEventListener('click', () => {
         const code    = document.getElementById('promo-input').value.trim().toUpperCase();
         const promo   = PROMO_CODES[code];
         const msgEl   = document.getElementById('promo-message');
         const priceEl = document.getElementById('display-price');
-
         if (promo) {
           activePromo = promo;
           const finalPrice = (BASE_PRICE * (1 - promo.discount)).toFixed(2);
@@ -1317,27 +1149,22 @@
       });
 
       document.getElementById('btn-purchase').addEventListener('click', () => {
-        // In production: initiate Stripe checkout
-        // For now: show placeholder
         const price = activePromo
           ? (BASE_PRICE * (1 - activePromo.discount)).toFixed(2)
           : BASE_PRICE;
-
-        // TODO: Replace with Stripe checkout redirect
-        // window.location.href = `/checkout?price=${price}&user=${currentUser.id}`;
+        // TODO: Replace with Stripe checkout
         alert(`Stripe checkout coming soon.\nPrice: $${price}\nUser: ${currentUser.email}`);
       });
     }
 
-    // ── Open session ──────────────────────────────────────────────
+    // ── Open session ──────────────────────────────────────────
     function openSession(sessionNumber) {
       const session = SESSIONS[sessionNumber];
       if (!session) return;
-      // Navigate to the session file, passing user context via URL params
       window.location.href = `${session.file}?uid=${currentUser.id}`;
     }
 
-    // ── Bypass gate ───────────────────────────────────────────────
+    // ── Bypass gate ───────────────────────────────────────────
     async function bypassGate(nextSession) {
       try {
         await sb
@@ -1351,14 +1178,6 @@
       }
     }
 
-    // ── Initial session check (runs once on page load) ─────────────
-    const { data: { session: initSession } } = await sb.auth.getSession();
-    if (initSession?.user) {
-      currentUser = initSession.user;
-      await loadDashboard();
-    } else {
-      showScreen('screen-auth');
-    }
   </script>
 
 </body>
