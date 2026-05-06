@@ -696,10 +696,10 @@
     <!-- Nav -->
     <nav class="nav">
       <div class="nav-left">
-        <a href="../index.html" class="nav-bird">🌿</a>
+        <a href="javascript:history.back()" class="nav-bird">🌿</a>
         <span class="nav-label">lil' bird · life change sessions</span>
       </div>
-      <a href="../index.html" class="nav-back">← My sessions</a>
+      <a href="javascript:history.back()" class="nav-back">← My sessions</a>
     </nav>
 
     <!-- Main -->
@@ -1057,7 +1057,7 @@
 
         // Redirect immediately — doesn't wait for email
         setTimeout(() => {
-          window.location.href = '/solo/index.html';
+          window.history.back();
         }, 500);
 
       } catch (err) {
@@ -1141,7 +1141,7 @@
       const { data: { session } } = await sb.auth.getSession();
 
       if (!session?.user) {
-        window.location.href = '../index.html';
+        window.history.back();
         return;
       }
 
@@ -1157,7 +1157,7 @@
 
       if (progress && progress.status === 'locked') {
         // Redirect back — they shouldn't be here yet
-        window.location.href = '../index.html';
+        window.history.back();
         return;
       }
 

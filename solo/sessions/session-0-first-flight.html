@@ -597,10 +597,10 @@
     <!-- Nav -->
     <nav class="nav">
       <div class="nav-left">
-        <a href="../index.html" class="nav-bird">🪶</a>
+        <a href="javascript:history.back()" class="nav-bird">🪶</a>
         <span class="nav-label">lil' bird · life change sessions</span>
       </div>
-      <a href="../index.html" class="nav-back">← My sessions</a>
+      <a href="javascript:history.back()" class="nav-back">← My sessions</a>
     </nav>
 
     <!-- Main -->
@@ -912,7 +912,7 @@
           }).catch(() => {});
 
         // Redirect immediately
-        setTimeout(() => {   window.location.href = '/solo/index.html'; }, 500);
+        window.history.back();
 
       } catch (err) {
         console.error('Complete session error:', err);
@@ -970,7 +970,7 @@
       const { data: { session } } = await sb.auth.getSession();
 
       if (!session?.user) {
-        setTimeout(() => {   window.location.href = '/solo/index.html'; }, 500);
+        window.history.back();
         return;
       }
 
