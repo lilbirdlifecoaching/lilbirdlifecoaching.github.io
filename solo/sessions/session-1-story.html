@@ -842,11 +842,10 @@
     const completePanel = document.getElementById('complete-panel');
     const btnComplete   = document.getElementById('btn-complete');
 
-    // ── Tool opener (exposed to window for onclick) ────────────
-    window.openTool = function(toolName) {
-      const uid = currentUser?.id || '';
-      window.location.href = `../tools/tool-${toolName}.html?uid=${uid}&session=1`;
-    };
+    // Redirect immediately — doesn't wait for email
+        setTimeout(() => {
+          window.location.href = '/solo/index.html';
+        }, 500);
 
     // ── Particles — earthy green drift ────────────────────────
     function createParticles() {
