@@ -380,7 +380,14 @@
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
     const WORKER_URL    = 'https://worker-solo.cwwq46sn7m.workers.dev';
     const { createClient } = supabase;
-    const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON, {
+      auth: {
+        storageKey: 'lilbird-solo-auth',
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: false,
+      }
+    });
 
     const SESSIONS = [
       {
