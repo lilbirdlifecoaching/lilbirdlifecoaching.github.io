@@ -664,7 +664,7 @@
       const eyeColor = status === 'locked' ? 'var(--text-muted)' : session.color;
       const iconColor = status === 'locked' ? 'var(--text-muted)' : status === 'complete' ? '#7a9e7e' : session.color;
       const num = session.number === 0 ? '✦' : String(session.number).padStart(2, '0');
-      return '<div class="session-card ' + status + '" data-session="' + session.number + '"><div class="session-num" style="background:' + numBg + ';color:' + numColor + ';">' + num + '</div><div class="session-content"><div class="session-eyebrow" style="color:' + eyeColor + '">' + session.tag + '</div><div class="session-title">' + session.title + '</div><div class="session-teaser">' + session.teaser + '</div>' + timerHtml + '</div><div class="session-status"><div class="status-icon" style="color:' + iconColor + '">' + s.icon + '</div><div class="status-pill ' + s.pill + '">' + s.label + '</div></div></div>' + bypassHtml;
+      return '<div class="session-card ' + status.replace('_','-') + '" data-session="' + session.number + '"><div class="session-num" style="background:' + numBg + ';color:' + numColor + ';">' + num + '</div><div class="session-content"><div class="session-eyebrow" style="color:' + eyeColor + '">' + session.tag + '</div><div class="session-title">' + session.title + '</div><div class="session-teaser">' + session.teaser + '</div>' + timerHtml + '</div><div class="session-status"><div class="status-icon" style="color:' + iconColor + '">' + s.icon + '</div><div class="status-pill ' + s.pill + '">' + s.label + '</div></div></div>' + bypassHtml;
     }
 
     function renderPurchaseGate() {
@@ -994,10 +994,22 @@
     // ── Init ──────────────────────────────────────────────────
     (async () => {
       try {
-        const { data: { session } } = await sb.auth.getSession();
-        if (session?.user) { currentUser = session.user; await loadDashboard(); }
-        else showView('view-auth');
-      } catch { showView('view-auth'); }
+        var sessionResult = await Promise.race([
+          sb.auth.getSession().then(function(r) { return r.data && r.data.session ? r.data.session : null; }),
+          new Promise(function(resolve) { setTimeout(function() { resolve('TIMEOUT'); }, 4000); }),
+        ]);
+        if (sessionResult === 'TIMEOUT') {
+          Object.keys(localStorage).filter(function(k) { return k.startsWith('sb-'); }).forEach(function(k) { localStorage.removeItem(k); });
+          showView('view-auth');
+        } else if (sessionResult && sessionResult.user) {
+          currentUser = sessionResult.user;
+          await loadDashboard();
+        } else {
+          showView('view-auth');
+        }
+      } catch(e) {
+        showView('view-auth');
+      }
     })();
   </script>
 </body>
