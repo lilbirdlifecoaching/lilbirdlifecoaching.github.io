@@ -807,9 +807,13 @@
 
     // ── Auth listener ─────────────────────────────────────────
     sb.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
+      if (event === 'SIGNED_IN' && session?.user && !currentUser) {
+        // Only load dashboard on first sign in — not on token refresh
         currentUser = session.user;
         await loadDashboard();
+      } else if (event === 'TOKEN_REFRESHED' && session?.user && currentUser) {
+        // Just update the user reference silently — no reload
+        currentUser = session.user;
       } else if (event === 'SIGNED_OUT') {
         currentUser = null; userProfile = null; sessionData = [];
         showView('view-auth');
