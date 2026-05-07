@@ -166,10 +166,16 @@
     .session-tag-label::before { content: ''; width: 20px; height: 1px; background: var(--session-col); display: inline-block; }
     .session-info h1 { font-family: var(--font-display); font-size: clamp(1.8rem, 3.5vw, 2.5rem); font-weight: 400; font-style: italic; line-height: 1.15; margin-bottom: 1rem; }
     .session-info-desc { color: var(--text-dim); font-size: 0.92rem; line-height: 1.75; margin-bottom: 2rem; max-width: 380px; }
-    .video-wrap { background: var(--dark-card); border: 1px solid var(--session-border); border-radius: 20px; aspect-ratio: 16/9; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 2rem; position: relative; overflow: hidden; cursor: pointer; transition: border-color 0.2s; }
-    .video-gradient { position: absolute; inset: 0; }
-    .video-play { width: 52px; height: 52px; border: 2px solid var(--session-col); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--session-col); font-size: 1.25rem; position: relative; z-index: 1; }
-    .video-label { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); position: relative; z-index: 1; }
+    .video-wrap { margin-bottom: 2rem; }
+    .video-player-container { position: relative; border-radius: 20px; overflow: hidden; border: 1px solid var(--session-border); background: var(--dark-card); display: flex; justify-content: center; }
+    .video-player-container video { display: block; width: 100%; max-height: 420px; object-fit: contain; background: #000; border-radius: 20px; }
+    .video-poster { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem; cursor: pointer; transition: opacity 0.3s; border-radius: 20px; }
+    .video-poster.hidden { opacity: 0; pointer-events: none; }
+    .video-play { width: 56px; height: 56px; border: 2px solid var(--session-col); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--session-col); font-size: 1.3rem; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); transition: background 0.2s, transform 0.15s; }
+    .video-poster:hover .video-play { background: rgba(0,0,0,0.6); transform: scale(1.08); }
+    .video-label { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+    .video-coming-soon { background: var(--dark-card); border: 1px solid var(--session-border); border-radius: 20px; padding: 2rem; text-align: center; margin-bottom: 2rem; }
+    .video-coming-soon p { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
     .session-meta-row { display: flex; gap: 1.5rem; margin-bottom: 2rem; }
     .meta-item { display: flex; flex-direction: column; gap: 0.2rem; }
     .meta-label { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
@@ -348,6 +354,7 @@
         teaser: 'Name where you are. Glimpse where you could be.',
         color: '#F5C842', emoji: '🪶', dim: 'rgba(245,200,66,0.12)', border: 'rgba(245,200,66,0.22)',
         minExchanges: 4, videoLen: '3 min', duration: '20–30 min', tools: [],
+        videoUrl: 'https://pub-f84f2be51fb44bd69d2d2271666a9506.r2.dev/session-0.mp4',
         completeTitle: "That's a good start.",
         completeDesc: "You've named where you are and glimpsed where you could go. Session 1 is waiting — and it goes deeper. When you're ready.",
       },
@@ -357,6 +364,7 @@
         teaser: "Before you take flight, know where you've been.",
         color: '#7a9e7e', emoji: '🌿', dim: 'rgba(122,158,126,0.12)', border: 'rgba(122,158,126,0.25)',
         minExchanges: 5, videoLen: '4 min', duration: '40–60 min',
+        videoUrl: 'https://pub-f84f2be51fb44bd69d2d2271666a9506.r2.dev/session-1.mp4',
         completeTitle: "You've done something tender here.",
         completeDesc: "The story you've told yourself about your life just got a little more honest. Before you move on — try one of the tools to anchor what came up.",
         tools: [
@@ -372,6 +380,7 @@
         teaser: "Clarify where you're going by discovering what matters most.",
         color: '#7eb8c9', emoji: '🌅', dim: 'rgba(126,184,201,0.12)', border: 'rgba(126,184,201,0.25)',
         minExchanges: 5, videoLen: '4 min', duration: '40–60 min',
+        videoUrl: 'https://pub-f84f2be51fb44bd69d2d2271666a9506.r2.dev/session-2.mp4',
         completeTitle: "Something just got clearer.",
         completeDesc: "A vision that's truly yours is worth ten goals that belong to someone else. Use the tools below to map what you found.",
         tools: [
@@ -386,6 +395,7 @@
         teaser: "Know who you are so you can rise with clarity.",
         color: '#a89060', emoji: '🌳', dim: 'rgba(168,144,96,0.12)', border: 'rgba(168,144,96,0.25)',
         minExchanges: 5, videoLen: '5 min', duration: '50–70 min',
+        videoUrl: 'https://pub-f84f2be51fb44bd69d2d2271666a9506.r2.dev/session-3.mp4',
         completeTitle: "That took courage.",
         completeDesc: "Most people never look this honestly at what drives them. You just did. Use the tools to map what surfaced.",
         tools: [
@@ -399,6 +409,7 @@
         teaser: "When the path gets foggy — slow down, look inward, choose your next step.",
         color: '#8a9ab0', emoji: '🌫️', dim: 'rgba(138,154,176,0.12)', border: 'rgba(138,154,176,0.25)',
         minExchanges: 4, videoLen: '4 min', duration: '40–55 min',
+        videoUrl: 'https://pub-f84f2be51fb44bd69d2d2271666a9506.r2.dev/session-4.mp4',
         completeTitle: "You named it.",
         completeDesc: "Naming what's in transition is half the work. Your Courage Compass is waiting — it'll help you find the next brave step.",
         tools: [
@@ -412,6 +423,7 @@
         teaser: "Find your rhythm. Design a life that fits how you actually work.",
         color: '#9dbf8a', emoji: '🍃', dim: 'rgba(157,191,138,0.12)', border: 'rgba(157,191,138,0.25)',
         minExchanges: 4, videoLen: '4 min', duration: '35–50 min',
+        videoUrl: 'https://pub-f84f2be51fb44bd69d2d2271666a9506.r2.dev/session-5.mp4',
         completeTitle: "One rhythm is worth a hundred resolutions.",
         completeDesc: "Map your energy states and design a week that actually fits you — not the version of you that you think you should be.",
         tools: [
@@ -424,6 +436,7 @@
         teaser: "No season of growth happens in isolation. Look at who's in your forest.",
         color: '#c4956a', emoji: '🌲', dim: 'rgba(196,149,106,0.12)', border: 'rgba(196,149,106,0.25)',
         minExchanges: 4, videoLen: '4 min', duration: '40–55 min',
+        videoUrl: null,
         completeTitle: "You can see your forest clearly now.",
         completeDesc: "Knowing who to invest in — and who needs a boundary — changes everything. Map it with the Forest tool below.",
         tools: [
@@ -437,6 +450,7 @@
         teaser: "Your story. Your vision. Your plan. All of it — yours.",
         color: '#F5C842', emoji: '🪶', dim: 'rgba(245,200,66,0.12)', border: 'rgba(245,200,66,0.22)',
         minExchanges: 6, videoLen: '5 min', duration: '50–70 min',
+        videoUrl: 'https://pub-f84f2be51fb44bd69d2d2271666a9506.r2.dev/session-7.mp4',
         completeTitle: "Full flight.",
         completeDesc: "You showed up. You did the work. You went to the places most people avoid. Your Full Flight Plan is being assembled.",
         tools: [
@@ -685,13 +699,39 @@
         session.tools.map(t => '<span class="tool-item clickable" onclick="openTool(\'' + t.file + '\')"><span class="tool-dot"></span>' + t.name + '<span class="tool-tag">' + t.tag + '</span></span>').join('') +
         '</div></div>' : '';
 
+      const videoHtml = session.videoUrl
+        ? `<div class="video-wrap">
+            <div class="video-player-container">
+              <video id="session-video" preload="metadata" playsinline>
+                <source src="${session.videoUrl}" type="video/mp4">
+              </video>
+              <div class="video-poster" id="video-poster" style="background:linear-gradient(135deg,${session.color}18,${session.color}08)">
+                <div class="video-play">▶</div>
+                <div class="video-label">A word from Luke · ${session.videoLen}</div>
+              </div>
+            </div>
+           </div>`
+        : `<div class="video-coming-soon"><p>🪶 &nbsp; Video coming soon</p></div>`;
+
       document.getElementById('session-info').innerHTML =
         '<div class="session-tag-label">' + session.tag + '</div>' +
         '<h1>' + session.title + '</h1>' +
         '<p class="session-info-desc">' + session.desc + '</p>' +
-        '<div class="video-wrap"><div class="video-gradient" style="background:linear-gradient(135deg,' + session.color + '09,' + session.color + '04)"></div><div class="video-play">▶</div><div class="video-label">A word from Luke · ' + session.videoLen + '</div></div>' +
+        videoHtml +
         '<div class="session-meta-row"><div class="meta-item"><span class="meta-label">Session</span><span class="meta-value">' + (session.number === 0 ? 'Orientation' : '0' + session.number + ' of 07') + '</span></div><div class="meta-item"><span class="meta-label">Duration</span><span class="meta-value">' + session.duration + '</span></div>' +
         (session.tools.length ? '<div class="meta-item"><span class="meta-label">Tools</span><span class="meta-value">' + session.tools.length + ' tools</span></div>' : '') + '</div>' + toolsHtml;
+
+      // Wire up video player after DOM update
+      if (session.videoUrl) {
+        const video  = document.getElementById('session-video');
+        const poster = document.getElementById('video-poster');
+        poster.addEventListener('click', () => {
+          poster.classList.add('hidden');
+          video.play();
+        });
+        video.addEventListener('pause', () => { if (!video.ended) poster.classList.remove('hidden'); });
+        video.addEventListener('ended', () => poster.classList.remove('hidden'));
+      }
 
       // Chat header
       document.getElementById('chat-header').innerHTML =
