@@ -897,10 +897,13 @@
       var frame = document.getElementById('tool-embed-frame');
       var title = document.getElementById('tool-embed-title');
       if (!wrap || !frame) return;
+      lastToolKey = toolKey;
       title.textContent = toolInfo.name;
       frame.src = toolInfo.file + '?uid=' + (currentUser ? currentUser.id : '') + '&session=' + (activeSession ? activeSession.number : 0) + '&embed=1';
       wrap.classList.add('active');
     }
+
+    var lastToolKey = null;
 
     function closeToolEmbed() {
       var wrap  = document.getElementById('tool-embed-wrap');
@@ -908,14 +911,43 @@
       if (!wrap) return;
       wrap.classList.remove('active');
       setTimeout(function() { if (frame) frame.src = 'about:blank'; }, 300);
-      if (activeSession && currentUser) {
-        setTimeout(function() {
-          var ack = 'Welcome back. How did that land for you — was there anything that surprised you, or something that felt particularly true?';
-          renderMessage('assistant', ack);
-          chatMsgs.push({ role: 'assistant', content: ack });
-          sb.from('ai_memory').upsert({ user_id: currentUser.id, session_number: activeSession.number, messages: chatMsgs }, { onConflict: 'user_id,session_number' }).catch(function(){});
-          document.getElementById('chat-input').focus();
-        }, 400);
+      if (activeSession && currentUser && lastToolKey) {
+        // Fetch tool data and inject into conversation context
+        var toolNameMap = {
+          'peak-plunge': 'peak_plunge', 'nurture-prune': 'nurture_prune',
+          'deep-roots': 'deep_roots', 'roots-feathers': 'roots_feathers',
+          'glow-map': 'glow_map_s' + activeSession.number,
+          'soar-steady': 'soar_steady', 'adventure-map': 'adventure_map',
+          'shadows-sparks': 'shadows_sparks', 'tangle-within': 'tangle_within',
+          'courage-compass': 'courage_compass', 'birdsong': 'birdsong',
+          'forest': 'forest', 'full-flight-plan': 'full_flight_plan'
+        };
+        var dbKey = toolNameMap[lastToolKey] || lastToolKey.replace(/-/g,'_');
+        sb.from('tool_outputs').select('output_data').eq('user_id', currentUser.id).eq('tool_name', dbKey).single()
+          .then(function(result) {
+            var toolData = result.data && result.data.output_data;
+            var toolName = TOOL_MAP[lastToolKey] ? TOOL_MAP[lastToolKey].name : lastToolKey;
+            // Inject tool results as context into the conversation
+            if (toolData) {
+              var contextMsg = '[Tool completed: ' + toolName + '] Results: ' + JSON.stringify(toolData).slice(0, 800);
+              chatMsgs.push({ role: 'user', content: contextMsg });
+            }
+            setTimeout(function() {
+              var ack = 'Welcome back. How did that land for you — was there anything that surprised you, or something that felt particularly true?';
+              renderMessage('assistant', ack);
+              chatMsgs.push({ role: 'assistant', content: ack });
+              sb.from('ai_memory').upsert({ user_id: currentUser.id, session_number: activeSession.number, messages: chatMsgs }, { onConflict: 'user_id,session_number' }).catch(function(){});
+              document.getElementById('chat-input').focus();
+            }, 400);
+          }).catch(function() {
+            // No tool data — just acknowledge
+            setTimeout(function() {
+              var ack = 'Welcome back. How did that land for you?';
+              renderMessage('assistant', ack);
+              chatMsgs.push({ role: 'assistant', content: ack });
+              document.getElementById('chat-input').focus();
+            }, 400);
+          });
       }
     }
 
