@@ -999,21 +999,47 @@
     });
 
     // ── Init ──────────────────────────────────────────────────
+    // ── Init — read token directly from localStorage ────────────
+    // Never calls getSession() on load — avoids Supabase multi-tab conflicts
     (async () => {
       try {
-        var sessionResult = await Promise.race([
-          sb.auth.getSession().then(function(r) { return r.data && r.data.session ? r.data.session : null; }),
-          new Promise(function(resolve) { setTimeout(function() { resolve('TIMEOUT'); }, 4000); }),
-        ]);
-        if (sessionResult === 'TIMEOUT') {
-          Object.keys(localStorage).filter(function(k) { return k.startsWith('sb-'); }).forEach(function(k) { localStorage.removeItem(k); });
+        // Read auth token directly from localStorage — synchronous, never hangs
+        var tokenRaw = localStorage.getItem('lilbird-solo-auth');
+        if (!tokenRaw) {
           showView('view-auth');
-        } else if (sessionResult && sessionResult.user) {
-          currentUser = sessionResult.user;
-          await loadDashboard();
-        } else {
-          showView('view-auth');
+          return;
         }
+        var tokenData = JSON.parse(tokenRaw);
+        var user = tokenData && tokenData.user;
+        if (!user || !user.id) {
+          showView('view-auth');
+          return;
+        }
+        // Check token hasn't expired
+        var expiresAt = tokenData.expires_at;
+        if (expiresAt && (expiresAt * 1000) < Date.now()) {
+          // Token expired — try silent refresh once, fall back to login
+          try {
+            var refreshed = await Promise.race([
+              sb.auth.refreshSession(),
+              new Promise(function(resolve) { setTimeout(function() { resolve(null); }, 3000); })
+            ]);
+            if (refreshed && refreshed.data && refreshed.data.user) {
+              currentUser = refreshed.data.user;
+              await loadDashboard();
+            } else {
+              localStorage.removeItem('lilbird-solo-auth');
+              showView('view-auth');
+            }
+          } catch(e) {
+            localStorage.removeItem('lilbird-solo-auth');
+            showView('view-auth');
+          }
+          return;
+        }
+        // Token valid — use it directly, no network call
+        currentUser = { id: user.id, email: user.email };
+        await loadDashboard();
       } catch(e) {
         showView('view-auth');
       }
