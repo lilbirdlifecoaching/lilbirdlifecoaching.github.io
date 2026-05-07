@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>Nurture & Prune Matrix · lil' bird</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -428,6 +428,30 @@
       .matrix-grid { grid-template-columns: 1fr; grid-template-rows: repeat(4, auto); min-height: auto; }
       .axis-y-wrap { flex-direction: column; }
       .axis-y-label { flex-direction: row; width: auto; height: auto; }
+    }
+
+    /* ── Mobile improvements ── */
+    @media (max-width: 640px) {
+      .page { padding: 1.25rem 1rem 4rem; }
+      /* Keep 2x2 matrix on mobile but tighter */
+      .matrix-grid {
+        gap: 6px;
+        min-height: 320px;
+      }
+      .quadrant {
+        padding: 0.75rem;
+        min-height: 140px;
+        border-radius: 12px;
+      }
+      .quadrant-name { font-size: 0.82rem; margin-bottom: 0.25rem; }
+      .quadrant-hint { font-size: 0.65rem; margin-bottom: 0.5rem; }
+      /* Larger chip tap targets */
+      .person-chip { padding: 0.4rem 0.75rem; font-size: 0.82rem; min-height: 36px; }
+      /* Axis labels smaller */
+      .axis-label { font-size: 0.52rem; }
+      .axis-y-label { width: 52px; }
+      /* Add unplaced area below matrix on mobile */
+      .save-section { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>

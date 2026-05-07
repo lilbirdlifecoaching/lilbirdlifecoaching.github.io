@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Soar & Steady · lil' bird</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --dark: #1e2028; --dark-mid: #252830; --dark-card: #2a2d38;
+      --session-col: #7eb8c9; --session-dim: rgba(126,184,201,0.12); --session-border: rgba(126,184,201,0.25);
+      --soar: #9dbf8a; --soar-dim: rgba(157,191,138,0.15); --soar-border: rgba(157,191,138,0.3);
+      --steady: #c4956a; --steady-dim: rgba(196,149,106,0.15); --steady-border: rgba(196,149,106,0.3);
+      --text: #f0ece4; --text-dim: rgba(240,236,228,0.58); --text-muted: rgba(240,236,228,0.3);
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body: 'DM Sans', system-ui, sans-serif;
+      --font-mono: 'DM Mono', monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--dark); color: var(--text); font-family: var(--font-body); min-height: 100vh; }
+    body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; opacity: 0.5; }
+    .page { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; padding: 1.5rem 1.25rem 5rem; }
+    .nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; }
+    .nav-left { display: flex; align-items: center; gap: 0.6rem; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+    .nav-bird { width: 28px; height: 28px; background: var(--session-col); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
+    .nav-back { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); text-decoration: none; border: 1px solid rgba(255,255,255,0.08); border-radius: 5px; padding: 0.4rem 0.75rem; }
+    .eyebrow { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--session-col); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    .eyebrow::before { content: ''; width: 16px; height: 1px; background: var(--session-col); }
+    h1 { font-family: var(--font-display); font-size: clamp(1.6rem, 5vw, 2.2rem); font-weight: 400; font-style: italic; margin-bottom: 0.6rem; line-height: 1.2; }
+    .intro { color: var(--text-dim); font-size: 0.88rem; line-height: 1.75; margin-bottom: 2rem; }
+
+    /* Add task */
+    .add-row { display: flex; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .add-input { flex: 1; background: var(--dark-card); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 0.75rem 1rem; color: var(--text); font-family: var(--font-body); font-size: 0.9rem; outline: none; transition: border-color 0.2s; min-height: 48px; }
+    .add-input:focus { border-color: var(--session-col); }
+    .add-input::placeholder { color: var(--text-muted); }
+    .btn-add { background: var(--session-col); border: none; border-radius: 10px; padding: 0 1.25rem; color: var(--dark); font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; cursor: pointer; min-height: 48px; white-space: nowrap; }
+
+    /* Unplaced */
+    .unplaced { background: var(--dark-card); border: 1px dashed rgba(255,255,255,0.1); border-radius: 14px; padding: 1rem; margin-bottom: 1.5rem; min-height: 60px; }
+    .unplaced-label { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.6rem; }
+
+    /* Two columns */
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem; }
+    @media (max-width: 520px) { .cols { grid-template-columns: 1fr; } }
+
+    .col { border-radius: 16px; padding: 1.25rem; min-height: 200px; transition: border-color 0.2s; }
+    .col.soar { background: var(--soar-dim); border: 1px solid var(--soar-border); }
+    .col.steady { background: var(--steady-dim); border: 1px solid var(--steady-border); }
+    .col.drag-over { border-width: 2px; }
+    .col-header { margin-bottom: 0.4rem; }
+    .col-title { font-family: var(--font-display); font-size: 1.1rem; font-style: italic; }
+    .col.soar .col-title { color: var(--soar); }
+    .col.steady .col-title { color: var(--steady); }
+    .col-sub { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.5rem; }
+    .col.soar .col-sub { color: rgba(157,191,138,0.6); }
+    .col.steady .col-sub { color: rgba(196,149,106,0.6); }
+    .col-desc { font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1rem; }
+    .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; min-height: 40px; }
+
+    /* Chips */
+    .chip { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.75rem; border-radius: 20px; font-size: 0.82rem; cursor: grab; user-select: none; transition: transform 0.15s; border: 1px solid transparent; }
+    .chip:active { cursor: grabbing; transform: scale(1.04); }
+    .chip.dragging { opacity: 0.4; }
+    .chip-remove { font-size: 0.7rem; opacity: 0.5; cursor: pointer; }
+    .chip-remove:hover { opacity: 1; }
+    .unplaced .chip { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); color: var(--text-dim); }
+    .col.soar .chip { background: rgba(157,191,138,0.2); border-color: rgba(157,191,138,0.35); color: var(--soar); }
+    .col.steady .chip { background: rgba(196,149,106,0.2); border-color: rgba(196,149,106,0.35); color: var(--steady); }
+
+    /* Mobile tap buttons */
+    .chip-actions { display: none; }
+    @media (max-width: 640px) {
+      .chip-actions { display: flex; gap: 0.4rem; margin-top: 0.35rem; }
+      .chip-act-btn { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.25rem 0.6rem; border-radius: 12px; border: none; cursor: pointer; }
+      .chip-act-soar { background: var(--soar-dim); color: var(--soar); }
+      .chip-act-steady { background: var(--steady-dim); color: var(--steady); }
+      .chip-act-remove { background: rgba(255,255,255,0.05); color: var(--text-muted); }
+    }
+
+    /* Bar */
+    .bar-wrap { background: var(--dark-card); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 1rem 1.25rem; margin-bottom: 2rem; }
+    .bar-label { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.75rem; display: flex; justify-content: space-between; }
+    .bar-track { height: 12px; background: rgba(255,255,255,0.06); border-radius: 6px; overflow: hidden; }
+    .bar-fill { height: 100%; background: linear-gradient(90deg, var(--soar), var(--steady)); border-radius: 6px; transition: width 0.4s ease; }
+    .bar-pct { display: flex; justify-content: space-between; margin-top: 0.4rem; font-family: var(--font-mono); font-size: 0.65rem; }
+    .soar-pct { color: var(--soar); }
+    .steady-pct { color: var(--steady); }
+
+    /* Save */
+    .save-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.06); }
+    .save-status { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--session-col); opacity: 0; transition: opacity 0.3s; }
+    .save-status.visible { opacity: 1; }
+    .save-actions { display: flex; gap: 0.75rem; }
+    .btn-save { background: var(--session-col); border: none; border-radius: 8px; padding: 0.75rem 1.5rem; color: var(--dark); font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; cursor: pointer; }
+    .btn-back2 { background: none; border: 1px solid var(--session-border); border-radius: 8px; padding: 0.75rem 1.25rem; color: var(--session-col); font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; text-decoration: none; display: inline-block; }
+  </style>
+</head>
+<body>
+<div class="page">
+  <nav class="nav">
+    <div class="nav-left"><div class="nav-bird">🌅</div>lil' bird · Tool</div>
+    <a href="javascript:history.back()" class="nav-back">← Back</a>
+  </nav>
+  <div class="eyebrow">Session 02 · Vision</div>
+  <h1>Soar & Steady</h1>
+  <p class="intro">Add the activities, roles, and tasks that fill your week. Then sort them — Soar for what energises you, Steady for what drains you. Aim for 70% Soar. The gap between where you are and that number is worth looking at.</p>
+
+  <div class="add-row">
+    <input class="add-input" id="task-input" type="text" placeholder="Add a task, role, or activity..." maxlength="80" />
+    <button class="btn-add" id="btn-add">Add</button>
+  </div>
+
+  <div class="unplaced" id="zone-unplaced" data-zone="unplaced">
+    <div class="unplaced-label">Unsorted — tap Soar or Steady to sort</div>
+    <div class="chips" id="chips-unplaced"></div>
+  </div>
+
+  <div class="bar-wrap">
+    <div class="bar-label"><span>Your energy split</span><span>Goal: 70% Soar</span></div>
+    <div class="bar-track"><div class="bar-fill" id="bar-fill" style="width:0%"></div></div>
+    <div class="bar-pct"><span class="soar-pct" id="soar-pct">0% Soar</span><span class="steady-pct" id="steady-pct">0% Steady</span></div>
+  </div>
+
+  <div class="cols">
+    <div class="col soar" id="zone-soar" data-zone="soar">
+      <div class="col-header">
+        <div class="col-title">Soar ▲</div>
+        <div class="col-sub">Gives energy</div>
+      </div>
+      <p class="col-desc">Things that light you up. You'd do them even if you didn't have to.</p>
+      <div class="chips" id="chips-soar"></div>
+    </div>
+    <div class="col steady" id="zone-steady" data-zone="steady">
+      <div class="col-header">
+        <div class="col-title">Steady ▼</div>
+        <div class="col-sub">Takes energy</div>
+      </div>
+      <p class="col-desc">Necessary things that cost you. Not bad — just draining.</p>
+      <div class="chips" id="chips-steady"></div>
+    </div>
+  </div>
+
+  <div class="save-row">
+    <span class="save-status" id="save-status">✓ Saved</span>
+    <div class="save-actions">
+      <a href="javascript:history.back()" class="btn-back2">Back to session</a>
+      <button class="btn-save" id="btn-save">Save</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+  const { createClient } = supabase;
+  const sb = createClient('https://mebqqzbuwkogdxvnihrq.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU');
+
+  let items = []; // { id, text, zone: 'unplaced'|'soar'|'steady' }
+  let currentUser = null;
+
+  function render() {
+    ['unplaced','soar','steady'].forEach(zone => {
+      const el = document.getElementById('chips-' + zone);
+      el.innerHTML = '';
+      items.filter(i => i.zone === zone).forEach(item => {
+        const chip = document.createElement('div');
+        chip.className = 'chip';
+        chip.draggable = true;
+        chip.dataset.id = item.id;
+        chip.innerHTML = item.text + '<span class="chip-remove" data-id="' + item.id + '">✕</span>';
+
+        // Mobile tap buttons (only on unplaced)
+        if (zone === 'unplaced') {
+          const acts = document.createElement('div');
+          acts.className = 'chip-actions';
+          acts.innerHTML =
+            '<button class="chip-act-btn chip-act-soar" data-id="' + item.id + '" data-zone="soar">Soar ▲</button>' +
+            '<button class="chip-act-btn chip-act-steady" data-id="' + item.id + '" data-zone="steady">Steady ▼</button>' +
+            '<button class="chip-act-btn chip-act-remove" data-id="' + item.id + '" data-zone="remove">Remove</button>';
+          chip.appendChild(acts);
+          acts.querySelectorAll('.chip-act-btn').forEach(btn => {
+            btn.addEventListener('click', e => {
+              e.stopPropagation();
+              const id   = btn.dataset.id;
+              const zone = btn.dataset.zone;
+              if (zone === 'remove') { items = items.filter(i => i.id !== id); }
+              else { const it = items.find(i => i.id === id); if (it) it.zone = zone; }
+              render(); autoSave();
+            });
+          });
+        }
+
+        chip.querySelector('.chip-remove').addEventListener('click', e => {
+          e.stopPropagation();
+          items = items.filter(i => i.id !== item.id);
+          render(); autoSave();
+        });
+
+        chip.addEventListener('dragstart', e => { e.dataTransfer.setData('itemId', item.id); chip.classList.add('dragging'); });
+        chip.addEventListener('dragend', () => chip.classList.remove('dragging'));
+        el.appendChild(chip);
+      });
+    });
+
+    // Bar
+    const soarCount   = items.filter(i => i.zone === 'soar').length;
+    const steadyCount = items.filter(i => i.zone === 'steady').length;
+    const total = soarCount + steadyCount;
+    const pct   = total ? Math.round((soarCount / total) * 100) : 0;
+    document.getElementById('bar-fill').style.width  = pct + '%';
+    document.getElementById('soar-pct').textContent   = pct + '% Soar';
+    document.getElementById('steady-pct').textContent = (100 - pct) + '% Steady';
+  }
+
+  // Drop zones
+  ['unplaced','soar','steady'].forEach(zone => {
+    const el = document.getElementById('zone-' + zone);
+    el.addEventListener('dragover',  e => { e.preventDefault(); el.classList.add('drag-over'); });
+    el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
+    el.addEventListener('drop', e => {
+      e.preventDefault(); el.classList.remove('drag-over');
+      const id   = e.dataTransfer.getData('itemId');
+      const item = items.find(i => i.id === id);
+      if (item) { item.zone = zone; render(); autoSave(); }
+    });
+  });
+
+  function addItem(text) {
+    if (!text.trim()) return;
+    items.push({ id: crypto.randomUUID(), text: text.trim(), zone: 'unplaced' });
+    render(); autoSave();
+  }
+
+  document.getElementById('btn-add').addEventListener('click', () => {
+    const input = document.getElementById('task-input');
+    addItem(input.value); input.value = ''; input.focus();
+  });
+
+  document.getElementById('task-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { addItem(e.target.value); e.target.value = ''; }
+  });
+
+  async function autoSave() {
+    if (!currentUser) return;
+    try { await sb.from('tool_outputs').upsert({ user_id: currentUser.id, tool_name: 'soar_steady', output_data: { items }, updated_at: new Date().toISOString() }, { onConflict: 'user_id,tool_name' }); } catch {}
+  }
+
+  document.getElementById('btn-save').addEventListener('click', async () => {
+    await autoSave();
+    const s = document.getElementById('save-status'); s.classList.add('visible'); setTimeout(() => s.classList.remove('visible'), 2500);
+  });
+
+  (async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session?.user) {
+      currentUser = session.user;
+      const { data } = await sb.from('tool_outputs').select('output_data').eq('user_id', currentUser.id).eq('tool_name', 'soar_steady').single();
+      if (data?.output_data?.items) items = data.output_data.items;
+    }
+    render();
+  })();
+</script>
+</body>
+</html>
