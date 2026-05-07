@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Identity Profile · lil' bird</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --dark: #1e2028; --dark-mid: #252830; --dark-card: #2a2d38;
+      --session-col: #a89060; --session-dim: rgba(168,144,96,0.12); --session-border: rgba(168,144,96,0.25);
+      --gold: #F5C842; --gold-dim: rgba(245,200,66,0.12); --gold-border: rgba(245,200,66,0.22);
+      --text: #f0ece4; --text-dim: rgba(240,236,228,0.58); --text-muted: rgba(240,236,228,0.3);
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body: 'DM Sans', system-ui, sans-serif;
+      --font-mono: 'DM Mono', monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--dark); color: var(--text); font-family: var(--font-body); min-height: 100vh; }
+    body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; opacity: 0.5; }
+    .page { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; padding: 1.5rem 1.25rem 5rem; }
+
+    .nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; }
+    .nav-left { display: flex; align-items: center; gap: 0.6rem; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+    .nav-bird { width: 28px; height: 28px; background: var(--session-col); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
+    .nav-back { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); text-decoration: none; border: 1px solid rgba(255,255,255,0.08); border-radius: 5px; padding: 0.4rem 0.75rem; transition: color 0.2s, border-color 0.2s; }
+    .nav-back:hover { color: var(--session-col); border-color: var(--session-border); }
+
+    .eyebrow { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--session-col); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    .eyebrow::before { content: ''; width: 16px; height: 1px; background: var(--session-col); }
+    h1 { font-family: var(--font-display); font-size: clamp(1.6rem, 5vw, 2.2rem); font-weight: 400; font-style: italic; margin-bottom: 0.6rem; line-height: 1.2; }
+    .intro { color: var(--text-dim); font-size: 0.88rem; line-height: 1.75; margin-bottom: 2rem; }
+
+    /* Opening prompt */
+    .prompt-card { display: flex; gap: 0.75rem; margin-bottom: 2rem; }
+    .prompt-avatar { width: 32px; height: 32px; background: var(--session-col); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; margin-top: 2px; }
+    .prompt-bubble { background: var(--dark-card); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; border-top-left-radius: 4px; padding: 0.875rem 1.1rem; font-size: 0.92rem; line-height: 1.75; color: var(--text); flex: 1; }
+
+    /* Tabs */
+    .path-tabs { display: flex; gap: 0.75rem; margin-bottom: 2rem; }
+    .path-tab { flex: 1; background: var(--dark-card); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 1.25rem; cursor: pointer; transition: border-color 0.2s, background 0.2s; text-align: center; }
+    .path-tab:hover { border-color: var(--session-border); }
+    .path-tab.active { border-color: var(--session-col); background: var(--session-dim); }
+    .path-tab-icon { font-size: 1.5rem; margin-bottom: 0.5rem; display: block; }
+    .path-tab-label { font-family: var(--font-display); font-size: 0.9rem; font-style: italic; margin-bottom: 0.25rem; }
+    .path-tab-hint { font-size: 0.72rem; color: var(--text-muted); line-height: 1.4; }
+
+    /* Panels */
+    .panel { display: none; }
+    .panel.active { display: block; animation: fadeUp 0.3s ease both; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Deep Profile panel */
+    .deep-profile-card { background: linear-gradient(135deg, rgba(168,144,96,0.08), rgba(245,200,66,0.06)); border: 1px solid var(--gold-border); border-radius: 18px; padding: 1.75rem; margin-bottom: 1.5rem; text-align: center; }
+    .deep-profile-card h3 { font-family: var(--font-display); font-size: 1.2rem; font-weight: 400; font-style: italic; margin-bottom: 0.6rem; }
+    .deep-profile-card p { color: var(--text-dim); font-size: 0.85rem; line-height: 1.7; margin-bottom: 1.25rem; }
+    .btn-do-assessment { display: inline-block; background: var(--gold); color: var(--dark); text-decoration: none; border-radius: 8px; padding: 0.75rem 1.75rem; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; transition: background 0.2s, transform 0.15s; }
+    .btn-do-assessment:hover { background: #fff; transform: translateY(-1px); }
+    .assessment-note { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.75rem; font-style: italic; }
+
+    /* After assessment return */
+    .return-card { background: var(--dark-card); border: 1px solid var(--session-border); border-radius: 14px; padding: 1.25rem; margin-bottom: 1.5rem; }
+    .return-label { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--session-col); margin-bottom: 0.5rem; }
+    .return-desc { font-size: 0.82rem; color: var(--text-dim); line-height: 1.6; margin-bottom: 0.875rem; }
+
+    /* Self report panel */
+    .field-label { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.4rem; margin-top: 1rem; }
+    .field-label:first-child { margin-top: 0; }
+    .field-input { width: 100%; background: var(--dark-card); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 0.75rem 1rem; color: var(--text); font-family: var(--font-body); font-size: 0.9rem; outline: none; transition: border-color 0.2s; }
+    .field-input:focus { border-color: var(--session-col); }
+    .field-input::placeholder { color: var(--text-muted); font-style: italic; }
+    .field-textarea { width: 100%; background: var(--dark-card); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 0.75rem 1rem; color: var(--text); font-family: var(--font-body); font-size: 0.9rem; line-height: 1.65; resize: none; outline: none; min-height: 90px; transition: border-color 0.2s; }
+    .field-textarea:focus { border-color: var(--session-col); }
+    .field-textarea::placeholder { color: var(--text-muted); font-style: italic; }
+
+    /* Type helpers */
+    .type-helpers { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem; }
+    @media (max-width: 480px) { .type-helpers { grid-template-columns: 1fr; } }
+    .type-helper { background: var(--dark-card); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 1rem; }
+    .type-helper-title { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--session-col); margin-bottom: 0.4rem; }
+    .type-helper-desc { font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; }
+    .type-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.5rem; }
+    .type-chip { font-family: var(--font-mono); font-size: 0.62rem; padding: 0.2rem 0.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); color: var(--text-dim); cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s; }
+    .type-chip:hover { background: var(--session-dim); border-color: var(--session-border); color: var(--text); }
+    .type-chip.selected { background: var(--session-dim); border-color: var(--session-col); color: var(--session-col); }
+
+    /* Reflection */
+    .reflection-card { background: var(--dark-card); border: 1px solid var(--session-border); border-radius: 14px; padding: 1.5rem; margin-top: 1.5rem; }
+    .reflection-label { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--session-col); margin-bottom: 0.5rem; }
+    .reflection-prompt { font-size: 0.88rem; color: var(--text-dim); line-height: 1.7; margin-bottom: 0.875rem; font-style: italic; }
+
+    /* Saved state */
+    .saved-card { background: rgba(168,144,96,0.08); border: 1px solid var(--session-border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; display: none; animation: fadeUp 0.4s ease both; }
+    .saved-card.visible { display: block; }
+    .saved-label { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--session-col); margin-bottom: 0.75rem; }
+    .saved-type { font-family: var(--font-display); font-size: 1.4rem; font-style: italic; color: var(--text); margin-bottom: 0.25rem; }
+    .saved-subtype { font-size: 0.82rem; color: var(--text-dim); }
+    .btn-edit { background: none; border: 1px solid var(--session-border); border-radius: 6px; padding: 0.35rem 0.75rem; font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--session-col); cursor: pointer; margin-top: 0.75rem; transition: background 0.2s; }
+    .btn-edit:hover { background: var(--session-dim); }
+
+    /* Save row */
+    .save-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.06); margin-top: 1.5rem; }
+    .save-status { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--session-col); opacity: 0; transition: opacity 0.3s; }
+    .save-status.visible { opacity: 1; }
+    .save-actions { display: flex; gap: 0.75rem; }
+    .btn-save { background: var(--session-col); border: none; border-radius: 8px; padding: 0.75rem 1.5rem; color: var(--dark); font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; cursor: pointer; transition: opacity 0.2s; }
+    .btn-save:hover { opacity: 0.85; }
+    .btn-back2 { background: none; border: 1px solid var(--session-border); border-radius: 8px; padding: 0.75rem 1.25rem; color: var(--session-col); font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; text-decoration: none; display: inline-block; transition: background 0.2s; }
+    .btn-back2:hover { background: var(--session-dim); }
+  </style>
+</head>
+<body>
+<div class="page">
+  <nav class="nav">
+    <div class="nav-left"><div class="nav-bird">🌳</div>lil' bird · Session 3</div>
+    <a href="javascript:history.back()" class="nav-back">← Back</a>
+  </nav>
+
+  <div class="eyebrow">Session 03 · Identity</div>
+  <h1>Your Identity<br>Profile</h1>
+  <p class="intro">Understanding how you're wired — how you think, feel, and move through the world — gives the coaching real material to work with. This isn't about putting you in a box. It's about giving you a language for what you already know about yourself.</p>
+
+  <!-- Opening prompt from lil' bird -->
+  <div class="prompt-card">
+    <div class="prompt-avatar">🌳</div>
+    <div class="prompt-bubble">
+      There are two ways to approach this. If you haven't done the lil' bird Deep Profile yet, I'd love you to do it now — it takes about 15 minutes and gives us real material. If you already know your type from another assessment, you can enter it directly and we'll work with that.
+    </div>
+  </div>
+
+  <!-- Already saved — show this if data exists -->
+  <div class="saved-card" id="saved-card">
+    <div class="saved-label">Your profile — saved</div>
+    <div class="saved-type" id="saved-type-display"></div>
+    <div class="saved-subtype" id="saved-subtype-display"></div>
+    <button type="button" class="btn-edit" id="btn-edit-profile">Edit profile</button>
+  </div>
+
+  <!-- Path selection tabs -->
+  <div class="path-tabs" id="path-tabs">
+    <div class="path-tab active" data-path="self-report">
+      <span class="path-tab-icon">✍️</span>
+      <div class="path-tab-label">I know my type</div>
+      <div class="path-tab-hint">Enter your MBTI, Enneagram, or both</div>
+    </div>
+    <div class="path-tab" data-path="deep-profile">
+      <span class="path-tab-icon">🧭</span>
+      <div class="path-tab-label">Take the Deep Profile</div>
+      <div class="path-tab-hint">15-minute assessment on lilbird.life</div>
+    </div>
+  </div>
+
+  <!-- Self-report panel -->
+  <div class="panel active" id="panel-self-report">
+
+    <div class="type-helpers">
+      <div class="type-helper">
+        <div class="type-helper-title">MBTI type</div>
+        <div class="type-helper-desc">Your four-letter type. Select below or type it in.</div>
+        <div class="type-chips" id="mbti-chips">
+          <span class="type-chip" data-type="mbti" data-val="INTJ">INTJ</span>
+          <span class="type-chip" data-type="mbti" data-val="INTP">INTP</span>
+          <span class="type-chip" data-type="mbti" data-val="ENTJ">ENTJ</span>
+          <span class="type-chip" data-type="mbti" data-val="ENTP">ENTP</span>
+          <span class="type-chip" data-type="mbti" data-val="INFJ">INFJ</span>
+          <span class="type-chip" data-type="mbti" data-val="INFP">INFP</span>
+          <span class="type-chip" data-type="mbti" data-val="ENFJ">ENFJ</span>
+          <span class="type-chip" data-type="mbti" data-val="ENFP">ENFP</span>
+          <span class="type-chip" data-type="mbti" data-val="ISTJ">ISTJ</span>
+          <span class="type-chip" data-type="mbti" data-val="ISFJ">ISFJ</span>
+          <span class="type-chip" data-type="mbti" data-val="ESTJ">ESTJ</span>
+          <span class="type-chip" data-type="mbti" data-val="ESFJ">ESFJ</span>
+          <span class="type-chip" data-type="mbti" data-val="ISTP">ISTP</span>
+          <span class="type-chip" data-type="mbti" data-val="ISFP">ISFP</span>
+          <span class="type-chip" data-type="mbti" data-val="ESTP">ESTP</span>
+          <span class="type-chip" data-type="mbti" data-val="ESFP">ESFP</span>
+        </div>
+      </div>
+      <div class="type-helper">
+        <div class="type-helper-title">Enneagram type</div>
+        <div class="type-helper-desc">Your core number. Select below or type it in.</div>
+        <div class="type-chips" id="enneagram-chips">
+          <span class="type-chip" data-type="enneagram" data-val="Type 1">1</span>
+          <span class="type-chip" data-type="enneagram" data-val="Type 2">2</span>
+          <span class="type-chip" data-type="enneagram" data-val="Type 3">3</span>
+          <span class="type-chip" data-type="enneagram" data-val="Type 4">4</span>
+          <span class="type-chip" data-type="enneagram" data-val="Type 5">5</span>
+          <span class="type-chip" data-type="enneagram" data-val="Type 6">6</span>
+          <span class="type-chip" data-type="enneagram" data-val="Type 7">7</span>
+          <span class="type-chip" data-type="enneagram" data-val="Type 8">8</span>
+          <span class="type-chip" data-type="enneagram" data-val="Type 9">9</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="field-label">MBTI type (or type it manually)</div>
+    <input class="field-input" id="mbti-input" type="text" placeholder="e.g. INFJ" maxlength="10" />
+
+    <div class="field-label">Enneagram type (or type it manually)</div>
+    <input class="field-input" id="enneagram-input" type="text" placeholder="e.g. Type 4 or 4w5" maxlength="20" />
+
+    <div class="field-label">Any other assessment results</div>
+    <input class="field-input" id="other-input" type="text" placeholder="e.g. StrengthsFinder, DISC, CliftonStrengths..." maxlength="100" />
+
+    <div class="reflection-card">
+      <div class="reflection-label">One question from lil' bird</div>
+      <p class="reflection-prompt">When you first saw your type — whether it was MBTI, Enneagram, or something else — what surprised you most? Was there something that felt immediately true, or something you pushed back on?</p>
+      <textarea class="field-textarea" id="type-reflection" placeholder="What landed, what didn't..."></textarea>
+    </div>
+  </div>
+
+  <!-- Deep Profile panel -->
+  <div class="panel" id="panel-deep-profile">
+    <div class="deep-profile-card">
+      <h3>The lil' bird Deep Profile</h3>
+      <p>A 15-minute personality assessment that explores how you think, what drives you, and how you show up in relationships and under pressure. Built specifically for the lil' bird coaching journey.</p>
+      <a href="https://lilbird.life/deep-profile.html" target="_blank" class="btn-do-assessment">Take the Deep Profile →</a>
+      <div class="assessment-note">Opens in a new tab. Come back here when you're done and enter your results above.</div>
+    </div>
+
+    <div class="return-card">
+      <div class="return-label">Back from the assessment?</div>
+      <p class="return-desc">Switch to "I know my type" above and enter what you found. The AI coach will use your results to go deeper in this session and reference them across the rest of the course.</p>
+    </div>
+  </div>
+
+  <!-- Save row -->
+  <div class="save-row">
+    <span class="save-status" id="save-status">✓ Saved</span>
+    <div class="save-actions">
+      <a href="javascript:history.back()" class="btn-back2">Back to session</a>
+      <button type="button" class="btn-save" id="btn-save">Save my profile</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+  const { createClient } = supabase;
+  const sb = createClient(
+    'https://mebqqzbuwkogdxvnihrq.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU'
+  );
+
+  var currentUser = null;
+  var selectedMbti = '';
+  var selectedEnneagram = '';
+  var saveTimer = null;
+
+  // ── Tab switching ─────────────────────────────────────────
+  document.querySelectorAll('.path-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.path-tab').forEach(function(t) { t.classList.remove('active'); });
+      document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
+      tab.classList.add('active');
+      document.getElementById('panel-' + tab.dataset.path).classList.add('active');
+    });
+  });
+
+  // ── Type chip selection ───────────────────────────────────
+  document.querySelectorAll('.type-chip').forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      var type = chip.dataset.type;
+      document.querySelectorAll('.type-chip[data-type="' + type + '"]').forEach(function(c) {
+        c.classList.remove('selected');
+      });
+      chip.classList.add('selected');
+      if (type === 'mbti') {
+        selectedMbti = chip.dataset.val;
+        document.getElementById('mbti-input').value = chip.dataset.val;
+      } else {
+        selectedEnneagram = chip.dataset.val;
+        document.getElementById('enneagram-input').value = chip.dataset.val;
+      }
+      scheduleSave();
+    });
+  });
+
+  // ── Auto save on input ────────────────────────────────────
+  ['mbti-input','enneagram-input','other-input','type-reflection'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('input', scheduleSave);
+  });
+
+  function scheduleSave() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(autoSave, 1200);
+  }
+
+  // ── Save ─────────────────────────────────────────────────
+  function getData() {
+    return {
+      mbti:        document.getElementById('mbti-input').value.trim().toUpperCase(),
+      enneagram:   document.getElementById('enneagram-input').value.trim(),
+      other:       document.getElementById('other-input').value.trim(),
+      reflection:  document.getElementById('type-reflection').value.trim(),
+    };
+  }
+
+  async function autoSave() {
+    if (!currentUser) return;
+    var data = getData();
+    try {
+      await sb.from('tool_outputs').upsert({
+        user_id:     currentUser.id,
+        tool_name:   'identity_profile',
+        output_data: data,
+        updated_at:  new Date().toISOString(),
+      }, { onConflict: 'user_id,tool_name' });
+    } catch(e) {}
+  }
+
+  document.getElementById('btn-save').addEventListener('click', async function() {
+    await autoSave();
+    showSavedState();
+    var s = document.getElementById('save-status');
+    s.classList.add('visible');
+    setTimeout(function() { s.classList.remove('visible'); }, 2500);
+  });
+
+  // ── Show saved state card ─────────────────────────────────
+  function showSavedState() {
+    var data = getData();
+    if (!data.mbti && !data.enneagram) return;
+    var parts = [];
+    if (data.mbti)       parts.push(data.mbti);
+    if (data.enneagram)  parts.push(data.enneagram);
+    if (data.other)      parts.push(data.other);
+    document.getElementById('saved-type-display').textContent = parts.join(' · ');
+    document.getElementById('saved-subtype-display').textContent = data.reflection
+      ? data.reflection.slice(0, 100) + (data.reflection.length > 100 ? '...' : '')
+      : '';
+    document.getElementById('saved-card').classList.add('visible');
+  }
+
+  document.getElementById('btn-edit-profile').addEventListener('click', function() {
+    document.getElementById('saved-card').classList.remove('visible');
+  });
+
+  // ── Init ─────────────────────────────────────────────────
+  (async function() {
+    try {
+      var tokenRaw  = localStorage.getItem('lilbird-solo-auth');
+      if (!tokenRaw) return;
+      var tokenData = JSON.parse(tokenRaw);
+      var user      = tokenData && tokenData.user;
+      if (!user || !user.id) return;
+      currentUser = { id: user.id, email: user.email };
+
+      var result = await sb.from('tool_outputs')
+        .select('output_data')
+        .eq('user_id', currentUser.id)
+        .eq('tool_name', 'identity_profile')
+        .single();
+
+      if (result.data && result.data.output_data) {
+        var d = result.data.output_data;
+        if (d.mbti) {
+          document.getElementById('mbti-input').value = d.mbti;
+          var chip = document.querySelector('.type-chip[data-val="' + d.mbti + '"]');
+          if (chip) chip.classList.add('selected');
+        }
+        if (d.enneagram) {
+          document.getElementById('enneagram-input').value = d.enneagram;
+          var echip = document.querySelector('.type-chip[data-val="' + d.enneagram + '"]');
+          if (echip) echip.classList.add('selected');
+        }
+        if (d.other)      document.getElementById('other-input').value = d.other;
+        if (d.reflection) document.getElementById('type-reflection').value = d.reflection;
+        showSavedState();
+      }
+    } catch(e) {}
+  })();
+</script>
+</body>
+</html>
