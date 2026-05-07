@@ -240,13 +240,45 @@
     @keyframes dot { 0%,100% { opacity: 0.4; transform: scale(1); } 50% { opacity: 1; transform: scale(1.2); } }
 
     @media (max-width: 768px) {
-      .session-main { grid-template-columns: 1fr; padding: 1.5rem 1rem; }
-      .session-info { padding-right: 0; position: static; }
-      .session-chat-col { min-height: 500px; }
-      .chat-container { min-height: 460px; }
-      .dash-nav, .session-nav { padding: 1rem; }
-      .dash-body { padding: 2rem 1rem 4rem; }
+      /* Dashboard */
+      .dash-nav { padding: 1rem; }
+      .dash-body { padding: 1.5rem 1rem 4rem; }
       .nav-user { display: none; }
+
+      /* Session view */
+      .session-nav { padding: 0.875rem 1rem; }
+      .session-nav-label { display: none; }
+      .session-main {
+        grid-template-columns: 1fr;
+        padding: 0;
+        gap: 0;
+      }
+      /* Hide session info on mobile — focus is the chat */
+      .session-info { display: none; }
+      .session-chat-col {
+        min-height: calc(100vh - 60px);
+        padding: 0;
+      }
+      .chat-container {
+        min-height: calc(100vh - 60px);
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        border-bottom: none;
+      }
+      .chat-header { padding: 1rem; }
+      .chat-messages { padding: 1rem; }
+      .chat-input-wrap {
+        padding: 0.75rem 1rem;
+        padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+      }
+      .chat-textarea { font-size: 16px; /* prevent iOS zoom */ }
+      .complete-panel {
+        border-radius: 0;
+        margin-top: 0;
+        border-left: none;
+        border-right: none;
+      }
     }
   </style>
 </head>
@@ -316,7 +348,10 @@
         <div class="session-nav-bird" id="session-nav-bird">🪶</div>
         <span class="session-nav-label">lil' bird · life change sessions</span>
       </div>
-      <button class="btn-back-dash" id="btn-back-dash">← My sessions</button>
+      <div style="display:flex;align-items:center;gap:0.5rem">
+        <button class="btn-back-dash" id="btn-session-info" style="display:none" onclick="toggleSessionInfo()">Info</button>
+        <button class="btn-back-dash" id="btn-back-dash">← My sessions</button>
+      </div>
     </nav>
     <div class="session-main">
       <div class="session-info" id="session-info"></div>
