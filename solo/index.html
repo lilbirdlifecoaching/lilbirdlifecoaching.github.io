@@ -247,17 +247,10 @@
     .tool-card.used .tool-card-label { color: var(--text-muted); }
 
 
-    /* Tool embed overlay — slides over chat */
     .tool-embed-wrap {
-      display: none;
-      position: absolute;
-      inset: 0;
-      background: var(--dark);
-      z-index: 10;
-      flex-direction: column;
-      border-radius: 28px;
-      overflow: hidden;
-      animation: slideIn 0.3s ease both;
+      display: none; position: absolute; inset: 0; background: var(--dark);
+      z-index: 10; flex-direction: column; border-radius: 28px;
+      overflow: hidden; animation: slideIn 0.3s ease both;
     }
     .tool-embed-wrap.active { display: flex; }
     @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
@@ -482,6 +475,7 @@
         completeTitle: "That took courage.",
         completeDesc: "Most people never look this honestly at what drives them. You just did. Use the tools to map what surfaced.",
         tools: [
+          { name: 'Identity Profile',  file: 'tools/tool-deep-profile.html',    tag: 'Profile'     },
           { name: 'Shadows & Sparks',  file: 'tools/tool-shadows-sparks.html',  tag: 'Interactive' },
           { name: 'Tangle Within',     file: 'tools/tool-tangle-within.html',   tag: 'Reflection'  },
         ],
@@ -881,6 +875,7 @@
       'adventure-map':   { file: 'tools/tool-adventure-map.html',   icon: '🗺️', name: 'Adventure Map',             hint: 'Map your journey to your North Star.' },
       'shadows-sparks':  { file: 'tools/tool-shadows-sparks.html',  icon: '✨', name: 'Shadows & Sparks',          hint: 'What drives you from fear vs passion.' },
       'tangle-within':   { file: 'tools/tool-tangle-within.html',   icon: '🌿', name: 'The Tangle Within',         hint: 'Name what is holding you back.' },
+      'deep-profile':    { file: 'tools/tool-deep-profile.html',    icon: '🧭', name: 'Identity Profile',             hint: 'Enter your MBTI, Enneagram, or take the Deep Profile.' },
       'courage-compass': { file: 'tools/tool-courage-compass.html', icon: '🧭', name: 'Courage Compass',           hint: 'Orient yourself at the crossroads.' },
       'birdsong':        { file: 'tools/tool-birdsong.html',        icon: '🎵', name: 'Birdsong Scale',            hint: 'Map your energy states and design your week.' },
       'forest':          { file: 'tools/tool-forest.html',          icon: '🌲', name: 'Forest of Connections',     hint: 'Map the people in your relational landscape.' },
@@ -892,6 +887,8 @@
       window.open(toolFile + '?uid=' + currentUser.id + '&session=' + (activeSession ? activeSession.number : 0), '_blank');
     }
 
+    var lastToolKey = null;
+
     function openToolEmbed(toolKey, toolInfo) {
       var wrap  = document.getElementById('tool-embed-wrap');
       var frame = document.getElementById('tool-embed-frame');
@@ -901,14 +898,11 @@
       title.textContent = toolInfo.name;
       frame.src = toolInfo.file + '?uid=' + (currentUser ? currentUser.id : '') + '&session=' + (activeSession ? activeSession.number : 0) + '&embed=1';
       wrap.classList.add('active');
-      // Scroll chat container into view
       setTimeout(function() {
         var chatCol = document.querySelector('.session-chat-col');
         if (chatCol) chatCol.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 100);
     }
-
-    var lastToolKey = null;
 
     function closeToolEmbed() {
       var wrap  = document.getElementById('tool-embed-wrap');
@@ -917,35 +911,35 @@
       wrap.classList.remove('active');
       setTimeout(function() { if (frame) frame.src = 'about:blank'; }, 300);
       if (activeSession && currentUser && lastToolKey) {
-        // Fetch tool data and inject into conversation context
         var toolNameMap = {
-          'peak-plunge': 'peak_plunge', 'nurture-prune': 'nurture_prune',
-          'deep-roots': 'deep_roots', 'roots-feathers': 'roots_feathers',
-          'glow-map': 'glow_map_s' + activeSession.number,
-          'soar-steady': 'soar_steady', 'adventure-map': 'adventure_map',
-          'shadows-sparks': 'shadows_sparks', 'tangle-within': 'tangle_within',
-          'courage-compass': 'courage_compass', 'birdsong': 'birdsong',
-          'forest': 'forest', 'full-flight-plan': 'full_flight_plan'
+          'peak-plunge':'peak_plunge','nurture-prune':'nurture_prune',
+          'deep-roots':'deep_roots','roots-feathers':'roots_feathers',
+          'soar-steady':'soar_steady','adventure-map':'adventure_map',
+          'shadows-sparks':'shadows_sparks','tangle-within':'tangle_within',
+          'courage-compass':'courage_compass','birdsong':'birdsong',
+          'forest':'forest','full-flight-plan':'full_flight_plan',
+          'deep-profile':'identity_profile',
         };
-        var dbKey = toolNameMap[lastToolKey] || lastToolKey.replace(/-/g,'_');
+        var sNum = activeSession.number;
+        var dbKey = lastToolKey === 'glow-map'
+          ? ('glow_map_s' + sNum)
+          : (toolNameMap[lastToolKey] || lastToolKey.replace(/-/g,'_'));
         sb.from('tool_outputs').select('output_data').eq('user_id', currentUser.id).eq('tool_name', dbKey).single()
           .then(function(result) {
             var toolData = result.data && result.data.output_data;
             var toolName = TOOL_MAP[lastToolKey] ? TOOL_MAP[lastToolKey].name : lastToolKey;
-            // Inject tool results as context into the conversation
             if (toolData) {
-              var contextMsg = '[Tool completed: ' + toolName + '] Results: ' + JSON.stringify(toolData).slice(0, 800);
-              chatMsgs.push({ role: 'user', content: contextMsg });
+              var ctx = '[Tool completed: ' + toolName + '] Data: ' + JSON.stringify(toolData).slice(0, 600);
+              chatMsgs.push({ role: 'user', content: ctx });
             }
             setTimeout(function() {
               var ack = 'Welcome back. How did that land for you — was there anything that surprised you, or something that felt particularly true?';
               renderMessage('assistant', ack);
               chatMsgs.push({ role: 'assistant', content: ack });
-              sb.from('ai_memory').upsert({ user_id: currentUser.id, session_number: activeSession.number, messages: chatMsgs }, { onConflict: 'user_id,session_number' }).catch(function(){});
+              sb.from('ai_memory').upsert({ user_id: currentUser.id, session_number: sNum, messages: chatMsgs }, { onConflict: 'user_id,session_number' }).catch(function(){});
               document.getElementById('chat-input').focus();
             }, 400);
           }).catch(function() {
-            // No tool data — just acknowledge
             setTimeout(function() {
               var ack = 'Welcome back. How did that land for you?';
               renderMessage('assistant', ack);
@@ -1017,8 +1011,6 @@
           setTimeout(function() { renderToolCard(toolKey, toolInfo, el); }, cleanContent ? 400 : 0);
         }
       }
-
-      // [COMPLETE] signal — show complete panel
       if (/\[COMPLETE\]/.test(msgContent) && role === 'assistant') {
         setTimeout(function() {
           var panel = document.getElementById('complete-panel');
@@ -1091,7 +1083,7 @@
         chatMsgs.push({ role: 'assistant', content: reply });
         await sb.from('ai_memory').upsert({ user_id: currentUser.id, session_number: activeSession.number, messages: chatMsgs }, { onConflict: 'user_id,session_number' });
         exchangeCount++;
-        // Complete panel appears only when AI sends [COMPLETE] signal
+        // Complete panel shown only when AI sends [COMPLETE] signal
       } catch {
         hideTyping();
         renderMessage('assistant', 'Something got in the way there. Take a breath — try sending that again.');
@@ -1152,7 +1144,6 @@
       chatInput.style.height = Math.min(chatInput.scrollHeight, 140) + 'px';
       btnSend.disabled = !chatInput.value.trim();
     });
-    // Close tool button — use event delegation to ensure it always works
     document.addEventListener('click', function(e) {
       if (e.target && e.target.id === 'btn-close-tool') {
         e.preventDefault();
