@@ -400,7 +400,7 @@
           <div class="tool-embed-wrap" id="tool-embed-wrap">
             <div class="tool-embed-header">
               <span class="tool-embed-title" id="tool-embed-title">Tool</span>
-              <button class="btn-close-tool" id="btn-close-tool">Done — back to session</button>
+              <button type="button" class="btn-close-tool" id="btn-close-tool">Done — back to session</button>
             </div>
             <iframe class="tool-embed-frame" id="tool-embed-frame" src="about:blank"></iframe>
           </div>
@@ -901,6 +901,11 @@
       title.textContent = toolInfo.name;
       frame.src = toolInfo.file + '?uid=' + (currentUser ? currentUser.id : '') + '&session=' + (activeSession ? activeSession.number : 0) + '&embed=1';
       wrap.classList.add('active');
+      // Scroll chat container into view
+      setTimeout(function() {
+        var chatCol = document.querySelector('.session-chat-col');
+        if (chatCol) chatCol.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
     }
 
     var lastToolKey = null;
@@ -1147,8 +1152,14 @@
       chatInput.style.height = Math.min(chatInput.scrollHeight, 140) + 'px';
       btnSend.disabled = !chatInput.value.trim();
     });
-    var btnCloseTool = document.getElementById('btn-close-tool');
-    if (btnCloseTool) btnCloseTool.addEventListener('click', closeToolEmbed);
+    // Close tool button — use event delegation to ensure it always works
+    document.addEventListener('click', function(e) {
+      if (e.target && e.target.id === 'btn-close-tool') {
+        e.preventDefault();
+        e.stopPropagation();
+        closeToolEmbed();
+      }
+    });
 
     chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (!btnSend.disabled) sendMessage(chatInput.value); } });
     btnSend.addEventListener('click', () => { if (!btnSend.disabled) sendMessage(chatInput.value); });
