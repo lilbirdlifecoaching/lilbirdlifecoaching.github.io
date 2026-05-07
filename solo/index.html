@@ -246,6 +246,27 @@
     .tool-card.used { opacity: 0.5; cursor: default; transform: none !important; }
     .tool-card.used .tool-card-label { color: var(--text-muted); }
 
+
+    /* Tool embed overlay — slides over chat */
+    .tool-embed-wrap {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: var(--dark);
+      z-index: 10;
+      flex-direction: column;
+      border-radius: 28px;
+      overflow: hidden;
+      animation: slideIn 0.3s ease both;
+    }
+    .tool-embed-wrap.active { display: flex; }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .tool-embed-header { padding: 1rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; background: var(--dark-card); }
+    .tool-embed-title { font-family: var(--font-display); font-size: 0.95rem; font-style: italic; }
+    .btn-close-tool { background: none; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 0.4rem 0.875rem; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); cursor: pointer; transition: border-color 0.2s, color 0.2s; }
+    .btn-close-tool:hover { border-color: var(--session-col); color: var(--session-col); }
+    .tool-embed-frame { flex: 1; border: none; background: var(--dark); width: 100%; }
+
     @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
     @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
@@ -369,12 +390,19 @@
     <div class="session-main">
       <div class="session-info" id="session-info"></div>
       <div class="session-chat-col">
-        <div class="chat-container">
+        <div class="chat-container" style="position:relative;overflow:hidden;">
           <div class="chat-header" id="chat-header"></div>
           <div class="chat-messages" id="chat-messages"></div>
           <div class="chat-input-wrap">
             <textarea class="chat-textarea" id="chat-input" placeholder="Take your time..." rows="1"></textarea>
             <button class="btn-send" id="btn-send" disabled>↑</button>
+          </div>
+          <div class="tool-embed-wrap" id="tool-embed-wrap">
+            <div class="tool-embed-header">
+              <span class="tool-embed-title" id="tool-embed-title">Tool</span>
+              <button class="btn-close-tool" id="btn-close-tool">Done — back to session</button>
+            </div>
+            <iframe class="tool-embed-frame" id="tool-embed-frame" src="about:blank"></iframe>
           </div>
         </div>
         <div class="complete-panel" id="complete-panel">
@@ -861,7 +889,34 @@
     var openedTools = {};
 
     function openTool(toolFile) {
-      window.open(toolFile + '?uid=' + currentUser.id + '&session=' + (activeSession?.number || 0), '_blank');
+      window.open(toolFile + '?uid=' + currentUser.id + '&session=' + (activeSession ? activeSession.number : 0), '_blank');
+    }
+
+    function openToolEmbed(toolKey, toolInfo) {
+      var wrap  = document.getElementById('tool-embed-wrap');
+      var frame = document.getElementById('tool-embed-frame');
+      var title = document.getElementById('tool-embed-title');
+      if (!wrap || !frame) return;
+      title.textContent = toolInfo.name;
+      frame.src = toolInfo.file + '?uid=' + (currentUser ? currentUser.id : '') + '&session=' + (activeSession ? activeSession.number : 0) + '&embed=1';
+      wrap.classList.add('active');
+    }
+
+    function closeToolEmbed() {
+      var wrap  = document.getElementById('tool-embed-wrap');
+      var frame = document.getElementById('tool-embed-frame');
+      if (!wrap) return;
+      wrap.classList.remove('active');
+      setTimeout(function() { if (frame) frame.src = 'about:blank'; }, 300);
+      if (activeSession && currentUser) {
+        setTimeout(function() {
+          var ack = 'Welcome back. How did that land for you — was there anything that surprised you, or something that felt particularly true?';
+          renderMessage('assistant', ack);
+          chatMsgs.push({ role: 'assistant', content: ack });
+          sb.from('ai_memory').upsert({ user_id: currentUser.id, session_number: activeSession.number, messages: chatMsgs }, { onConflict: 'user_id,session_number' }).catch(function(){});
+          document.getElementById('chat-input').focus();
+        }, 400);
+      }
     }
 
     function buildGreeting(sessionNumber) {
@@ -925,6 +980,14 @@
           setTimeout(function() { renderToolCard(toolKey, toolInfo, el); }, cleanContent ? 400 : 0);
         }
       }
+
+      // [COMPLETE] signal — show complete panel
+      if (/\[COMPLETE\]/.test(msgContent) && role === 'assistant') {
+        setTimeout(function() {
+          var panel = document.getElementById('complete-panel');
+          if (panel) panel.classList.add('visible');
+        }, 600);
+      }
       el.scrollTop = el.scrollHeight;
     }
 
@@ -951,7 +1014,7 @@
           card.classList.add('used');
           card.querySelector('.tool-card-label').textContent = 'Done';
           card.querySelector('.tool-card-arrow').innerHTML = '&#x2713;';
-          openTool(toolInfo.file);
+          openToolEmbed(toolKey, toolInfo);
         });
       }
       container.appendChild(wrap);
@@ -991,7 +1054,7 @@
         chatMsgs.push({ role: 'assistant', content: reply });
         await sb.from('ai_memory').upsert({ user_id: currentUser.id, session_number: activeSession.number, messages: chatMsgs }, { onConflict: 'user_id,session_number' });
         exchangeCount++;
-        if (exchangeCount >= activeSession.minExchanges) document.getElementById('complete-panel').classList.add('visible');
+        // Complete panel appears only when AI sends [COMPLETE] signal
       } catch {
         hideTyping();
         renderMessage('assistant', 'Something got in the way there. Take a breath — try sending that again.');
@@ -1052,6 +1115,9 @@
       chatInput.style.height = Math.min(chatInput.scrollHeight, 140) + 'px';
       btnSend.disabled = !chatInput.value.trim();
     });
+    var btnCloseTool = document.getElementById('btn-close-tool');
+    if (btnCloseTool) btnCloseTool.addEventListener('click', closeToolEmbed);
+
     chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (!btnSend.disabled) sendMessage(chatInput.value); } });
     btnSend.addEventListener('click', () => { if (!btnSend.disabled) sendMessage(chatInput.value); });
     document.getElementById('btn-complete').addEventListener('click', completeSession);
