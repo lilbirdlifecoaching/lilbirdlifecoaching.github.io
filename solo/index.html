@@ -235,90 +235,16 @@
 
 
     /* ── Inline tool cards ── */
-    .tool-card-msg {
-      display: flex;
-      gap: 0.75rem;
-      animation: msgIn 0.35s ease both;
-      max-width: 88%;
-    }
-
-    .tool-card {
-      background: var(--dark-card);
-      border: 1px solid var(--session-border);
-      border-radius: 16px;
-      border-top-left-radius: 4px;
-      padding: 1rem 1.25rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      cursor: pointer;
-      transition: background 0.2s, border-color 0.2s, transform 0.15s;
-      min-width: 240px;
-    }
-
-    .tool-card:hover {
-      background: var(--session-dim);
-      border-color: var(--session-col);
-      transform: translateY(-1px);
-    }
-
-    .tool-card-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      background: var(--session-dim);
-      border: 1px solid var(--session-border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
-      flex-shrink: 0;
-    }
-
+    .tool-card-msg { display: flex; gap: 0.75rem; animation: msgIn 0.35s ease both; max-width: 88%; }
+    .tool-card { background: var(--dark-card); border: 1px solid var(--session-border); border-radius: 16px; border-top-left-radius: 4px; padding: 1rem 1.25rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: background 0.2s, border-color 0.2s, transform 0.15s; min-width: 220px; }
+    .tool-card:hover { background: var(--session-dim); border-color: var(--session-col); transform: translateY(-1px); }
+    .tool-card-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--session-dim); border: 1px solid var(--session-border); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
     .tool-card-body { flex: 1; min-width: 0; }
-
-    .tool-card-label {
-      font-family: var(--font-mono);
-      font-size: 0.58rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--session-col);
-      margin-bottom: 0.2rem;
-    }
-
-    .tool-card-name {
-      font-family: var(--font-display);
-      font-size: 0.92rem;
-      font-style: italic;
-      color: var(--text);
-      margin-bottom: 0.15rem;
-    }
-
-    .tool-card-hint {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      line-height: 1.4;
-    }
-
-    .tool-card-arrow {
-      font-size: 0.9rem;
-      color: var(--session-col);
-      flex-shrink: 0;
-    }
-
-    .tool-card.used {
-      opacity: 0.5;
-      cursor: default;
-      transform: none;
-    }
-
-    .tool-card.used:hover {
-      background: var(--dark-card);
-      border-color: var(--session-border);
-      transform: none;
-    }
-
-    .tool-card.used .tool-card-arrow::before { content: '✓'; }
+    .tool-card-label { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--session-col); margin-bottom: 0.2rem; }
+    .tool-card-name { font-family: var(--font-display); font-size: 0.92rem; font-style: italic; color: var(--text); margin-bottom: 0.15rem; }
+    .tool-card-hint { font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; }
+    .tool-card-arrow { font-size: 0.9rem; color: var(--session-col); flex-shrink: 0; }
+    .tool-card.used { opacity: 0.5; cursor: default; transform: none !important; }
     .tool-card.used .tool-card-label { color: var(--text-muted); }
 
     @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
@@ -911,24 +837,22 @@
     }
 
 
-    // ── Tool map — keys the AI uses to surface tools ──────────
+    // ── Tool map ──────────────────────────────────────────────
     const TOOL_MAP = {
-      'peak-plunge':      { file: 'tools/tool-peak-plunge.html',     icon: '📈', name: 'Peak & Plunge Timeline',    hint: 'Map the highs and lows of your story so far.' },
-      'nurture-prune':    { file: 'tools/tool-nurture-prune.html',   icon: '🌿', name: 'Nurture & Prune Matrix',    hint: 'Map the people who shaped you.' },
-      'deep-roots':       { file: 'tools/tool-deep-roots.html',      icon: '🌱', name: 'Deep Roots Reflection',     hint: 'A guided reflection on where you came from.' },
-      'roots-feathers':   { file: 'tools/tool-roots-feathers.html',  icon: '🪶', name: 'Roots & Feathers Practice', hint: 'What to keep. What to release.' },
-      'glow-map':         { file: 'tools/tool-glow-map.html',        icon: '✨', name: 'Glow Map',                  hint: 'Score the five areas of your life right now.' },
-      'soar-steady':      { file: 'tools/tool-soar-steady.html',     icon: '⚡', name: 'Soar & Steady',             hint: 'Sort what gives energy from what takes it.' },
-      'adventure-map':    { file: 'tools/tool-adventure-map.html',   icon: '🗺️', name: 'Adventure Map',             hint: 'Map your journey from now to your North Star.' },
-      'shadows-sparks':   { file: 'tools/tool-shadows-sparks.html',  icon: '✨', name: 'Shadows & Sparks',          hint: 'What drives you from fear vs passion.' },
-      'tangle-within':    { file: 'tools/tool-tangle-within.html',   icon: '🌿', name: 'The Tangle Within',         hint: 'Name what's holding you back.' },
-      'courage-compass':  { file: 'tools/tool-courage-compass.html', icon: '🧭', name: 'Courage Compass',           hint: 'Orient yourself at the crossroads.' },
-      'birdsong':         { file: 'tools/tool-birdsong.html',        icon: '🎵', name: 'Birdsong Scale',            hint: 'Map your energy states and design your week.' },
-      'forest':           { file: 'tools/tool-forest.html',          icon: '🌲', name: 'Forest of Connections',     hint: 'Map the people in your relational landscape.' },
-      'full-flight-plan': { file: 'tools/tool-full-flight-plan.html',icon: '🪶', name: 'Full Flight Plan',          hint: 'Build your plan. In your words.' },
+      'peak-plunge':     { file: 'tools/tool-peak-plunge.html',     icon: '📈', name: 'Peak & Plunge Timeline',    hint: 'Map the highs and lows of your story so far.' },
+      'nurture-prune':   { file: 'tools/tool-nurture-prune.html',   icon: '🌿', name: 'Nurture & Prune Matrix',    hint: 'Map the people who shaped you.' },
+      'deep-roots':      { file: 'tools/tool-deep-roots.html',      icon: '🌱', name: 'Deep Roots Reflection',     hint: 'A guided reflection on where you came from.' },
+      'roots-feathers':  { file: 'tools/tool-roots-feathers.html',  icon: '🪶', name: 'Roots & Feathers Practice', hint: 'What to keep. What to release.' },
+      'glow-map':        { file: 'tools/tool-glow-map.html',        icon: '✨', name: 'Glow Map',                  hint: 'Score the five areas of your life right now.' },
+      'soar-steady':     { file: 'tools/tool-soar-steady.html',     icon: '⚡', name: 'Soar & Steady',             hint: 'Sort what gives energy from what takes it.' },
+      'adventure-map':   { file: 'tools/tool-adventure-map.html',   icon: '🗺️', name: 'Adventure Map',             hint: 'Map your journey from now to your North Star.' },
+      'shadows-sparks':  { file: 'tools/tool-shadows-sparks.html',  icon: '✨', name: 'Shadows & Sparks',          hint: 'What drives you from fear vs passion.' },
+      'tangle-within':   { file: 'tools/tool-tangle-within.html',   icon: '🌿', name: 'The Tangle Within',         hint: 'Name what is holding you back.' },
+      'courage-compass': { file: 'tools/tool-courage-compass.html', icon: '🧭', name: 'Courage Compass',           hint: 'Orient yourself at the crossroads.' },
+      'birdsong':        { file: 'tools/tool-birdsong.html',        icon: '🎵', name: 'Birdsong Scale',            hint: 'Map your energy states and design your week.' },
+      'forest':          { file: 'tools/tool-forest.html',          icon: '🌲', name: 'Forest of Connections',     hint: 'Map the people in your relational landscape.' },
+      'full-flight-plan':{ file: 'tools/tool-full-flight-plan.html',icon: '🪶', name: 'Full Flight Plan',          hint: 'Build your plan. In your words.' },
     };
-
-    // Track which tools have been opened this session
     let openedTools = new Set();
 
     function openTool(toolFile) {
@@ -980,12 +904,9 @@
     // ── Chat rendering ────────────────────────────────────────
     function renderMessage(role, content) {
       const el = document.getElementById('chat-messages');
-
-      // Check for tool signal: [TOOL:key] anywhere in the message
-      const toolMatch = content.match(/\[TOOL:([a-z-]+)\]/);
+      const toolMatch   = content.match(/\[TOOL:([a-z-]+)\]/);
       const cleanContent = content.replace(/\[TOOL:[a-z-]+\]\s*/g, '').trim();
 
-      // Render the text bubble if there's content
       if (cleanContent) {
         const wrap = document.createElement('div');
         wrap.className = 'msg ' + role;
@@ -993,13 +914,10 @@
         el.appendChild(wrap);
       }
 
-      // Render tool card if signal present
       if (toolMatch && role === 'assistant') {
-        const toolKey  = toolMatch[1];
-        const toolInfo = TOOL_MAP[toolKey];
-        if (toolInfo) {
-          setTimeout(() => renderToolCard(toolKey, toolInfo, el), cleanContent ? 400 : 0);
-        }
+        const key  = toolMatch[1];
+        const info = TOOL_MAP[key];
+        if (info) setTimeout(() => renderToolCard(key, info, el), cleanContent ? 400 : 0);
       }
 
       el.scrollTop = el.scrollHeight;
@@ -1007,29 +925,27 @@
 
     function renderToolCard(toolKey, toolInfo, container) {
       const isUsed = openedTools.has(toolKey);
-      const wrap = document.createElement('div');
+      const wrap   = document.createElement('div');
       wrap.className = 'tool-card-msg';
-      wrap.innerHTML = '<div class="msg-avatar" style="background:var(--session-col);width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0;margin-top:2px;">' + (activeSession?.emoji || '🪶') + '</div>' +
-        '<div class="tool-card' + (isUsed ? ' used' : '') + '" data-tool-key="' + toolKey + '">' +
-        '<div class="tool-card-icon">' + toolInfo.icon + '</div>' +
-        '<div class="tool-card-body">' +
-        '<div class="tool-card-label">' + (isUsed ? 'Completed' : 'Tool ready') + '</div>' +
-        '<div class="tool-card-name">' + toolInfo.name + '</div>' +
-        '<div class="tool-card-hint">' + toolInfo.hint + '</div>' +
-        '</div>' +
-        '<div class="tool-card-arrow">' + (isUsed ? '' : '→') + '</div>' +
+      wrap.innerHTML =
+        '<div class="msg-avatar" style="background:var(--session-col);width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0;margin-top:2px;">' + (activeSession?.emoji || '🪶') + '</div>' +
+        '<div class="tool-card' + (isUsed ? ' used' : '') + '" data-key="' + toolKey + '">' +
+          '<div class="tool-card-icon">' + toolInfo.icon + '</div>' +
+          '<div class="tool-card-body">' +
+            '<div class="tool-card-label">' + (isUsed ? 'Done' : 'Tool ready') + '</div>' +
+            '<div class="tool-card-name">' + toolInfo.name + '</div>' +
+            '<div class="tool-card-hint">' + toolInfo.hint + '</div>' +
+          '</div>' +
+          '<div class="tool-card-arrow">' + (isUsed ? '✓' : '→') + '</div>' +
         '</div>';
 
       if (!isUsed) {
-        wrap.querySelector('.tool-card').addEventListener('click', () => {
+        wrap.querySelector('.tool-card').addEventListener('click', function() {
           openedTools.add(toolKey);
-          // Mark card as used
-          wrap.querySelector('.tool-card').classList.add('used');
-          wrap.querySelector('.tool-card-label').textContent = 'Completed';
-          wrap.querySelector('.tool-card-arrow').textContent = '✓';
-          // Open tool
+          this.classList.add('used');
+          this.querySelector('.tool-card-label').textContent = 'Done';
+          this.querySelector('.tool-card-arrow').textContent = '✓';
           openTool(toolInfo.file);
-          // When user returns, acknowledge
           scheduleReturnAck(toolInfo.name);
         });
       }
@@ -1038,22 +954,21 @@
       container.scrollTop = container.scrollHeight;
     }
 
-    // When user returns from a tool, AI acknowledges
     function scheduleReturnAck(toolName) {
-      const handleReturn = () => {
-        if (document.visibilityState === 'visible') {
+      var handled = false;
+      function handleReturn() {
+        if (document.visibilityState === 'visible' && !handled) {
+          handled = true;
           document.removeEventListener('visibilitychange', handleReturn);
-          // Small delay so it feels natural, not instant
-          setTimeout(() => {
+          setTimeout(function() {
             if (!activeSession) return;
-            const ack = 'Welcome back. How did that land for you — was there anything that surprised you, or something that felt particularly true?';
+            var ack = 'Welcome back. How did that land for you — was there anything that surprised you, or something that felt particularly true?';
             renderMessage('assistant', ack);
-            chatMsgs.push({ role: 'assistant', content: '[Tool return: ' + toolName + '] ' + ack });
-            // Save
-            sb.from('ai_memory').upsert({ user_id: currentUser.id, session_number: activeSession.number, messages: chatMsgs }, { onConflict: 'user_id,session_number' }).catch(() => {});
+            chatMsgs.push({ role: 'assistant', content: ack });
+            sb.from('ai_memory').upsert({ user_id: currentUser.id, session_number: activeSession.number, messages: chatMsgs }, { onConflict: 'user_id,session_number' }).catch(function(){});
           }, 800);
         }
-      };
+      }
       document.addEventListener('visibilitychange', handleReturn);
     }
 
