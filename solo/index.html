@@ -9,41 +9,26 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
 
   <style>
-    /* ============================================================
-       DESIGN TOKENS
-       ============================================================ */
     :root {
-      --dark:       #1e2028;
-      --dark-mid:   #252830;
-      --dark-card:  #2a2d38;
-      --dark-hover: #30333f;
-      --gold:       #F5C842;
-      --gold-dim:   rgba(245,200,66,0.15);
-      --gold-border:rgba(245,200,66,0.2);
-      --ember:      #e8734a;
-      --ember-dim:  rgba(232,115,74,0.15);
-      --mist:       rgba(255,255,255,0.04);
-      --text:       #f0ece4;
-      --text-dim:   rgba(240,236,228,0.55);
-      --text-muted: rgba(240,236,228,0.3);
-
-      --s0: #F5C842;
-      --s1: #7a9e7e;
-      --s2: #7eb8c9;
-      --s3: #a89060;
-      --s4: #8a9ab0;
-      --s5: #9dbf8a;
-      --s6: #c4956a;
-      --s7: #F5C842;
-
+      --dark:        #1e2028;
+      --dark-mid:    #252830;
+      --dark-card:   #2a2d38;
+      --dark-hover:  #30333f;
+      --gold:        #F5C842;
+      --gold-dim:    rgba(245,200,66,0.15);
+      --gold-border: rgba(245,200,66,0.2);
+      --ember:       #e8734a;
+      --ember-dim:   rgba(232,115,74,0.15);
+      --mist:        rgba(255,255,255,0.04);
+      --text:        #f0ece4;
+      --text-dim:    rgba(240,236,228,0.55);
+      --text-muted:  rgba(240,236,228,0.3);
+      --session-col:    #F5C842;
+      --session-dim:    rgba(245,200,66,0.12);
+      --session-border: rgba(245,200,66,0.22);
       --font-display: 'Playfair Display', Georgia, serif;
       --font-body:    'DM Sans', system-ui, sans-serif;
       --font-mono:    'DM Mono', monospace;
-
-      --radius-sm:  6px;
-      --radius-md:  12px;
-      --radius-lg:  20px;
-      --radius-xl:  32px;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -61,684 +46,214 @@
 
     body::before {
       content: '';
-      position: fixed;
-      inset: 0;
+      position: fixed; inset: 0;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.6;
+      pointer-events: none; z-index: 0; opacity: 0.6;
     }
 
-    .screen {
-      display: none;
-      position: relative;
-      z-index: 1;
-      min-height: 100vh;
-    }
-    .screen.active { display: flex; }
+    .view { display: none; position: relative; z-index: 1; min-height: 100vh; }
+    .view.active { display: flex; flex-direction: column; }
 
-    /* ── AUTH ── */
-    #screen-auth {
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-      flex-direction: column;
-    }
+    /* ── Loading ── */
+    #view-loading { align-items: center; justify-content: center; gap: 1.5rem; }
+    .loading-bird { font-size: 2rem; animation: float 2s ease-in-out infinite; }
+    .loading-text { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); }
 
-    .auth-wrap {
-      width: 100%;
-      max-width: 420px;
-      animation: fadeUp 0.6s ease both;
-    }
-
-    .auth-logo {
-      text-align: center;
-      margin-bottom: 2.5rem;
-    }
-
-    .auth-logo .bird-mark {
-      width: 52px;
-      height: 52px;
-      background: var(--gold);
-      border-radius: 14px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 1rem;
-      font-size: 1.5rem;
-    }
-
-    .auth-logo h1 {
-      font-family: var(--font-display);
-      font-size: 1.5rem;
-      font-weight: 400;
-      letter-spacing: -0.01em;
-      color: var(--text);
-    }
-
-    .auth-logo p {
-      font-size: 0.8rem;
-      color: var(--text-dim);
-      font-family: var(--font-mono);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-top: 0.25rem;
-    }
-
-    .auth-card {
-      background: var(--dark-card);
-      border: 1px solid var(--gold-border);
-      border-radius: var(--radius-lg);
-      padding: 2rem;
-    }
-
-    .auth-tabs {
-      display: flex;
-      gap: 0;
-      margin-bottom: 1.75rem;
-      border-bottom: 1px solid var(--gold-border);
-    }
-
-    .auth-tab {
-      flex: 1;
-      background: none;
-      border: none;
-      padding: 0.75rem 1rem;
-      font-family: var(--font-mono);
-      font-size: 0.72rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: color 0.2s;
-      position: relative;
-    }
-
+    /* ── Auth ── */
+    #view-auth { align-items: center; justify-content: center; padding: 2rem; }
+    .auth-wrap { width: 100%; max-width: 420px; animation: fadeUp 0.6s ease both; }
+    .auth-logo { text-align: center; margin-bottom: 2.5rem; }
+    .auth-logo .bird-mark { width: 52px; height: 52px; background: var(--gold); border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 1rem; font-size: 1.5rem; }
+    .auth-logo h1 { font-family: var(--font-display); font-size: 1.5rem; font-weight: 400; }
+    .auth-logo p { font-size: 0.8rem; color: var(--text-dim); font-family: var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.25rem; }
+    .auth-card { background: var(--dark-card); border: 1px solid var(--gold-border); border-radius: 20px; padding: 2rem; }
+    .auth-tabs { display: flex; margin-bottom: 1.75rem; border-bottom: 1px solid var(--gold-border); }
+    .auth-tab { flex: 1; background: none; border: none; padding: 0.75rem 1rem; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); cursor: pointer; transition: color 0.2s; position: relative; }
     .auth-tab.active { color: var(--gold); }
-
-    .auth-tab.active::after {
-      content: '';
-      position: absolute;
-      bottom: -1px;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: var(--gold);
-    }
-
+    .auth-tab.active::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 2px; background: var(--gold); }
     .auth-form { display: none; flex-direction: column; gap: 1rem; }
     .auth-form.active { display: flex; }
-
     .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
-
-    .form-group label {
-      font-size: 0.72rem;
-      font-family: var(--font-mono);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-    }
-
-    .form-group input {
-      background: var(--dark-mid);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: var(--radius-sm);
-      padding: 0.75rem 1rem;
-      color: var(--text);
-      font-family: var(--font-body);
-      font-size: 0.95rem;
-      outline: none;
-      transition: border-color 0.2s;
-      width: 100%;
-    }
-
+    .form-group label { font-size: 0.72rem; font-family: var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); }
+    .form-group input { background: var(--dark-mid); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 0.75rem 1rem; color: var(--text); font-family: var(--font-body); font-size: 0.95rem; outline: none; transition: border-color 0.2s; width: 100%; }
     .form-group input:focus { border-color: var(--gold); }
     .form-group input::placeholder { color: var(--text-muted); }
-
-    .btn-primary {
-      background: var(--gold);
-      color: var(--dark);
-      border: none;
-      border-radius: var(--radius-sm);
-      padding: 0.85rem 1.5rem;
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
-      margin-top: 0.5rem;
-    }
-
+    .btn-primary { background: var(--gold); color: var(--dark); border: none; border-radius: 6px; padding: 0.85rem 1.5rem; font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 500; cursor: pointer; transition: background 0.2s, transform 0.15s; margin-top: 0.5rem; }
     .btn-primary:hover { background: #fff; transform: translateY(-1px); }
     .btn-primary:disabled { opacity: 0.5; cursor: default; transform: none; }
-
-    .auth-error {
-      background: var(--ember-dim);
-      border: 1px solid rgba(232,115,74,0.3);
-      border-radius: var(--radius-sm);
-      padding: 0.6rem 0.875rem;
-      font-size: 0.82rem;
-      color: var(--ember);
-      display: none;
-    }
-
+    .auth-error { background: var(--ember-dim); border: 1px solid rgba(232,115,74,0.3); border-radius: 6px; padding: 0.6rem 0.875rem; font-size: 0.82rem; color: var(--ember); display: none; }
     .auth-error.visible { display: block; }
-
-    .auth-footer {
-      text-align: center;
-      margin-top: 1.5rem;
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      line-height: 1.5;
-    }
-
+    .auth-footer { text-align: center; margin-top: 1.5rem; font-size: 0.78rem; color: var(--text-muted); }
     .auth-footer a { color: var(--gold); text-decoration: none; }
 
-    /* ── LOADING ── */
-    #screen-loading {
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
-
-    .loading-bird {
-      font-size: 2rem;
-      animation: float 2s ease-in-out infinite;
-    }
-
-    .loading-text {
-      font-family: var(--font-mono);
-      font-size: 0.72rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-    }
-
-    /* ── DASHBOARD ── */
-    #screen-dashboard {
-      flex-direction: column;
-      min-height: 100vh;
-    }
-
-    .dash-nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1.25rem 2rem;
-      border-bottom: 1px solid var(--gold-border);
-      position: sticky;
-      top: 0;
-      background: rgba(30,32,40,0.92);
-      backdrop-filter: blur(12px);
-      z-index: 100;
-    }
-
-    .nav-brand {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .nav-bird {
-      width: 32px;
-      height: 32px;
-      background: var(--gold);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.95rem;
-      flex-shrink: 0;
-    }
-
-    .nav-title {
-      font-family: var(--font-display);
-      font-size: 1rem;
-      font-weight: 400;
-    }
-
-    .nav-right {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .nav-user {
-      font-size: 0.78rem;
-      color: var(--text-dim);
-      font-family: var(--font-mono);
-    }
-
-    .btn-ghost {
-      background: none;
-      border: 1px solid var(--gold-border);
-      border-radius: var(--radius-sm);
-      padding: 0.4rem 0.85rem;
-      font-family: var(--font-mono);
-      font-size: 0.65rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-      cursor: pointer;
-      transition: border-color 0.2s, color 0.2s;
-    }
-
+    /* ── Dashboard ── */
+    .dash-nav { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 2rem; border-bottom: 1px solid var(--gold-border); background: rgba(30,32,40,0.92); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; }
+    .nav-brand { display: flex; align-items: center; gap: 0.75rem; }
+    .nav-bird { width: 32px; height: 32px; background: var(--gold); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; }
+    .nav-title { font-family: var(--font-display); font-size: 1rem; font-weight: 400; }
+    .nav-right { display: flex; align-items: center; gap: 1rem; }
+    .nav-user { font-size: 0.78rem; color: var(--text-dim); font-family: var(--font-mono); }
+    .btn-ghost { background: none; border: 1px solid var(--gold-border); border-radius: 6px; padding: 0.4rem 0.85rem; font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); cursor: pointer; transition: border-color 0.2s, color 0.2s; }
     .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
-
-    .dash-body {
-      flex: 1;
-      max-width: 900px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 3rem 2rem 5rem;
-    }
-
-    .dash-welcome {
-      margin-bottom: 3rem;
-      animation: fadeUp 0.5s ease both;
-    }
-
-    .dash-eyebrow {
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 0.6rem;
-    }
-
-    .dash-welcome h2 {
-      font-family: var(--font-display);
-      font-size: clamp(1.75rem, 4vw, 2.5rem);
-      font-weight: 400;
-      font-style: italic;
-      line-height: 1.2;
-      margin-bottom: 0.75rem;
-    }
-
-    .dash-welcome p {
-      color: var(--text-dim);
-      font-size: 0.95rem;
-      max-width: 520px;
-      line-height: 1.7;
-    }
-
-    .dash-progress {
-      margin-bottom: 3rem;
-      animation: fadeUp 0.5s 0.1s ease both;
-    }
-
-    .progress-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.6rem;
-    }
-
-    .progress-label {
-      font-family: var(--font-mono);
-      font-size: 0.68rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-    }
-
-    .progress-count {
-      font-family: var(--font-mono);
-      font-size: 0.68rem;
-      color: var(--gold);
-    }
-
-    .progress-track {
-      height: 3px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 99px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--ember), var(--gold));
-      border-radius: 99px;
-      transition: width 0.8s ease;
-    }
-
-    .sessions-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1rem;
-    }
-
-    .session-card {
-      background: var(--dark-card);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: var(--radius-lg);
-      padding: 1.5rem 1.75rem;
-      display: flex;
-      align-items: center;
-      gap: 1.25rem;
-      transition: border-color 0.25s, background 0.25s, transform 0.2s;
-      animation: fadeUp 0.5s ease both;
-      position: relative;
-      overflow: hidden;
-      cursor: default;
-    }
-
-    .session-card:nth-child(1) { animation-delay: 0.1s; }
-    .session-card:nth-child(2) { animation-delay: 0.15s; }
-    .session-card:nth-child(3) { animation-delay: 0.2s; }
-    .session-card:nth-child(4) { animation-delay: 0.25s; }
-    .session-card:nth-child(5) { animation-delay: 0.3s; }
-    .session-card:nth-child(6) { animation-delay: 0.35s; }
-    .session-card:nth-child(7) { animation-delay: 0.4s; }
-    .session-card:nth-child(8) { animation-delay: 0.45s; }
-
-    .session-card.available {
-      border-color: var(--gold-border);
-      cursor: pointer;
-    }
-
-    .session-card.available:hover {
-      background: var(--dark-hover);
-      transform: translateY(-2px);
-      border-color: var(--gold);
-    }
-
-    .session-card.available::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: var(--gold-dim);
-      opacity: 0;
-      transition: opacity 0.25s;
-      border-radius: inherit;
-    }
-
-    .session-card.available:hover::before { opacity: 1; }
-
-    .session-card.in-progress {
-      border-color: var(--gold);
-      cursor: pointer;
-    }
-
-    .session-card.in-progress:hover {
-      background: var(--dark-hover);
-      transform: translateY(-2px);
-    }
-
-    .session-card.complete {
-      opacity: 0.65;
-      cursor: pointer;
-    }
-
+    .dash-body { flex: 1; max-width: 900px; width: 100%; margin: 0 auto; padding: 3rem 2rem 5rem; }
+    .dash-welcome { margin-bottom: 3rem; animation: fadeUp 0.5s ease both; }
+    .dash-eyebrow { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.6rem; }
+    .dash-welcome h2 { font-family: var(--font-display); font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 400; font-style: italic; line-height: 1.2; margin-bottom: 0.75rem; }
+    .dash-welcome p { color: var(--text-dim); font-size: 0.95rem; max-width: 520px; line-height: 1.7; }
+    .dash-progress { margin-bottom: 3rem; animation: fadeUp 0.5s 0.1s ease both; }
+    .progress-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; }
+    .progress-label { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+    .progress-count { font-family: var(--font-mono); font-size: 0.68rem; color: var(--gold); }
+    .progress-track { height: 3px; background: rgba(255,255,255,0.06); border-radius: 99px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--ember), var(--gold)); border-radius: 99px; transition: width 0.8s ease; }
+    .sessions-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+    .session-card { background: var(--dark-card); border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 1.5rem 1.75rem; display: flex; align-items: center; gap: 1.25rem; transition: border-color 0.25s, background 0.25s, transform 0.2s; animation: fadeUp 0.5s ease both; position: relative; overflow: hidden; cursor: default; }
+    .session-card:nth-child(1){animation-delay:0.05s}.session-card:nth-child(2){animation-delay:0.1s}.session-card:nth-child(3){animation-delay:0.15s}.session-card:nth-child(4){animation-delay:0.2s}.session-card:nth-child(5){animation-delay:0.25s}.session-card:nth-child(6){animation-delay:0.3s}.session-card:nth-child(7){animation-delay:0.35s}.session-card:nth-child(8){animation-delay:0.4s}
+    .session-card.available,.session-card.in-progress,.session-card.complete { cursor: pointer; }
+    .session-card.available { border-color: var(--gold-border); }
+    .session-card.available:hover,.session-card.in-progress:hover { background: var(--dark-hover); transform: translateY(-2px); }
+    .session-card.available:hover { border-color: var(--gold); }
+    .session-card.in-progress { border-color: var(--gold); }
+    .session-card.complete { opacity: 0.65; }
     .session-card.complete:hover { opacity: 0.85; }
-
     .session-card.locked { opacity: 0.4; }
-
-    .session-num {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      font-weight: 500;
-      flex-shrink: 0;
-      letter-spacing: 0.05em;
-    }
-
+    .session-num { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 500; flex-shrink: 0; }
     .session-content { flex: 1; min-width: 0; }
-
-    .session-eyebrow {
-      font-family: var(--font-mono);
-      font-size: 0.62rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      margin-bottom: 0.2rem;
-    }
-
-    .session-title {
-      font-family: var(--font-display);
-      font-size: 1.1rem;
-      font-weight: 500;
-      margin-bottom: 0.3rem;
-      line-height: 1.3;
-    }
-
-    .session-teaser {
-      font-size: 0.82rem;
-      color: var(--text-dim);
-      line-height: 1.5;
-      font-style: italic;
-    }
-
-    .session-status {
-      flex-shrink: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 0.4rem;
-    }
-
+    .session-eyebrow { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.2rem; }
+    .session-title { font-family: var(--font-display); font-size: 1.1rem; font-weight: 500; margin-bottom: 0.3rem; line-height: 1.3; }
+    .session-teaser { font-size: 0.82rem; color: var(--text-dim); line-height: 1.5; font-style: italic; }
+    .unlock-timer { font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono); margin-top: 0.25rem; }
+    .session-status { flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 0.4rem; }
     .status-icon { font-size: 1.1rem; line-height: 1; }
-
-    .status-pill {
-      font-family: var(--font-mono);
-      font-size: 0.58rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 0.2rem 0.55rem;
-      border-radius: 99px;
-    }
-
-    .pill-available  { background: var(--gold-dim);  color: var(--gold);  border: 1px solid var(--gold-border); }
-    .pill-progress   { background: var(--ember-dim); color: var(--ember); border: 1px solid rgba(232,115,74,0.3); }
-    .pill-complete   { background: rgba(122,158,126,0.15); color: #7a9e7e; border: 1px solid rgba(122,158,126,0.25); }
-    .pill-locked     { background: var(--mist); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.06); }
-
-    .unlock-timer {
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      font-family: var(--font-mono);
-      margin-top: 0.25rem;
-    }
-
-    .gate-card {
-      background: var(--dark-card);
-      border: 1px solid var(--gold-border);
-      border-radius: var(--radius-lg);
-      padding: 1.5rem 1.75rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      margin-top: 0.5rem;
-      animation: fadeUp 0.4s ease both;
-    }
-
-    .gate-content p {
-      font-size: 0.85rem;
-      color: var(--text-dim);
-      line-height: 1.6;
-      margin-bottom: 0.75rem;
-    }
-
-    .btn-ready {
-      background: none;
-      border: 1px solid var(--gold);
-      border-radius: var(--radius-sm);
-      padding: 0.55rem 1.1rem;
-      font-family: var(--font-mono);
-      font-size: 0.68rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--gold);
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s;
-      white-space: nowrap;
-    }
-
+    .status-pill { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.2rem 0.55rem; border-radius: 99px; }
+    .pill-available { background: var(--gold-dim); color: var(--gold); border: 1px solid var(--gold-border); }
+    .pill-progress { background: var(--ember-dim); color: var(--ember); border: 1px solid rgba(232,115,74,0.3); }
+    .pill-complete { background: rgba(122,158,126,0.15); color: #7a9e7e; border: 1px solid rgba(122,158,126,0.25); }
+    .pill-locked { background: var(--mist); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.06); }
+    .gate-card { background: var(--dark-card); border: 1px solid var(--gold-border); border-radius: 20px; padding: 1.25rem 1.75rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 0.5rem; animation: fadeUp 0.4s ease both; }
+    .gate-content p { font-size: 0.85rem; color: var(--text-dim); line-height: 1.6; }
+    .btn-ready { background: none; border: 1px solid var(--gold); border-radius: 6px; padding: 0.55rem 1.1rem; font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); cursor: pointer; transition: background 0.2s, color 0.2s; white-space: nowrap; }
     .btn-ready:hover { background: var(--gold); color: var(--dark); }
-
-    .purchase-gate {
-      background: linear-gradient(135deg, var(--dark-card), var(--dark-mid));
-      border: 1px solid var(--gold-border);
-      border-radius: var(--radius-xl);
-      padding: 3rem 2rem;
-      text-align: center;
-      margin-top: 1rem;
-      animation: fadeUp 0.5s 0.2s ease both;
-    }
-
-    .purchase-gate .bird-glyph {
-      font-size: 2.5rem;
-      display: block;
-      margin-bottom: 1.25rem;
-    }
-
-    .purchase-gate h3 {
-      font-family: var(--font-display);
-      font-size: 1.6rem;
-      font-weight: 400;
-      font-style: italic;
-      margin-bottom: 0.75rem;
-    }
-
-    .purchase-gate p {
-      color: var(--text-dim);
-      font-size: 0.9rem;
-      line-height: 1.7;
-      max-width: 400px;
-      margin: 0 auto 2rem;
-    }
-
-    .purchase-price {
-      display: flex;
-      align-items: baseline;
-      justify-content: center;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .price-amount {
-      font-family: var(--font-display);
-      font-size: 3rem;
-      font-weight: 700;
-      color: var(--gold);
-      line-height: 1;
-    }
-
-    .price-label {
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      color: var(--text-dim);
-      letter-spacing: 0.08em;
-    }
-
-    .promo-input-wrap {
-      display: flex;
-      gap: 0.5rem;
-      max-width: 280px;
-      margin: 0 auto 1rem;
-    }
-
-    .promo-input {
-      flex: 1;
-      background: var(--dark-mid);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: var(--radius-sm);
-      padding: 0.6rem 0.875rem;
-      color: var(--text);
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
-      letter-spacing: 0.08em;
-      outline: none;
-      text-transform: uppercase;
-      transition: border-color 0.2s;
-    }
-
+    .purchase-gate { background: linear-gradient(135deg, var(--dark-card), var(--dark-mid)); border: 1px solid var(--gold-border); border-radius: 32px; padding: 3rem 2rem; text-align: center; margin-top: 1rem; animation: fadeUp 0.5s 0.2s ease both; }
+    .purchase-gate .bird-glyph { font-size: 2.5rem; display: block; margin-bottom: 1.25rem; }
+    .purchase-gate h3 { font-family: var(--font-display); font-size: 1.6rem; font-weight: 400; font-style: italic; margin-bottom: 0.75rem; }
+    .purchase-gate p { color: var(--text-dim); font-size: 0.9rem; line-height: 1.7; max-width: 400px; margin: 0 auto 2rem; }
+    .purchase-price { display: flex; align-items: baseline; justify-content: center; gap: 0.5rem; margin-bottom: 1.5rem; }
+    .price-amount { font-family: var(--font-display); font-size: 3rem; font-weight: 700; color: var(--gold); line-height: 1; }
+    .price-label { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.08em; }
+    .promo-input-wrap { display: flex; gap: 0.5rem; max-width: 280px; margin: 0 auto 1rem; }
+    .promo-input { flex: 1; background: var(--dark-mid); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 0.6rem 0.875rem; color: var(--text); font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.08em; outline: none; text-transform: uppercase; transition: border-color 0.2s; }
     .promo-input:focus { border-color: var(--gold); }
     .promo-input::placeholder { color: var(--text-muted); text-transform: none; }
-
-    .btn-apply-promo {
-      background: var(--dark-hover);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: var(--radius-sm);
-      padding: 0.6rem 0.875rem;
-      font-family: var(--font-mono);
-      font-size: 0.65rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-      cursor: pointer;
-      transition: border-color 0.2s, color 0.2s;
-      white-space: nowrap;
-    }
-
+    .btn-apply-promo { background: var(--dark-hover); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 0.6rem 0.875rem; font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); cursor: pointer; transition: border-color 0.2s, color 0.2s; white-space: nowrap; }
     .btn-apply-promo:hover { border-color: var(--gold); color: var(--gold); }
-
-    .promo-message {
-      font-size: 0.78rem;
-      font-family: var(--font-mono);
-      margin-bottom: 1rem;
-      min-height: 1.2em;
-    }
-
+    .promo-message { font-size: 0.78rem; font-family: var(--font-mono); margin-bottom: 1rem; min-height: 1.2em; }
     .promo-success { color: #7a9e7e; }
-    .promo-error   { color: var(--ember); }
-
-    .btn-purchase {
-      background: var(--gold);
-      color: var(--dark);
-      border: none;
-      border-radius: var(--radius-sm);
-      padding: 1rem 2.5rem;
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
-      display: inline-block;
-    }
-
+    .promo-error { color: var(--ember); }
+    .btn-purchase { background: var(--gold); color: var(--dark); border: none; border-radius: 6px; padding: 1rem 2.5rem; font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 500; cursor: pointer; transition: background 0.2s, transform 0.15s; }
     .btn-purchase:hover { background: #fff; transform: translateY(-2px); }
 
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+    /* ── Session view ── */
+    .session-nav { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 2rem; border-bottom: 1px solid var(--session-border); background: rgba(30,32,40,0.92); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; }
+    .session-nav-left { display: flex; align-items: center; gap: 0.75rem; }
+    .session-nav-bird { width: 32px; height: 32px; background: var(--session-col); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+    .session-nav-label { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); }
+    .btn-back-dash { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); background: none; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 0.35rem 0.75rem; cursor: pointer; transition: color 0.2s, border-color 0.2s; }
+    .btn-back-dash:hover { color: var(--session-col); border-color: var(--session-border); }
+    .session-main { flex: 1; display: grid; grid-template-columns: 1fr 1fr; max-width: 1100px; width: 100%; margin: 0 auto; padding: 3rem 2rem; align-items: start; }
+    .session-info { padding-right: 3rem; position: sticky; top: 100px; }
+    .session-tag-label { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--session-col); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
+    .session-tag-label::before { content: ''; width: 20px; height: 1px; background: var(--session-col); display: inline-block; }
+    .session-info h1 { font-family: var(--font-display); font-size: clamp(1.8rem, 3.5vw, 2.5rem); font-weight: 400; font-style: italic; line-height: 1.15; margin-bottom: 1rem; }
+    .session-info-desc { color: var(--text-dim); font-size: 0.92rem; line-height: 1.75; margin-bottom: 2rem; max-width: 380px; }
+    .video-wrap { background: var(--dark-card); border: 1px solid var(--session-border); border-radius: 20px; aspect-ratio: 16/9; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 2rem; position: relative; overflow: hidden; cursor: pointer; transition: border-color 0.2s; }
+    .video-gradient { position: absolute; inset: 0; }
+    .video-play { width: 52px; height: 52px; border: 2px solid var(--session-col); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--session-col); font-size: 1.25rem; position: relative; z-index: 1; }
+    .video-label { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); position: relative; z-index: 1; }
+    .session-meta-row { display: flex; gap: 1.5rem; margin-bottom: 2rem; }
+    .meta-item { display: flex; flex-direction: column; gap: 0.2rem; }
+    .meta-label { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+    .meta-value { font-size: 0.82rem; color: var(--text-dim); }
+    .tools-section { border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1.5rem; }
+    .tools-label { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.75rem; }
+    .tool-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .tool-item { display: flex; align-items: center; gap: 0.6rem; font-size: 0.8rem; color: var(--text-dim); padding: 0.5rem 0.75rem; border-radius: 12px; border: 1px solid transparent; cursor: default; transition: background 0.2s, border-color 0.2s, color 0.2s; }
+    .tool-item.clickable { cursor: pointer; border-color: var(--session-border); }
+    .tool-item.clickable:hover { background: var(--session-dim); color: var(--text); border-color: var(--session-col); }
+    .tool-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted); flex-shrink: 0; }
+    .tool-item.clickable .tool-dot { background: var(--session-col); }
+    .tool-tag { margin-left: auto; font-family: var(--font-mono); font-size: 0.55rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--session-col); opacity: 0.7; }
 
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50%       { transform: translateY(-8px); }
-    }
+    /* Chat */
+    .session-chat-col { display: flex; flex-direction: column; min-height: calc(100vh - 200px); }
+    .chat-container { flex: 1; display: flex; flex-direction: column; background: var(--dark-card); border: 1px solid var(--session-border); border-radius: 28px; overflow: hidden; min-height: 580px; }
+    .chat-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; gap: 0.75rem; }
+    .chat-avatar { width: 36px; height: 36px; background: var(--session-col); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+    .chat-avatar-info h3 { font-family: var(--font-display); font-size: 0.95rem; font-weight: 500; line-height: 1.2; }
+    .chat-avatar-info p { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
+    .chat-status { margin-left: auto; display: flex; align-items: center; gap: 0.4rem; font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--session-col); animation: pulse 2.5s ease-in-out infinite; }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; scroll-behavior: smooth; }
+    .chat-messages::-webkit-scrollbar { width: 4px; }
+    .chat-messages::-webkit-scrollbar-track { background: transparent; }
+    .chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+    .msg { display: flex; gap: 0.75rem; animation: msgIn 0.35s ease both; max-width: 88%; }
+    .msg.user { flex-direction: row-reverse; align-self: flex-end; }
+    .msg-avatar { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; flex-shrink: 0; margin-top: 2px; }
+    .msg.assistant .msg-avatar { background: var(--session-col); }
+    .msg.user .msg-avatar { background: var(--dark-hover); border: 1px solid rgba(255,255,255,0.08); }
+    .msg-bubble { padding: 0.875rem 1.1rem; border-radius: 16px; font-size: 0.88rem; line-height: 1.7; }
+    .msg.assistant .msg-bubble { background: var(--dark-mid); border: 1px solid rgba(255,255,255,0.06); border-top-left-radius: 4px; }
+    .msg.user .msg-bubble { background: var(--session-dim); border: 1px solid var(--session-border); border-top-right-radius: 4px; }
+    .typing-indicator { display: flex; gap: 0.75rem; align-items: flex-start; animation: msgIn 0.3s ease both; }
+    .typing-dots { padding: 0.875rem 1.1rem; background: var(--dark-mid); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; border-top-left-radius: 4px; display: flex; align-items: center; gap: 4px; }
+    .typing-dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--session-col); opacity: 0.4; animation: dot 1.4s ease-in-out infinite; }
+    .typing-dots span:nth-child(2){animation-delay:0.2s}.typing-dots span:nth-child(3){animation-delay:0.4s}
+    .chat-input-wrap { padding: 1rem 1.25rem; border-top: 1px solid rgba(255,255,255,0.06); display: flex; gap: 0.75rem; align-items: flex-end; }
+    .chat-textarea { flex: 1; background: var(--dark-mid); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 0.75rem 1rem; color: var(--text); font-family: var(--font-body); font-size: 0.88rem; line-height: 1.5; resize: none; outline: none; min-height: 44px; max-height: 140px; transition: border-color 0.2s; overflow-y: auto; }
+    .chat-textarea:focus { border-color: var(--session-col); }
+    .chat-textarea::placeholder { color: var(--text-muted); }
+    .btn-send { width: 44px; height: 44px; background: var(--session-col); border: none; border-radius: 12px; color: var(--dark); font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: opacity 0.2s, transform 0.15s; }
+    .btn-send:hover:not(:disabled) { opacity: 0.85; transform: scale(1.05); }
+    .btn-send:disabled { opacity: 0.35; cursor: default; transform: none; }
+    .complete-panel { display: none; background: var(--dark-card); border: 1px solid var(--session-border); border-radius: 28px; padding: 2rem; margin-top: 1.25rem; animation: fadeUp 0.5s ease both; text-align: center; }
+    .complete-panel.visible { display: block; }
+    .complete-panel h3 { font-family: var(--font-display); font-size: 1.4rem; font-weight: 400; font-style: italic; margin-bottom: 0.6rem; }
+    .complete-panel p { color: var(--text-dim); font-size: 0.88rem; line-height: 1.7; margin-bottom: 1.5rem; max-width: 380px; margin-left: auto; margin-right: auto; }
+    .tools-nudge { display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; margin-bottom: 1.5rem; }
+    .tool-nudge-chip { display: inline-flex; align-items: center; gap: 0.4rem; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--session-col); border: 1px solid var(--session-border); border-radius: 20px; padding: 0.3rem 0.75rem; cursor: pointer; transition: background 0.2s; }
+    .tool-nudge-chip:hover { background: var(--session-dim); }
+    .btn-complete { background: var(--session-col); color: var(--dark); border: none; border-radius: 8px; padding: 0.85rem 2rem; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 500; cursor: pointer; transition: opacity 0.2s, transform 0.15s; }
+    .btn-complete:hover { opacity: 0.85; transform: translateY(-2px); }
+    .btn-complete:disabled { opacity: 0.5; cursor: default; transform: none; }
 
-    @media (max-width: 600px) {
-      .dash-nav { padding: 1rem; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+    @keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes dot { 0%,100% { opacity: 0.4; transform: scale(1); } 50% { opacity: 1; transform: scale(1.2); } }
+
+    @media (max-width: 768px) {
+      .session-main { grid-template-columns: 1fr; padding: 1.5rem 1rem; }
+      .session-info { padding-right: 0; position: static; }
+      .session-chat-col { min-height: 500px; }
+      .chat-container { min-height: 460px; }
+      .dash-nav, .session-nav { padding: 1rem; }
       .dash-body { padding: 2rem 1rem 4rem; }
-      .session-card { flex-wrap: wrap; }
       .nav-user { display: none; }
     }
   </style>
 </head>
-
 <body>
 
   <!-- LOADING -->
-  <div id="screen-loading" class="screen active">
+  <div id="view-loading" class="view active">
     <div class="loading-bird">🪶</div>
     <div class="loading-text">finding your nest...</div>
   </div>
 
   <!-- AUTH -->
-  <div id="screen-auth" class="screen">
+  <div id="view-auth" class="view">
     <div class="auth-wrap">
       <div class="auth-logo">
         <div class="bird-mark">🪶</div>
@@ -750,96 +265,107 @@
           <button class="auth-tab active" data-tab="signin">Sign in</button>
           <button class="auth-tab" data-tab="signup">Create account</button>
         </div>
-        <!-- Sign In -->
         <form class="auth-form active" id="form-signin" novalidate>
-          <div class="form-group">
-            <label for="signin-email">Email</label>
-            <input id="signin-email" type="email" placeholder="you@example.com" autocomplete="email" />
-          </div>
-          <div class="form-group">
-            <label for="signin-password">Password</label>
-            <input id="signin-password" type="password" placeholder="••••••••" autocomplete="current-password" />
-          </div>
+          <div class="form-group"><label for="signin-email">Email</label><input id="signin-email" type="email" placeholder="you@example.com" autocomplete="email" /></div>
+          <div class="form-group"><label for="signin-password">Password</label><input id="signin-password" type="password" placeholder="••••••••" autocomplete="current-password" /></div>
           <div class="auth-error" id="signin-error"></div>
           <button type="submit" class="btn-primary" id="btn-signin">Sign in →</button>
         </form>
-        <!-- Sign Up -->
         <form class="auth-form" id="form-signup" novalidate>
-          <div class="form-group">
-            <label for="signup-name">Your name</label>
-            <input id="signup-name" type="text" placeholder="First name" autocomplete="given-name" />
-          </div>
-          <div class="form-group">
-            <label for="signup-email">Email</label>
-            <input id="signup-email" type="email" placeholder="you@example.com" autocomplete="email" />
-          </div>
-          <div class="form-group">
-            <label for="signup-password">Password</label>
-            <input id="signup-password" type="password" placeholder="at least 8 characters" autocomplete="new-password" />
-          </div>
+          <div class="form-group"><label for="signup-name">Your name</label><input id="signup-name" type="text" placeholder="First name" autocomplete="given-name" /></div>
+          <div class="form-group"><label for="signup-email">Email</label><input id="signup-email" type="email" placeholder="you@example.com" autocomplete="email" /></div>
+          <div class="form-group"><label for="signup-password">Password</label><input id="signup-password" type="password" placeholder="at least 8 characters" autocomplete="new-password" /></div>
           <div class="auth-error" id="signup-error"></div>
           <button type="submit" class="btn-primary" id="btn-signup">Create account →</button>
         </form>
       </div>
-      <div class="auth-footer">
-        By continuing you agree to lil' bird's <a href="https://lilbird.life/terms" target="_blank">terms</a> and <a href="https://lilbird.life/privacy" target="_blank">privacy policy</a>.
-      </div>
+      <div class="auth-footer">By continuing you agree to lil' bird's <a href="https://lilbird.life/terms" target="_blank">terms</a> and <a href="https://lilbird.life/privacy" target="_blank">privacy policy</a>.</div>
     </div>
   </div>
 
   <!-- DASHBOARD -->
-  <div id="screen-dashboard" class="screen">
+  <div id="view-dashboard" class="view">
     <nav class="dash-nav">
-      <div class="nav-brand">
-        <div class="nav-bird">🪶</div>
-        <div class="nav-title">lil' bird</div>
-      </div>
-      <div class="nav-right">
-        <span class="nav-user" id="nav-user-email"></span>
-        <button class="btn-ghost" id="btn-signout">Sign out</button>
-      </div>
+      <div class="nav-brand"><div class="nav-bird">🪶</div><div class="nav-title">lil' bird</div></div>
+      <div class="nav-right"><span class="nav-user" id="nav-user-email"></span><button class="btn-ghost" id="btn-signout">Sign out</button></div>
     </nav>
     <div class="dash-body">
       <div class="dash-welcome">
         <div class="dash-eyebrow">your journey</div>
         <h2 id="dash-greeting">Welcome back.</h2>
-        <p id="dash-subtext">Pick up where you left off — or begin when you're ready. There's no rush here.</p>
+        <p id="dash-subtext">Pick up where you left off — or begin when you're ready.</p>
       </div>
       <div class="dash-progress" id="dash-progress" style="display:none;">
-        <div class="progress-meta">
-          <span class="progress-label">Course progress</span>
-          <span class="progress-count" id="progress-count">0 of 8 sessions</span>
-        </div>
-        <div class="progress-track">
-          <div class="progress-fill" id="progress-fill" style="width:0%"></div>
-        </div>
+        <div class="progress-meta"><span class="progress-label">Course progress</span><span class="progress-count" id="progress-count">0 of 8 sessions</span></div>
+        <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
       </div>
       <div id="dash-content"></div>
     </div>
   </div>
 
+  <!-- SESSION VIEW -->
+  <div id="view-session" class="view">
+    <nav class="session-nav">
+      <div class="session-nav-left">
+        <div class="session-nav-bird" id="session-nav-bird">🪶</div>
+        <span class="session-nav-label">lil' bird · life change sessions</span>
+      </div>
+      <button class="btn-back-dash" id="btn-back-dash">← My sessions</button>
+    </nav>
+    <div class="session-main">
+      <div class="session-info" id="session-info"></div>
+      <div class="session-chat-col">
+        <div class="chat-container">
+          <div class="chat-header" id="chat-header"></div>
+          <div class="chat-messages" id="chat-messages"></div>
+          <div class="chat-input-wrap">
+            <textarea class="chat-textarea" id="chat-input" placeholder="Take your time..." rows="1"></textarea>
+            <button class="btn-send" id="btn-send" disabled>↑</button>
+          </div>
+        </div>
+        <div class="complete-panel" id="complete-panel">
+          <h3 id="complete-title">Good work.</h3>
+          <p id="complete-desc">Take a moment before moving on.</p>
+          <div class="tools-nudge" id="tools-nudge"></div>
+          <button class="btn-complete" id="btn-complete">Mark complete & continue →</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script>
-    const { createClient } = supabase;
-
     const SUPABASE_URL  = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
-
-    // Singleton — reuse existing client if already initialised
-    // Prevents auth token corruption from multiple createClient calls
-    const sb = globalThis.__supabaseClient ||
-      (globalThis.__supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON));
+    const WORKER_URL    = 'https://worker-solo.cwwq46sn7m.workers.dev';
+    const { createClient } = supabase;
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
 
     const SESSIONS = [
-      { number: 0, tag: 'orientation',  title: 'First Flight',          teaser: 'Name where you are. Glimpse where you could be. Take one real step.',                         file: 'sessions/session-0-first-flight.html',   color: 'var(--s0)' },
-      { number: 1, tag: 'session 1',    title: 'Story',                  teaser: 'Before you take flight, know where you\'ve been.',                                              file: 'sessions/session-1-story.html',           color: 'var(--s1)' },
-      { number: 2, tag: 'session 2',    title: 'Vision & Your Why',      teaser: 'Clarify where you\'re going by discovering what actually drives you.',                          file: 'sessions/session-2-vision.html',          color: 'var(--s2)' },
-      { number: 3, tag: 'session 3',    title: 'Identity & Insight',     teaser: 'Know who you are so you can rise with clarity.',                                                file: 'sessions/session-3-identity.html',        color: 'var(--s3)' },
-      { number: 4, tag: 'session 4',    title: 'Navigating Transitions', teaser: 'When the path gets foggy — slow down, look inward, choose your next step.',                    file: 'sessions/session-4-transitions.html',     color: 'var(--s4)' },
-      { number: 5, tag: 'session 5',    title: 'Life Rhythms & Routines',teaser: 'Find your rhythm. Root where you need to stay. Move where you\'re meant to grow.',             file: 'sessions/session-5-rhythms.html',         color: 'var(--s5)' },
-      { number: 6, tag: 'session 6',    title: 'Relationships',          teaser: 'No season of growth happens in isolation. Look at who\'s in your forest.',                     file: 'sessions/session-6-relationships.html',   color: 'var(--s6)' },
-      { number: 7, tag: 'session 7',    title: 'Full Flight',            teaser: 'Your story. Your vision. Your plan. All of it — yours.',                                        file: 'sessions/session-7-full-flight.html',     color: 'var(--s7)' },
+      {
+        number: 0, tag: 'Orientation', title: 'First Flight',
+        desc: 'Name where you are. Glimpse where you could be. Take one real step.',
+        teaser: 'Name where you are. Glimpse where you could be.',
+        color: '#F5C842', emoji: '🪶', dim: 'rgba(245,200,66,0.12)', border: 'rgba(245,200,66,0.22)',
+        minExchanges: 4, videoLen: '3 min', duration: '20–30 min', tools: [],
+        completeTitle: "That's a good start.",
+        completeDesc: "You've named where you are and glimpsed where you could go. Session 1 is waiting — and it goes deeper. When you're ready.",
+      },
+      {
+        number: 1, tag: 'Session 01', title: 'Story',
+        desc: "We don't start with goals. We start with the ground beneath them — your history, your people, the seasons that made you.",
+        teaser: "Before you take flight, know where you've been.",
+        color: '#7a9e7e', emoji: '🌿', dim: 'rgba(122,158,126,0.12)', border: 'rgba(122,158,126,0.25)',
+        minExchanges: 5, videoLen: '4 min', duration: '40–60 min',
+        completeTitle: "You've done something tender here.",
+        completeDesc: "The story you've told yourself about your life just got a little more honest. Before you move on — try one of the tools to anchor what came up.",
+        tools: [
+          { name: 'Peak & Plunge Timeline',    file: 'tools/tool-peak-plunge.html',    tag: 'Interactive' },
+          { name: 'Nurture & Prune Matrix',    file: 'tools/tool-nurture-prune.html',  tag: 'Interactive' },
+          { name: 'Deep Roots Reflection',     file: 'tools/tool-deep-roots.html',     tag: 'Journaling'  },
+          { name: 'Roots & Feathers Practice', file: 'tools/tool-roots-feathers.html', tag: 'Reflection'  },
+        ],
+      },
     ];
 
     const PROMO_CODES = {
@@ -847,62 +373,58 @@
       'IMREADY': { discount: 0.25, label: '25% off applied — $72.75' },
     };
     const BASE_PRICE = 97;
-    let activePromo = null;
 
-    // ── State ─────────────────────────────────────────────────
-    let currentUser      = null;
-    let userProfile      = null;
-    let sessionData      = [];
-    let dashboardLoading = false;  // ← GUARD: prevents double-load
+    let currentUser    = null;
+    let userProfile    = null;
+    let sessionData    = [];
+    let activePromo    = null;
+    let activeSession  = null;
+    let chatMsgs       = [];
+    let isTyping       = false;
+    let exchangeCount  = 0;
+    let sessionContext = {};
 
-    // ── Screen helpers ────────────────────────────────────────
-    function showScreen(id) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    // ── View ──────────────────────────────────────────────────
+    function showView(id) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
       document.getElementById(id).classList.add('active');
     }
 
-    // ── Auth tab switching ────────────────────────────────────
+    // ── Auth ──────────────────────────────────────────────────
     document.querySelectorAll('.auth-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
         tab.classList.add('active');
-        document.getElementById(`form-${tab.dataset.tab}`).classList.add('active');
+        document.getElementById('form-' + tab.dataset.tab).classList.add('active');
       });
     });
 
-    // ── Sign In ───────────────────────────────────────────────
     document.getElementById('form-signin').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('btn-signin');
       const err = document.getElementById('signin-error');
       err.classList.remove('visible');
-      btn.disabled = true;
-      btn.textContent = 'Signing in...';
-
+      btn.disabled = true; btn.textContent = 'Signing in...';
       try {
-        const email    = document.getElementById('signin-email').value.trim();
-        const password = document.getElementById('signin-password').value;
-        const { error } = await sb.auth.signInWithPassword({ email, password });
+        const { error } = await sb.auth.signInWithPassword({
+          email:    document.getElementById('signin-email').value.trim(),
+          password: document.getElementById('signin-password').value,
+        });
         if (error) throw error;
-        // onAuthStateChange handles the rest
       } catch (error) {
-        err.textContent = error.message || 'Something went wrong. Try again.';
+        err.textContent = error.message || 'Something went wrong.';
         err.classList.add('visible');
-        btn.disabled = false;
-        btn.textContent = 'Sign in →';
+        btn.disabled = false; btn.textContent = 'Sign in →';
       }
     });
 
-    // ── Sign Up ───────────────────────────────────────────────
     document.getElementById('form-signup').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('btn-signup');
       const err = document.getElementById('signup-error');
       err.classList.remove('visible');
-      btn.disabled = true;
-      btn.textContent = 'Creating account...';
-
+      btn.disabled = true; btn.textContent = 'Creating account...';
       try {
         const name     = document.getElementById('signup-name').value.trim();
         const email    = document.getElementById('signup-email').value.trim();
@@ -911,148 +433,68 @@
         const { data, error } = await sb.auth.signUp({ email, password });
         if (error) throw error;
         if (data.user) {
-          await sb.from('course_users').update({ full_name: name }).eq('id', data.user.id);
+          await sb.from('course_users').upsert({ id: data.user.id, email, full_name: name }, { onConflict: 'id' });
         }
       } catch (error) {
-        err.textContent = error.message || 'Something went wrong. Try again.';
+        err.textContent = error.message || 'Something went wrong.';
         err.classList.add('visible');
-        btn.disabled = false;
-        btn.textContent = 'Create account →';
+        btn.disabled = false; btn.textContent = 'Create account →';
       }
     });
 
-    // ── Sign Out ──────────────────────────────────────────────
     document.getElementById('btn-signout').addEventListener('click', async () => {
       await sb.auth.signOut();
+      showView('view-auth');
     });
 
-    // ── Load dashboard ────────────────────────────────────────
+    // ── Dashboard ─────────────────────────────────────────────
     async function loadDashboard() {
-      // GUARD — never run two simultaneous loads
-      if (dashboardLoading) return;
-      dashboardLoading = true;
-
-      showScreen('screen-loading');
-
+      showView('view-loading');
       try {
-        // Fetch profile
-        const { data: profile, error: profileError } = await sb
-          .from('course_users')
-          .select('*')
-          .eq('id', currentUser.id)
-          .single();
-
-        // Profile may not exist yet for brand new users — that's fine
+        const { data: profile } = await sb.from('course_users').select('*').eq('id', currentUser.id).single();
         userProfile = profile || null;
-
-        // Auto-unlock sessions whose timer has passed
-        const now = new Date().toISOString();
-        await sb
-          .from('session_progress')
-          .update({ status: 'available' })
-          .eq('user_id', currentUser.id)
-          .eq('status', 'locked')
-          .not('unlocks_at', 'is', null)
-          .lte('unlocks_at', now);
-
-        // Fetch session progress
-        const { data: progress } = await sb
-          .from('session_progress')
-          .select('*')
-          .eq('user_id', currentUser.id)
-          .order('session_number');
-
-        sessionData = progress || [];
-
+        await loadSessionProgress();
         renderDashboard();
-        showScreen('screen-dashboard');
-
+        showView('view-dashboard');
       } catch (err) {
-        console.error('Dashboard load error:', err);
-        // On any error fall back to auth screen cleanly
-        showScreen('screen-auth');
-      } finally {
-        // Always release the guard so future loads can proceed
-        dashboardLoading = false;
+        console.error('Dashboard error:', err);
+        showView('view-auth');
       }
     }
 
-    // ── Auth state listener ───────────────────────────────────
-    // Only handles explicit sign-in and sign-out events.
-    // Page load init is handled by init() below instead.
-    sb.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user && !currentUser) {
-        currentUser = session.user;
-        await loadDashboard();
-      } else if (event === 'SIGNED_OUT') {
-        currentUser      = null;
-        userProfile      = null;
-        sessionData      = [];
-        dashboardLoading = false;
-        showScreen('screen-auth');
-      }
-    });
-
-    // ── Token cleanup helper ─────────────────────────────────
-    function clearSupabaseTokens() {
-      Object.keys(localStorage)
-        .filter(k => k.startsWith('sb-'))
-        .forEach(k => localStorage.removeItem(k));
-    }
-
-    // ── Page load init ────────────────────────────────────────
-    // Reads the Supabase session from localStorage directly.
-    // On any failure, clears corrupted tokens and shows login.
-    async function init() {
+    async function loadSessionProgress() {
       try {
-        const { data: { session }, error } = await sb.auth.getSession();
-        if (error) throw error;
-        if (session?.user) {
-          currentUser = session.user;
-          await loadDashboard();
-        } else {
-          showScreen('screen-auth');
-        }
-      } catch (err) {
-        console.error('Init error — clearing tokens:', err);
-        clearSupabaseTokens();
-        showScreen('screen-auth');
-      }
+        const now = new Date().toISOString();
+        await sb.from('session_progress').update({ status: 'available' })
+          .eq('user_id', currentUser.id).eq('status', 'locked')
+          .not('unlocks_at', 'is', null).lte('unlocks_at', now);
+        const { data } = await sb.from('session_progress').select('*').eq('user_id', currentUser.id).order('session_number');
+        sessionData = data || [];
+      } catch { sessionData = []; }
     }
 
-    init();
-
-    // ── Render dashboard ──────────────────────────────────────
     function renderDashboard() {
       const name = userProfile?.full_name?.split(' ')[0] || '';
-
       const hour = new Date().getHours();
-      const timeGreeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-      document.getElementById('dash-greeting').textContent =
-        name ? `${timeGreeting}, ${name}.` : `${timeGreeting}.`;
-
+      const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+      document.getElementById('dash-greeting').textContent = name ? greeting + ', ' + name + '.' : greeting + '.';
       document.getElementById('nav-user-email').textContent = currentUser.email;
-
       const purchased = !!userProfile?.purchased_at;
       const content   = document.getElementById('dash-content');
 
       if (!purchased) {
         document.getElementById('dash-progress').style.display = 'none';
-        document.getElementById('dash-subtext').textContent =
-          'Seven sessions. Your pace. The same depth as working with a coach — in a format built around you.';
+        document.getElementById('dash-subtext').textContent = 'Seven sessions. Your pace. The same depth as working with a coach — in a format built around you.';
         content.innerHTML = renderPurchaseGate();
         bindPurchaseGate();
         return;
       }
 
-      document.getElementById('dash-subtext').textContent =
-        'Pick up where you left off. The work you do between sessions matters as much as the sessions themselves.';
-
+      document.getElementById('dash-subtext').textContent = 'Pick up where you left off. The work you do between sessions matters as much as the sessions themselves.';
       const completed = sessionData.filter(s => s.status === 'complete').length;
-      const total     = 8;
       document.getElementById('dash-progress').style.display = 'block';
-      document.getElementById('progress-count').textContent = `${completed} of ${total} sessions`;
-      document.getElementById('progress-fill').style.width  = `${(completed / total) * 100}%`;
+      document.getElementById('progress-count').textContent = completed + ' of 8 sessions';
+      document.getElementById('progress-fill').style.width = ((completed / 8) * 100) + '%';
 
       let html = '<div class="sessions-grid">';
       SESSIONS.forEach(session => {
@@ -1064,156 +506,324 @@
       content.innerHTML = html;
 
       document.querySelectorAll('.session-card.available, .session-card.in-progress, .session-card.complete').forEach(card => {
-        card.addEventListener('click', () => {
-          const num = parseInt(card.dataset.session);
-          openSession(num);
-        });
+        card.addEventListener('click', () => openSession(parseInt(card.dataset.session)));
       });
-
       document.querySelectorAll('.btn-ready').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-          e.stopPropagation();
-          const nextSession = parseInt(btn.dataset.next);
-          await bypassGate(nextSession);
-        });
+        btn.addEventListener('click', async (e) => { e.stopPropagation(); await bypassGate(parseInt(btn.dataset.next)); });
       });
     }
 
-    // ── Render session card ───────────────────────────────────
     function renderSessionCard(session, status, progress) {
-      const statusLabels = {
-        available:   { pill: 'pill-available', label: 'Ready',       icon: '→' },
-        in_progress: { pill: 'pill-progress',  label: 'In progress', icon: '◉' },
-        complete:    { pill: 'pill-complete',   label: 'Complete',    icon: '✓' },
-        locked:      { pill: 'pill-locked',     label: 'Locked',      icon: '○' },
-      };
-      const s = statusLabels[status] || statusLabels.locked;
-
+      const labels = { available: { pill: 'pill-available', label: 'Ready', icon: '→' }, in_progress: { pill: 'pill-progress', label: 'In progress', icon: '◉' }, complete: { pill: 'pill-complete', label: 'Complete', icon: '✓' }, locked: { pill: 'pill-locked', label: 'Locked', icon: '○' } };
+      const s = labels[status] || labels.locked;
       let timerHtml = '';
       if (status === 'locked' && progress?.unlocks_at) {
-        const unlockTime = new Date(progress.unlocks_at);
-        const diffMs     = unlockTime - Date.now();
+        const diffMs = new Date(progress.unlocks_at) - Date.now();
         if (diffMs > 0) {
-          const hrs  = Math.floor(diffMs / 3600000);
+          const hrs = Math.floor(diffMs / 3600000);
           const mins = Math.floor((diffMs % 3600000) / 60000);
-          timerHtml = `<div class="unlock-timer">unlocks in ${hrs}h ${mins}m</div>`;
+          timerHtml = '<div class="unlock-timer">unlocks in ' + hrs + 'h ' + mins + 'm</div>';
         }
       }
-
       let bypassHtml = '';
       if (status === 'complete' && session.number < 7) {
-        const nextProgress = sessionData.find(s => s.session_number === session.number + 1);
-        if (nextProgress?.status === 'locked' && nextProgress?.unlocks_at) {
-          const diffMs = new Date(nextProgress.unlocks_at) - Date.now();
-          if (diffMs > 0) {
-            bypassHtml = `
-              <div class="gate-card">
-                <div class="gate-content">
-                  <p>Your next session opens in a little while — giving you time to sit with your take-home action. Done already?</p>
-                </div>
-                <button class="btn-ready" data-next="${session.number + 1}">I'm ready →</button>
-              </div>`;
-          }
+        const next = sessionData.find(s => s.session_number === session.number + 1);
+        if (next?.status === 'locked' && next?.unlocks_at && new Date(next.unlocks_at) - Date.now() > 0) {
+          bypassHtml = '<div class="gate-card"><div class="gate-content"><p>Your next session opens in a little while — giving you time to sit with your take-home. Done already?</p></div><button class="btn-ready" data-next="' + (session.number + 1) + '">I\'m ready →</button></div>';
         }
       }
-
-      return `
-        <div class="session-card ${status}" data-session="${session.number}">
-          <div class="session-num" style="background:${status === 'locked' ? 'var(--mist)' : session.color + '22'};color:${status === 'locked' ? 'var(--text-muted)' : session.color};">
-            ${session.number === 0 ? '✦' : String(session.number).padStart(2, '0')}
-          </div>
-          <div class="session-content">
-            <div class="session-eyebrow" style="color:${status === 'locked' ? 'var(--text-muted)' : session.color}">
-              ${session.tag}
-            </div>
-            <div class="session-title">${session.title}</div>
-            <div class="session-teaser">${session.teaser}</div>
-            ${timerHtml}
-          </div>
-          <div class="session-status">
-            <div class="status-icon" style="color:${status === 'locked' ? 'var(--text-muted)' : status === 'complete' ? '#7a9e7e' : session.color}">
-              ${s.icon}
-            </div>
-            <div class="status-pill ${s.pill}">${s.label}</div>
-          </div>
-        </div>
-        ${bypassHtml}
-      `;
+      const numBg    = status === 'locked' ? 'rgba(255,255,255,0.04)' : session.color + '22';
+      const numColor = status === 'locked' ? 'var(--text-muted)' : session.color;
+      const eyeColor = status === 'locked' ? 'var(--text-muted)' : session.color;
+      const iconColor = status === 'locked' ? 'var(--text-muted)' : status === 'complete' ? '#7a9e7e' : session.color;
+      const num = session.number === 0 ? '✦' : String(session.number).padStart(2, '0');
+      return '<div class="session-card ' + status + '" data-session="' + session.number + '"><div class="session-num" style="background:' + numBg + ';color:' + numColor + ';">' + num + '</div><div class="session-content"><div class="session-eyebrow" style="color:' + eyeColor + '">' + session.tag + '</div><div class="session-title">' + session.title + '</div><div class="session-teaser">' + session.teaser + '</div>' + timerHtml + '</div><div class="session-status"><div class="status-icon" style="color:' + iconColor + '">' + s.icon + '</div><div class="status-pill ' + s.pill + '">' + s.label + '</div></div></div>' + bypassHtml;
     }
 
-    // ── Purchase gate ─────────────────────────────────────────
     function renderPurchaseGate() {
-      return `
-        <div class="purchase-gate">
-          <span class="bird-glyph">🪶</span>
-          <h3>Ready to begin?</h3>
-          <p>Seven sessions. Fully self-paced. An AI coaching guide that actually listens — and a set of tools that help you see yourself clearly. This is the work.</p>
-          <div class="purchase-price">
-            <div class="price-amount" id="display-price">$97</div>
-            <div class="price-label">one-time · lifetime access</div>
-          </div>
-          <div class="promo-input-wrap">
-            <input class="promo-input" id="promo-input" type="text" placeholder="Have a promo code?" />
-            <button class="btn-apply-promo" id="btn-apply-promo">Apply</button>
-          </div>
-          <div class="promo-message" id="promo-message"></div>
-          <button class="btn-purchase" id="btn-purchase">Begin my journey →</button>
-        </div>
-      `;
+      return '<div class="purchase-gate"><span class="bird-glyph">🪶</span><h3>Ready to begin?</h3><p>Seven sessions. Fully self-paced. An AI coaching guide that actually listens — and tools that help you see yourself clearly.</p><div class="purchase-price"><div class="price-amount" id="display-price">$97</div><div class="price-label">one-time · lifetime access</div></div><div class="promo-input-wrap"><input class="promo-input" id="promo-input" type="text" placeholder="Have a promo code?" /><button class="btn-apply-promo" id="btn-apply-promo">Apply</button></div><div class="promo-message" id="promo-message"></div><button class="btn-purchase" id="btn-purchase">Begin my journey →</button></div>';
     }
 
     function bindPurchaseGate() {
       document.getElementById('btn-apply-promo').addEventListener('click', () => {
-        const code    = document.getElementById('promo-input').value.trim().toUpperCase();
-        const promo   = PROMO_CODES[code];
-        const msgEl   = document.getElementById('promo-message');
+        const code  = document.getElementById('promo-input').value.trim().toUpperCase();
+        const promo = PROMO_CODES[code];
+        const msgEl = document.getElementById('promo-message');
         const priceEl = document.getElementById('display-price');
         if (promo) {
           activePromo = promo;
-          const finalPrice = (BASE_PRICE * (1 - promo.discount)).toFixed(2);
-          priceEl.textContent = `$${parseFloat(finalPrice) % 1 === 0 ? parseInt(finalPrice) : finalPrice}`;
-          msgEl.textContent   = promo.label;
-          msgEl.className     = 'promo-message promo-success';
+          const final = (BASE_PRICE * (1 - promo.discount)).toFixed(2);
+          priceEl.textContent = '$' + (parseFloat(final) % 1 === 0 ? parseInt(final) : final);
+          msgEl.textContent = promo.label; msgEl.className = 'promo-message promo-success';
         } else {
           activePromo = null;
-          priceEl.textContent = `$${BASE_PRICE}`;
-          msgEl.textContent   = code ? 'That code doesn\'t look right.' : '';
-          msgEl.className     = 'promo-message promo-error';
+          priceEl.textContent = '$' + BASE_PRICE;
+          msgEl.textContent = code ? "That code doesn't look right." : '';
+          msgEl.className = 'promo-message promo-error';
         }
       });
-
       document.getElementById('btn-purchase').addEventListener('click', () => {
-        const price = activePromo
-          ? (BASE_PRICE * (1 - activePromo.discount)).toFixed(2)
-          : BASE_PRICE;
-        // TODO: Replace with Stripe checkout
-        alert(`Stripe checkout coming soon.\nPrice: $${price}\nUser: ${currentUser.email}`);
+        const price = activePromo ? (BASE_PRICE * (1 - activePromo.discount)).toFixed(2) : BASE_PRICE;
+        alert('Stripe checkout coming soon.\nPrice: $' + price + '\nUser: ' + currentUser.email);
       });
     }
 
-    // ── Open session ──────────────────────────────────────────
-    // Opens in a new tab — keeps dashboard loaded and auth intact
-    function openSession(sessionNumber) {
-      const session = SESSIONS[sessionNumber];
-      if (!session) return;
-      window.open(`${session.file}?uid=${currentUser.id}`, '_blank');
-    }
-
-    // ── Bypass gate ───────────────────────────────────────────
     async function bypassGate(nextSession) {
       try {
-        await sb
-          .from('session_progress')
-          .update({ status: 'available', unlocks_at: new Date().toISOString() })
-          .eq('user_id', currentUser.id)
-          .eq('session_number', nextSession);
-        await loadDashboard();
+        await sb.from('session_progress').update({ status: 'available', unlocks_at: new Date().toISOString() }).eq('user_id', currentUser.id).eq('session_number', nextSession);
+        await loadSessionProgress();
+        renderDashboard();
+      } catch (err) { console.error('Bypass error:', err); }
+    }
+
+    // ── Back to dashboard — NO navigation ────────────────────
+    document.getElementById('btn-back-dash').addEventListener('click', async () => {
+      await loadSessionProgress();
+      renderDashboard();
+      showView('view-dashboard');
+    });
+
+    // ── Open session ──────────────────────────────────────────
+    async function openSession(sessionNumber) {
+      const session = SESSIONS[sessionNumber];
+      if (!session) return;
+
+      activeSession  = session;
+      chatMsgs       = [];
+      isTyping       = false;
+      exchangeCount  = 0;
+      sessionContext = {};
+
+      // Apply session theme
+      document.documentElement.style.setProperty('--session-col',    session.color);
+      document.documentElement.style.setProperty('--session-dim',    session.dim);
+      document.documentElement.style.setProperty('--session-border', session.border);
+
+      // Nav bird emoji
+      document.getElementById('session-nav-bird').textContent = session.emoji;
+
+      // Render left col
+      const toolsHtml = session.tools.length ? '<div class="tools-section"><div class="tools-label">Tools in this session</div><div class="tool-list">' +
+        session.tools.map(t => '<span class="tool-item clickable" onclick="openTool(\'' + t.file + '\')"><span class="tool-dot"></span>' + t.name + '<span class="tool-tag">' + t.tag + '</span></span>').join('') +
+        '</div></div>' : '';
+
+      document.getElementById('session-info').innerHTML =
+        '<div class="session-tag-label">' + session.tag + '</div>' +
+        '<h1>' + session.title + '</h1>' +
+        '<p class="session-info-desc">' + session.desc + '</p>' +
+        '<div class="video-wrap"><div class="video-gradient" style="background:linear-gradient(135deg,' + session.color + '09,' + session.color + '04)"></div><div class="video-play">▶</div><div class="video-label">A word from Luke · ' + session.videoLen + '</div></div>' +
+        '<div class="session-meta-row"><div class="meta-item"><span class="meta-label">Session</span><span class="meta-value">' + (session.number === 0 ? 'Orientation' : '0' + session.number + ' of 07') + '</span></div><div class="meta-item"><span class="meta-label">Duration</span><span class="meta-value">' + session.duration + '</span></div>' +
+        (session.tools.length ? '<div class="meta-item"><span class="meta-label">Tools</span><span class="meta-value">' + session.tools.length + ' tools</span></div>' : '') + '</div>' + toolsHtml;
+
+      // Chat header
+      document.getElementById('chat-header').innerHTML =
+        '<div class="chat-avatar">' + session.emoji + '</div>' +
+        '<div class="chat-avatar-info"><h3>lil\' bird</h3><p>' + session.tag.toLowerCase() + ' · ' + session.title.toLowerCase() + '</p></div>' +
+        '<div class="chat-status"><div class="status-dot"></div>present</div>';
+
+      // Complete panel
+      document.getElementById('complete-panel').classList.remove('visible');
+      document.getElementById('complete-title').textContent = session.completeTitle;
+      document.getElementById('complete-desc').textContent  = session.completeDesc;
+      document.getElementById('tools-nudge').innerHTML = session.tools.slice(0, 2).map(t =>
+        '<span class="tool-nudge-chip" onclick="openTool(\'' + t.file + '\')">' + t.name + ' →</span>'
+      ).join('');
+
+      // Clear chat
+      document.getElementById('chat-messages').innerHTML = '';
+      document.getElementById('chat-input').value = '';
+      document.getElementById('btn-send').disabled = true;
+
+      showView('view-session');
+
+      // Load prior memory
+      await loadSessionContext(sessionNumber);
+
+      // Load or start conversation
+      try {
+        const { data: memory } = await sb.from('ai_memory').select('messages').eq('user_id', currentUser.id).eq('session_number', sessionNumber).single();
+        if (memory?.messages?.length) {
+          chatMsgs = memory.messages;
+          chatMsgs.forEach(m => renderMessage(m.role, m.content));
+          exchangeCount = chatMsgs.filter(m => m.role === 'user').length;
+          if (exchangeCount >= session.minExchanges) document.getElementById('complete-panel').classList.add('visible');
+        } else {
+          setTimeout(() => {
+            const greeting = buildGreeting(sessionNumber);
+            renderMessage('assistant', greeting);
+            chatMsgs.push({ role: 'assistant', content: greeting });
+          }, 600);
+        }
+      } catch {
+        setTimeout(() => {
+          const greeting = buildGreeting(sessionNumber);
+          renderMessage('assistant', greeting);
+          chatMsgs.push({ role: 'assistant', content: greeting });
+        }, 600);
+      }
+
+      // Mark in_progress
+      await sb.from('session_progress').update({ status: 'in_progress', started_at: new Date().toISOString() })
+        .eq('user_id', currentUser.id).eq('session_number', sessionNumber).eq('status', 'available');
+
+      document.getElementById('chat-input').focus();
+    }
+
+    function openTool(toolFile) {
+      window.open(toolFile + '?uid=' + currentUser.id + '&session=' + (activeSession?.number || 0), '_blank');
+    }
+
+    function buildGreeting(sessionNumber) {
+      const name = userProfile?.full_name?.split(' ')[0] || '';
+      const hasContext = sessionContext?.previous_sessions?.length > 0;
+      if (sessionNumber === 0) {
+        return (name ? name + '. ' : '') + "You made it here — and that already says something about you.\n\nI'm lil' bird. Think of me as a guide — I'm not going to tell you what to do or hand you a plan. My job is to ask the right questions and stay curious with you as you figure out what's actually true for your life.\n\nBefore we go anywhere — tell me what brought you here. What's alive for you right now?";
+      }
+      if (sessionNumber === 1) {
+        return hasContext
+          ? (name ? name + ', ' : '') + "you've already taken the first step — and now we go somewhere different.\n\nSession 1 is about your story. Not your goals, not your plans — your actual history. The people who raised you. The seasons that stretched you. The moments you still carry.\n\nI want to start somewhere slow. Think back to where you grew up — the house, the people, the unspoken rules of that place. What's the first thing that comes to mind when you picture it?"
+          : "Welcome to Session 1 — Story.\n\nBefore we talk about where you want to go, I want to understand where you've come from. Your history isn't just background — it's the ground your future is built on.\n\nLet's start somewhere slow. Think back to where you grew up — the house, the people, the unspoken rules of that place. What's the first thing that comes to mind when you picture it?";
+      }
+      return 'Welcome to ' + (SESSIONS[sessionNumber]?.title || 'this session') + '. Let\'s begin.';
+    }
+
+    async function loadSessionContext(sessionNumber) {
+      try {
+        const { data: memories } = await sb.from('ai_memory').select('session_number, summary, key_words')
+          .eq('user_id', currentUser.id).lt('session_number', sessionNumber).not('summary', 'is', null);
+        if (memories?.length) {
+          sessionContext = { previous_sessions: memories.map(m => ({ session_number: m.session_number, summary: m.summary, key_words: m.key_words || [] })) };
+        }
+      } catch { sessionContext = {}; }
+    }
+
+    // ── Chat rendering ────────────────────────────────────────
+    function renderMessage(role, content) {
+      const el = document.getElementById('chat-messages');
+      const wrap = document.createElement('div');
+      wrap.className = 'msg ' + role;
+      wrap.innerHTML = '<div class="msg-avatar">' + (role === 'assistant' ? (activeSession?.emoji || '🪶') : '✦') + '</div><div class="msg-bubble">' + content.replace(/\n/g, '<br>') + '</div>';
+      el.appendChild(wrap);
+      el.scrollTop = el.scrollHeight;
+    }
+
+    function showTyping() {
+      const el = document.getElementById('chat-messages');
+      const wrap = document.createElement('div');
+      wrap.className = 'typing-indicator'; wrap.id = 'typing-indicator';
+      wrap.innerHTML = '<div class="msg-avatar" style="background:var(--session-col);width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0;margin-top:2px;">' + (activeSession?.emoji || '🪶') + '</div><div class="typing-dots"><span></span><span></span><span></span></div>';
+      el.appendChild(wrap); el.scrollTop = el.scrollHeight;
+    }
+
+    function hideTyping() { const el = document.getElementById('typing-indicator'); if (el) el.remove(); }
+
+    async function sendMessage(userText) {
+      if (isTyping || !userText.trim() || !activeSession) return;
+      isTyping = true;
+      document.getElementById('btn-send').disabled = true;
+      renderMessage('user', userText);
+      chatMsgs.push({ role: 'user', content: userText });
+      document.getElementById('chat-input').value = '';
+      document.getElementById('chat-input').style.height = 'auto';
+      showTyping();
+
+      try {
+        const response = await fetch(WORKER_URL + '/chat', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ session_number: activeSession.number, messages: chatMsgs, context: sessionContext, user_name: userProfile?.full_name?.split(' ')[0] || null }),
+        });
+        if (!response.ok) throw new Error('Worker error');
+        const data  = await response.json();
+        const reply = data.reply || '... take your time.';
+        hideTyping();
+        renderMessage('assistant', reply);
+        chatMsgs.push({ role: 'assistant', content: reply });
+        await sb.from('ai_memory').upsert({ user_id: currentUser.id, session_number: activeSession.number, messages: chatMsgs }, { onConflict: 'user_id,session_number' });
+        exchangeCount++;
+        if (exchangeCount >= activeSession.minExchanges) document.getElementById('complete-panel').classList.add('visible');
+      } catch {
+        hideTyping();
+        renderMessage('assistant', 'Something got in the way there. Take a breath — try sending that again.');
+        chatMsgs.pop();
+      }
+
+      isTyping = false;
+      document.getElementById('btn-send').disabled = false;
+      document.getElementById('chat-input').focus();
+    }
+
+    // ── Complete session ──────────────────────────────────────
+    async function completeSession() {
+      if (!activeSession) return;
+      const btn = document.getElementById('btn-complete');
+      btn.disabled = true; btn.textContent = 'Saving your session...';
+
+      const withTimeout = (p, ms) => Promise.race([p, new Promise(r => setTimeout(() => r(null), ms))]);
+
+      try {
+        let summary = '', keyWords = [];
+        const result = await withTimeout(
+          fetch(WORKER_URL + '/summarise', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ session_number: activeSession.number, messages: chatMsgs, user_name: userProfile?.full_name?.split(' ')[0] || null }) }).then(r => r.ok ? r.json() : null),
+          8000
+        );
+        if (result) { summary = result.summary || ''; keyWords = result.key_words || []; }
+
+        await sb.from('ai_memory').upsert({ user_id: currentUser.id, session_number: activeSession.number, messages: chatMsgs, summary, key_words: keyWords }, { onConflict: 'user_id,session_number' });
+        await sb.from('session_progress').update({ status: 'complete', completed_at: new Date().toISOString() }).eq('user_id', currentUser.id).eq('session_number', activeSession.number);
+
+        const nextNum = activeSession.number + 1;
+        const unlockAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+        await sb.from('session_progress').update({ unlocks_at: unlockAt }).eq('user_id', currentUser.id).eq('session_number', nextNum);
+
+        // Fire-and-forget email
+        sb.from('course_users').select('email, full_name').eq('id', currentUser.id).single().then(({ data: profile }) => {
+          if (!profile?.email) return;
+          const nextSession = SESSIONS[nextNum];
+          fetch(WORKER_URL + '/session-email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: profile.email, user_name: profile.full_name || '', session_number: activeSession.number, summary, next_session_title: nextSession ? nextSession.title + ' — ' + nextSession.teaser : '' }) }).catch(() => {});
+        }).catch(() => {});
+
+        // Back to dashboard — NO navigation
+        await loadSessionProgress();
+        renderDashboard();
+        showView('view-dashboard');
+
       } catch (err) {
-        console.error('Bypass gate error:', err);
+        console.error('Complete error:', err);
+        btn.disabled = false; btn.textContent = 'Mark complete & continue →';
       }
     }
 
-  </script>
+    // ── Input bindings ────────────────────────────────────────
+    const chatInput = document.getElementById('chat-input');
+    const btnSend   = document.getElementById('btn-send');
+    chatInput.addEventListener('input', () => {
+      chatInput.style.height = 'auto';
+      chatInput.style.height = Math.min(chatInput.scrollHeight, 140) + 'px';
+      btnSend.disabled = !chatInput.value.trim();
+    });
+    chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (!btnSend.disabled) sendMessage(chatInput.value); } });
+    btnSend.addEventListener('click', () => { if (!btnSend.disabled) sendMessage(chatInput.value); });
+    document.getElementById('btn-complete').addEventListener('click', completeSession);
 
+    // ── Auth listener ─────────────────────────────────────────
+    sb.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        currentUser = session.user;
+        await loadDashboard();
+      } else if (event === 'SIGNED_OUT') {
+        currentUser = null; userProfile = null; sessionData = [];
+        showView('view-auth');
+      }
+    });
+
+    // ── Init ──────────────────────────────────────────────────
+    (async () => {
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        if (session?.user) { currentUser = session.user; await loadDashboard(); }
+        else showView('view-auth');
+      } catch { showView('view-auth'); }
+    })();
+  </script>
 </body>
 </html>
