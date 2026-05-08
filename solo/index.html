@@ -573,15 +573,16 @@
     };
     const BASE_PRICE = 97;
 
-    let currentUser    = null;
-    let userProfile    = null;
-    let sessionData    = [];
-    let activePromo    = null;
-    let activeSession  = null;
-    let chatMsgs       = [];
-    let isTyping       = false;
-    let exchangeCount  = 0;
-    let sessionContext = {};
+let currentUser      = null;
+let userProfile      = null;
+let sessionData      = [];
+let activePromo      = null;
+let activeSession    = null;
+let chatMsgs         = [];
+let isTyping         = false;
+let exchangeCount    = 0;
+let sessionContext   = {};
+let toolOutputsCache = {};
 
     // ── View ──────────────────────────────────────────────────
     function showView(id) {
