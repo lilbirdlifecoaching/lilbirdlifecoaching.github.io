@@ -908,7 +908,12 @@
       if (!wrap || !frame) return;
       lastToolKey = toolKey;
       title.textContent = toolInfo.name;
-      frame.src = toolInfo.file + '?uid=' + (currentUser ? currentUser.id : '') + '&session=' + (activeSession ? activeSession.number : 0) + '&embed=1';
+      var token = '';
+      try {
+        var raw = localStorage.getItem('lilbird-solo-auth');
+        if (raw) { var td = JSON.parse(raw); token = td.access_token || ''; }
+      } catch(e) {}
+      frame.src = toolInfo.file + '?uid=' + (currentUser ? currentUser.id : '') + '&session=' + (activeSession ? activeSession.number : 0) + '&token=' + encodeURIComponent(token) + '&embed=1';
       wrap.classList.add('active');
       setTimeout(function() {
         var chatCol = document.querySelector('.session-chat-col');
@@ -950,23 +955,19 @@
               chatMsgs.push({ role: 'user', content: ctx });
             }
             setTimeout(function() {
-              var ack = 'Welcome back. How did that land for you — was there anything that surprised you, or something that felt particularly true?';
-              renderMessage('assistant', ack);
-              chatMsgs.push({ role: 'assistant', content: ack });
-              sb.from('ai_memory').upsert({ user_id: currentUser.id, session_number: sNum, messages: chatMsgs }, { onConflict: 'user_id,session_number' }).catch(function(){});
-              // Scroll chat to bottom so user sees the ack
+              // Send tool context to AI and get a real response
               var msgs = document.getElementById('chat-messages');
               if (msgs) msgs.scrollTop = msgs.scrollHeight;
               document.getElementById('chat-input').focus();
+              // Trigger real AI response with tool context
+              triggerToolReturnAck();
             }, 400);
           }).catch(function() {
             setTimeout(function() {
-              var ack = 'Welcome back. How did that land for you?';
-              renderMessage('assistant', ack);
-              chatMsgs.push({ role: 'assistant', content: ack });
               var msgs = document.getElementById('chat-messages');
               if (msgs) msgs.scrollTop = msgs.scrollHeight;
               document.getElementById('chat-input').focus();
+              sendMessage('');
             }, 400);
           });
       } else {
@@ -1085,6 +1086,41 @@
     }
 
     function hideTyping() { const el = document.getElementById('typing-indicator'); if (el) el.remove(); }
+
+    async function triggerToolReturnAck() {
+      if (isTyping || !activeSession || !currentUser) return;
+      isTyping = true;
+      document.getElementById('btn-send').disabled = true;
+      showTyping();
+      try {
+        var response = await fetch(WORKER_URL + '/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            session_number: activeSession.number,
+            messages: chatMsgs,
+            context: sessionContext,
+            user_name: userProfile && userProfile.full_name ? userProfile.full_name.split(' ')[0] : null,
+          }),
+        });
+        if (!response.ok) throw new Error('Worker error');
+        var data  = await response.json();
+        var reply = data.reply || 'How did that land for you?';
+        hideTyping();
+        renderMessage('assistant', reply);
+        chatMsgs.push({ role: 'assistant', content: reply });
+        await sb.from('ai_memory').upsert({ user_id: currentUser.id, session_number: activeSession.number, messages: chatMsgs }, { onConflict: 'user_id,session_number' });
+        var msgs = document.getElementById('chat-messages');
+        if (msgs) msgs.scrollTop = msgs.scrollHeight;
+      } catch(e) {
+        hideTyping();
+        renderMessage('assistant', 'Welcome back. How did that land for you?');
+        chatMsgs.push({ role: 'assistant', content: 'Welcome back. How did that land for you?' });
+      }
+      isTyping = false;
+      document.getElementById('btn-send').disabled = false;
+      document.getElementById('chat-input').focus();
+    }
 
     async function sendMessage(userText) {
       if (isTyping || !userText.trim() || !activeSession) return;
