@@ -79,7 +79,7 @@
 <div class="page">
   <nav class="nav">
     <div class="nav-left"><div class="nav-bird">🌫️</div>lil' bird · Tool</div>
-    <a href="javascript:history.back()" class="nav-back">← Back</a>
+    <a href="javascript:void(0)" onclick="goBack()" class="nav-back">← Back</a>
   </nav>
   <div class="eyebrow">Session 04 · Transitions</div>
   <h1>Courage Compass</h1>
@@ -138,13 +138,21 @@
   <div class="save-row">
     <span class="save-status" id="save-status">✓ Saved</span>
     <div class="save-actions">
-      <a href="javascript:history.back()" class="btn-back2">Back to session</a>
+      <a href="javascript:void(0)" onclick="goBack()" class="btn-back2">Back to session</a>
       <button class="btn-save" id="btn-save">Save my compass</button>
     </div>
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js">
+  function goBack() {
+    if (window.parent !== window) {
+      window.parent.postMessage('tool-close', '*');
+    } else {
+      history.back();
+    }
+  }
+</script>
 <script>
   const { createClient } = supabase;
   const sb = createClient('https://mebqqzbuwkogdxvnihrq.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU');
@@ -170,9 +178,17 @@
   });
 
   (async () => {
-    const { data: { session } } = await sb.auth.getSession();
-    if (session?.user) {
-      currentUser = session.user;
+    const params = new URLSearchParams(window.location.search);
+    const urlUid = params.get('uid');
+    if (urlUid) {
+      currentUser = { id: urlUid };
+    } else {
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        if (session?.user) currentUser = session.user;
+      } catch(e) {}
+    }
+    if (currentUser) {
       const { data } = await sb.from('tool_outputs').select('output_data').eq('user_id', currentUser.id).eq('tool_name', 'courage_compass').single();
       if (data?.output_data) FIELDS.forEach(id => { if (data.output_data[id]) document.getElementById(id).value = data.output_data[id]; });
     }

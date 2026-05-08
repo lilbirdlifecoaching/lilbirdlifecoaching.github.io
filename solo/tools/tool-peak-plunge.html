@@ -549,7 +549,7 @@
       <div class="nav-bird">🌿</div>
       lil' bird · Session 1 Tool
     </div>
-    <a href="javascript:history.back()" class="nav-back">← Back to session</a>
+    <a href="javascript:void(0)" onclick="goBack()" class="nav-back">← Back to session</a>
   </nav>
 
   <!-- Header -->
@@ -607,7 +607,7 @@
       Your timeline saves automatically when you add moments. When you're done, head back to your session to continue the conversation with what you've seen here.
     </div>
     <div class="save-actions">
-      <a href="javascript:history.back()" class="btn-back-session">Back to session</a>
+      <a href="javascript:void(0)" onclick="goBack()" class="btn-back-session">Back to session</a>
       <button class="btn-save" id="btn-save">Save my timeline</button>
     </div>
   </div>
@@ -631,7 +631,15 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js">
+  function goBack() {
+    if (window.parent !== window) {
+      window.parent.postMessage('tool-close', '*');
+    } else {
+      history.back();
+    }
+  }
+</script>
   <script>
   const { createClient } = supabase;
 

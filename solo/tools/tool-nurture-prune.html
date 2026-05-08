@@ -466,7 +466,7 @@
       <div class="nav-bird">🌿</div>
       lil' bird · Session 1 Tool
     </div>
-    <a href="javascript:history.back()" class="nav-back">← Back to session</a>
+    <a href="javascript:void(0)" onclick="goBack()" class="nav-back">← Back to session</a>
   </nav>
 
   <!-- Header -->
@@ -548,7 +548,7 @@
       Which quadrant surprised you? The Flourishing box often holds the people we should thank. The Pruning box often holds the people who gave us the most resilience.
     </div>
     <div class="save-actions">
-      <a href="javascript:history.back()" class="btn-back-session">Back to session</a>
+      <a href="javascript:void(0)" onclick="goBack()" class="btn-back-session">Back to session</a>
       <button class="btn-save" id="btn-save">Save my matrix</button>
     </div>
   </div>
@@ -556,7 +556,15 @@
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js">
+  function goBack() {
+    if (window.parent !== window) {
+      window.parent.postMessage('tool-close', '*');
+    } else {
+      history.back();
+    }
+  }
+</script>
   <script>
   const { createClient } = supabase;
 
@@ -683,9 +691,17 @@
 
   // ── Init ─────────────────────────────────────────────────────
   async function init() {
-    const { data: { session } } = await sb.auth.getSession();
-    if (session?.user) {
-      currentUser = session.user;
+    const params = new URLSearchParams(window.location.search);
+    const urlUid = params.get('uid');
+    if (urlUid) {
+      currentUser = { id: urlUid };
+    } else {
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        if (session?.user) currentUser = session.user;
+      } catch(e) {}
+    }
+    if (currentUser) {
 
       const { data: toolData } = await sb
         .from('tool_outputs')
