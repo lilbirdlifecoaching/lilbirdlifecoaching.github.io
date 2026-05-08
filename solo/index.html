@@ -1023,7 +1023,7 @@
     function renderMessage(role, msgContent) {
       var el = document.getElementById('chat-messages');
       var toolMatch = msgContent.match(/\[TOOL:([a-z-]+)\]/);
-      var cleanContent = msgContent.replace(/\[TOOL:[a-z-]+\]\s*/g, '').trim();
+      var cleanContent = msgContent.replace(/\[TOOL:[a-z-]+\]\s*/g, '').replace(/\[COMPLETE\]\s*/g, '').trim();
       if (cleanContent) {
         var wrap = document.createElement('div');
         wrap.className = 'msg ' + role;
@@ -1184,7 +1184,7 @@
         sb.from('course_users').select('email, full_name').eq('id', currentUser.id).single().then(({ data: profile }) => {
           if (!profile?.email) return;
           const nextSession = SESSIONS[nextNum];
-          fetch(WORKER_URL + '/session-email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: profile.email, user_name: profile.full_name || '', session_number: activeSession.number, summary, action_point: actionPoint, next_session_title: nextSession ? nextSession.title + ' — ' + nextSession.teaser : '' }) }).catch(() => {});
+          fetch(WORKER_URL + '/session-email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: profile.email, user_name: profile.full_name || '', user_id: currentUser.id, session_number: activeSession.number, summary, action_point: actionPoint, next_session_title: nextSession ? nextSession.title + ' — ' + nextSession.teaser : '' }) }).catch(() => {});
         }).catch(() => {});
 
         // Back to dashboard — NO navigation
