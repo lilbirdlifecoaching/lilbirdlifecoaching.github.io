@@ -233,7 +233,6 @@
     .btn-complete:hover { opacity: 0.85; transform: translateY(-2px); }
     .btn-complete:disabled { opacity: 0.5; cursor: default; transform: none; }
 
-
     .tool-card-msg { display: flex; gap: 0.75rem; animation: msgIn 0.35s ease both; max-width: 88%; }
     .tool-card { background: var(--dark-card); border: 1px solid var(--session-border); border-radius: 16px; border-top-left-radius: 4px; padding: 1rem 1.25rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: background 0.2s, border-color 0.2s, transform 0.15s; min-width: 220px; }
     .tool-card:hover { background: var(--session-dim); border-color: var(--session-col); transform: translateY(-1px); }
@@ -245,7 +244,6 @@
     .tool-card-arrow { font-size: 0.9rem; color: var(--session-col); flex-shrink: 0; }
     .tool-card.used { opacity: 0.5; cursor: default; transform: none !important; }
     .tool-card.used .tool-card-label { color: var(--text-muted); }
-
 
     .tool-embed-wrap {
       display: none; position: absolute; inset: 0; background: var(--dark);
@@ -259,7 +257,6 @@
     .btn-close-tool { background: none; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 0.4rem 0.875rem; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); cursor: pointer; transition: border-color 0.2s, color 0.2s; }
     .btn-close-tool:hover { border-color: var(--session-col); color: var(--session-col); }
     .tool-embed-frame { flex: 1; border: none; background: var(--dark); width: 100%; }
-
 
     /* ── Tool snapshots ── */
     .tool-snapshot { padding: 0.75rem 1.1rem; border-top: 1px solid rgba(255,255,255,0.05); animation: fadeUp 0.3s ease both; }
@@ -281,13 +278,11 @@
     .snap-bar-fill { height: 100%; border-radius: 2px; background: var(--session-col); }
     .snap-mini-svg { width: 100%; display: block; margin-bottom: 6px; }
 
-    /* Tool card revisit state */
     .tool-card-actions { display: flex; gap: 0; border-top: 1px solid rgba(255,255,255,0.05); }
     .tool-card-action { flex: 1; padding: 7px 10px; font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(240,236,228,0.35); cursor: pointer; text-align: center; transition: color 0.2s, background 0.2s; border: none; background: none; }
     .tool-card-action:first-child { border-right: 1px solid rgba(255,255,255,0.05); }
     .tool-card-action:hover { color: var(--session-col); background: var(--session-dim); }
 
-    /* Left panel expanded tool items */
     .tool-item-snap { padding: 0.5rem 0.75rem; border-top: 1px solid rgba(255,255,255,0.04); animation: fadeUp 0.3s ease both; }
 
     @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
@@ -297,57 +292,30 @@
     @keyframes dot { 0%,100% { opacity: 0.4; transform: scale(1); } 50% { opacity: 1; transform: scale(1.2); } }
 
     @media (max-width: 768px) {
-      /* Dashboard */
       .dash-nav { padding: 1rem; }
       .dash-body { padding: 1.5rem 1rem 4rem; }
       .nav-user { display: none; }
-
-      /* Session view */
       .session-nav { padding: 0.875rem 1rem; }
       .session-nav-label { display: none; }
-      .session-main {
-        grid-template-columns: 1fr;
-        padding: 0;
-        gap: 0;
-      }
-      /* Hide session info on mobile — focus is the chat */
+      .session-main { grid-template-columns: 1fr; padding: 0; gap: 0; }
       .session-info { display: none; }
-      .session-chat-col {
-        min-height: calc(100vh - 60px);
-        padding: 0;
-      }
-      .chat-container {
-        min-height: calc(100vh - 60px);
-        border-radius: 0;
-        border-left: none;
-        border-right: none;
-        border-bottom: none;
-      }
+      .session-chat-col { min-height: calc(100vh - 60px); padding: 0; }
+      .chat-container { min-height: calc(100vh - 60px); border-radius: 0; border-left: none; border-right: none; border-bottom: none; }
       .chat-header { padding: 1rem; }
       .chat-messages { padding: 1rem; }
-      .chat-input-wrap {
-        padding: 0.75rem 1rem;
-        padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
-      }
-      .chat-textarea { font-size: 16px; /* prevent iOS zoom */ }
-      .complete-panel {
-        border-radius: 0;
-        margin-top: 0;
-        border-left: none;
-        border-right: none;
-      }
+      .chat-input-wrap { padding: 0.75rem 1rem; padding-bottom: max(0.75rem, env(safe-area-inset-bottom)); }
+      .chat-textarea { font-size: 16px; }
+      .complete-panel { border-radius: 0; margin-top: 0; border-left: none; border-right: none; }
     }
   </style>
 </head>
 <body>
 
-  <!-- LOADING -->
   <div id="view-loading" class="view active">
     <div class="loading-bird">🪶</div>
     <div class="loading-text">finding your nest...</div>
   </div>
 
-  <!-- AUTH -->
   <div id="view-auth" class="view">
     <div class="auth-wrap">
       <div class="auth-logo">
@@ -378,7 +346,6 @@
     </div>
   </div>
 
-  <!-- DASHBOARD -->
   <div id="view-dashboard" class="view">
     <nav class="dash-nav">
       <div class="nav-brand"><div class="nav-bird">🪶</div><div class="nav-title">lil' bird</div></div>
@@ -398,7 +365,6 @@
     </div>
   </div>
 
-  <!-- SESSION VIEW -->
   <div id="view-session" class="view">
     <nav class="session-nav">
       <div class="session-nav-left">
@@ -547,8 +513,8 @@
         completeTitle: "You can see your forest clearly now.",
         completeDesc: "Knowing who to invest in — and who needs a boundary — changes everything. Map it with the Forest tool below.",
         tools: [
-          { name: 'Forest of Connections', file: 'tools/tool-forest.html',          tag: 'Interactive' },
-          { name: 'Nurture & Prune revisit', file: 'tools/tool-nurture-prune.html', tag: 'Check-in'    },
+          { name: 'Forest of Connections',   file: 'tools/tool-forest.html',          tag: 'Interactive' },
+          { name: 'Nurture & Prune revisit', file: 'tools/tool-nurture-prune.html',   tag: 'Check-in'    },
         ],
       },
       {
@@ -573,16 +539,59 @@
     };
     const BASE_PRICE = 97;
 
-let currentUser      = null;
-let userProfile      = null;
-let sessionData      = [];
-let activePromo      = null;
-let activeSession    = null;
-let chatMsgs         = [];
-let isTyping         = false;
-let exchangeCount    = 0;
-let sessionContext   = {};
-let toolOutputsCache = {};
+    // ── FIX 4: Single source of truth for tool key ↔ DB key mapping ──
+    // toolKey (hyphenated) → dbKey (what's stored in Supabase tool_outputs.tool_name)
+    function getDbKey(toolKey, sessionNumber) {
+      var map = {
+        'peak-plunge':      'peak_plunge',
+        'nurture-prune':    'nurture_prune',
+        'deep-roots':       'deep_roots',
+        'roots-feathers':   'roots_feathers',
+        'soar-steady':      'soar_steady',
+        'adventure-map':    'adventure_map',
+        'shadows-sparks':   'shadows_sparks',
+        'tangle-within':    'tangle_within',
+        'courage-compass':  'courage_compass',
+        'birdsong':         'birdsong',
+        'forest':           'forest',
+        'full-flight-plan': 'full_flight_plan',
+        'deep-profile':     'identity_profile',
+        'glow-map':         'glow_map_s' + (sessionNumber !== undefined ? sessionNumber : (activeSession ? activeSession.number : 0)),
+      };
+      return map[toolKey] || toolKey.replace(/-/g, '_');
+    }
+
+    // ── FIX 5: Reverse map — dbKey → toolKey, for pre-populating openedTools ──
+    var DB_KEY_TO_TOOL_KEY = {
+      'peak_plunge':      'peak-plunge',
+      'nurture_prune':    'nurture-prune',
+      'deep_roots':       'deep-roots',
+      'roots_feathers':   'roots-feathers',
+      'soar_steady':      'soar-steady',
+      'adventure_map':    'adventure-map',
+      'shadows_sparks':   'shadows-sparks',
+      'tangle_within':    'tangle-within',
+      'courage_compass':  'courage-compass',
+      'birdsong':         'birdsong',
+      'forest':           'forest',
+      'full_flight_plan': 'full-flight-plan',
+      'identity_profile': 'deep-profile',
+      'glow_map_s0': 'glow-map', 'glow_map_s1': 'glow-map',
+      'glow_map_s2': 'glow-map', 'glow_map_s3': 'glow-map',
+      'glow_map_s4': 'glow-map', 'glow_map_s5': 'glow-map',
+      'glow_map_s6': 'glow-map', 'glow_map_s7': 'glow-map',
+    };
+
+    let currentUser      = null;
+    let userProfile      = null;
+    let sessionData      = [];
+    let activePromo      = null;
+    let activeSession    = null;
+    let chatMsgs         = [];
+    let isTyping         = false;
+    let exchangeCount    = 0;
+    let sessionContext   = {};
+    let toolOutputsCache = {};  // FIX 1: declared at top level
 
     // ── View ──────────────────────────────────────────────────
     function showView(id) {
@@ -654,6 +663,7 @@ let toolOutputsCache = {};
         const { data: profile } = await sb.from('course_users').select('*').eq('id', currentUser.id).single();
         userProfile = profile || null;
         await loadSessionProgress();
+        await loadToolOutputs(); // FIX 1: populate cache on every dashboard load
         renderDashboard();
         showView('view-dashboard');
       } catch (err) {
@@ -670,7 +680,39 @@ let toolOutputsCache = {};
           .not('unlocks_at', 'is', null).lte('unlocks_at', now);
         const { data } = await sb.from('session_progress').select('*').eq('user_id', currentUser.id).order('session_number');
         sessionData = data || [];
+
+        // FIX 7: Auto-init missing session rows for purchased users
+        if (userProfile && userProfile.purchased_at && sessionData.length < 8) {
+          var existing = sessionData.map(function(s) { return s.session_number; });
+          var inserts  = [];
+          for (var i = 0; i <= 7; i++) {
+            if (existing.indexOf(i) === -1) {
+              inserts.push({
+                user_id:        currentUser.id,
+                session_number: i,
+                status:         i === 0 ? 'available' : 'locked',
+              });
+            }
+          }
+          if (inserts.length) {
+            await sb.from('session_progress').insert(inserts);
+            const { data: data2 } = await sb.from('session_progress').select('*').eq('user_id', currentUser.id).order('session_number');
+            sessionData = data2 || sessionData;
+          }
+        }
       } catch { sessionData = []; }
+    }
+
+    // FIX 1: loadToolOutputs populates toolOutputsCache from Supabase
+    async function loadToolOutputs() {
+      if (!currentUser) return;
+      try {
+        var result = await sb.from('tool_outputs').select('tool_name, output_data').eq('user_id', currentUser.id);
+        if (result.data) {
+          toolOutputsCache = {};
+          result.data.forEach(function(row) { toolOutputsCache[row.tool_name] = row.output_data; });
+        }
+      } catch(e) { toolOutputsCache = {}; }
     }
 
     function renderDashboard() {
@@ -776,9 +818,10 @@ let toolOutputsCache = {};
       } catch (err) { console.error('Bypass error:', err); }
     }
 
-    // ── Back to dashboard — NO navigation ────────────────────
+    // FIX 1: also reload tool outputs when returning to dashboard from a session
     document.getElementById('btn-back-dash').addEventListener('click', async () => {
       await loadSessionProgress();
+      await loadToolOutputs();
       renderDashboard();
       showView('view-dashboard');
     });
@@ -794,41 +837,39 @@ let toolOutputsCache = {};
       exchangeCount  = 0;
       sessionContext = {};
 
+      // FIX 5: Pre-populate openedTools from toolOutputsCache using reverse map
+      // so returning users see tools correctly marked as done
+      openedTools = {};
+      Object.keys(toolOutputsCache).forEach(function(dbKey) {
+        var tk = DB_KEY_TO_TOOL_KEY[dbKey];
+        if (tk) openedTools[tk] = true;
+      });
+
       // Apply session theme
       document.documentElement.style.setProperty('--session-col',    session.color);
       document.documentElement.style.setProperty('--session-dim',    session.dim);
       document.documentElement.style.setProperty('--session-border', session.border);
 
-      // Nav bird emoji
       document.getElementById('session-nav-bird').textContent = session.emoji;
 
-      // Render left col
+      // Build left panel tool list using getDbKey for correct cache lookup
       const toolsHtml = session.tools.length ? '<div class="tools-section"><div class="tools-label">Tools in this session</div><div class="tool-list">' +
         session.tools.map(function(t) {
           var k = Object.keys(TOOL_MAP).find(function(key) { return TOOL_MAP[key].file === t.file; });
           var oc = k ? ('openToolEmbed(\'' + k + '\',TOOL_MAP[\'' + k + '\'])') : ('openTool(\'' + t.file + '\')');
-          var dbKey = k ? k.replace(/-/g,'_') : '';
-          var snapData = dbKey ? (toolOutputsCache[dbKey] || toolOutputsCache[k] || null) : null;
-          var isDone = openedTools[k] || false;
-          var snapHtml = (isDone && snapData) ? ('<div class="tool-item-snap">' + renderToolSnapshot(k, snapData).replace(/<div class="tool-snapshot">/,'').replace(/<\/div>$/,'') + '</div>') : '';
+          // FIX 4: use getDbKey for correct cache lookup (handles glow-map and identity_profile)
+          var dbKey    = k ? getDbKey(k, sessionNumber) : '';
+          var snapData = dbKey ? (toolOutputsCache[dbKey] || null) : null;
+          var isDone   = openedTools[k] || false;
+          var snapHtml = (isDone && snapData) ? ('<div class="tool-item-snap">' + renderToolSnapshot(k, snapData).replace('<div class="tool-snapshot">', '').replace(/<\/div>\s*$/, '') + '</div>') : '';
           var doneTag  = isDone ? 'Done' : t.tag;
-          var doneClass = isDone ? ' style="color:var(--session-col)"' : '';
-          return '<div class="tool-item clickable' + (isDone ? ' tool-done' : '') + '" onclick="' + oc + '"><span class="tool-dot"></span><span>' + t.name + '</span><span class="tool-tag"' + doneClass + '>' + doneTag + '</span></div>' + snapHtml;
+          var doneStyle = isDone ? ' style="color:var(--session-col);opacity:1"' : '';
+          return '<div class="tool-item clickable' + (isDone ? ' tool-done' : '') + '" data-tool-key="' + (k || '') + '" onclick="' + oc + '"><span class="tool-dot"></span><span>' + t.name + '</span><span class="tool-tag"' + doneStyle + '>' + doneTag + '</span></div>' + snapHtml;
         }).join('') +
         '</div></div>' : '';
 
       const videoHtml = session.videoUrl
-        ? `<div class="video-wrap">
-            <div class="video-player-container">
-              <video id="session-video" preload="metadata" playsinline>
-                <source src="${session.videoUrl}" type="video/mp4">
-              </video>
-              <div class="video-poster" id="video-poster" style="background:linear-gradient(135deg,${session.color}18,${session.color}08)">
-                <div class="video-play">▶</div>
-                <div class="video-label">A word from Luke · ${session.videoLen}</div>
-              </div>
-            </div>
-           </div>`
+        ? `<div class="video-wrap"><div class="video-player-container"><video id="session-video" preload="metadata" playsinline><source src="${session.videoUrl}" type="video/mp4"></video><div class="video-poster" id="video-poster" style="background:linear-gradient(135deg,${session.color}18,${session.color}08)"><div class="video-play">▶</div><div class="video-label">A word from Luke · ${session.videoLen}</div></div></div></div>`
         : `<div class="video-coming-soon"><p>🪶 &nbsp; Video coming soon</p></div>`;
 
       document.getElementById('session-info').innerHTML =
@@ -839,15 +880,11 @@ let toolOutputsCache = {};
         '<div class="session-meta-row"><div class="meta-item"><span class="meta-label">Session</span><span class="meta-value">' + (session.number === 0 ? 'Orientation' : '0' + session.number + ' of 07') + '</span></div><div class="meta-item"><span class="meta-label">Duration</span><span class="meta-value">' + session.duration + '</span></div>' +
         (session.tools.length ? '<div class="meta-item"><span class="meta-label">Tools</span><span class="meta-value">' + session.tools.length + ' tools</span></div>' : '') + '</div>' + toolsHtml;
 
-      // Wire up video player after DOM update
+      // Wire up video player
       if (session.videoUrl) {
         const video  = document.getElementById('session-video');
         const poster = document.getElementById('video-poster');
-        poster.addEventListener('click', () => {
-          poster.classList.add('hidden');
-          video.play();
-        });
-        // Click video to pause/resume
+        poster.addEventListener('click', () => { poster.classList.add('hidden'); video.play(); });
         video.addEventListener('click', () => {
           if (video.paused) { video.play(); poster.classList.add('hidden'); }
           else { video.pause(); }
@@ -857,13 +894,11 @@ let toolOutputsCache = {};
         video.addEventListener('ended', () => poster.classList.remove('hidden'));
       }
 
-      // Chat header
       document.getElementById('chat-header').innerHTML =
         '<div class="chat-avatar">' + session.emoji + '</div>' +
         '<div class="chat-avatar-info"><h3>lil\' bird</h3><p>' + session.tag.toLowerCase() + ' · ' + session.title.toLowerCase() + '</p></div>' +
         '<div class="chat-status"><div class="status-dot"></div>present</div>';
 
-      // Complete panel
       document.getElementById('complete-panel').classList.remove('visible');
       document.getElementById('complete-title').textContent = session.completeTitle;
       document.getElementById('complete-desc').textContent  = session.completeDesc;
@@ -873,14 +908,11 @@ let toolOutputsCache = {};
         return '<span class="tool-nudge-chip" onclick="' + oc + '">' + t.name + ' →</span>';
       }).join('');
 
-      // Clear chat
       document.getElementById('chat-messages').innerHTML = '';
       document.getElementById('chat-input').value = '';
       document.getElementById('btn-send').disabled = true;
 
       showView('view-session');
-
-      // Load prior memory
       await loadSessionContext(sessionNumber);
 
       // Load or start conversation
@@ -890,7 +922,14 @@ let toolOutputsCache = {};
           chatMsgs = memory.messages;
           chatMsgs.forEach(m => renderMessage(m.role, m.content));
           exchangeCount = chatMsgs.filter(m => m.role === 'user').length;
-          // Complete panel shown only when AI sends [COMPLETE] signal
+          // FIX 8: If session already complete, hide the complete panel even if [COMPLETE] was in history
+          const sessionStatus = sessionData.find(s => s.session_number === sessionNumber)?.status;
+          if (sessionStatus === 'complete') {
+            setTimeout(function() {
+              var panel = document.getElementById('complete-panel');
+              if (panel) panel.classList.remove('visible');
+            }, 700);
+          }
         } else {
           setTimeout(() => {
             const greeting = buildGreeting(sessionNumber);
@@ -906,13 +945,11 @@ let toolOutputsCache = {};
         }, 600);
       }
 
-      // Mark in_progress
       await sb.from('session_progress').update({ status: 'in_progress', started_at: new Date().toISOString() })
         .eq('user_id', currentUser.id).eq('session_number', sessionNumber).eq('status', 'available');
 
       document.getElementById('chat-input').focus();
     }
-
 
     const TOOL_MAP = {
       'peak-plunge':     { file: 'tools/tool-peak-plunge.html',     icon: '📈', name: 'Peak & Plunge Timeline',    hint: 'Map the highs and lows of your story so far.' },
@@ -924,7 +961,7 @@ let toolOutputsCache = {};
       'adventure-map':   { file: 'tools/tool-adventure-map.html',   icon: '🗺️', name: 'Adventure Map',             hint: 'Map your journey to your North Star.' },
       'shadows-sparks':  { file: 'tools/tool-shadows-sparks.html',  icon: '✨', name: 'Shadows & Sparks',          hint: 'What drives you from fear vs passion.' },
       'tangle-within':   { file: 'tools/tool-tangle-within.html',   icon: '🌿', name: 'The Tangle Within',         hint: 'Name what is holding you back.' },
-      'deep-profile':    { file: 'tools/tool-deep-profile.html',    icon: '🧭', name: 'Identity Profile',             hint: 'Enter your MBTI, Enneagram, or take the Deep Profile.' },
+      'deep-profile':    { file: 'tools/tool-deep-profile.html',    icon: '🧭', name: 'Identity Profile',          hint: 'Enter your MBTI, Enneagram, or take the Deep Profile.' },
       'courage-compass': { file: 'tools/tool-courage-compass.html', icon: '🧭', name: 'Courage Compass',           hint: 'Orient yourself at the crossroads.' },
       'birdsong':        { file: 'tools/tool-birdsong.html',        icon: '🎵', name: 'Birdsong Scale',            hint: 'Map your energy states and design your week.' },
       'forest':          { file: 'tools/tool-forest.html',          icon: '🌲', name: 'Forest of Connections',     hint: 'Map the people in your relational landscape.' },
@@ -964,57 +1001,79 @@ let toolOutputsCache = {};
       if (!wrap) return;
       wrap.classList.remove('active');
       setTimeout(function() { if (frame) frame.src = 'about:blank'; }, 300);
-      // Scroll session chat col back into view
       setTimeout(function() {
         var msgs = document.getElementById('chat-messages');
         if (msgs) msgs.scrollTop = msgs.scrollHeight;
       }, 150);
+
       if (activeSession && currentUser && lastToolKey) {
-        var toolNameMap = {
-          'peak-plunge':'peak_plunge','nurture-prune':'nurture_prune',
-          'deep-roots':'deep_roots','roots-feathers':'roots_feathers',
-          'soar-steady':'soar_steady','adventure-map':'adventure_map',
-          'shadows-sparks':'shadows_sparks','tangle-within':'tangle_within',
-          'courage-compass':'courage_compass','birdsong':'birdsong',
-          'forest':'forest','full-flight-plan':'full_flight_plan',
-          'deep-profile':'identity_profile',
-        };
-        var sNum = activeSession.number;
-        var dbKey = lastToolKey === 'glow-map'
-          ? ('glow_map_s' + sNum)
-          : (toolNameMap[lastToolKey] || lastToolKey.replace(/-/g,'_'));
-        sb.from('tool_outputs').select('output_data').eq('user_id', currentUser.id).eq('tool_name', dbKey).single()
-          .then(function(result) {
-            var toolData = result.data && result.data.output_data;
-            var toolName = TOOL_MAP[lastToolKey] ? TOOL_MAP[lastToolKey].name : lastToolKey;
-            if (toolData) {
-              var ctx = '[Tool completed: ' + toolName + '] Data: ' + JSON.stringify(toolData).slice(0, 600);
-              chatMsgs.push({ role: 'user', content: ctx });
-              // Cache and update tool card snapshot in chat + left panel
-              toolOutputsCache[dbKey] = toolData;
-              updateToolCardSnapshot(lastToolKey, toolData);
-            }
-            setTimeout(function() {
-              // Send tool context to AI and get a real response
-              var msgs = document.getElementById('chat-messages');
-              if (msgs) msgs.scrollTop = msgs.scrollHeight;
-              document.getElementById('chat-input').focus();
-              // Trigger real AI response with tool context
-              triggerToolReturnAck();
-            }, 400);
-          }).catch(function() {
-            setTimeout(function() {
-              var msgs = document.getElementById('chat-messages');
-              if (msgs) msgs.scrollTop = msgs.scrollHeight;
-              document.getElementById('chat-input').focus();
-              sendMessage('');
-            }, 400);
-          });
+        // FIX 3: 1500ms delay before querying — gives tool time to finish saving
+        // FIX 2: use maybeSingle() so zero rows returns null instead of throwing
+        // FIX 4: use getDbKey() for correct key mapping
+        setTimeout(function() {
+          var sNum  = activeSession.number;
+          var dbKey = getDbKey(lastToolKey, sNum);
+          sb.from('tool_outputs').select('output_data')
+            .eq('user_id', currentUser.id)
+            .eq('tool_name', dbKey)
+            .maybeSingle()                          // FIX 2
+            .then(function(result) {
+              var toolData = result && result.data && result.data.output_data;
+              if (toolData) {
+                var toolName = TOOL_MAP[lastToolKey] ? TOOL_MAP[lastToolKey].name : lastToolKey;
+                var ctx = '[Tool completed: ' + toolName + '] Data: ' + JSON.stringify(toolData).slice(0, 600);
+                chatMsgs.push({ role: 'user', content: ctx });
+                toolOutputsCache[dbKey] = toolData;
+                updateToolCardSnapshot(lastToolKey, toolData);
+                updateLeftPanelTool(lastToolKey, toolData); // FIX 6
+              }
+              // Always trigger AI response regardless of whether tool data was found
+              setTimeout(function() {
+                var msgs = document.getElementById('chat-messages');
+                if (msgs) msgs.scrollTop = msgs.scrollHeight;
+                document.getElementById('chat-input').focus();
+                triggerToolReturnAck();
+              }, 400);
+            })
+            .catch(function() {
+              // Even on error, always trigger AI response
+              setTimeout(function() {
+                var msgs = document.getElementById('chat-messages');
+                if (msgs) msgs.scrollTop = msgs.scrollHeight;
+                document.getElementById('chat-input').focus();
+                triggerToolReturnAck();
+              }, 400);
+            });
+        }, 1500); // FIX 3: wait for tool save to complete
       } else {
-        // No tool key tracked — just scroll back to chat
         var msgs = document.getElementById('chat-messages');
         if (msgs) setTimeout(function() { msgs.scrollTop = msgs.scrollHeight; }, 100);
       }
+    }
+
+    // FIX 6: Update left panel tool item with snapshot after tool close
+    function updateLeftPanelTool(toolKey, snapData) {
+      var toolList = document.querySelector('.tool-list');
+      if (!toolList) return;
+      var items = toolList.querySelectorAll('.tool-item[data-tool-key="' + toolKey + '"]');
+      items.forEach(function(item) {
+        // Mark as done
+        var tag = item.querySelector('.tool-tag');
+        if (tag) { tag.textContent = 'Done'; tag.style.color = 'var(--session-col)'; tag.style.opacity = '1'; }
+        item.classList.add('tool-done');
+        // Remove existing snap if present
+        var next = item.nextElementSibling;
+        if (next && next.classList.contains('tool-item-snap')) next.remove();
+        // Insert new snapshot
+        var snapHtml = renderToolSnapshot(toolKey, snapData);
+        if (snapHtml) {
+          var inner = snapHtml.replace('<div class="tool-snapshot">', '').replace(/<\/div>\s*$/, '');
+          var div = document.createElement('div');
+          div.className = 'tool-item-snap';
+          div.innerHTML = inner;
+          item.insertAdjacentElement('afterend', div);
+        }
+      });
     }
 
     function buildGreeting(sessionNumber) {
@@ -1047,17 +1106,6 @@ let toolOutputsCache = {};
         return (name ? name + '. ' : '') + "You made it to Session 7.\n\nI want to start by acknowledging that — not as a formality, but genuinely. You showed up. You went to the places most people avoid. You did the work.\n\nToday we pull it all together. But before we build your Full Flight Plan, I want to look back with you.\n\nOf everything we've covered — Story, Vision, Identity, Transitions, Rhythms, Relationships — what shifted most for you? What do you see differently now than when you started?";
       }
       return 'Welcome to ' + (SESSIONS[sessionNumber]?.title || 'this session') + '. Let\'s begin.';
-    }
-
-    async function loadToolOutputs() {
-      if (!currentUser) return;
-      try {
-        var result = await sb.from('tool_outputs').select('tool_name, output_data').eq('user_id', currentUser.id);
-        if (result.data) {
-          toolOutputsCache = {};
-          result.data.forEach(function(row) { toolOutputsCache[row.tool_name] = row.output_data; });
-        }
-      } catch(e) { toolOutputsCache = {}; }
     }
 
     async function loadSessionContext(sessionNumber) {
@@ -1098,35 +1146,29 @@ let toolOutputsCache = {};
       el.scrollTop = el.scrollHeight;
     }
 
-
     // ── Tool snapshot renderer ────────────────────────────────
     function renderToolSnapshot(toolKey, data) {
       if (!data) return '';
-
       var html = '';
 
-      if (toolKey === 'soar-steady' || toolKey === 'soar_steady') {
-        var items = data.items || [];
+      // Normalise key — handle both hyphenated and underscore forms
+      var k = toolKey.replace(/_/g, '-');
+
+      if (k === 'soar-steady') {
+        var items  = data.items || [];
         var soar   = items.filter(function(i) { return i.zone === 'soar'; }).slice(0, 2);
         var steady = items.filter(function(i) { return i.zone === 'steady'; }).slice(0, 2);
         var total  = items.filter(function(i) { return i.zone === 'soar' || i.zone === 'steady'; }).length;
-        var soarPct = total ? Math.round((soar.length / total) * 100) : 0;
-        soar.forEach(function(i) {
-          html += '<div class="snap-row"><span class="snap-badge snap-badge-soar">Soar ▲</span><span class="snap-text">' + i.text + '</span></div>';
-        });
+        var soarPct = total ? Math.round((items.filter(function(i){return i.zone==='soar';}).length / total) * 100) : 0;
+        soar.forEach(function(i) { html += '<div class="snap-row"><span class="snap-badge snap-badge-soar">Soar ▲</span><span class="snap-text">' + i.text + '</span></div>'; });
         if (soar.length && steady.length) html += '<div class="snap-divider"></div>';
-        steady.forEach(function(i) {
-          html += '<div class="snap-row"><span class="snap-badge snap-badge-steady">Steady ▼</span><span class="snap-text">' + i.text + '</span></div>';
-        });
-        if (total > 0) {
-          html += '<div class="snap-bar-wrap" style="margin-top:8px"><div class="snap-bar-label"><span>Energy split</span><span class="snap-bar-val">' + soarPct + '% Soar</span></div><div class="snap-bar-track"><div class="snap-bar-fill" style="width:' + soarPct + '%"></div></div></div>';
-        }
+        steady.forEach(function(i) { html += '<div class="snap-row"><span class="snap-badge snap-badge-steady">Steady ▼</span><span class="snap-text">' + i.text + '</span></div>'; });
+        if (total > 0) html += '<div class="snap-bar-wrap" style="margin-top:8px"><div class="snap-bar-label"><span>Energy split</span><span class="snap-bar-val">' + soarPct + '% Soar</span></div><div class="snap-bar-track"><div class="snap-bar-fill" style="width:' + soarPct + '%"></div></div></div>';
       }
 
-      else if (toolKey === 'peak-plunge' || toolKey === 'peak_plunge') {
+      else if (k === 'peak-plunge') {
         var pts = (data.points || data.events || []).slice(0, 4);
         if (pts.length) {
-          // Mini SVG chart
           var w = 280, h = 36, n = pts.length;
           var ys = pts.map(function(p) { return p.value !== undefined ? p.value : (p.type === 'peak' ? 2 : 8); });
           var minY = Math.min.apply(null, ys), maxY = Math.max.apply(null, ys);
@@ -1139,11 +1181,7 @@ let toolOutputsCache = {};
           });
           var polyline = coords.map(function(c) { return c.join(','); }).join(' ');
           var polygon  = polyline + ' ' + w + ',' + h + ' 0,' + h;
-          html += '<svg class="snap-mini-svg" viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">' +
-            '<line x1="0" y1="' + (h/2) + '" x2="' + w + '" y2="' + (h/2) + '" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>' +
-            '<polygon points="' + polygon + '" fill="rgba(122,158,126,0.1)"/>' +
-            '<polyline points="' + polyline + '" fill="none" stroke="#7a9e7e" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>' +
-            '</svg>';
+          html += '<svg class="snap-mini-svg" viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg"><line x1="0" y1="' + (h/2) + '" x2="' + w + '" y2="' + (h/2) + '" stroke="rgba(255,255,255,0.06)" stroke-width="1"/><polygon points="' + polygon + '" fill="rgba(122,158,126,0.1)"/><polyline points="' + polyline + '" fill="none" stroke="#7a9e7e" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>';
           pts.slice(0, 3).forEach(function(p) {
             var badge = p.type === 'peak' ? 'snap-badge-peak' : 'snap-badge-plunge';
             var icon  = p.type === 'peak' ? '▲' : '▼';
@@ -1154,7 +1192,7 @@ let toolOutputsCache = {};
         }
       }
 
-      else if (toolKey === 'glow-map' || toolKey === 'glow_map_s2' || toolKey === 'glow_map_s4' || toolKey === 'glow_map_s7') {
+      else if (k === 'glow-map') {
         var scores = data.scores || {};
         var entries = Object.entries(scores).sort(function(a,b) { return b[1]-a[1]; }).slice(0, 3);
         entries.forEach(function(entry) {
@@ -1164,40 +1202,26 @@ let toolOutputsCache = {};
         });
       }
 
-      else if (toolKey === 'shadows-sparks' || toolKey === 'shadows_sparks') {
+      else if (k === 'shadows-sparks') {
         var shadows = (data.shadows || []).slice(0, 2);
         var sparks  = (data.sparks  || []).slice(0, 2);
-        shadows.forEach(function(s) {
-          html += '<div class="snap-row"><span class="snap-badge snap-badge-shadow">Shadow</span><span class="snap-text">' + s.text + '</span></div>';
-        });
+        shadows.forEach(function(s) { html += '<div class="snap-row"><span class="snap-badge snap-badge-shadow">Shadow</span><span class="snap-text">' + s.text + '</span></div>'; });
         if (shadows.length && sparks.length) html += '<div class="snap-divider"></div>';
-        sparks.forEach(function(s) {
-          html += '<div class="snap-row"><span class="snap-badge snap-badge-spark">Spark</span><span class="snap-text">' + s.text + '</span></div>';
-        });
+        sparks.forEach(function(s) { html += '<div class="snap-row"><span class="snap-badge snap-badge-spark">Spark</span><span class="snap-text">' + s.text + '</span></div>'; });
       }
 
-      else if (toolKey === 'courage-compass' || toolKey === 'courage_compass') {
-        var dirs = [
-          { key: 'dir-north', label: 'North', cls: 'snap-badge-north' },
-          { key: 'dir-east',  label: 'East',  cls: 'snap-badge-plunge' },
-        ];
+      else if (k === 'courage-compass') {
+        var dirs = [{ key: 'dir-north', label: 'North', cls: 'snap-badge-north' }, { key: 'dir-east', label: 'East', cls: 'snap-badge-plunge' }];
         dirs.forEach(function(d) {
           var val = data[d.key] || '';
           if (val) html += '<div class="snap-row"><span class="snap-badge ' + d.cls + '">' + d.label + '</span><span class="snap-text">' + val + '</span></div>';
         });
-        if (data['brave-step']) {
-          html += '<div class="snap-divider"></div><div class="snap-row"><span class="snap-badge snap-badge-spark">Step</span><span class="snap-text">' + data['brave-step'] + '</span></div>';
-        }
+        if (data['brave-step']) html += '<div class="snap-divider"></div><div class="snap-row"><span class="snap-badge snap-badge-spark">Step</span><span class="snap-text">' + data['brave-step'] + '</span></div>';
       }
 
-      else if (toolKey === 'birdsong' || toolKey === 'birdsong') {
+      else if (k === 'birdsong') {
         var cur = data.current || {};
-        var des = data.desired || {};
         var modes = ['solo','melody','harmony','lullaby','resonance'];
-        var biggest = modes.reduce(function(best, m) {
-          var diff = (des[m]||0) - (cur[m]||0);
-          return diff > best.diff ? { name: m, diff: diff } : best;
-        }, { name: '', diff: -999 });
         var modeColors = { solo:'#8a9ab0', melody:'#9dbf8a', harmony:'#F5C842', lullaby:'#c4956a', resonance:'#7eb8c9' };
         modes.slice(0, 3).forEach(function(m) {
           var pct = Math.round(((cur[m]||1)/10)*100);
@@ -1206,19 +1230,13 @@ let toolOutputsCache = {};
         });
       }
 
-      else if (toolKey === 'forest' || toolKey === 'forest') {
+      else if (k === 'forest') {
         var people = data.people || {};
         var canopy = (people.canopy || []).slice(0, 2);
         var lone   = (people.lone   || []).slice(0, 1);
-        canopy.forEach(function(p) {
-          html += '<div class="snap-row"><span class="snap-badge snap-badge-soar">Canopy</span><span class="snap-text">' + p.name + '</span></div>';
-        });
-        lone.forEach(function(p) {
-          html += '<div class="snap-row"><span class="snap-badge snap-badge-plunge">Lone</span><span class="snap-text">' + p.name + '</span></div>';
-        });
-        if (data.intention) {
-          html += '<div class="snap-divider"></div><div class="snap-row"><span class="snap-text" style="font-style:italic;color:rgba(240,236,228,0.5)">' + data.intention.slice(0, 80) + '</span></div>';
-        }
+        canopy.forEach(function(p) { html += '<div class="snap-row"><span class="snap-badge snap-badge-soar">Canopy</span><span class="snap-text">' + p.name + '</span></div>'; });
+        lone.forEach(function(p) { html += '<div class="snap-row"><span class="snap-badge snap-badge-plunge">Lone</span><span class="snap-text">' + p.name + '</span></div>'; });
+        if (data.intention) html += '<div class="snap-divider"></div><div class="snap-row"><span class="snap-text" style="font-style:italic;color:rgba(240,236,228,0.5)">' + data.intention.slice(0, 80) + '</span></div>';
       }
 
       return html ? '<div class="tool-snapshot">' + html + '</div>' : '';
@@ -1228,9 +1246,10 @@ let toolOutputsCache = {};
       var isUsed   = openedTools[toolKey] || false;
       var wrap     = document.createElement('div');
       wrap.className = 'tool-card-msg';
-      var emoji    = (activeSession && activeSession.emoji) ? activeSession.emoji : '\u{1FAB6}';
-      var dbKey    = toolKey.replace(/-/g,'_');
-      var snapData = toolOutputsCache[dbKey] || toolOutputsCache[toolKey] || null;
+      var emoji    = (activeSession && activeSession.emoji) ? activeSession.emoji : '🪶';
+      // FIX 4: use getDbKey for correct cache lookup
+      var dbKey    = getDbKey(toolKey, activeSession ? activeSession.number : 0);
+      var snapData = toolOutputsCache[dbKey] || null;
       var snapHtml = (isUsed && snapData) ? renderToolSnapshot(toolKey, snapData) : '';
       var actHtml  = isUsed ? '<div class="tool-card-actions"><button class="tool-card-action tool-revisit-btn">Revisit</button><button class="tool-card-action tool-dismiss-btn">Close</button></div>' : '';
 
@@ -1297,15 +1316,16 @@ let toolOutputsCache = {};
         if (db) db.addEventListener('click', function() { msg2.style.display = 'none'; });
       });
     }
+
     function showTyping() {
-      const el = document.getElementById('chat-messages');
-      const wrap = document.createElement('div');
+      var el = document.getElementById('chat-messages');
+      var wrap = document.createElement('div');
       wrap.className = 'typing-indicator'; wrap.id = 'typing-indicator';
       wrap.innerHTML = '<div class="msg-avatar" style="background:var(--session-col);width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0;margin-top:2px;">' + (activeSession?.emoji || '🪶') + '</div><div class="typing-dots"><span></span><span></span><span></span></div>';
       el.appendChild(wrap); el.scrollTop = el.scrollHeight;
     }
 
-    function hideTyping() { const el = document.getElementById('typing-indicator'); if (el) el.remove(); }
+    function hideTyping() { var el = document.getElementById('typing-indicator'); if (el) el.remove(); }
 
     async function triggerToolReturnAck() {
       if (isTyping || !activeSession || !currentUser) return;
@@ -1351,7 +1371,6 @@ let toolOutputsCache = {};
       document.getElementById('chat-input').value = '';
       document.getElementById('chat-input').style.height = 'auto';
       showTyping();
-
       try {
         const response = await fetch(WORKER_URL + '/chat', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -1365,13 +1384,11 @@ let toolOutputsCache = {};
         chatMsgs.push({ role: 'assistant', content: reply });
         await sb.from('ai_memory').upsert({ user_id: currentUser.id, session_number: activeSession.number, messages: chatMsgs }, { onConflict: 'user_id,session_number' });
         exchangeCount++;
-        // Complete panel shown only when AI sends [COMPLETE] signal
       } catch {
         hideTyping();
         renderMessage('assistant', 'Something got in the way there. Take a breath — try sending that again.');
         chatMsgs.pop();
       }
-
       isTyping = false;
       document.getElementById('btn-send').disabled = false;
       document.getElementById('chat-input').focus();
@@ -1382,9 +1399,7 @@ let toolOutputsCache = {};
       if (!activeSession) return;
       const btn = document.getElementById('btn-complete');
       btn.disabled = true; btn.textContent = 'Saving your session...';
-
       const withTimeout = (p, ms) => Promise.race([p, new Promise(r => setTimeout(() => r(null), ms))]);
-
       try {
         let summary = '', keyWords = [], actionPoint = '';
         const result = await withTimeout(
@@ -1392,28 +1407,22 @@ let toolOutputsCache = {};
           8000
         );
         if (result) { summary = result.summary || ''; keyWords = result.key_words || []; actionPoint = result.action_point || ''; }
-
         await sb.from('ai_memory').upsert({ user_id: currentUser.id, session_number: activeSession.number, messages: chatMsgs, summary, key_words: keyWords }, { onConflict: 'user_id,session_number' });
         await sb.from('session_progress').update({ status: 'complete', completed_at: new Date().toISOString() }).eq('user_id', currentUser.id).eq('session_number', activeSession.number);
-
-        const nextNum = activeSession.number + 1;
+        const nextNum  = activeSession.number + 1;
         const unlockAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
         await sb.from('session_progress').update({ unlocks_at: unlockAt }).eq('user_id', currentUser.id).eq('session_number', nextNum);
-
-        // Fire-and-forget email
         sb.from('course_users').select('email, full_name').eq('id', currentUser.id).single().then(({ data: profile }) => {
           if (!profile?.email) return;
           const nextSession = SESSIONS[nextNum];
           fetch(WORKER_URL + '/session-email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: profile.email, user_name: profile.full_name || '', user_id: currentUser.id, session_number: activeSession.number, summary, action_point: actionPoint, next_session_title: nextSession ? nextSession.title + ' — ' + nextSession.teaser : '' }) }).catch(() => {});
         }).catch(() => {});
-
-        // Back to dashboard — NO navigation
         btn.textContent = 'Mark complete & continue →';
         btn.disabled = false;
         await loadSessionProgress();
+        await loadToolOutputs();
         renderDashboard();
         showView('view-dashboard');
-
       } catch (err) {
         console.error('Complete error:', err);
         btn.disabled = false; btn.textContent = 'Mark complete & continue →';
@@ -1435,12 +1444,9 @@ let toolOutputsCache = {};
         closeToolEmbed();
       }
     });
-
-    // Listen for postMessage from embedded tool iframes
     window.addEventListener('message', function(e) {
       if (e.data === 'tool-close') closeToolEmbed();
     });
-
     chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (!btnSend.disabled) sendMessage(chatInput.value); } });
     btnSend.addEventListener('click', () => { if (!btnSend.disabled) sendMessage(chatInput.value); });
     document.getElementById('btn-complete').addEventListener('click', completeSession);
@@ -1448,11 +1454,9 @@ let toolOutputsCache = {};
     // ── Auth listener ─────────────────────────────────────────
     sb.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user && !currentUser) {
-        // Only load dashboard on first sign in — not on token refresh
         currentUser = session.user;
         await loadDashboard();
       } else if (event === 'TOKEN_REFRESHED' && session?.user && currentUser) {
-        // Just update the user reference silently — no reload
         currentUser = session.user;
       } else if (event === 'SIGNED_OUT') {
         currentUser = null; userProfile = null; sessionData = [];
@@ -1461,26 +1465,15 @@ let toolOutputsCache = {};
     });
 
     // ── Init ──────────────────────────────────────────────────
-    // ── Init — read token directly from localStorage ────────────
-    // Never calls getSession() on load — avoids Supabase multi-tab conflicts
     (async () => {
       try {
-        // Read auth token directly from localStorage — synchronous, never hangs
         var tokenRaw = localStorage.getItem('lilbird-solo-auth');
-        if (!tokenRaw) {
-          showView('view-auth');
-          return;
-        }
+        if (!tokenRaw) { showView('view-auth'); return; }
         var tokenData = JSON.parse(tokenRaw);
         var user = tokenData && tokenData.user;
-        if (!user || !user.id) {
-          showView('view-auth');
-          return;
-        }
-        // Check token hasn't expired
+        if (!user || !user.id) { showView('view-auth'); return; }
         var expiresAt = tokenData.expires_at;
         if (expiresAt && (expiresAt * 1000) < Date.now()) {
-          // Token expired — try silent refresh once, fall back to login
           try {
             var refreshed = await Promise.race([
               sb.auth.refreshSession(),
@@ -1499,7 +1492,6 @@ let toolOutputsCache = {};
           }
           return;
         }
-        // Token valid — use it directly, no network call
         currentUser = { id: user.id, email: user.email };
         await loadDashboard();
       } catch(e) {
