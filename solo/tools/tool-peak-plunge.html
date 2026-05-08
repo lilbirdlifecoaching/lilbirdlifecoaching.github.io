@@ -646,7 +646,10 @@
   const SUPABASE_URL  = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
 
-  const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+  const _urlP = new URLSearchParams(window.location.search);
+  const _tok  = _urlP.get('token') ? decodeURIComponent(_urlP.get('token')) : null;
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON, { auth: { persistSession: false, autoRefreshToken: false } });
+  if (_tok) sb.auth.setSession({ access_token: _tok, refresh_token: '' }).catch(function(){});
 
   // ── Get user from URL param ──────────────────────────────────
   const params  = new URLSearchParams(window.location.search);

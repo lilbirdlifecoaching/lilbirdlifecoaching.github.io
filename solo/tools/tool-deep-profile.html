@@ -247,10 +247,14 @@
 </script>
 <script>
   const { createClient } = supabase;
+  const _urlP2 = new URLSearchParams(window.location.search);
+  const _tok2  = _urlP2.get('token') ? decodeURIComponent(_urlP2.get('token')) : null;
   const sb = createClient(
     'https://mebqqzbuwkogdxvnihrq.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU'
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU',
+    { auth: { persistSession: false, autoRefreshToken: false } }
   );
+  if (_tok2) sb.auth.setSession({ access_token: _tok2, refresh_token: '' }).catch(function(){});
 
   var currentUser = null;
   var selectedMbti = '';

@@ -144,7 +144,12 @@
 </script>
 <script>
   const { createClient } = supabase;
-  const sb = createClient('https://mebqqzbuwkogdxvnihrq.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU');
+  const _urlParams = new URLSearchParams(window.location.search);
+  const _token = _urlParams.get('token') ? decodeURIComponent(_urlParams.get('token')) : null;
+  const sb = createClient('https://mebqqzbuwkogdxvnihrq.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU', {
+    auth: { persistSession: false, autoRefreshToken: false }
+  });
+  if (_token) sb.auth.setSession({ access_token: _token, refresh_token: '' }).catch(function(){});
   let currentUser = null;
   let saveTimer = null;
 
