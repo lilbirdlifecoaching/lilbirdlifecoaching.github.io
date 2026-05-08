@@ -922,6 +922,11 @@
       if (!wrap) return;
       wrap.classList.remove('active');
       setTimeout(function() { if (frame) frame.src = 'about:blank'; }, 300);
+      // Scroll session chat col back into view
+      setTimeout(function() {
+        var msgs = document.getElementById('chat-messages');
+        if (msgs) msgs.scrollTop = msgs.scrollHeight;
+      }, 150);
       if (activeSession && currentUser && lastToolKey) {
         var toolNameMap = {
           'peak-plunge':'peak_plunge','nurture-prune':'nurture_prune',
@@ -949,6 +954,9 @@
               renderMessage('assistant', ack);
               chatMsgs.push({ role: 'assistant', content: ack });
               sb.from('ai_memory').upsert({ user_id: currentUser.id, session_number: sNum, messages: chatMsgs }, { onConflict: 'user_id,session_number' }).catch(function(){});
+              // Scroll chat to bottom so user sees the ack
+              var msgs = document.getElementById('chat-messages');
+              if (msgs) msgs.scrollTop = msgs.scrollHeight;
               document.getElementById('chat-input').focus();
             }, 400);
           }).catch(function() {
@@ -956,9 +964,15 @@
               var ack = 'Welcome back. How did that land for you?';
               renderMessage('assistant', ack);
               chatMsgs.push({ role: 'assistant', content: ack });
+              var msgs = document.getElementById('chat-messages');
+              if (msgs) msgs.scrollTop = msgs.scrollHeight;
               document.getElementById('chat-input').focus();
             }, 400);
           });
+      } else {
+        // No tool key tracked — just scroll back to chat
+        var msgs = document.getElementById('chat-messages');
+        if (msgs) setTimeout(function() { msgs.scrollTop = msgs.scrollHeight; }, 100);
       }
     }
 
