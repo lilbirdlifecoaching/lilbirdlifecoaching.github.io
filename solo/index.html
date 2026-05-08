@@ -54,12 +54,10 @@
     .view { display: none; position: relative; z-index: 1; min-height: 100vh; }
     .view.active { display: flex; flex-direction: column; }
 
-    /* ── Loading ── */
     #view-loading { align-items: center; justify-content: center; gap: 1.5rem; }
     .loading-bird { font-size: 2rem; animation: float 2s ease-in-out infinite; }
     .loading-text { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); }
 
-    /* ── Auth ── */
     #view-auth { align-items: center; justify-content: center; padding: 2rem; }
     .auth-wrap { width: 100%; max-width: 420px; animation: fadeUp 0.6s ease both; }
     .auth-logo { text-align: center; margin-bottom: 2.5rem; }
@@ -86,7 +84,6 @@
     .auth-footer { text-align: center; margin-top: 1.5rem; font-size: 0.78rem; color: var(--text-muted); }
     .auth-footer a { color: var(--gold); text-decoration: none; }
 
-    /* ── Dashboard ── */
     .dash-nav { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 2rem; border-bottom: 1px solid var(--gold-border); background: rgba(30,32,40,0.92); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; }
     .nav-brand { display: flex; align-items: center; gap: 0.75rem; }
     .nav-bird { width: 32px; height: 32px; background: var(--gold); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; }
@@ -153,7 +150,6 @@
     .btn-purchase { background: var(--gold); color: var(--dark); border: none; border-radius: 6px; padding: 1rem 2.5rem; font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 500; cursor: pointer; transition: background 0.2s, transform 0.15s; }
     .btn-purchase:hover { background: #fff; transform: translateY(-2px); }
 
-    /* ── Session view ── */
     .session-nav { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 2rem; border-bottom: 1px solid var(--session-border); background: rgba(30,32,40,0.92); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; }
     .session-nav-left { display: flex; align-items: center; gap: 0.75rem; }
     .session-nav-bird { width: 32px; height: 32px; background: var(--session-col); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
@@ -190,7 +186,6 @@
     .tool-item.clickable .tool-dot { background: var(--session-col); }
     .tool-tag { margin-left: auto; font-family: var(--font-mono); font-size: 0.55rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--session-col); opacity: 0.7; }
 
-    /* Chat */
     .session-chat-col { display: flex; flex-direction: column; min-height: calc(100vh - 200px); }
     .chat-container { flex: 1; display: flex; flex-direction: column; background: var(--dark-card); border: 1px solid var(--session-border); border-radius: 28px; overflow: hidden; min-height: 580px; }
     .chat-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; gap: 0.75rem; }
@@ -245,11 +240,7 @@
     .tool-card.used { opacity: 0.5; cursor: default; transform: none !important; }
     .tool-card.used .tool-card-label { color: var(--text-muted); }
 
-    .tool-embed-wrap {
-      display: none; position: absolute; inset: 0; background: var(--dark);
-      z-index: 10; flex-direction: column; border-radius: 28px;
-      overflow: hidden; animation: slideIn 0.3s ease both;
-    }
+    .tool-embed-wrap { display: none; position: absolute; inset: 0; background: var(--dark); z-index: 10; flex-direction: column; border-radius: 28px; overflow: hidden; animation: slideIn 0.3s ease both; }
     .tool-embed-wrap.active { display: flex; }
     @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     .tool-embed-header { padding: 1rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; background: var(--dark-card); }
@@ -258,7 +249,6 @@
     .btn-close-tool:hover { border-color: var(--session-col); color: var(--session-col); }
     .tool-embed-frame { flex: 1; border: none; background: var(--dark); width: 100%; }
 
-    /* ── Tool snapshots ── */
     .tool-snapshot { padding: 0.75rem 1.1rem; border-top: 1px solid rgba(255,255,255,0.05); animation: fadeUp 0.3s ease both; }
     .snap-row { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
     .snap-badge { font-family: var(--font-mono); font-size: 0.55rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
@@ -411,195 +401,56 @@
     const WORKER_URL    = 'https://worker-solo.cwwq46sn7m.workers.dev';
     const { createClient } = supabase;
     const sb = createClient(SUPABASE_URL, SUPABASE_ANON, {
-      auth: {
-        storageKey: 'lilbird-solo-auth',
-        autoRefreshToken: true,
-        persistSession: true,
-        detectSessionInUrl: false,
-      }
+      auth: { storageKey: 'lilbird-solo-auth', autoRefreshToken: true, persistSession: true, detectSessionInUrl: false }
     });
 
     const SESSIONS = [
-      {
-        number: 0, tag: 'Orientation', title: 'First Flight',
-        desc: 'Name where you are. Glimpse where you could be. Take one real step.',
-        teaser: 'Name where you are. Glimpse where you could be.',
-        color: '#F5C842', emoji: '🪶', dim: 'rgba(245,200,66,0.12)', border: 'rgba(245,200,66,0.22)',
-        minExchanges: 4, videoLen: '3 min', duration: '20–30 min', tools: [],
-        videoUrl: 'https://pub-f84f2be51fb44bd69d2d2271666a9506.r2.dev/session-0.mp4',
-        completeTitle: "That's a good start.",
-        completeDesc: "You've named where you are and glimpsed where you could go. Session 1 is waiting — and it goes deeper. When you're ready.",
-      },
-      {
-        number: 1, tag: 'Session 01', title: 'Story',
-        desc: "We don't start with goals. We start with the ground beneath them — your history, your people, the seasons that made you.",
-        teaser: "Before you take flight, know where you've been.",
-        color: '#7a9e7e', emoji: '🌿', dim: 'rgba(122,158,126,0.12)', border: 'rgba(122,158,126,0.25)',
-        minExchanges: 5, videoLen: '4 min', duration: '40–60 min',
-        videoUrl: 'https://pub-f84f2be51fb44bd69d2d2271666a9506.r2.dev/session-1.mp4',
-        completeTitle: "You've done something tender here.",
-        completeDesc: "The story you've told yourself about your life just got a little more honest. Before you move on — try one of the tools to anchor what came up.",
-        tools: [
-          { name: 'Peak & Plunge Timeline',    file: 'tools/tool-peak-plunge.html',    tag: 'Interactive' },
-          { name: 'Nurture & Prune Matrix',    file: 'tools/tool-nurture-prune.html',  tag: 'Interactive' },
-          { name: 'Deep Roots Reflection',     file: 'tools/tool-deep-roots.html',     tag: 'Journaling'  },
-          { name: 'Roots & Feathers Practice', file: 'tools/tool-roots-feathers.html', tag: 'Reflection'  },
-        ],
-      },
-      {
-        number: 2, tag: 'Session 02', title: 'Vision & Goals',
-        desc: "Clarity changes everything. This session helps you find the why underneath the goal — and the goal underneath the should.",
-        teaser: "Clarify where you're going by discovering what matters most.",
-        color: '#7eb8c9', emoji: '🌅', dim: 'rgba(126,184,201,0.12)', border: 'rgba(126,184,201,0.25)',
-        minExchanges: 5, videoLen: '4 min', duration: '40–60 min',
-        videoUrl: 'https://pub-f84f2be51fb44bd69d2d2271666a9506.r2.dev/session-2.mp4',
-        completeTitle: "Something just got clearer.",
-        completeDesc: "A vision that's truly yours is worth ten goals that belong to someone else. Use the tools below to map what you found.",
-        tools: [
-          { name: 'Glow Map',           file: 'tools/tool-glow-map.html',      tag: 'Interactive' },
-          { name: 'Soar & Steady',      file: 'tools/tool-soar-steady.html',   tag: 'Interactive' },
-          { name: 'Adventure Map',      file: 'tools/tool-adventure-map.html', tag: 'Visual'      },
-        ],
-      },
-      {
-        number: 3, tag: 'Session 03', title: 'Identity & Insight',
-        desc: "Know who you are so you can rise with clarity. This session goes to the places most people avoid — the tangles, the shadows, the question underneath the question.",
-        teaser: "Know who you are so you can rise with clarity.",
-        color: '#a89060', emoji: '🌳', dim: 'rgba(168,144,96,0.12)', border: 'rgba(168,144,96,0.25)',
-        minExchanges: 5, videoLen: '5 min', duration: '50–70 min',
-        videoUrl: 'https://pub-f84f2be51fb44bd69d2d2271666a9506.r2.dev/session-3.mp4',
-        completeTitle: "That took courage.",
-        completeDesc: "Most people never look this honestly at what drives them. You just did. Use the tools to map what surfaced.",
-        tools: [
-          { name: 'Identity Profile',  file: 'tools/tool-deep-profile.html',    tag: 'Profile'     },
-          { name: 'Shadows & Sparks',  file: 'tools/tool-shadows-sparks.html',  tag: 'Interactive' },
-          { name: 'Tangle Within',     file: 'tools/tool-tangle-within.html',   tag: 'Reflection'  },
-        ],
-      },
-      {
-        number: 4, tag: 'Session 04', title: 'Navigating Transitions',
-        desc: "When the path gets foggy — slow down, look inward, choose your next step. This session names what's actually in transition and finds the one brave step forward.",
-        teaser: "When the path gets foggy — slow down, look inward, choose your next step.",
-        color: '#8a9ab0', emoji: '🌫️', dim: 'rgba(138,154,176,0.12)', border: 'rgba(138,154,176,0.25)',
-        minExchanges: 4, videoLen: '4 min', duration: '40–55 min',
-        videoUrl: 'https://pub-f84f2be51fb44bd69d2d2271666a9506.r2.dev/session-4.mp4',
-        completeTitle: "You named it.",
-        completeDesc: "Naming what's in transition is half the work. Your Courage Compass is waiting — it'll help you find the next brave step.",
-        tools: [
-          { name: 'Courage Compass',   file: 'tools/tool-courage-compass.html', tag: 'Interactive' },
-          { name: 'Glow Map revisit',  file: 'tools/tool-glow-map.html',        tag: 'Check-in'    },
-        ],
-      },
-      {
-        number: 5, tag: 'Session 05', title: 'Life Rhythms & Routines',
-        desc: "You know what you should do. This session is about designing rhythms that actually fit your energy — not someone else's ideal week.",
-        teaser: "Find your rhythm. Design a life that fits how you actually work.",
-        color: '#9dbf8a', emoji: '🍃', dim: 'rgba(157,191,138,0.12)', border: 'rgba(157,191,138,0.25)',
-        minExchanges: 4, videoLen: '4 min', duration: '35–50 min',
-        videoUrl: 'https://pub-f84f2be51fb44bd69d2d2271666a9506.r2.dev/session-5.mp4',
-        completeTitle: "One rhythm is worth a hundred resolutions.",
-        completeDesc: "Map your energy states and design a week that actually fits you — not the version of you that you think you should be.",
-        tools: [
-          { name: 'Birdsong Scale',    file: 'tools/tool-birdsong.html',        tag: 'Interactive' },
-        ],
-      },
-      {
-        number: 6, tag: 'Session 06', title: 'Relationships & Community',
-        desc: "You weren't made to fly alone. This session maps your relational landscape honestly — who gives energy, who takes it, and where you want to invest.",
-        teaser: "No season of growth happens in isolation. Look at who's in your forest.",
-        color: '#c4956a', emoji: '🌲', dim: 'rgba(196,149,106,0.12)', border: 'rgba(196,149,106,0.25)',
-        minExchanges: 4, videoLen: '4 min', duration: '40–55 min',
-        videoUrl: null,
-        completeTitle: "You can see your forest clearly now.",
-        completeDesc: "Knowing who to invest in — and who needs a boundary — changes everything. Map it with the Forest tool below.",
-        tools: [
-          { name: 'Forest of Connections',   file: 'tools/tool-forest.html',          tag: 'Interactive' },
-          { name: 'Nurture & Prune revisit', file: 'tools/tool-nurture-prune.html',   tag: 'Check-in'    },
-        ],
-      },
-      {
-        number: 7, tag: 'Session 07', title: 'Full Flight',
-        desc: "You've done the work. Now own it. This session pulls everything together into a plan that's genuinely yours — and a document worth keeping.",
-        teaser: "Your story. Your vision. Your plan. All of it — yours.",
-        color: '#F5C842', emoji: '🪶', dim: 'rgba(245,200,66,0.12)', border: 'rgba(245,200,66,0.22)',
-        minExchanges: 6, videoLen: '5 min', duration: '50–70 min',
-        videoUrl: 'https://pub-f84f2be51fb44bd69d2d2271666a9506.r2.dev/session-7.mp4',
-        completeTitle: "Full flight.",
-        completeDesc: "You showed up. You did the work. You went to the places most people avoid. Your Full Flight Plan is being assembled.",
-        tools: [
-          { name: 'Full Flight Plan',  file: 'tools/tool-full-flight-plan.html', tag: 'Final output' },
-          { name: 'Glow Map — final',  file: 'tools/tool-glow-map.html',         tag: 'Before/after' },
-        ],
-      },
+      { number: 0, tag: 'Orientation', title: 'First Flight', desc: 'Name where you are. Glimpse where you could be. Take one real step.', teaser: 'Name where you are. Glimpse where you could be.', color: '#F5C842', emoji: '🪶', dim: 'rgba(245,200,66,0.12)', border: 'rgba(245,200,66,0.22)', minExchanges: 4, videoLen: '3 min', duration: '20–30 min', tools: [], videoUrl: 'https://pub-f84f2be51fb44bd69d2d2271666a9506.r2.dev/session-0.mp4', completeTitle: "That's a good start.", completeDesc: "You've named where you are and glimpsed where you could go. Session 1 is waiting — and it goes deeper. When you're ready." },
+      { number: 1, tag: 'Session 01', title: 'Story', desc: "We don't start with goals. We start with the ground beneath them — your history, your people, the seasons that made you.", teaser: "Before you take flight, know where you've been.", color: '#7a9e7e', emoji: '🌿', dim: 'rgba(122,158,126,0.12)', border: 'rgba(122,158,126,0.25)', minExchanges: 5, videoLen: '4 min', duration: '40–60 min', videoUrl: 'https://pub-f84f2be51fb44bd69d2d2271666a9506.r2.dev/session-1.mp4', completeTitle: "You've done something tender here.", completeDesc: "The story you've told yourself about your life just got a little more honest. Before you move on — try one of the tools to anchor what came up.", tools: [ { name: 'Peak & Plunge Timeline', file: 'tools/tool-peak-plunge.html', tag: 'Interactive' }, { name: 'Nurture & Prune Matrix', file: 'tools/tool-nurture-prune.html', tag: 'Interactive' }, { name: 'Deep Roots Reflection', file: 'tools/tool-deep-roots.html', tag: 'Journaling' }, { name: 'Roots & Feathers Practice', file: 'tools/tool-roots-feathers.html', tag: 'Reflection' } ] },
+      { number: 2, tag: 'Session 02', title: 'Vision & Goals', desc: "Clarity changes everything. This session helps you find the why underneath the goal — and the goal underneath the should.", teaser: "Clarify where you're going by discovering what matters most.", color: '#7eb8c9', emoji: '🌅', dim: 'rgba(126,184,201,0.12)', border: 'rgba(126,184,201,0.25)', minExchanges: 5, videoLen: '4 min', duration: '40–60 min', videoUrl: 'https://pub-f84f2be51fb44bd69d2d2271666a9506.r2.dev/session-2.mp4', completeTitle: "Something just got clearer.", completeDesc: "A vision that's truly yours is worth ten goals that belong to someone else. Use the tools below to map what you found.", tools: [ { name: 'Glow Map', file: 'tools/tool-glow-map.html', tag: 'Interactive' }, { name: 'Soar & Steady', file: 'tools/tool-soar-steady.html', tag: 'Interactive' }, { name: 'Adventure Map', file: 'tools/tool-adventure-map.html', tag: 'Visual' } ] },
+      { number: 3, tag: 'Session 03', title: 'Identity & Insight', desc: "Know who you are so you can rise with clarity. This session goes to the places most people avoid — the tangles, the shadows, the question underneath the question.", teaser: "Know who you are so you can rise with clarity.", color: '#a89060', emoji: '🌳', dim: 'rgba(168,144,96,0.12)', border: 'rgba(168,144,96,0.25)', minExchanges: 5, videoLen: '5 min', duration: '50–70 min', videoUrl: 'https://pub-f84f2be51fb44bd69d2d2271666a9506.r2.dev/session-3.mp4', completeTitle: "That took courage.", completeDesc: "Most people never look this honestly at what drives them. You just did. Use the tools to map what surfaced.", tools: [ { name: 'Identity Profile', file: 'tools/tool-deep-profile.html', tag: 'Profile' }, { name: 'Shadows & Sparks', file: 'tools/tool-shadows-sparks.html', tag: 'Interactive' }, { name: 'Tangle Within', file: 'tools/tool-tangle-within.html', tag: 'Reflection' } ] },
+      { number: 4, tag: 'Session 04', title: 'Navigating Transitions', desc: "When the path gets foggy — slow down, look inward, choose your next step. This session names what's actually in transition and finds the one brave step forward.", teaser: "When the path gets foggy — slow down, look inward, choose your next step.", color: '#8a9ab0', emoji: '🌫️', dim: 'rgba(138,154,176,0.12)', border: 'rgba(138,154,176,0.25)', minExchanges: 4, videoLen: '4 min', duration: '40–55 min', videoUrl: 'https://pub-f84f2be51fb44bd69d2d2271666a9506.r2.dev/session-4.mp4', completeTitle: "You named it.", completeDesc: "Naming what's in transition is half the work. Your Courage Compass is waiting — it'll help you find the next brave step.", tools: [ { name: 'Courage Compass', file: 'tools/tool-courage-compass.html', tag: 'Interactive' }, { name: 'Glow Map revisit', file: 'tools/tool-glow-map.html', tag: 'Check-in' } ] },
+      { number: 5, tag: 'Session 05', title: 'Life Rhythms & Routines', desc: "You know what you should do. This session is about designing rhythms that actually fit your energy — not someone else's ideal week.", teaser: "Find your rhythm. Design a life that fits how you actually work.", color: '#9dbf8a', emoji: '🍃', dim: 'rgba(157,191,138,0.12)', border: 'rgba(157,191,138,0.25)', minExchanges: 4, videoLen: '4 min', duration: '35–50 min', videoUrl: 'https://pub-f84f2be51fb44bd69d2d2271666a9506.r2.dev/session-5.mp4', completeTitle: "One rhythm is worth a hundred resolutions.", completeDesc: "Map your energy states and design a week that actually fits you — not the version of you that you think you should be.", tools: [ { name: 'Birdsong Scale', file: 'tools/tool-birdsong.html', tag: 'Interactive' } ] },
+      { number: 6, tag: 'Session 06', title: 'Relationships & Community', desc: "You weren't made to fly alone. This session maps your relational landscape honestly — who gives energy, who takes it, and where you want to invest.", teaser: "No season of growth happens in isolation. Look at who's in your forest.", color: '#c4956a', emoji: '🌲', dim: 'rgba(196,149,106,0.12)', border: 'rgba(196,149,106,0.25)', minExchanges: 4, videoLen: '4 min', duration: '40–55 min', videoUrl: null, completeTitle: "You can see your forest clearly now.", completeDesc: "Knowing who to invest in — and who needs a boundary — changes everything. Map it with the Forest tool below.", tools: [ { name: 'Forest of Connections', file: 'tools/tool-forest.html', tag: 'Interactive' }, { name: 'Nurture & Prune revisit', file: 'tools/tool-nurture-prune.html', tag: 'Check-in' } ] },
+      { number: 7, tag: 'Session 07', title: 'Full Flight', desc: "You've done the work. Now own it. This session pulls everything together into a plan that's genuinely yours — and a document worth keeping.", teaser: "Your story. Your vision. Your plan. All of it — yours.", color: '#F5C842', emoji: '🪶', dim: 'rgba(245,200,66,0.12)', border: 'rgba(245,200,66,0.22)', minExchanges: 6, videoLen: '5 min', duration: '50–70 min', videoUrl: 'https://pub-f84f2be51fb44bd69d2d2271666a9506.r2.dev/session-7.mp4', completeTitle: "Full flight.", completeDesc: "You showed up. You did the work. You went to the places most people avoid. Your Full Flight Plan is being assembled.", tools: [ { name: 'Full Flight Plan', file: 'tools/tool-full-flight-plan.html', tag: 'Final output' }, { name: 'Glow Map — final', file: 'tools/tool-glow-map.html', tag: 'Before/after' } ] },
     ];
 
-    const PROMO_CODES = {
-      'SOLO50':  { discount: 0.5,  label: '50% off applied — $48.50' },
-      'IMREADY': { discount: 0.25, label: '25% off applied — $72.75' },
-    };
+    const PROMO_CODES = { 'SOLO50': { discount: 0.5, label: '50% off applied — $48.50' }, 'IMREADY': { discount: 0.25, label: '25% off applied — $72.75' } };
     const BASE_PRICE = 97;
 
-    // ── FIX 4: Single source of truth for tool key ↔ DB key mapping ──
-    // toolKey (hyphenated) → dbKey (what's stored in Supabase tool_outputs.tool_name)
     function getDbKey(toolKey, sessionNumber) {
+      var sn = sessionNumber !== undefined ? sessionNumber : (activeSession ? activeSession.number : 0);
       var map = {
-        'peak-plunge':      'peak_plunge',
-        'nurture-prune':    'nurture_prune',
-        'deep-roots':       'deep_roots',
-        'roots-feathers':   'roots_feathers',
-        'soar-steady':      'soar_steady',
-        'adventure-map':    'adventure_map',
-        'shadows-sparks':   'shadows_sparks',
-        'tangle-within':    'tangle_within',
-        'courage-compass':  'courage_compass',
-        'birdsong':         'birdsong',
-        'forest':           'forest',
-        'full-flight-plan': 'full_flight_plan',
-        'deep-profile':     'identity_profile',
-        'glow-map':         'glow_map_s' + (sessionNumber !== undefined ? sessionNumber : (activeSession ? activeSession.number : 0)),
+        'peak-plunge': 'peak_plunge', 'nurture-prune': 'nurture_prune',
+        'deep-roots': 'deep_roots', 'roots-feathers': 'roots_feathers',
+        'soar-steady': 'soar_steady', 'adventure-map': 'adventure_map',
+        'shadows-sparks': 'shadows_sparks', 'tangle-within': 'tangle_within',
+        'courage-compass': 'courage_compass', 'birdsong': 'birdsong',
+        'forest': 'forest', 'full-flight-plan': 'full_flight_plan',
+        'deep-profile': 'identity_profile',
+        'glow-map': 'glow_map_s' + sn,
       };
       return map[toolKey] || toolKey.replace(/-/g, '_');
     }
 
-    // ── FIX 5: Reverse map — dbKey → toolKey, for pre-populating openedTools ──
     var DB_KEY_TO_TOOL_KEY = {
-      'peak_plunge':      'peak-plunge',
-      'nurture_prune':    'nurture-prune',
-      'deep_roots':       'deep-roots',
-      'roots_feathers':   'roots-feathers',
-      'soar_steady':      'soar-steady',
-      'adventure_map':    'adventure-map',
-      'shadows_sparks':   'shadows-sparks',
-      'tangle_within':    'tangle-within',
-      'courage_compass':  'courage-compass',
-      'birdsong':         'birdsong',
-      'forest':           'forest',
-      'full_flight_plan': 'full-flight-plan',
-      'identity_profile': 'deep-profile',
-      'glow_map_s0': 'glow-map', 'glow_map_s1': 'glow-map',
-      'glow_map_s2': 'glow-map', 'glow_map_s3': 'glow-map',
-      'glow_map_s4': 'glow-map', 'glow_map_s5': 'glow-map',
-      'glow_map_s6': 'glow-map', 'glow_map_s7': 'glow-map',
+      'peak_plunge':'peak-plunge','nurture_prune':'nurture-prune','deep_roots':'deep-roots',
+      'roots_feathers':'roots-feathers','soar_steady':'soar-steady','adventure_map':'adventure-map',
+      'shadows_sparks':'shadows-sparks','tangle_within':'tangle-within','courage_compass':'courage-compass',
+      'birdsong':'birdsong','forest':'forest','full_flight_plan':'full-flight-plan','identity_profile':'deep-profile',
+      'glow_map_s0':'glow-map','glow_map_s1':'glow-map','glow_map_s2':'glow-map','glow_map_s3':'glow-map',
+      'glow_map_s4':'glow-map','glow_map_s5':'glow-map','glow_map_s6':'glow-map','glow_map_s7':'glow-map',
     };
 
-    let currentUser      = null;
-    let userProfile      = null;
-    let sessionData      = [];
-    let activePromo      = null;
-    let activeSession    = null;
-    let chatMsgs         = [];
-    let isTyping         = false;
-    let exchangeCount    = 0;
-    let sessionContext   = {};
-    let toolOutputsCache = {};  // FIX 1: declared at top level
+    let currentUser = null, userProfile = null, sessionData = [], activePromo = null;
+    let activeSession = null, chatMsgs = [], isTyping = false, exchangeCount = 0;
+    let sessionContext = {}, toolOutputsCache = {};
 
-    // ── View ──────────────────────────────────────────────────
     function showView(id) {
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
       document.getElementById(id).classList.add('active');
     }
 
-    // ── Auth ──────────────────────────────────────────────────
     document.querySelectorAll('.auth-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
@@ -611,107 +462,62 @@
 
     document.getElementById('form-signin').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const btn = document.getElementById('btn-signin');
-      const err = document.getElementById('signin-error');
-      err.classList.remove('visible');
-      btn.disabled = true; btn.textContent = 'Signing in...';
+      const btn = document.getElementById('btn-signin'), err = document.getElementById('signin-error');
+      err.classList.remove('visible'); btn.disabled = true; btn.textContent = 'Signing in...';
       try {
-        const { error } = await sb.auth.signInWithPassword({
-          email:    document.getElementById('signin-email').value.trim(),
-          password: document.getElementById('signin-password').value,
-        });
+        const { error } = await sb.auth.signInWithPassword({ email: document.getElementById('signin-email').value.trim(), password: document.getElementById('signin-password').value });
         if (error) throw error;
-      } catch (error) {
-        err.textContent = error.message || 'Something went wrong.';
-        err.classList.add('visible');
-        btn.disabled = false; btn.textContent = 'Sign in →';
-      }
+      } catch (error) { err.textContent = error.message || 'Something went wrong.'; err.classList.add('visible'); btn.disabled = false; btn.textContent = 'Sign in →'; }
     });
 
     document.getElementById('form-signup').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const btn = document.getElementById('btn-signup');
-      const err = document.getElementById('signup-error');
-      err.classList.remove('visible');
-      btn.disabled = true; btn.textContent = 'Creating account...';
+      const btn = document.getElementById('btn-signup'), err = document.getElementById('signup-error');
+      err.classList.remove('visible'); btn.disabled = true; btn.textContent = 'Creating account...';
       try {
-        const name     = document.getElementById('signup-name').value.trim();
-        const email    = document.getElementById('signup-email').value.trim();
+        const name = document.getElementById('signup-name').value.trim();
+        const email = document.getElementById('signup-email').value.trim();
         const password = document.getElementById('signup-password').value;
         if (password.length < 8) throw new Error('Password must be at least 8 characters.');
         const { data, error } = await sb.auth.signUp({ email, password });
         if (error) throw error;
-        if (data.user) {
-          await sb.from('course_users').upsert({ id: data.user.id, email, full_name: name }, { onConflict: 'id' });
-        }
-      } catch (error) {
-        err.textContent = error.message || 'Something went wrong.';
-        err.classList.add('visible');
-        btn.disabled = false; btn.textContent = 'Create account →';
-      }
+        if (data.user) await sb.from('course_users').upsert({ id: data.user.id, email, full_name: name }, { onConflict: 'id' });
+      } catch (error) { err.textContent = error.message || 'Something went wrong.'; err.classList.add('visible'); btn.disabled = false; btn.textContent = 'Create account →'; }
     });
 
-    document.getElementById('btn-signout').addEventListener('click', async () => {
-      await sb.auth.signOut();
-      showView('view-auth');
-    });
+    document.getElementById('btn-signout').addEventListener('click', async () => { await sb.auth.signOut(); showView('view-auth'); });
 
-    // ── Dashboard ─────────────────────────────────────────────
     async function loadDashboard() {
       showView('view-loading');
       try {
         const { data: profile } = await sb.from('course_users').select('*').eq('id', currentUser.id).single();
         userProfile = profile || null;
         await loadSessionProgress();
-        await loadToolOutputs(); // FIX 1: populate cache on every dashboard load
+        await loadToolOutputs();
         renderDashboard();
         showView('view-dashboard');
-      } catch (err) {
-        console.error('Dashboard error:', err);
-        showView('view-auth');
-      }
+      } catch (err) { console.error('Dashboard error:', err); showView('view-auth'); }
     }
 
     async function loadSessionProgress() {
       try {
         const now = new Date().toISOString();
-        await sb.from('session_progress').update({ status: 'available' })
-          .eq('user_id', currentUser.id).eq('status', 'locked')
-          .not('unlocks_at', 'is', null).lte('unlocks_at', now);
+        await sb.from('session_progress').update({ status: 'available' }).eq('user_id', currentUser.id).eq('status', 'locked').not('unlocks_at', 'is', null).lte('unlocks_at', now);
         const { data } = await sb.from('session_progress').select('*').eq('user_id', currentUser.id).order('session_number');
         sessionData = data || [];
-
-        // FIX 7: Auto-init missing session rows for purchased users
         if (userProfile && userProfile.purchased_at && sessionData.length < 8) {
-          var existing = sessionData.map(function(s) { return s.session_number; });
-          var inserts  = [];
-          for (var i = 0; i <= 7; i++) {
-            if (existing.indexOf(i) === -1) {
-              inserts.push({
-                user_id:        currentUser.id,
-                session_number: i,
-                status:         i === 0 ? 'available' : 'locked',
-              });
-            }
-          }
-          if (inserts.length) {
-            await sb.from('session_progress').insert(inserts);
-            const { data: data2 } = await sb.from('session_progress').select('*').eq('user_id', currentUser.id).order('session_number');
-            sessionData = data2 || sessionData;
-          }
+          var existing = sessionData.map(s => s.session_number), inserts = [];
+          for (var i = 0; i <= 7; i++) { if (existing.indexOf(i) === -1) inserts.push({ user_id: currentUser.id, session_number: i, status: i === 0 ? 'available' : 'locked' }); }
+          if (inserts.length) { await sb.from('session_progress').insert(inserts); const { data: d2 } = await sb.from('session_progress').select('*').eq('user_id', currentUser.id).order('session_number'); sessionData = d2 || sessionData; }
         }
       } catch { sessionData = []; }
     }
 
-    // FIX 1: loadToolOutputs populates toolOutputsCache from Supabase
     async function loadToolOutputs() {
       if (!currentUser) return;
       try {
         var result = await sb.from('tool_outputs').select('tool_name, output_data').eq('user_id', currentUser.id);
-        if (result.data) {
-          toolOutputsCache = {};
-          result.data.forEach(function(row) { toolOutputsCache[row.tool_name] = row.output_data; });
-        }
+        if (result.data) { toolOutputsCache = {}; result.data.forEach(row => { toolOutputsCache[row.tool_name] = row.output_data; }); }
       } catch(e) { toolOutputsCache = {}; }
     }
 
@@ -722,64 +528,37 @@
       document.getElementById('dash-greeting').textContent = name ? greeting + ', ' + name + '.' : greeting + '.';
       document.getElementById('nav-user-email').textContent = currentUser.email;
       const purchased = !!userProfile?.purchased_at;
-      const content   = document.getElementById('dash-content');
-
+      const content = document.getElementById('dash-content');
       if (!purchased) {
         document.getElementById('dash-progress').style.display = 'none';
         document.getElementById('dash-subtext').textContent = 'Seven sessions. Your pace. The same depth as working with a coach — in a format built around you.';
-        content.innerHTML = renderPurchaseGate();
-        bindPurchaseGate();
-        return;
+        content.innerHTML = renderPurchaseGate(); bindPurchaseGate(); return;
       }
-
       document.getElementById('dash-subtext').textContent = 'Pick up where you left off. The work you do between sessions matters as much as the sessions themselves.';
       const completed = sessionData.filter(s => s.status === 'complete').length;
       document.getElementById('dash-progress').style.display = 'block';
       document.getElementById('progress-count').textContent = completed + ' of 8 sessions';
       document.getElementById('progress-fill').style.width = ((completed / 8) * 100) + '%';
-
       let html = '<div class="sessions-grid">';
-      SESSIONS.forEach(session => {
-        const progress = sessionData.find(s => s.session_number === session.number);
-        const status   = progress?.status || 'locked';
-        html += renderSessionCard(session, status, progress);
-      });
+      SESSIONS.forEach(session => { const progress = sessionData.find(s => s.session_number === session.number); html += renderSessionCard(session, progress?.status || 'locked', progress); });
       html += '</div>';
       content.innerHTML = html;
-
-      document.querySelectorAll('.session-card.available, .session-card.in-progress, .session-card.complete').forEach(card => {
-        card.addEventListener('click', () => openSession(parseInt(card.dataset.session)));
-      });
-      document.querySelectorAll('.btn-ready').forEach(btn => {
-        btn.addEventListener('click', async (e) => { e.stopPropagation(); await bypassGate(parseInt(btn.dataset.next)); });
-      });
+      document.querySelectorAll('.session-card.available, .session-card.in-progress, .session-card.complete').forEach(card => { card.addEventListener('click', () => openSession(parseInt(card.dataset.session))); });
+      document.querySelectorAll('.btn-ready').forEach(btn => { btn.addEventListener('click', async (e) => { e.stopPropagation(); await bypassGate(parseInt(btn.dataset.next)); }); });
     }
 
     function renderSessionCard(session, status, progress) {
       const labels = { available: { pill: 'pill-available', label: 'Ready', icon: '→' }, in_progress: { pill: 'pill-progress', label: 'In progress', icon: '◉' }, complete: { pill: 'pill-complete', label: 'Complete', icon: '✓' }, locked: { pill: 'pill-locked', label: 'Locked', icon: '○' } };
       const s = labels[status] || labels.locked;
       let timerHtml = '';
-      if (status === 'locked' && progress?.unlocks_at) {
-        const diffMs = new Date(progress.unlocks_at) - Date.now();
-        if (diffMs > 0) {
-          const hrs = Math.floor(diffMs / 3600000);
-          const mins = Math.floor((diffMs % 3600000) / 60000);
-          timerHtml = '<div class="unlock-timer">unlocks in ' + hrs + 'h ' + mins + 'm</div>';
-        }
-      }
+      if (status === 'locked' && progress?.unlocks_at) { const diffMs = new Date(progress.unlocks_at) - Date.now(); if (diffMs > 0) { const hrs = Math.floor(diffMs/3600000), mins = Math.floor((diffMs%3600000)/60000); timerHtml = '<div class="unlock-timer">unlocks in ' + hrs + 'h ' + mins + 'm</div>'; } }
       let bypassHtml = '';
-      if (status === 'complete' && session.number < 7) {
-        const next = sessionData.find(s => s.session_number === session.number + 1);
-        if (next?.status === 'locked' && next?.unlocks_at && new Date(next.unlocks_at) - Date.now() > 0) {
-          bypassHtml = '<div class="gate-card"><div class="gate-content"><p>Your next session opens in a little while — giving you time to sit with your take-home. Done already?</p></div><button class="btn-ready" data-next="' + (session.number + 1) + '">I\'m ready →</button></div>';
-        }
-      }
-      const numBg    = status === 'locked' ? 'rgba(255,255,255,0.04)' : session.color + '22';
+      if (status === 'complete' && session.number < 7) { const next = sessionData.find(s => s.session_number === session.number + 1); if (next?.status === 'locked' && next?.unlocks_at && new Date(next.unlocks_at) - Date.now() > 0) bypassHtml = '<div class="gate-card"><div class="gate-content"><p>Your next session opens in a little while — giving you time to sit with your take-home. Done already?</p></div><button class="btn-ready" data-next="' + (session.number+1) + '">I\'m ready →</button></div>'; }
+      const numBg = status === 'locked' ? 'rgba(255,255,255,0.04)' : session.color+'22';
       const numColor = status === 'locked' ? 'var(--text-muted)' : session.color;
-      const eyeColor = status === 'locked' ? 'var(--text-muted)' : session.color;
       const iconColor = status === 'locked' ? 'var(--text-muted)' : status === 'complete' ? '#7a9e7e' : session.color;
-      const num = session.number === 0 ? '✦' : String(session.number).padStart(2, '0');
-      return '<div class="session-card ' + status.replace('_','-') + '" data-session="' + session.number + '"><div class="session-num" style="background:' + numBg + ';color:' + numColor + ';">' + num + '</div><div class="session-content"><div class="session-eyebrow" style="color:' + eyeColor + '">' + session.tag + '</div><div class="session-title">' + session.title + '</div><div class="session-teaser">' + session.teaser + '</div>' + timerHtml + '</div><div class="session-status"><div class="status-icon" style="color:' + iconColor + '">' + s.icon + '</div><div class="status-pill ' + s.pill + '">' + s.label + '</div></div></div>' + bypassHtml;
+      const num = session.number === 0 ? '✦' : String(session.number).padStart(2,'0');
+      return '<div class="session-card ' + status.replace('_','-') + '" data-session="' + session.number + '"><div class="session-num" style="background:' + numBg + ';color:' + numColor + ';">' + num + '</div><div class="session-content"><div class="session-eyebrow" style="color:' + numColor + '">' + session.tag + '</div><div class="session-title">' + session.title + '</div><div class="session-teaser">' + session.teaser + '</div>' + timerHtml + '</div><div class="session-status"><div class="status-icon" style="color:' + iconColor + '">' + s.icon + '</div><div class="status-pill ' + s.pill + '">' + s.label + '</div></div></div>' + bypassHtml;
     }
 
     function renderPurchaseGate() {
@@ -788,169 +567,24 @@
 
     function bindPurchaseGate() {
       document.getElementById('btn-apply-promo').addEventListener('click', () => {
-        const code  = document.getElementById('promo-input').value.trim().toUpperCase();
-        const promo = PROMO_CODES[code];
-        const msgEl = document.getElementById('promo-message');
-        const priceEl = document.getElementById('display-price');
-        if (promo) {
-          activePromo = promo;
-          const final = (BASE_PRICE * (1 - promo.discount)).toFixed(2);
-          priceEl.textContent = '$' + (parseFloat(final) % 1 === 0 ? parseInt(final) : final);
-          msgEl.textContent = promo.label; msgEl.className = 'promo-message promo-success';
-        } else {
-          activePromo = null;
-          priceEl.textContent = '$' + BASE_PRICE;
-          msgEl.textContent = code ? "That code doesn't look right." : '';
-          msgEl.className = 'promo-message promo-error';
-        }
+        const code = document.getElementById('promo-input').value.trim().toUpperCase();
+        const promo = PROMO_CODES[code], msgEl = document.getElementById('promo-message'), priceEl = document.getElementById('display-price');
+        if (promo) { activePromo = promo; const final = (BASE_PRICE*(1-promo.discount)).toFixed(2); priceEl.textContent = '$'+(parseFloat(final)%1===0?parseInt(final):final); msgEl.textContent = promo.label; msgEl.className = 'promo-message promo-success'; }
+        else { activePromo = null; priceEl.textContent = '$'+BASE_PRICE; msgEl.textContent = code ? "That code doesn't look right." : ''; msgEl.className = 'promo-message promo-error'; }
       });
-      document.getElementById('btn-purchase').addEventListener('click', () => {
-        const price = activePromo ? (BASE_PRICE * (1 - activePromo.discount)).toFixed(2) : BASE_PRICE;
-        alert('Stripe checkout coming soon.\nPrice: $' + price + '\nUser: ' + currentUser.email);
-      });
+      document.getElementById('btn-purchase').addEventListener('click', () => { const price = activePromo ? (BASE_PRICE*(1-activePromo.discount)).toFixed(2) : BASE_PRICE; alert('Stripe checkout coming soon.\nPrice: $'+price+'\nUser: '+currentUser.email); });
     }
 
     async function bypassGate(nextSession) {
-      try {
-        await sb.from('session_progress').update({ status: 'available', unlocks_at: new Date().toISOString() }).eq('user_id', currentUser.id).eq('session_number', nextSession);
-        await loadSessionProgress();
-        renderDashboard();
-      } catch (err) { console.error('Bypass error:', err); }
+      try { await sb.from('session_progress').update({ status: 'available', unlocks_at: new Date().toISOString() }).eq('user_id', currentUser.id).eq('session_number', nextSession); await loadSessionProgress(); renderDashboard(); }
+      catch (err) { console.error('Bypass error:', err); }
     }
 
-    // FIX 1: also reload tool outputs when returning to dashboard from a session
     document.getElementById('btn-back-dash').addEventListener('click', async () => {
-      await loadSessionProgress();
-      await loadToolOutputs();
-      renderDashboard();
-      showView('view-dashboard');
+      await loadSessionProgress(); await loadToolOutputs(); renderDashboard(); showView('view-dashboard');
     });
 
-    // ── Open session ──────────────────────────────────────────
-    async function openSession(sessionNumber) {
-      const session = SESSIONS[sessionNumber];
-      if (!session) return;
-
-      activeSession  = session;
-      chatMsgs       = [];
-      isTyping       = false;
-      exchangeCount  = 0;
-      sessionContext = {};
-
-      // FIX 5: Pre-populate openedTools from toolOutputsCache using reverse map
-      // so returning users see tools correctly marked as done
-      openedTools = {};
-      Object.keys(toolOutputsCache).forEach(function(dbKey) {
-        var tk = DB_KEY_TO_TOOL_KEY[dbKey];
-        if (tk) openedTools[tk] = true;
-      });
-
-      // Apply session theme
-      document.documentElement.style.setProperty('--session-col',    session.color);
-      document.documentElement.style.setProperty('--session-dim',    session.dim);
-      document.documentElement.style.setProperty('--session-border', session.border);
-
-      document.getElementById('session-nav-bird').textContent = session.emoji;
-
-      // Build left panel tool list using getDbKey for correct cache lookup
-      const toolsHtml = session.tools.length ? '<div class="tools-section"><div class="tools-label">Tools in this session</div><div class="tool-list">' +
-        session.tools.map(function(t) {
-          var k = Object.keys(TOOL_MAP).find(function(key) { return TOOL_MAP[key].file === t.file; });
-          var oc = k ? ('openToolEmbed(\'' + k + '\',TOOL_MAP[\'' + k + '\'])') : ('openTool(\'' + t.file + '\')');
-          // FIX 4: use getDbKey for correct cache lookup (handles glow-map and identity_profile)
-          var dbKey    = k ? getDbKey(k, sessionNumber) : '';
-          var snapData = dbKey ? (toolOutputsCache[dbKey] || null) : null;
-          var isDone   = openedTools[k] || false;
-          var snapHtml = (isDone && snapData) ? ('<div class="tool-item-snap">' + renderToolSnapshot(k, snapData).replace('<div class="tool-snapshot">', '').replace(/<\/div>\s*$/, '') + '</div>') : '';
-          var doneTag  = isDone ? 'Done' : t.tag;
-          var doneStyle = isDone ? ' style="color:var(--session-col);opacity:1"' : '';
-          return '<div class="tool-item clickable' + (isDone ? ' tool-done' : '') + '" data-tool-key="' + (k || '') + '" onclick="' + oc + '"><span class="tool-dot"></span><span>' + t.name + '</span><span class="tool-tag"' + doneStyle + '>' + doneTag + '</span></div>' + snapHtml;
-        }).join('') +
-        '</div></div>' : '';
-
-      const videoHtml = session.videoUrl
-        ? `<div class="video-wrap"><div class="video-player-container"><video id="session-video" preload="metadata" playsinline><source src="${session.videoUrl}" type="video/mp4"></video><div class="video-poster" id="video-poster" style="background:linear-gradient(135deg,${session.color}18,${session.color}08)"><div class="video-play">▶</div><div class="video-label">A word from Luke · ${session.videoLen}</div></div></div></div>`
-        : `<div class="video-coming-soon"><p>🪶 &nbsp; Video coming soon</p></div>`;
-
-      document.getElementById('session-info').innerHTML =
-        '<div class="session-tag-label">' + session.tag + '</div>' +
-        '<h1>' + session.title + '</h1>' +
-        '<p class="session-info-desc">' + session.desc + '</p>' +
-        videoHtml +
-        '<div class="session-meta-row"><div class="meta-item"><span class="meta-label">Session</span><span class="meta-value">' + (session.number === 0 ? 'Orientation' : '0' + session.number + ' of 07') + '</span></div><div class="meta-item"><span class="meta-label">Duration</span><span class="meta-value">' + session.duration + '</span></div>' +
-        (session.tools.length ? '<div class="meta-item"><span class="meta-label">Tools</span><span class="meta-value">' + session.tools.length + ' tools</span></div>' : '') + '</div>' + toolsHtml;
-
-      // Wire up video player
-      if (session.videoUrl) {
-        const video  = document.getElementById('session-video');
-        const poster = document.getElementById('video-poster');
-        poster.addEventListener('click', () => { poster.classList.add('hidden'); video.play(); });
-        video.addEventListener('click', () => {
-          if (video.paused) { video.play(); poster.classList.add('hidden'); }
-          else { video.pause(); }
-        });
-        video.style.cursor = 'pointer';
-        video.addEventListener('pause', () => { if (!video.ended) poster.classList.remove('hidden'); });
-        video.addEventListener('ended', () => poster.classList.remove('hidden'));
-      }
-
-      document.getElementById('chat-header').innerHTML =
-        '<div class="chat-avatar">' + session.emoji + '</div>' +
-        '<div class="chat-avatar-info"><h3>lil\' bird</h3><p>' + session.tag.toLowerCase() + ' · ' + session.title.toLowerCase() + '</p></div>' +
-        '<div class="chat-status"><div class="status-dot"></div>present</div>';
-
-      document.getElementById('complete-panel').classList.remove('visible');
-      document.getElementById('complete-title').textContent = session.completeTitle;
-      document.getElementById('complete-desc').textContent  = session.completeDesc;
-      document.getElementById('tools-nudge').innerHTML = session.tools.slice(0, 2).map(function(t) {
-        var k = Object.keys(TOOL_MAP).find(function(key) { return TOOL_MAP[key].file === t.file; });
-        var oc = k ? ('openToolEmbed(\'' + k + '\',TOOL_MAP[\'' + k + '\'])') : ('openTool(\'' + t.file + '\')');
-        return '<span class="tool-nudge-chip" onclick="' + oc + '">' + t.name + ' →</span>';
-      }).join('');
-
-      document.getElementById('chat-messages').innerHTML = '';
-      document.getElementById('chat-input').value = '';
-      document.getElementById('btn-send').disabled = true;
-
-      showView('view-session');
-      await loadSessionContext(sessionNumber);
-
-      // Load or start conversation
-      try {
-        const { data: memory } = await sb.from('ai_memory').select('messages').eq('user_id', currentUser.id).eq('session_number', sessionNumber).single();
-        if (memory?.messages?.length) {
-          chatMsgs = memory.messages;
-          chatMsgs.forEach(m => renderMessage(m.role, m.content));
-          exchangeCount = chatMsgs.filter(m => m.role === 'user').length;
-          // FIX 8: If session already complete, hide the complete panel even if [COMPLETE] was in history
-          const sessionStatus = sessionData.find(s => s.session_number === sessionNumber)?.status;
-          if (sessionStatus === 'complete') {
-            setTimeout(function() {
-              var panel = document.getElementById('complete-panel');
-              if (panel) panel.classList.remove('visible');
-            }, 700);
-          }
-        } else {
-          setTimeout(() => {
-            const greeting = buildGreeting(sessionNumber);
-            renderMessage('assistant', greeting);
-            chatMsgs.push({ role: 'assistant', content: greeting });
-          }, 600);
-        }
-      } catch {
-        setTimeout(() => {
-          const greeting = buildGreeting(sessionNumber);
-          renderMessage('assistant', greeting);
-          chatMsgs.push({ role: 'assistant', content: greeting });
-        }, 600);
-      }
-
-      await sb.from('session_progress').update({ status: 'in_progress', started_at: new Date().toISOString() })
-        .eq('user_id', currentUser.id).eq('session_number', sessionNumber).eq('status', 'available');
-
-      document.getElementById('chat-input').focus();
-    }
-
+    // ── TOOL MAP ──────────────────────────────────────────────
     const TOOL_MAP = {
       'peak-plunge':     { file: 'tools/tool-peak-plunge.html',     icon: '📈', name: 'Peak & Plunge Timeline',    hint: 'Map the highs and lows of your story so far.' },
       'nurture-prune':   { file: 'tools/tool-nurture-prune.html',   icon: '🌿', name: 'Nurture & Prune Matrix',    hint: 'Map the people who shaped you.' },
@@ -969,544 +603,431 @@
     };
     var openedTools = {};
 
-    function openTool(toolFile) {
-      window.open(toolFile + '?uid=' + currentUser.id + '&session=' + (activeSession ? activeSession.number : 0), '_blank');
+    // ── OPEN SESSION ──────────────────────────────────────────
+    async function openSession(sessionNumber) {
+      const session = SESSIONS[sessionNumber];
+      if (!session) return;
+      activeSession = session;
+      chatMsgs = []; isTyping = false; exchangeCount = 0; sessionContext = {};
+
+      // FIX 1: reset openedTools to only current session's tools that have saved data
+      openedTools = {};
+      var sessionToolKeys = (session.tools || []).map(function(t) {
+        return Object.keys(TOOL_MAP).find(function(k) { return TOOL_MAP[k].file === t.file; });
+      }).filter(Boolean);
+      sessionToolKeys.forEach(function(tk) {
+        var dbKey = getDbKey(tk, sessionNumber);
+        if (toolOutputsCache[dbKey]) openedTools[tk] = true;
+      });
+
+      document.documentElement.style.setProperty('--session-col', session.color);
+      document.documentElement.style.setProperty('--session-dim', session.dim);
+      document.documentElement.style.setProperty('--session-border', session.border);
+      document.getElementById('session-nav-bird').textContent = session.emoji;
+
+      const toolsHtml = session.tools.length ? '<div class="tools-section"><div class="tools-label">Tools in this session</div><div class="tool-list">' +
+        session.tools.map(function(t) {
+          var k = Object.keys(TOOL_MAP).find(function(key) { return TOOL_MAP[key].file === t.file; });
+          var oc = k ? ('openToolEmbed(\'' + k + '\',TOOL_MAP[\'' + k + '\'])') : ('openTool(\'' + t.file + '\')');
+          var dbKey = k ? getDbKey(k, sessionNumber) : '';
+          var snapData = dbKey ? (toolOutputsCache[dbKey] || null) : null;
+          var isDone = openedTools[k] || false;
+          var snapHtml = (isDone && snapData) ? ('<div class="tool-item-snap">' + renderToolSnapshot(k, snapData).replace('<div class="tool-snapshot">', '').replace(/<\/div>\s*$/, '') + '</div>') : '';
+          var doneStyle = isDone ? ' style="color:var(--session-col);opacity:1"' : '';
+          return '<div class="tool-item clickable' + (isDone ? ' tool-done' : '') + '" data-tool-key="' + (k||'') + '" onclick="' + oc + '"><span class="tool-dot"></span><span>' + t.name + '</span><span class="tool-tag"' + doneStyle + '>' + (isDone ? 'Done' : t.tag) + '</span></div>' + snapHtml;
+        }).join('') + '</div></div>' : '';
+
+      const videoHtml = session.videoUrl
+        ? `<div class="video-wrap"><div class="video-player-container"><video id="session-video" preload="metadata" playsinline><source src="${session.videoUrl}" type="video/mp4"></video><div class="video-poster" id="video-poster" style="background:linear-gradient(135deg,${session.color}18,${session.color}08)"><div class="video-play">▶</div><div class="video-label">A word from Luke · ${session.videoLen}</div></div></div></div>`
+        : `<div class="video-coming-soon"><p>🪶 &nbsp; Video coming soon</p></div>`;
+
+      document.getElementById('session-info').innerHTML =
+        '<div class="session-tag-label">' + session.tag + '</div><h1>' + session.title + '</h1><p class="session-info-desc">' + session.desc + '</p>' + videoHtml +
+        '<div class="session-meta-row"><div class="meta-item"><span class="meta-label">Session</span><span class="meta-value">' + (session.number===0?'Orientation':'0'+session.number+' of 07') + '</span></div><div class="meta-item"><span class="meta-label">Duration</span><span class="meta-value">' + session.duration + '</span></div>' +
+        (session.tools.length ? '<div class="meta-item"><span class="meta-label">Tools</span><span class="meta-value">' + session.tools.length + ' tools</span></div>' : '') + '</div>' + toolsHtml;
+
+      if (session.videoUrl) {
+        const video = document.getElementById('session-video'), poster = document.getElementById('video-poster');
+        poster.addEventListener('click', () => { poster.classList.add('hidden'); video.play(); });
+        video.addEventListener('click', () => { if (video.paused) { video.play(); poster.classList.add('hidden'); } else video.pause(); });
+        video.style.cursor = 'pointer';
+        video.addEventListener('pause', () => { if (!video.ended) poster.classList.remove('hidden'); });
+        video.addEventListener('ended', () => poster.classList.remove('hidden'));
+      }
+
+      document.getElementById('chat-header').innerHTML = '<div class="chat-avatar">' + session.emoji + '</div><div class="chat-avatar-info"><h3>lil\' bird</h3><p>' + session.tag.toLowerCase() + ' · ' + session.title.toLowerCase() + '</p></div><div class="chat-status"><div class="status-dot"></div>present</div>';
+      document.getElementById('complete-panel').classList.remove('visible');
+      document.getElementById('complete-title').textContent = session.completeTitle;
+      document.getElementById('complete-desc').textContent = session.completeDesc;
+      document.getElementById('tools-nudge').innerHTML = session.tools.slice(0,2).map(function(t) {
+        var k = Object.keys(TOOL_MAP).find(function(key) { return TOOL_MAP[key].file === t.file; });
+        var oc = k ? ('openToolEmbed(\'' + k + '\',TOOL_MAP[\'' + k + '\'])') : ('openTool(\'' + t.file + '\')');
+        return '<span class="tool-nudge-chip" onclick="' + oc + '">' + t.name + ' →</span>';
+      }).join('');
+
+      document.getElementById('chat-messages').innerHTML = '';
+      document.getElementById('chat-input').value = '';
+      document.getElementById('btn-send').disabled = true;
+      showView('view-session');
+      await loadSessionContext(sessionNumber);
+
+      try {
+        const { data: memory } = await sb.from('ai_memory').select('messages').eq('user_id', currentUser.id).eq('session_number', sessionNumber).single();
+        if (memory?.messages?.length) {
+          chatMsgs = memory.messages;
+          chatMsgs.forEach(m => renderMessage(m.role, m.content));
+          exchangeCount = chatMsgs.filter(m => m.role === 'user').length;
+          const sessionStatus = sessionData.find(s => s.session_number === sessionNumber)?.status;
+          if (sessionStatus === 'complete') { setTimeout(function() { var p = document.getElementById('complete-panel'); if (p) p.classList.remove('visible'); }, 700); }
+        } else {
+          setTimeout(() => { const g = buildGreeting(sessionNumber); renderMessage('assistant', g); chatMsgs.push({ role: 'assistant', content: g }); }, 600);
+        }
+      } catch {
+        setTimeout(() => { const g = buildGreeting(sessionNumber); renderMessage('assistant', g); chatMsgs.push({ role: 'assistant', content: g }); }, 600);
+      }
+
+      await sb.from('session_progress').update({ status: 'in_progress', started_at: new Date().toISOString() }).eq('user_id', currentUser.id).eq('session_number', sessionNumber).eq('status', 'available');
+      document.getElementById('chat-input').focus();
     }
+
+    function openTool(toolFile) { window.open(toolFile + '?uid=' + currentUser.id + '&session=' + (activeSession ? activeSession.number : 0), '_blank'); }
 
     var lastToolKey = null;
 
     function openToolEmbed(toolKey, toolInfo) {
-      var wrap  = document.getElementById('tool-embed-wrap');
-      var frame = document.getElementById('tool-embed-frame');
-      var title = document.getElementById('tool-embed-title');
+      var wrap = document.getElementById('tool-embed-wrap'), frame = document.getElementById('tool-embed-frame'), title = document.getElementById('tool-embed-title');
       if (!wrap || !frame) return;
       lastToolKey = toolKey;
       title.textContent = toolInfo.name;
       var token = '';
-      try {
-        var raw = localStorage.getItem('lilbird-solo-auth');
-        if (raw) { var td = JSON.parse(raw); token = td.access_token || ''; }
-      } catch(e) {}
+      try { var raw = localStorage.getItem('lilbird-solo-auth'); if (raw) { var td = JSON.parse(raw); token = td.access_token || ''; } } catch(e) {}
       frame.src = toolInfo.file + '?uid=' + (currentUser ? currentUser.id : '') + '&session=' + (activeSession ? activeSession.number : 0) + '&token=' + encodeURIComponent(token) + '&embed=1';
       wrap.classList.add('active');
-      setTimeout(function() {
-        var chatCol = document.querySelector('.session-chat-col');
-        if (chatCol) chatCol.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
+      setTimeout(function() { var c = document.querySelector('.session-chat-col'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
     }
 
     function closeToolEmbed() {
-      var wrap  = document.getElementById('tool-embed-wrap');
-      var frame = document.getElementById('tool-embed-frame');
+      var wrap = document.getElementById('tool-embed-wrap'), frame = document.getElementById('tool-embed-frame');
       if (!wrap) return;
       wrap.classList.remove('active');
       setTimeout(function() { if (frame) frame.src = 'about:blank'; }, 300);
-      setTimeout(function() {
-        var msgs = document.getElementById('chat-messages');
-        if (msgs) msgs.scrollTop = msgs.scrollHeight;
-      }, 150);
+      setTimeout(function() { var m = document.getElementById('chat-messages'); if (m) m.scrollTop = m.scrollHeight; }, 150);
 
       if (activeSession && currentUser && lastToolKey) {
-        // FIX 3: 1500ms delay before querying — gives tool time to finish saving
-        // FIX 2: use maybeSingle() so zero rows returns null instead of throwing
-        // FIX 4: use getDbKey() for correct key mapping
+        // FIX 4: increased to 2500ms for drag-and-drop tools like Soar & Steady, Nurture & Prune
         setTimeout(function() {
-          var sNum  = activeSession.number;
+          var sNum = activeSession.number;
           var dbKey = getDbKey(lastToolKey, sNum);
-          sb.from('tool_outputs').select('output_data')
-            .eq('user_id', currentUser.id)
-            .eq('tool_name', dbKey)
-            .maybeSingle()                          // FIX 2
+          sb.from('tool_outputs').select('output_data').eq('user_id', currentUser.id).eq('tool_name', dbKey).maybeSingle()
             .then(function(result) {
               var toolData = result && result.data && result.data.output_data;
               if (toolData) {
-              var toolName = TOOL_MAP[lastToolKey] ? TOOL_MAP[lastToolKey].name : lastToolKey;
-              var ctx = '[Tool completed: ' + toolName + '] Data: ' + JSON.stringify(toolData).slice(0, 600);
-              chatMsgs.push({ role: 'user', content: ctx });
-              toolOutputsCache[dbKey] = toolData;
-              openedTools[lastToolKey] = true;
-              var existingCards = document.querySelectorAll('.tool-card[data-key="' + lastToolKey + '"]');
-              if (existingCards.length > 0) {
-                updateToolCardSnapshot(lastToolKey, toolData);
-              } else {
-                var toolInfo = TOOL_MAP[lastToolKey];
-                if (toolInfo) {
-                  var msgEl = document.getElementById('chat-messages');
-                  if (msgEl) renderToolCard(lastToolKey, toolInfo, msgEl);
-                }
+                var toolName = TOOL_MAP[lastToolKey] ? TOOL_MAP[lastToolKey].name : lastToolKey;
+                var ctx = '[Tool completed: ' + toolName + '] Data: ' + JSON.stringify(toolData).slice(0, 600);
+                // FIX 2: replace existing tool context in chatMsgs instead of appending
+                var existingIdx = chatMsgs.findIndex(function(m) { return m.role === 'user' && m.content.indexOf('[Tool completed: ' + toolName + ']') === 0; });
+                if (existingIdx !== -1) { chatMsgs[existingIdx] = { role: 'user', content: ctx }; }
+                else { chatMsgs.push({ role: 'user', content: ctx }); }
+                toolOutputsCache[dbKey] = toolData;
+                openedTools[lastToolKey] = true;
+                var existingCards = document.querySelectorAll('.tool-card[data-key="' + lastToolKey + '"]');
+                if (existingCards.length > 0) { updateToolCardSnapshot(lastToolKey, toolData); }
+                else { var ti = TOOL_MAP[lastToolKey]; if (ti) { var el = document.getElementById('chat-messages'); if (el) renderToolCard(lastToolKey, ti, el); } }
+                updateLeftPanelTool(lastToolKey, toolData);
               }
-              updateLeftPanelTool(lastToolKey, toolData);
-            }
-              // Always trigger AI response regardless of whether tool data was found
-              setTimeout(function() {
-                var msgs = document.getElementById('chat-messages');
-                if (msgs) msgs.scrollTop = msgs.scrollHeight;
-                document.getElementById('chat-input').focus();
-                triggerToolReturnAck();
-              }, 400);
+              setTimeout(function() { var m = document.getElementById('chat-messages'); if (m) m.scrollTop = m.scrollHeight; document.getElementById('chat-input').focus(); triggerToolReturnAck(); }, 400);
             })
-            .catch(function() {
-              // Even on error, always trigger AI response
-              setTimeout(function() {
-                var msgs = document.getElementById('chat-messages');
-                if (msgs) msgs.scrollTop = msgs.scrollHeight;
-                document.getElementById('chat-input').focus();
-                triggerToolReturnAck();
-              }, 400);
-            });
-        }, 1500); // FIX 3: wait for tool save to complete
+            .catch(function() { setTimeout(function() { var m = document.getElementById('chat-messages'); if (m) m.scrollTop = m.scrollHeight; document.getElementById('chat-input').focus(); triggerToolReturnAck(); }, 400); });
+        }, 2500); // FIX 4: was 1500, now 2500
       } else {
-        var msgs = document.getElementById('chat-messages');
-        if (msgs) setTimeout(function() { msgs.scrollTop = msgs.scrollHeight; }, 100);
+        var m = document.getElementById('chat-messages'); if (m) setTimeout(function() { m.scrollTop = m.scrollHeight; }, 100);
       }
     }
 
-    // FIX 6: Update left panel tool item with snapshot after tool close
     function updateLeftPanelTool(toolKey, snapData) {
       var toolList = document.querySelector('.tool-list');
       if (!toolList) return;
-      var items = toolList.querySelectorAll('.tool-item[data-tool-key="' + toolKey + '"]');
-      items.forEach(function(item) {
-        // Mark as done
+      toolList.querySelectorAll('.tool-item[data-tool-key="' + toolKey + '"]').forEach(function(item) {
         var tag = item.querySelector('.tool-tag');
         if (tag) { tag.textContent = 'Done'; tag.style.color = 'var(--session-col)'; tag.style.opacity = '1'; }
         item.classList.add('tool-done');
-        // Remove existing snap if present
         var next = item.nextElementSibling;
         if (next && next.classList.contains('tool-item-snap')) next.remove();
-        // Insert new snapshot
         var snapHtml = renderToolSnapshot(toolKey, snapData);
         if (snapHtml) {
           var inner = snapHtml.replace('<div class="tool-snapshot">', '').replace(/<\/div>\s*$/, '');
-          var div = document.createElement('div');
-          div.className = 'tool-item-snap';
-          div.innerHTML = inner;
+          var div = document.createElement('div'); div.className = 'tool-item-snap'; div.innerHTML = inner;
           item.insertAdjacentElement('afterend', div);
         }
       });
     }
 
-    function buildGreeting(sessionNumber) {
+    function buildGreeting(sn) {
       const name = userProfile?.full_name?.split(' ')[0] || '';
-      const hasContext = sessionContext?.previous_sessions?.length > 0;
-      if (sessionNumber === 0) {
-        return (name ? name + '. ' : '') + "You made it here — and that already says something about you.\n\nI'm lil' bird. Think of me as a guide — I'm not going to tell you what to do or hand you a plan. My job is to ask the right questions and stay curious with you as you figure out what's actually true for your life.\n\nBefore we go anywhere — tell me what brought you here. What's alive for you right now?";
-      }
-      if (sessionNumber === 1) {
-        return hasContext
-          ? (name ? name + ', ' : '') + "you've already taken the first step — and now we go somewhere different.\n\nSession 1 is about your story. Not your goals, not your plans — your actual history. The people who raised you. The seasons that stretched you. The moments you still carry.\n\nI want to start somewhere slow. Think back to where you grew up — the house, the people, the unspoken rules of that place. What's the first thing that comes to mind when you picture it?"
-          : "Welcome to Session 1 — Story.\n\nBefore we talk about where you want to go, I want to understand where you've come from. Your history isn't just background — it's the ground your future is built on.\n\nLet's start somewhere slow. Think back to where you grew up — the house, the people, the unspoken rules of that place. What's the first thing that comes to mind when you picture it?";
-      }
-      if (sessionNumber === 2) {
-        return "Session 2 is about vision — but not the kind that sounds good on paper.\n\nBefore we talk about where you want to go, I want to understand what actually pulls you. The things that make you lose track of time. The moments where you've felt most alive.\n\nLet's start there. When was the last time you felt genuinely energised by something — not just busy, but actually lit up? What were you doing?";
-      }
-      if (sessionNumber === 3) {
-        return "Session 3 goes somewhere different. We're not talking about goals or vision today — we're talking about you.\n\nWho you actually are underneath the roles you play. What drives you. What holds you back. The parts of yourself you've maybe been avoiding.\n\nI want to start with something simple. When you think about how other people see you versus how you see yourself — is there a gap? What does that feel like?";
-      }
-      if (sessionNumber === 4) {
-        return "Something is in transition for you — otherwise you wouldn't be here.\n\nThis session is about naming it precisely. Not a general feeling of being stuck, but the actual thing that's changing, ending, or waiting to begin.\n\nLet's start there. What's the most honest description of where you are right now — the one you might not say out loud to most people?";
-      }
-      if (sessionNumber === 5) {
-        return "This session is a little different — lighter than the ones before it.\n\nWe're not going deep into story or identity today. We're looking at your actual week. The rhythms you live by. The energy patterns that show up whether you plan them or not.\n\nSimple question to start: if you could change one thing about how your days feel — not what you do, but how they feel — what would it be?";
-      }
-      if (sessionNumber === 6) {
-        return "You don't build a life alone — even the most independent people need a forest around them.\n\nThis session is about your relational landscape. Not just who's in your life, but what's actually happening in those relationships. Who gives you energy. Who takes it. Who you've been neglecting. Who you've been over-investing in.\n\nLet's start with the person who comes to mind first when you think about someone who genuinely sees you. Who is that?";
-      }
-      if (sessionNumber === 7) {
-        return (name ? name + '. ' : '') + "You made it to Session 7.\n\nI want to start by acknowledging that — not as a formality, but genuinely. You showed up. You went to the places most people avoid. You did the work.\n\nToday we pull it all together. But before we build your Full Flight Plan, I want to look back with you.\n\nOf everything we've covered — Story, Vision, Identity, Transitions, Rhythms, Relationships — what shifted most for you? What do you see differently now than when you started?";
-      }
-      return 'Welcome to ' + (SESSIONS[sessionNumber]?.title || 'this session') + '. Let\'s begin.';
+      const hasCtx = sessionContext?.previous_sessions?.length > 0;
+      if (sn===0) return (name?name+'. ':'')+"You made it here — and that already says something about you.\n\nI'm lil' bird. Think of me as a guide — I'm not going to tell you what to do or hand you a plan. My job is to ask the right questions and stay curious with you as you figure out what's actually true for your life.\n\nBefore we go anywhere — tell me what brought you here. What's alive for you right now?";
+      if (sn===1) return hasCtx ? (name?name+', ':'')+"you've already taken the first step — and now we go somewhere different.\n\nSession 1 is about your story. Not your goals, not your plans — your actual history. The people who raised you. The seasons that stretched you. The moments you still carry.\n\nI want to start somewhere slow. Think back to where you grew up — the house, the people, the unspoken rules of that place. What's the first thing that comes to mind when you picture it?" : "Welcome to Session 1 — Story.\n\nBefore we talk about where you want to go, I want to understand where you've come from. Your history isn't just background — it's the ground your future is built on.\n\nLet's start somewhere slow. Think back to where you grew up — the house, the people, the unspoken rules of that place. What's the first thing that comes to mind when you picture it?";
+      if (sn===2) return "Session 2 is about vision — but not the kind that sounds good on paper.\n\nBefore we talk about where you want to go, I want to understand what actually pulls you. The things that make you lose track of time. The moments where you've felt most alive.\n\nLet's start there. When was the last time you felt genuinely energised by something — not just busy, but actually lit up? What were you doing?";
+      if (sn===3) return "Session 3 goes somewhere different. We're not talking about goals or vision today — we're talking about you.\n\nWho you actually are underneath the roles you play. What drives you. What holds you back. The parts of yourself you've maybe been avoiding.\n\nI want to start with something simple. When you think about how other people see you versus how you see yourself — is there a gap? What does that feel like?";
+      if (sn===4) return "Something is in transition for you — otherwise you wouldn't be here.\n\nThis session is about naming it precisely. Not a general feeling of being stuck, but the actual thing that's changing, ending, or waiting to begin.\n\nLet's start there. What's the most honest description of where you are right now — the one you might not say out loud to most people?";
+      if (sn===5) return "This session is a little different — lighter than the ones before it.\n\nWe're not going deep into story or identity today. We're looking at your actual week. The rhythms you live by. The energy patterns that show up whether you plan them or not.\n\nSimple question to start: if you could change one thing about how your days feel — not what you do, but how they feel — what would it be?";
+      if (sn===6) return "You don't build a life alone — even the most independent people need a forest around them.\n\nThis session is about your relational landscape. Not just who's in your life, but what's actually happening in those relationships. Who gives you energy. Who takes it. Who you've been neglecting. Who you've been over-investing in.\n\nLet's start with the person who comes to mind first when you think about someone who genuinely sees you. Who is that?";
+      if (sn===7) return (name?name+'. ':'')+"You made it to Session 7.\n\nI want to start by acknowledging that — not as a formality, but genuinely. You showed up. You went to the places most people avoid. You did the work.\n\nToday we pull it all together. But before we build your Full Flight Plan, I want to look back with you.\n\nOf everything we've covered — Story, Vision, Identity, Transitions, Rhythms, Relationships — what shifted most for you? What do you see differently now than when you started?";
+      return 'Welcome to ' + (SESSIONS[sn]?.title || 'this session') + '. Let\'s begin.';
     }
 
     async function loadSessionContext(sessionNumber) {
       try {
-        const { data: memories } = await sb.from('ai_memory').select('session_number, summary, key_words')
-          .eq('user_id', currentUser.id).lt('session_number', sessionNumber).not('summary', 'is', null);
-        if (memories?.length) {
-          sessionContext = { previous_sessions: memories.map(m => ({ session_number: m.session_number, summary: m.summary, key_words: m.key_words || [] })) };
-        }
+        const { data: memories } = await sb.from('ai_memory').select('session_number, summary, key_words').eq('user_id', currentUser.id).lt('session_number', sessionNumber).not('summary', 'is', null);
+        if (memories?.length) sessionContext = { previous_sessions: memories.map(m => ({ session_number: m.session_number, summary: m.summary, key_words: m.key_words || [] })) };
       } catch { sessionContext = {}; }
     }
 
-    // ── Chat rendering ────────────────────────────────────────
     function renderMessage(role, msgContent) {
       var el = document.getElementById('chat-messages');
       var toolMatch = msgContent.match(/\[TOOL:([a-z-]+)\]/);
-      var cleanContent = msgContent.replace(/\[TOOL:[a-z-]+\]\s*/g, '').replace(/\[COMPLETE\]\s*/g, '').trim();
+      var cleanContent = msgContent.replace(/\[TOOL:[a-z-]+\]\s*/g,'').replace(/\[COMPLETE\]\s*/g,'').trim();
       if (cleanContent) {
-        var wrap = document.createElement('div');
-        wrap.className = 'msg ' + role;
+        var wrap = document.createElement('div'); wrap.className = 'msg ' + role;
         var emoji = (activeSession && activeSession.emoji) ? activeSession.emoji : '🪶';
-        wrap.innerHTML = '<div class="msg-avatar">' + (role === 'assistant' ? emoji : '✦') + '</div><div class="msg-bubble">' + cleanContent.replace(/\n/g, '<br>') + '</div>';
+        wrap.innerHTML = '<div class="msg-avatar">' + (role==='assistant'?emoji:'✦') + '</div><div class="msg-bubble">' + cleanContent.replace(/\n/g,'<br>') + '</div>';
         el.appendChild(wrap);
       }
-      if (toolMatch && role === 'assistant') {
-        var toolKey  = toolMatch[1];
-        var toolInfo = TOOL_MAP[toolKey];
-        if (toolInfo) {
-          setTimeout(function() { renderToolCard(toolKey, toolInfo, el); }, cleanContent ? 400 : 0);
-        }
-      }
-      if (/\[COMPLETE\]/.test(msgContent) && role === 'assistant') {
-        setTimeout(function() {
-          var panel = document.getElementById('complete-panel');
-          if (panel) panel.classList.add('visible');
-        }, 600);
-      }
+      if (toolMatch && role==='assistant') { var tk=toolMatch[1], ti=TOOL_MAP[tk]; if (ti) setTimeout(function(){renderToolCard(tk,ti,el);}, cleanContent?400:0); }
+      if (/\[COMPLETE\]/.test(msgContent) && role==='assistant') { setTimeout(function(){ var p=document.getElementById('complete-panel'); if(p) p.classList.add('visible'); },600); }
       el.scrollTop = el.scrollHeight;
     }
 
-    // ── Tool snapshot renderer ────────────────────────────────
+    // ── TOOL SNAPSHOT RENDERER — FIX 3: added missing tool handlers ──
     function renderToolSnapshot(toolKey, data) {
       if (!data) return '';
       var html = '';
-
-      // Normalise key — handle both hyphenated and underscore forms
-      var k = toolKey.replace(/_/g, '-');
+      var k = toolKey.replace(/_/g,'-');
 
       if (k === 'soar-steady') {
-        var items  = data.items || [];
-        var soar   = items.filter(function(i) { return i.zone === 'soar'; }).slice(0, 2);
-        var steady = items.filter(function(i) { return i.zone === 'steady'; }).slice(0, 2);
-        var total  = items.filter(function(i) { return i.zone === 'soar' || i.zone === 'steady'; }).length;
-        var soarPct = total ? Math.round((items.filter(function(i){return i.zone==='soar';}).length / total) * 100) : 0;
-        soar.forEach(function(i) { html += '<div class="snap-row"><span class="snap-badge snap-badge-soar">Soar ▲</span><span class="snap-text">' + i.text + '</span></div>'; });
-        if (soar.length && steady.length) html += '<div class="snap-divider"></div>';
-        steady.forEach(function(i) { html += '<div class="snap-row"><span class="snap-badge snap-badge-steady">Steady ▼</span><span class="snap-text">' + i.text + '</span></div>'; });
-        if (total > 0) html += '<div class="snap-bar-wrap" style="margin-top:8px"><div class="snap-bar-label"><span>Energy split</span><span class="snap-bar-val">' + soarPct + '% Soar</span></div><div class="snap-bar-track"><div class="snap-bar-fill" style="width:' + soarPct + '%"></div></div></div>';
+        var items = data.items||[], soar=items.filter(i=>i.zone==='soar').slice(0,2), steady=items.filter(i=>i.zone==='steady').slice(0,2);
+        var total=items.filter(i=>i.zone==='soar'||i.zone==='steady').length, soarPct=total?Math.round((items.filter(i=>i.zone==='soar').length/total)*100):0;
+        soar.forEach(i=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-soar">Soar ▲</span><span class="snap-text">'+i.text+'</span></div>';});
+        if(soar.length&&steady.length) html+='<div class="snap-divider"></div>';
+        steady.forEach(i=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-steady">Steady ▼</span><span class="snap-text">'+i.text+'</span></div>';});
+        if(total>0) html+='<div class="snap-bar-wrap" style="margin-top:8px"><div class="snap-bar-label"><span>Energy split</span><span class="snap-bar-val">'+soarPct+'% Soar</span></div><div class="snap-bar-track"><div class="snap-bar-fill" style="width:'+soarPct+'%"></div></div></div>';
       }
-
       else if (k === 'peak-plunge') {
-        var pts = (data.points || data.events || []).slice(0, 4);
-        if (pts.length) {
-          var w = 280, h = 36, n = pts.length;
-          var ys = pts.map(function(p) { return p.value !== undefined ? p.value : (p.type === 'peak' ? 2 : 8); });
-          var minY = Math.min.apply(null, ys), maxY = Math.max.apply(null, ys);
-          var range = maxY - minY || 1;
-          var coords = pts.map(function(p, i) {
-            var x = n === 1 ? w/2 : (i / (n-1)) * w;
-            var val = p.value !== undefined ? p.value : (p.type === 'peak' ? 2 : 8);
-            var y = h - 4 - ((val - minY) / range) * (h - 8);
-            return [Math.round(x), Math.round(y)];
-          });
-          var polyline = coords.map(function(c) { return c.join(','); }).join(' ');
-          var polygon  = polyline + ' ' + w + ',' + h + ' 0,' + h;
-          html += '<svg class="snap-mini-svg" viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg"><line x1="0" y1="' + (h/2) + '" x2="' + w + '" y2="' + (h/2) + '" stroke="rgba(255,255,255,0.06)" stroke-width="1"/><polygon points="' + polygon + '" fill="rgba(122,158,126,0.1)"/><polyline points="' + polyline + '" fill="none" stroke="#7a9e7e" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>';
-          pts.slice(0, 3).forEach(function(p) {
-            var badge = p.type === 'peak' ? 'snap-badge-peak' : 'snap-badge-plunge';
-            var icon  = p.type === 'peak' ? '▲' : '▼';
-            var label = p.label || p.note || p.event || '';
-            var year  = p.year || '';
-            html += '<div class="snap-row"><span class="snap-badge ' + badge + '">' + icon + '</span><span class="snap-text">' + label + '</span><span style="font-family:var(--font-mono);font-size:0.62rem;color:rgba(240,236,228,0.3);flex-shrink:0;margin-left:4px">' + year + '</span></div>';
-          });
+        var pts=(data.points||data.events||[]).slice(0,4);
+        if(pts.length){
+          var w=280,h=36,n=pts.length, ys=pts.map(p=>p.value!==undefined?p.value:(p.type==='peak'?2:8));
+          var minY=Math.min(...ys),maxY=Math.max(...ys),range=maxY-minY||1;
+          var coords=pts.map((p,i)=>{var x=n===1?w/2:(i/(n-1))*w,val=p.value!==undefined?p.value:(p.type==='peak'?2:8),y=h-4-((val-minY)/range)*(h-8);return[Math.round(x),Math.round(y)];});
+          var polyline=coords.map(c=>c.join(',')).join(' '),polygon=polyline+' '+w+','+h+' 0,'+h;
+          html+='<svg class="snap-mini-svg" viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg"><line x1="0" y1="'+(h/2)+'" x2="'+w+'" y2="'+(h/2)+'" stroke="rgba(255,255,255,0.06)" stroke-width="1"/><polygon points="'+polygon+'" fill="rgba(122,158,126,0.1)"/><polyline points="'+polyline+'" fill="none" stroke="#7a9e7e" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>';
+          pts.slice(0,3).forEach(p=>{var badge=p.type==='peak'?'snap-badge-peak':'snap-badge-plunge',icon=p.type==='peak'?'▲':'▼',label=p.label||p.note||p.event||'',year=p.year||'';html+='<div class="snap-row"><span class="snap-badge '+badge+'">'+icon+'</span><span class="snap-text">'+label+'</span><span style="font-family:var(--font-mono);font-size:0.62rem;color:rgba(240,236,228,0.3);flex-shrink:0;margin-left:4px">'+year+'</span></div>';});
         }
       }
-
       else if (k === 'glow-map') {
-        var scores = data.scores || {};
-        var entries = Object.entries(scores).sort(function(a,b) { return b[1]-a[1]; }).slice(0, 3);
-        entries.forEach(function(entry) {
-          var pct = Math.round((entry[1]/10)*100);
-          var label = entry[0].charAt(0).toUpperCase() + entry[0].slice(1).replace('_',' ');
-          html += '<div class="snap-bar-wrap"><div class="snap-bar-label"><span>' + label + '</span><span class="snap-bar-val">' + entry[1] + '/10</span></div><div class="snap-bar-track"><div class="snap-bar-fill" style="width:' + pct + '%"></div></div></div>';
-        });
+        var scores=data.scores||{}, entries=Object.entries(scores).sort((a,b)=>b[1]-a[1]).slice(0,3);
+        entries.forEach(e=>{var pct=Math.round((e[1]/10)*100),label=e[0].charAt(0).toUpperCase()+e[0].slice(1).replace('_',' ');html+='<div class="snap-bar-wrap"><div class="snap-bar-label"><span>'+label+'</span><span class="snap-bar-val">'+e[1]+'/10</span></div><div class="snap-bar-track"><div class="snap-bar-fill" style="width:'+pct+'%"></div></div></div>';});
       }
-
       else if (k === 'shadows-sparks') {
-        var shadows = (data.shadows || []).slice(0, 2);
-        var sparks  = (data.sparks  || []).slice(0, 2);
-        shadows.forEach(function(s) { html += '<div class="snap-row"><span class="snap-badge snap-badge-shadow">Shadow</span><span class="snap-text">' + s.text + '</span></div>'; });
-        if (shadows.length && sparks.length) html += '<div class="snap-divider"></div>';
-        sparks.forEach(function(s) { html += '<div class="snap-row"><span class="snap-badge snap-badge-spark">Spark</span><span class="snap-text">' + s.text + '</span></div>'; });
+        var shadows=(data.shadows||[]).slice(0,2),sparks=(data.sparks||[]).slice(0,2);
+        shadows.forEach(s=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-shadow">Shadow</span><span class="snap-text">'+s.text+'</span></div>';});
+        if(shadows.length&&sparks.length) html+='<div class="snap-divider"></div>';
+        sparks.forEach(s=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-spark">Spark</span><span class="snap-text">'+s.text+'</span></div>';});
       }
-
       else if (k === 'courage-compass') {
-        var dirs = [{ key: 'dir-north', label: 'North', cls: 'snap-badge-north' }, { key: 'dir-east', label: 'East', cls: 'snap-badge-plunge' }];
-        dirs.forEach(function(d) {
-          var val = data[d.key] || '';
-          if (val) html += '<div class="snap-row"><span class="snap-badge ' + d.cls + '">' + d.label + '</span><span class="snap-text">' + val + '</span></div>';
-        });
-        if (data['brave-step']) html += '<div class="snap-divider"></div><div class="snap-row"><span class="snap-badge snap-badge-spark">Step</span><span class="snap-text">' + data['brave-step'] + '</span></div>';
+        var dirs=[{key:'dir-north',label:'North',cls:'snap-badge-north'},{key:'dir-east',label:'East',cls:'snap-badge-plunge'}];
+        dirs.forEach(d=>{var val=data[d.key]||'';if(val) html+='<div class="snap-row"><span class="snap-badge '+d.cls+'">'+d.label+'</span><span class="snap-text">'+val+'</span></div>';});
+        if(data['brave-step']) html+='<div class="snap-divider"></div><div class="snap-row"><span class="snap-badge snap-badge-spark">Step</span><span class="snap-text">'+data['brave-step']+'</span></div>';
       }
-
       else if (k === 'birdsong') {
-        var cur = data.current || {};
-        var modes = ['solo','melody','harmony','lullaby','resonance'];
-        var modeColors = { solo:'#8a9ab0', melody:'#9dbf8a', harmony:'#F5C842', lullaby:'#c4956a', resonance:'#7eb8c9' };
-        modes.slice(0, 3).forEach(function(m) {
-          var pct = Math.round(((cur[m]||1)/10)*100);
-          var col = modeColors[m] || 'var(--session-col)';
-          html += '<div class="snap-bar-wrap"><div class="snap-bar-label"><span style="text-transform:capitalize">' + m + '</span><span style="color:' + col + '">' + (cur[m]||1) + '/10</span></div><div class="snap-bar-track"><div class="snap-bar-fill" style="width:' + pct + '%;background:' + col + '"></div></div></div>';
-        });
+        var cur=data.current||{},modes=['solo','melody','harmony','lullaby','resonance'],modeColors={solo:'#8a9ab0',melody:'#9dbf8a',harmony:'#F5C842',lullaby:'#c4956a',resonance:'#7eb8c9'};
+        modes.slice(0,3).forEach(m=>{var pct=Math.round(((cur[m]||1)/10)*100),col=modeColors[m]||'var(--session-col)';html+='<div class="snap-bar-wrap"><div class="snap-bar-label"><span style="text-transform:capitalize">'+m+'</span><span style="color:'+col+'">'+(cur[m]||1)+'/10</span></div><div class="snap-bar-track"><div class="snap-bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div></div>';});
       }
-
       else if (k === 'forest') {
-        var people = data.people || {};
-        var canopy = (people.canopy || []).slice(0, 2);
-        var lone   = (people.lone   || []).slice(0, 1);
-        canopy.forEach(function(p) { html += '<div class="snap-row"><span class="snap-badge snap-badge-soar">Canopy</span><span class="snap-text">' + p.name + '</span></div>'; });
-        lone.forEach(function(p) { html += '<div class="snap-row"><span class="snap-badge snap-badge-plunge">Lone</span><span class="snap-text">' + p.name + '</span></div>'; });
-        if (data.intention) html += '<div class="snap-divider"></div><div class="snap-row"><span class="snap-text" style="font-style:italic;color:rgba(240,236,228,0.5)">' + data.intention.slice(0, 80) + '</span></div>';
+        var people=data.people||{},canopy=(people.canopy||[]).slice(0,2),lone=(people.lone||[]).slice(0,1);
+        canopy.forEach(p=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-soar">Canopy</span><span class="snap-text">'+p.name+'</span></div>';});
+        lone.forEach(p=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-plunge">Lone</span><span class="snap-text">'+p.name+'</span></div>';});
+        if(data.intention) html+='<div class="snap-divider"></div><div class="snap-row"><span class="snap-text" style="font-style:italic;color:rgba(240,236,228,0.5)">'+data.intention.slice(0,80)+'</span></div>';
+      }
+      // FIX 3: missing tool snapshot handlers added below
+      else if (k === 'nurture-prune') {
+        var people=(data.people||[]).filter(p=>p.quadrant!=='unplaced');
+        var flourishing=people.filter(p=>p.quadrant==='flourishing').slice(0,2);
+        var pruning=people.filter(p=>p.quadrant==='pruning').slice(0,2);
+        flourishing.forEach(p=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-soar">Flourishing</span><span class="snap-text">'+p.name+'</span></div>';});
+        if(flourishing.length&&pruning.length) html+='<div class="snap-divider"></div>';
+        pruning.forEach(p=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-steady">Pruning</span><span class="snap-text">'+p.name+'</span></div>';});
+      }
+      else if (k === 'roots-feathers') {
+        var roots=(data.roots||[]).slice(0,2),feathers=(data.feathers||[]).slice(0,2);
+        roots.forEach(r=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-peak">Root</span><span class="snap-text">'+r.text+'</span></div>';});
+        if(roots.length&&feathers.length) html+='<div class="snap-divider"></div>';
+        feathers.forEach(f=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-plunge">Release</span><span class="snap-text">'+f.text+'</span></div>';});
+      }
+      else if (k === 'adventure-map') {
+        var now=data['stop-now']||'',north=data['stop-north-title']||'';
+        if(now) html+='<div class="snap-row"><span class="snap-badge snap-badge-plunge">Now</span><span class="snap-text">'+now+'</span></div>';
+        if(north) html+='<div class="snap-row"><span class="snap-badge snap-badge-north">North Star</span><span class="snap-text">'+north+'</span></div>';
+      }
+      else if (k === 'deep-roots') {
+        var responses=data.responses||{}, rkeys=Object.keys(responses).slice(0,2);
+        rkeys.forEach(rk=>{var val=responses[rk]; if(val) html+='<div class="snap-row"><span class="snap-text" style="font-style:italic;color:rgba(240,236,228,0.5)">'+val.slice(0,80)+(val.length>80?'..':'')+'</span></div>';});
+      }
+      else if (k === 'tangle-within') {
+        var fear=data['vine-fear']||'',truth=data['truth-release']||'';
+        if(fear) html+='<div class="snap-row"><span class="snap-badge snap-badge-shadow">Fear</span><span class="snap-text">'+fear.slice(0,60)+'</span></div>';
+        if(truth) { html+='<div class="snap-divider"></div><div class="snap-row"><span class="snap-text" style="font-style:italic;color:rgba(240,236,228,0.5)">'+truth.slice(0,80)+'</span></div>'; }
+      }
+      else if (k === 'deep-profile') {
+        var mbti=data.mbti||'',enn=data.enneagram||'';
+        if(mbti) html+='<div class="snap-row"><span class="snap-badge snap-badge-north">MBTI</span><span class="snap-text">'+mbti+'</span></div>';
+        if(enn) html+='<div class="snap-row"><span class="snap-badge snap-badge-spark">Enneagram</span><span class="snap-text">'+enn+'</span></div>';
       }
 
       return html ? '<div class="tool-snapshot">' + html + '</div>' : '';
     }
 
     function renderToolCard(toolKey, toolInfo, container) {
-      var isUsed   = openedTools[toolKey] || false;
-      var wrap     = document.createElement('div');
+      var isUsed = openedTools[toolKey]||false, wrap = document.createElement('div');
       wrap.className = 'tool-card-msg';
-      var emoji    = (activeSession && activeSession.emoji) ? activeSession.emoji : '🪶';
-      // FIX 4: use getDbKey for correct cache lookup
-      var dbKey    = getDbKey(toolKey, activeSession ? activeSession.number : 0);
-      var snapData = toolOutputsCache[dbKey] || null;
-      var snapHtml = (isUsed && snapData) ? renderToolSnapshot(toolKey, snapData) : '';
-      var actHtml  = isUsed ? '<div class="tool-card-actions"><button class="tool-card-action tool-revisit-btn">Revisit</button><button class="tool-card-action tool-dismiss-btn">Close</button></div>' : '';
-
-      wrap.innerHTML =
-        '<div class="msg-avatar" style="background:var(--session-col);width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0;margin-top:2px;">' + emoji + '</div>' +
-        '<div class="tool-card' + (isUsed ? ' used' : '') + '" data-key="' + toolKey + '">' +
-          '<div class="tool-card-icon">' + toolInfo.icon + '</div>' +
-          '<div class="tool-card-body">' +
-            '<div class="tool-card-label">' + (isUsed ? 'Completed' : 'Tool ready') + '</div>' +
-            '<div class="tool-card-name">' + toolInfo.name + '</div>' +
-            (isUsed ? '' : '<div class="tool-card-hint">' + toolInfo.hint + '</div>') +
-          '</div>' +
-          '<div class="tool-card-arrow">' + (isUsed ? '&#x2713;' : '&rarr;') + '</div>' +
-        '</div>' +
-        snapHtml + actHtml;
-
+      var emoji = (activeSession&&activeSession.emoji)?activeSession.emoji:'🪶';
+      var dbKey = getDbKey(toolKey, activeSession?activeSession.number:0);
+      var snapData = toolOutputsCache[dbKey]||null;
+      var snapHtml = (isUsed&&snapData) ? renderToolSnapshot(toolKey,snapData) : '';
+      var actHtml = isUsed ? '<div class="tool-card-actions"><button class="tool-card-action tool-revisit-btn">Revisit</button><button class="tool-card-action tool-dismiss-btn">Close</button></div>' : '';
+      wrap.innerHTML = '<div class="msg-avatar" style="background:var(--session-col);width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0;margin-top:2px;">'+emoji+'</div><div class="tool-card'+(isUsed?' used':'')+'" data-key="'+toolKey+'"><div class="tool-card-icon">'+toolInfo.icon+'</div><div class="tool-card-body"><div class="tool-card-label">'+(isUsed?'Completed':'Tool ready')+'</div><div class="tool-card-name">'+toolInfo.name+'</div>'+(isUsed?'':'<div class="tool-card-hint">'+toolInfo.hint+'</div>')+'</div><div class="tool-card-arrow">'+(isUsed?'&#x2713;':'&rarr;')+'</div></div>'+snapHtml+actHtml;
       if (!isUsed) {
         var card = wrap.querySelector('.tool-card');
         card.addEventListener('click', function() {
-          openedTools[toolKey] = true;
-          card.classList.add('used');
-          card.querySelector('.tool-card-label').textContent = 'Completed';
-          card.querySelector('.tool-card-arrow').innerHTML = '&#x2713;';
-          var hint = card.querySelector('.tool-card-hint');
-          if (hint) hint.style.display = 'none';
-          openToolEmbed(toolKey, toolInfo);
+          openedTools[toolKey]=true; card.classList.add('used'); card.querySelector('.tool-card-label').textContent='Completed'; card.querySelector('.tool-card-arrow').innerHTML='&#x2713;';
+          var hint=card.querySelector('.tool-card-hint'); if(hint) hint.style.display='none';
+          openToolEmbed(toolKey,toolInfo);
         });
       } else {
-        var revisitBtn = wrap.querySelector('.tool-revisit-btn');
-        var dismissBtn = wrap.querySelector('.tool-dismiss-btn');
-        if (revisitBtn) revisitBtn.addEventListener('click', function() { openToolEmbed(toolKey, toolInfo); });
-        if (dismissBtn) dismissBtn.addEventListener('click', function() { wrap.style.display = 'none'; });
+        var rb=wrap.querySelector('.tool-revisit-btn'),db=wrap.querySelector('.tool-dismiss-btn');
+        if(rb) rb.addEventListener('click',function(){openToolEmbed(toolKey,toolInfo);});
+        if(db) db.addEventListener('click',function(){wrap.style.display='none';});
       }
-
-      container.appendChild(wrap);
-      container.scrollTop = container.scrollHeight;
+      container.appendChild(wrap); container.scrollTop=container.scrollHeight;
     }
 
     function updateToolCardSnapshot(toolKey, snapData) {
-      var cards = document.querySelectorAll('.tool-card[data-key="' + toolKey + '"]');
-      cards.forEach(function(card) {
-        var msg = card.closest('.tool-card-msg');
-        if (!msg) return;
-        var old = msg.querySelector('.tool-snapshot');
-        if (old) old.remove();
-        var oldAct = msg.querySelector('.tool-card-actions');
-        if (oldAct) oldAct.remove();
+      document.querySelectorAll('.tool-card[data-key="'+toolKey+'"]').forEach(function(card) {
+        var msg=card.closest('.tool-card-msg'); if(!msg) return;
+        var old=msg.querySelector('.tool-snapshot'); if(old) old.remove();
+        var oldAct=msg.querySelector('.tool-card-actions'); if(oldAct) oldAct.remove();
         card.classList.add('used');
-        var lbl = card.querySelector('.tool-card-label');
-        if (lbl) lbl.textContent = 'Completed';
-        var arr = card.querySelector('.tool-card-arrow');
-        if (arr) arr.innerHTML = '&#x2713;';
-        var hint = card.querySelector('.tool-card-hint');
-        if (hint) hint.style.display = 'none';
-        var snapHtml = renderToolSnapshot(toolKey, snapData);
-        var actHtml  = '<div class="tool-card-actions"><button class="tool-card-action tool-revisit-btn">Revisit</button><button class="tool-card-action tool-dismiss-btn">Close</button></div>';
-        card.insertAdjacentHTML('afterend', snapHtml + actHtml);
-        var msg2 = card.closest('.tool-card-msg');
-        if (!msg2) return;
-        var rb = msg2.querySelector('.tool-revisit-btn');
-        var db = msg2.querySelector('.tool-dismiss-btn');
-        var ti = TOOL_MAP[toolKey];
-        if (rb && ti) rb.addEventListener('click', function() { openToolEmbed(toolKey, ti); });
-        if (db) db.addEventListener('click', function() { msg2.style.display = 'none'; });
+        var lbl=card.querySelector('.tool-card-label'); if(lbl) lbl.textContent='Completed';
+        var arr=card.querySelector('.tool-card-arrow'); if(arr) arr.innerHTML='&#x2713;';
+        var hint=card.querySelector('.tool-card-hint'); if(hint) hint.style.display='none';
+        var snapHtml=renderToolSnapshot(toolKey,snapData);
+        var actHtml='<div class="tool-card-actions"><button class="tool-card-action tool-revisit-btn">Revisit</button><button class="tool-card-action tool-dismiss-btn">Close</button></div>';
+        card.insertAdjacentHTML('afterend',snapHtml+actHtml);
+        var msg2=card.closest('.tool-card-msg'); if(!msg2) return;
+        var rb=msg2.querySelector('.tool-revisit-btn'),db=msg2.querySelector('.tool-dismiss-btn'),ti=TOOL_MAP[toolKey];
+        if(rb&&ti) rb.addEventListener('click',function(){openToolEmbed(toolKey,ti);});
+        if(db) db.addEventListener('click',function(){msg2.style.display='none';});
       });
     }
 
     function showTyping() {
-      var el = document.getElementById('chat-messages');
-      var wrap = document.createElement('div');
-      wrap.className = 'typing-indicator'; wrap.id = 'typing-indicator';
-      wrap.innerHTML = '<div class="msg-avatar" style="background:var(--session-col);width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0;margin-top:2px;">' + (activeSession?.emoji || '🪶') + '</div><div class="typing-dots"><span></span><span></span><span></span></div>';
-      el.appendChild(wrap); el.scrollTop = el.scrollHeight;
+      var el=document.getElementById('chat-messages'),wrap=document.createElement('div');
+      wrap.className='typing-indicator'; wrap.id='typing-indicator';
+      wrap.innerHTML='<div class="msg-avatar" style="background:var(--session-col);width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0;margin-top:2px;">'+(activeSession?.emoji||'🪶')+'</div><div class="typing-dots"><span></span><span></span><span></span></div>';
+      el.appendChild(wrap); el.scrollTop=el.scrollHeight;
     }
 
-    function hideTyping() { var el = document.getElementById('typing-indicator'); if (el) el.remove(); }
+    function hideTyping() { var el=document.getElementById('typing-indicator'); if(el) el.remove(); }
 
     async function triggerToolReturnAck() {
-      if (isTyping || !activeSession || !currentUser) return;
-      isTyping = true;
-      document.getElementById('btn-send').disabled = true;
-      showTyping();
+      if (isTyping||!activeSession||!currentUser) return;
+      isTyping=true; document.getElementById('btn-send').disabled=true; showTyping();
       try {
-        var response = await fetch(WORKER_URL + '/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            session_number: activeSession.number,
-            messages: chatMsgs,
-            context: sessionContext,
-            user_name: userProfile && userProfile.full_name ? userProfile.full_name.split(' ')[0] : null,
-          }),
-        });
-        if (!response.ok) throw new Error('Worker error');
-        var data  = await response.json();
-        var reply = data.reply || 'How did that land for you?';
-        hideTyping();
-        renderMessage('assistant', reply);
-        chatMsgs.push({ role: 'assistant', content: reply });
-        await sb.from('ai_memory').upsert({ user_id: currentUser.id, session_number: activeSession.number, messages: chatMsgs }, { onConflict: 'user_id,session_number' });
-        var msgs = document.getElementById('chat-messages');
-        if (msgs) msgs.scrollTop = msgs.scrollHeight;
+        var response=await fetch(WORKER_URL+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session_number:activeSession.number,messages:chatMsgs,context:sessionContext,user_name:userProfile&&userProfile.full_name?userProfile.full_name.split(' ')[0]:null})});
+        if(!response.ok) throw new Error('Worker error');
+        var data=await response.json(), reply=data.reply||'How did that land for you?';
+        hideTyping(); renderMessage('assistant',reply); chatMsgs.push({role:'assistant',content:reply});
+        await sb.from('ai_memory').upsert({user_id:currentUser.id,session_number:activeSession.number,messages:chatMsgs},{onConflict:'user_id,session_number'});
+        var m=document.getElementById('chat-messages'); if(m) m.scrollTop=m.scrollHeight;
       } catch(e) {
-        hideTyping();
-        renderMessage('assistant', 'Welcome back. How did that land for you?');
-        chatMsgs.push({ role: 'assistant', content: 'Welcome back. How did that land for you?' });
+        hideTyping(); renderMessage('assistant','Welcome back. How did that land for you?'); chatMsgs.push({role:'assistant',content:'Welcome back. How did that land for you?'});
       }
-      isTyping = false;
-      document.getElementById('btn-send').disabled = false;
-      document.getElementById('chat-input').focus();
+      isTyping=false; document.getElementById('btn-send').disabled=false; document.getElementById('chat-input').focus();
     }
 
     async function sendMessage(userText) {
-      if (isTyping || !userText.trim() || !activeSession) return;
-      isTyping = true;
-      document.getElementById('btn-send').disabled = true;
-      renderMessage('user', userText);
-      chatMsgs.push({ role: 'user', content: userText });
-      document.getElementById('chat-input').value = '';
-      document.getElementById('chat-input').style.height = 'auto';
+      if (isTyping||!userText.trim()||!activeSession) return;
+      isTyping=true; document.getElementById('btn-send').disabled=true;
+      renderMessage('user',userText); chatMsgs.push({role:'user',content:userText});
+      document.getElementById('chat-input').value=''; document.getElementById('chat-input').style.height='auto';
       showTyping();
       try {
-        const response = await fetch(WORKER_URL + '/chat', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ session_number: activeSession.number, messages: chatMsgs, context: sessionContext, user_name: userProfile?.full_name?.split(' ')[0] || null }),
-        });
-        if (!response.ok) throw new Error('Worker error');
-        const data  = await response.json();
-        const reply = data.reply || '... take your time.';
-        hideTyping();
-        renderMessage('assistant', reply);
-        chatMsgs.push({ role: 'assistant', content: reply });
-        await sb.from('ai_memory').upsert({ user_id: currentUser.id, session_number: activeSession.number, messages: chatMsgs }, { onConflict: 'user_id,session_number' });
+        const response=await fetch(WORKER_URL+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session_number:activeSession.number,messages:chatMsgs,context:sessionContext,user_name:userProfile?.full_name?.split(' ')[0]||null})});
+        if(!response.ok) throw new Error('Worker error');
+        const data=await response.json(), reply=data.reply||'... take your time.';
+        hideTyping(); renderMessage('assistant',reply); chatMsgs.push({role:'assistant',content:reply});
+        await sb.from('ai_memory').upsert({user_id:currentUser.id,session_number:activeSession.number,messages:chatMsgs},{onConflict:'user_id,session_number'});
         exchangeCount++;
       } catch {
-        hideTyping();
-        renderMessage('assistant', 'Something got in the way there. Take a breath — try sending that again.');
-        chatMsgs.pop();
+        hideTyping(); renderMessage('assistant','Something got in the way there. Take a breath — try sending that again.'); chatMsgs.pop();
       }
-      isTyping = false;
-      document.getElementById('btn-send').disabled = false;
-      document.getElementById('chat-input').focus();
+      isTyping=false; document.getElementById('btn-send').disabled=false; document.getElementById('chat-input').focus();
     }
 
-    // ── Complete session ──────────────────────────────────────
     async function completeSession() {
       if (!activeSession) return;
-      const btn = document.getElementById('btn-complete');
-      btn.disabled = true; btn.textContent = 'Saving your session...';
-      const withTimeout = (p, ms) => Promise.race([p, new Promise(r => setTimeout(() => r(null), ms))]);
+      const btn=document.getElementById('btn-complete');
+      btn.disabled=true; btn.textContent='Saving your session...';
+      const withTimeout=(p,ms)=>Promise.race([p,new Promise(r=>setTimeout(()=>r(null),ms))]);
       try {
-        let summary = '', keyWords = [], actionPoint = '';
-        const result = await withTimeout(
-          fetch(WORKER_URL + '/summarise', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ session_number: activeSession.number, messages: chatMsgs, user_name: userProfile?.full_name?.split(' ')[0] || null }) }).then(r => r.ok ? r.json() : null),
-          8000
-        );
-        if (result) { summary = result.summary || ''; keyWords = result.key_words || []; actionPoint = result.action_point || ''; }
-        await sb.from('ai_memory').upsert({ user_id: currentUser.id, session_number: activeSession.number, messages: chatMsgs, summary, key_words: keyWords }, { onConflict: 'user_id,session_number' });
-        await sb.from('session_progress').update({ status: 'complete', completed_at: new Date().toISOString() }).eq('user_id', currentUser.id).eq('session_number', activeSession.number);
-        const nextNum  = activeSession.number + 1;
-        const unlockAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
-        await sb.from('session_progress').update({ unlocks_at: unlockAt }).eq('user_id', currentUser.id).eq('session_number', nextNum);
-        sb.from('course_users').select('email, full_name').eq('id', currentUser.id).single().then(({ data: profile }) => {
-          if (!profile?.email) return;
-          const nextSession = SESSIONS[nextNum];
-          fetch(WORKER_URL + '/session-email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: profile.email, user_name: profile.full_name || '', user_id: currentUser.id, session_number: activeSession.number, summary, action_point: actionPoint, next_session_title: nextSession ? nextSession.title + ' — ' + nextSession.teaser : '' }) }).catch(() => {});
-        }).catch(() => {});
-        btn.textContent = 'Mark complete & continue →';
-        btn.disabled = false;
-        await loadSessionProgress();
-        await loadToolOutputs();
-        renderDashboard();
-        showView('view-dashboard');
-      } catch (err) {
-        console.error('Complete error:', err);
-        btn.disabled = false; btn.textContent = 'Mark complete & continue →';
-      }
+        let summary='',keyWords=[],actionPoint='';
+        const result=await withTimeout(fetch(WORKER_URL+'/summarise',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session_number:activeSession.number,messages:chatMsgs,user_name:userProfile?.full_name?.split(' ')[0]||null})}).then(r=>r.ok?r.json():null),8000);
+        if(result){summary=result.summary||'';keyWords=result.key_words||[];actionPoint=result.action_point||'';}
+        await sb.from('ai_memory').upsert({user_id:currentUser.id,session_number:activeSession.number,messages:chatMsgs,summary,key_words:keyWords},{onConflict:'user_id,session_number'});
+        await sb.from('session_progress').update({status:'complete',completed_at:new Date().toISOString()}).eq('user_id',currentUser.id).eq('session_number',activeSession.number);
+        const nextNum=activeSession.number+1, unlockAt=new Date(Date.now()+48*60*60*1000).toISOString();
+        await sb.from('session_progress').update({unlocks_at:unlockAt}).eq('user_id',currentUser.id).eq('session_number',nextNum);
+        sb.from('course_users').select('email, full_name').eq('id',currentUser.id).single().then(({data:profile})=>{
+          if(!profile?.email) return;
+          const nextSession=SESSIONS[nextNum];
+          fetch(WORKER_URL+'/session-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:profile.email,user_name:profile.full_name||'',user_id:currentUser.id,session_number:activeSession.number,summary,action_point:actionPoint,next_session_title:nextSession?nextSession.title+' — '+nextSession.teaser:''})}).catch(()=>{});
+        }).catch(()=>{});
+        btn.textContent='Mark complete & continue →'; btn.disabled=false;
+        await loadSessionProgress(); await loadToolOutputs(); renderDashboard(); showView('view-dashboard');
+      } catch(err) { console.error('Complete error:',err); btn.disabled=false; btn.textContent='Mark complete & continue →'; }
     }
 
-    // ── Input bindings ────────────────────────────────────────
-    const chatInput = document.getElementById('chat-input');
-    const btnSend   = document.getElementById('btn-send');
-    chatInput.addEventListener('input', () => {
-      chatInput.style.height = 'auto';
-      chatInput.style.height = Math.min(chatInput.scrollHeight, 140) + 'px';
-      btnSend.disabled = !chatInput.value.trim();
-    });
-    document.addEventListener('click', function(e) {
-      if (e.target && e.target.id === 'btn-close-tool') {
-        e.preventDefault();
-        e.stopPropagation();
-        closeToolEmbed();
-      }
-    });
-    window.addEventListener('message', function(e) {
-      if (e.data === 'tool-close') closeToolEmbed();
-    });
-    chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (!btnSend.disabled) sendMessage(chatInput.value); } });
-    btnSend.addEventListener('click', () => { if (!btnSend.disabled) sendMessage(chatInput.value); });
-    document.getElementById('btn-complete').addEventListener('click', completeSession);
+    const chatInput=document.getElementById('chat-input'), btnSend=document.getElementById('btn-send');
+    chatInput.addEventListener('input',()=>{chatInput.style.height='auto';chatInput.style.height=Math.min(chatInput.scrollHeight,140)+'px';btnSend.disabled=!chatInput.value.trim();});
+    document.addEventListener('click',function(e){if(e.target&&e.target.id==='btn-close-tool'){e.preventDefault();e.stopPropagation();closeToolEmbed();}});
+    window.addEventListener('message',function(e){if(e.data==='tool-close') closeToolEmbed();});
+    chatInput.addEventListener('keydown',(e)=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();if(!btnSend.disabled) sendMessage(chatInput.value);}});
+    btnSend.addEventListener('click',()=>{if(!btnSend.disabled) sendMessage(chatInput.value);});
+    document.getElementById('btn-complete').addEventListener('click',completeSession);
 
-    // ── Auth listener ─────────────────────────────────────────
-    sb.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user && !currentUser) {
-        currentUser = session.user;
-        await loadDashboard();
-      } else if (event === 'TOKEN_REFRESHED' && session?.user && currentUser) {
-        currentUser = session.user;
-      } else if (event === 'SIGNED_OUT') {
-        currentUser = null; userProfile = null; sessionData = [];
-        showView('view-auth');
-      }
+    sb.auth.onAuthStateChange(async(event,session)=>{
+      if(event==='SIGNED_IN'&&session?.user&&!currentUser){currentUser=session.user;await loadDashboard();}
+      else if(event==='TOKEN_REFRESHED'&&session?.user&&currentUser){currentUser=session.user;}
+      else if(event==='SIGNED_OUT'){currentUser=null;userProfile=null;sessionData=[];showView('view-auth');}
     });
 
-    // ── Init ──────────────────────────────────────────────────
-    (async () => {
+    (async()=>{
       try {
-        var tokenRaw = localStorage.getItem('lilbird-solo-auth');
-        if (!tokenRaw) { showView('view-auth'); return; }
-        var tokenData = JSON.parse(tokenRaw);
-        var user = tokenData && tokenData.user;
-        if (!user || !user.id) { showView('view-auth'); return; }
-        var expiresAt = tokenData.expires_at;
-        if (expiresAt && (expiresAt * 1000) < Date.now()) {
+        var tokenRaw=localStorage.getItem('lilbird-solo-auth');
+        if(!tokenRaw){showView('view-auth');return;}
+        var tokenData=JSON.parse(tokenRaw), user=tokenData&&tokenData.user;
+        if(!user||!user.id){showView('view-auth');return;}
+        var expiresAt=tokenData.expires_at;
+        if(expiresAt&&(expiresAt*1000)<Date.now()){
           try {
-            var refreshed = await Promise.race([
-              sb.auth.refreshSession(),
-              new Promise(function(resolve) { setTimeout(function() { resolve(null); }, 3000); })
-            ]);
-            if (refreshed && refreshed.data && refreshed.data.user) {
-              currentUser = refreshed.data.user;
-              await loadDashboard();
-            } else {
-              localStorage.removeItem('lilbird-solo-auth');
-              showView('view-auth');
-            }
-          } catch(e) {
-            localStorage.removeItem('lilbird-solo-auth');
-            showView('view-auth');
-          }
+            var refreshed=await Promise.race([sb.auth.refreshSession(),new Promise(resolve=>setTimeout(()=>resolve(null),3000))]);
+            if(refreshed&&refreshed.data&&refreshed.data.user){currentUser=refreshed.data.user;await loadDashboard();}
+            else{localStorage.removeItem('lilbird-solo-auth');showView('view-auth');}
+          } catch(e){localStorage.removeItem('lilbird-solo-auth');showView('view-auth');}
           return;
         }
-        currentUser = { id: user.id, email: user.email };
+        currentUser={id:user.id,email:user.email};
         await loadDashboard();
-      } catch(e) {
-        showView('view-auth');
-      }
+      } catch(e){showView('view-auth');}
     })();
   </script>
 </body>
