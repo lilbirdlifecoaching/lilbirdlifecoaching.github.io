@@ -330,7 +330,11 @@
     showSavedState();
     var s = document.getElementById('save-status');
     s.classList.add('visible');
-    setTimeout(function() { s.classList.remove('visible'); }, 2500);
+    if (window.parent !== window) {
+      setTimeout(function() { window.parent.postMessage('tool-close', '*'); }, 2000);
+    } else {
+      setTimeout(function() { s.classList.remove('visible'); }, 2500);
+    }
   });
 
   // ── Show saved state card ─────────────────────────────────
