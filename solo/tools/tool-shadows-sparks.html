@@ -192,7 +192,10 @@
 
   document.getElementById('btn-save').addEventListener('click', async () => {
     await autoSave();
-    const s = document.getElementById('save-status'); s.classList.add('visible'); setTimeout(() => s.classList.remove('visible'), 2500);
+    const s = document.getElementById('save-status'); s.classList.add('visible');
+    if (window.parent !== window) {
+      setTimeout(function() { window.parent.postMessage('tool-close', '*'); }, 1000);
+    } else { setTimeout(() => s.classList.remove('visible'), 2500); }
   });
 
   (async () => {
