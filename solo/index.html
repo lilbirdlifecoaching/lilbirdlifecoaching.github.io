@@ -1020,13 +1020,23 @@
             .then(function(result) {
               var toolData = result && result.data && result.data.output_data;
               if (toolData) {
-                var toolName = TOOL_MAP[lastToolKey] ? TOOL_MAP[lastToolKey].name : lastToolKey;
-                var ctx = '[Tool completed: ' + toolName + '] Data: ' + JSON.stringify(toolData).slice(0, 600);
-                chatMsgs.push({ role: 'user', content: ctx });
-                toolOutputsCache[dbKey] = toolData;
+              var toolName = TOOL_MAP[lastToolKey] ? TOOL_MAP[lastToolKey].name : lastToolKey;
+              var ctx = '[Tool completed: ' + toolName + '] Data: ' + JSON.stringify(toolData).slice(0, 600);
+              chatMsgs.push({ role: 'user', content: ctx });
+              toolOutputsCache[dbKey] = toolData;
+              openedTools[lastToolKey] = true;
+              var existingCards = document.querySelectorAll('.tool-card[data-key="' + lastToolKey + '"]');
+              if (existingCards.length > 0) {
                 updateToolCardSnapshot(lastToolKey, toolData);
-                updateLeftPanelTool(lastToolKey, toolData); // FIX 6
+              } else {
+                var toolInfo = TOOL_MAP[lastToolKey];
+                if (toolInfo) {
+                  var msgEl = document.getElementById('chat-messages');
+                  if (msgEl) renderToolCard(lastToolKey, toolInfo, msgEl);
+                }
               }
+              updateLeftPanelTool(lastToolKey, toolData);
+            }
               // Always trigger AI response regardless of whether tool data was found
               setTimeout(function() {
                 var msgs = document.getElementById('chat-messages');
