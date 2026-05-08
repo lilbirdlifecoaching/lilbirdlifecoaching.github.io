@@ -254,7 +254,7 @@
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU',
     { auth: { persistSession: false, autoRefreshToken: false } }
   );
-  if (_tok2) sb.auth.setSession({ access_token: _tok2, refresh_token: '' }).catch(function(){});
+  // setSession moved to init (awaited)
 
   var currentUser = null;
   var selectedMbti = '';
@@ -354,12 +354,21 @@
   // ── Init ─────────────────────────────────────────────────
   (async function() {
     try {
-      var tokenRaw  = localStorage.getItem('lilbird-solo-auth');
-      if (!tokenRaw) return;
-      var tokenData = JSON.parse(tokenRaw);
-      var user      = tokenData && tokenData.user;
-      if (!user || !user.id) return;
-      currentUser = { id: user.id, email: user.email };
+      // When embedded in iframe, use URL params; otherwise use localStorage
+      var _dpParams = new URLSearchParams(window.location.search);
+      var _dpUid    = _dpParams.get('uid');
+      var _dpTok    = _dpParams.get('token') ? decodeURIComponent(_dpParams.get('token')) : null;
+      if (_dpUid && _dpTok) {
+        try { await sb.auth.setSession({ access_token: _dpTok, refresh_token: '' }); } catch(e) {}
+        currentUser = { id: _dpUid };
+      } else {
+        var tokenRaw  = localStorage.getItem('lilbird-solo-auth');
+        if (!tokenRaw) return;
+        var tokenData = JSON.parse(tokenRaw);
+        var user      = tokenData && tokenData.user;
+        if (!user || !user.id) return;
+        currentUser = { id: user.id, email: user.email };
+      }
 
       var result = await sb.from('tool_outputs')
         .select('output_data')

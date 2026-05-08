@@ -523,7 +523,7 @@
     const _urlP = new URLSearchParams(window.location.search);
   const _tok  = _urlP.get('token') ? decodeURIComponent(_urlP.get('token')) : null;
   const sb = createClient(SUPABASE_URL, SUPABASE_ANON, { auth: { persistSession: false, autoRefreshToken: false } });
-  if (_tok) sb.auth.setSession({ access_token: _tok, refresh_token: '' }).catch(function(){});
+
 
     // ── Prompts ──────────────────────────────────────────────
     const PROMPTS = [
@@ -730,6 +730,7 @@
       const urlUid = params.get('uid');
       if (urlUid) {
         currentUser = { id: urlUid };
+        if (_tok) { try { await sb.auth.setSession({ access_token: _tok, refresh_token: '' }); } catch(e) {} }
       } else {
         try {
           const { data: { session } } = await sb.auth.getSession();
