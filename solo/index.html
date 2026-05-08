@@ -260,6 +260,36 @@
     .btn-close-tool:hover { border-color: var(--session-col); color: var(--session-col); }
     .tool-embed-frame { flex: 1; border: none; background: var(--dark); width: 100%; }
 
+
+    /* ── Tool snapshots ── */
+    .tool-snapshot { padding: 0.75rem 1.1rem; border-top: 1px solid rgba(255,255,255,0.05); animation: fadeUp 0.3s ease both; }
+    .snap-row { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+    .snap-badge { font-family: var(--font-mono); font-size: 0.55rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
+    .snap-badge-soar   { background: rgba(157,191,138,0.15); color: #9dbf8a; }
+    .snap-badge-steady { background: rgba(196,149,106,0.15); color: #c4956a; }
+    .snap-badge-peak   { background: rgba(122,158,126,0.15); color: #7a9e7e; }
+    .snap-badge-plunge { background: rgba(138,154,176,0.15); color: #8a9ab0; }
+    .snap-badge-shadow { background: rgba(138,154,176,0.15); color: #8a9ab0; }
+    .snap-badge-spark  { background: rgba(245,200,66,0.12);  color: #F5C842; }
+    .snap-badge-north  { background: rgba(126,184,201,0.12); color: #7eb8c9; }
+    .snap-text { font-size: 0.75rem; color: rgba(240,236,228,0.7); line-height: 1.4; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .snap-divider { height: 1px; background: rgba(255,255,255,0.05); margin: 6px 0; }
+    .snap-bar-wrap { margin-bottom: 5px; }
+    .snap-bar-label { display: flex; justify-content: space-between; font-size: 0.68rem; color: rgba(240,236,228,0.38); margin-bottom: 3px; }
+    .snap-bar-val { color: var(--session-col); }
+    .snap-bar-track { height: 3px; background: rgba(255,255,255,0.07); border-radius: 2px; overflow: hidden; }
+    .snap-bar-fill { height: 100%; border-radius: 2px; background: var(--session-col); }
+    .snap-mini-svg { width: 100%; display: block; margin-bottom: 6px; }
+
+    /* Tool card revisit state */
+    .tool-card-actions { display: flex; gap: 0; border-top: 1px solid rgba(255,255,255,0.05); }
+    .tool-card-action { flex: 1; padding: 7px 10px; font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(240,236,228,0.35); cursor: pointer; text-align: center; transition: color 0.2s, background 0.2s; border: none; background: none; }
+    .tool-card-action:first-child { border-right: 1px solid rgba(255,255,255,0.05); }
+    .tool-card-action:hover { color: var(--session-col); background: var(--session-dim); }
+
+    /* Left panel expanded tool items */
+    .tool-item-snap { padding: 0.5rem 0.75rem; border-top: 1px solid rgba(255,255,255,0.04); animation: fadeUp 0.3s ease both; }
+
     @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
     @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
@@ -776,7 +806,13 @@
         session.tools.map(function(t) {
           var k = Object.keys(TOOL_MAP).find(function(key) { return TOOL_MAP[key].file === t.file; });
           var oc = k ? ('openToolEmbed(\'' + k + '\',TOOL_MAP[\'' + k + '\'])') : ('openTool(\'' + t.file + '\')');
-          return '<span class="tool-item clickable" onclick="' + oc + '"><span class="tool-dot"></span>' + t.name + '<span class="tool-tag">' + t.tag + '</span></span>';
+          var dbKey = k ? k.replace(/-/g,'_') : '';
+          var snapData = dbKey ? (toolOutputsCache[dbKey] || toolOutputsCache[k] || null) : null;
+          var isDone = openedTools[k] || false;
+          var snapHtml = (isDone && snapData) ? ('<div class="tool-item-snap">' + renderToolSnapshot(k, snapData).replace(/<div class="tool-snapshot">/,'').replace(/<\/div>$/,'') + '</div>') : '';
+          var doneTag  = isDone ? 'Done' : t.tag;
+          var doneClass = isDone ? ' style="color:var(--session-col)"' : '';
+          return '<div class="tool-item clickable' + (isDone ? ' tool-done' : '') + '" onclick="' + oc + '"><span class="tool-dot"></span><span>' + t.name + '</span><span class="tool-tag"' + doneClass + '>' + doneTag + '</span></div>' + snapHtml;
         }).join('') +
         '</div></div>' : '';
 
@@ -953,6 +989,9 @@
             if (toolData) {
               var ctx = '[Tool completed: ' + toolName + '] Data: ' + JSON.stringify(toolData).slice(0, 600);
               chatMsgs.push({ role: 'user', content: ctx });
+              // Cache and update tool card snapshot in chat + left panel
+              toolOutputsCache[dbKey] = toolData;
+              updateToolCardSnapshot(lastToolKey, toolData);
             }
             setTimeout(function() {
               // Send tool context to AI and get a real response
@@ -1009,6 +1048,17 @@
       return 'Welcome to ' + (SESSIONS[sessionNumber]?.title || 'this session') + '. Let\'s begin.';
     }
 
+    async function loadToolOutputs() {
+      if (!currentUser) return;
+      try {
+        var result = await sb.from('tool_outputs').select('tool_name, output_data').eq('user_id', currentUser.id);
+        if (result.data) {
+          toolOutputsCache = {};
+          result.data.forEach(function(row) { toolOutputsCache[row.tool_name] = row.output_data; });
+        }
+      } catch(e) { toolOutputsCache = {}; }
+    }
+
     async function loadSessionContext(sessionNumber) {
       try {
         const { data: memories } = await sb.from('ai_memory').select('session_number, summary, key_words')
@@ -1047,36 +1097,205 @@
       el.scrollTop = el.scrollHeight;
     }
 
+
+    // ── Tool snapshot renderer ────────────────────────────────
+    function renderToolSnapshot(toolKey, data) {
+      if (!data) return '';
+
+      var html = '';
+
+      if (toolKey === 'soar-steady' || toolKey === 'soar_steady') {
+        var items = data.items || [];
+        var soar   = items.filter(function(i) { return i.zone === 'soar'; }).slice(0, 2);
+        var steady = items.filter(function(i) { return i.zone === 'steady'; }).slice(0, 2);
+        var total  = items.filter(function(i) { return i.zone === 'soar' || i.zone === 'steady'; }).length;
+        var soarPct = total ? Math.round((soar.length / total) * 100) : 0;
+        soar.forEach(function(i) {
+          html += '<div class="snap-row"><span class="snap-badge snap-badge-soar">Soar ▲</span><span class="snap-text">' + i.text + '</span></div>';
+        });
+        if (soar.length && steady.length) html += '<div class="snap-divider"></div>';
+        steady.forEach(function(i) {
+          html += '<div class="snap-row"><span class="snap-badge snap-badge-steady">Steady ▼</span><span class="snap-text">' + i.text + '</span></div>';
+        });
+        if (total > 0) {
+          html += '<div class="snap-bar-wrap" style="margin-top:8px"><div class="snap-bar-label"><span>Energy split</span><span class="snap-bar-val">' + soarPct + '% Soar</span></div><div class="snap-bar-track"><div class="snap-bar-fill" style="width:' + soarPct + '%"></div></div></div>';
+        }
+      }
+
+      else if (toolKey === 'peak-plunge' || toolKey === 'peak_plunge') {
+        var pts = (data.points || data.events || []).slice(0, 4);
+        if (pts.length) {
+          // Mini SVG chart
+          var w = 280, h = 36, n = pts.length;
+          var ys = pts.map(function(p) { return p.value !== undefined ? p.value : (p.type === 'peak' ? 2 : 8); });
+          var minY = Math.min.apply(null, ys), maxY = Math.max.apply(null, ys);
+          var range = maxY - minY || 1;
+          var coords = pts.map(function(p, i) {
+            var x = n === 1 ? w/2 : (i / (n-1)) * w;
+            var val = p.value !== undefined ? p.value : (p.type === 'peak' ? 2 : 8);
+            var y = h - 4 - ((val - minY) / range) * (h - 8);
+            return [Math.round(x), Math.round(y)];
+          });
+          var polyline = coords.map(function(c) { return c.join(','); }).join(' ');
+          var polygon  = polyline + ' ' + w + ',' + h + ' 0,' + h;
+          html += '<svg class="snap-mini-svg" viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">' +
+            '<line x1="0" y1="' + (h/2) + '" x2="' + w + '" y2="' + (h/2) + '" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>' +
+            '<polygon points="' + polygon + '" fill="rgba(122,158,126,0.1)"/>' +
+            '<polyline points="' + polyline + '" fill="none" stroke="#7a9e7e" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>' +
+            '</svg>';
+          pts.slice(0, 3).forEach(function(p) {
+            var badge = p.type === 'peak' ? 'snap-badge-peak' : 'snap-badge-plunge';
+            var icon  = p.type === 'peak' ? '▲' : '▼';
+            var label = p.label || p.note || p.event || '';
+            var year  = p.year || '';
+            html += '<div class="snap-row"><span class="snap-badge ' + badge + '">' + icon + '</span><span class="snap-text">' + label + '</span><span style="font-family:var(--font-mono);font-size:0.62rem;color:rgba(240,236,228,0.3);flex-shrink:0;margin-left:4px">' + year + '</span></div>';
+          });
+        }
+      }
+
+      else if (toolKey === 'glow-map' || toolKey === 'glow_map_s2' || toolKey === 'glow_map_s4' || toolKey === 'glow_map_s7') {
+        var scores = data.scores || {};
+        var entries = Object.entries(scores).sort(function(a,b) { return b[1]-a[1]; }).slice(0, 3);
+        entries.forEach(function(entry) {
+          var pct = Math.round((entry[1]/10)*100);
+          var label = entry[0].charAt(0).toUpperCase() + entry[0].slice(1).replace('_',' ');
+          html += '<div class="snap-bar-wrap"><div class="snap-bar-label"><span>' + label + '</span><span class="snap-bar-val">' + entry[1] + '/10</span></div><div class="snap-bar-track"><div class="snap-bar-fill" style="width:' + pct + '%"></div></div></div>';
+        });
+      }
+
+      else if (toolKey === 'shadows-sparks' || toolKey === 'shadows_sparks') {
+        var shadows = (data.shadows || []).slice(0, 2);
+        var sparks  = (data.sparks  || []).slice(0, 2);
+        shadows.forEach(function(s) {
+          html += '<div class="snap-row"><span class="snap-badge snap-badge-shadow">Shadow</span><span class="snap-text">' + s.text + '</span></div>';
+        });
+        if (shadows.length && sparks.length) html += '<div class="snap-divider"></div>';
+        sparks.forEach(function(s) {
+          html += '<div class="snap-row"><span class="snap-badge snap-badge-spark">Spark</span><span class="snap-text">' + s.text + '</span></div>';
+        });
+      }
+
+      else if (toolKey === 'courage-compass' || toolKey === 'courage_compass') {
+        var dirs = [
+          { key: 'dir-north', label: 'North', cls: 'snap-badge-north' },
+          { key: 'dir-east',  label: 'East',  cls: 'snap-badge-plunge' },
+        ];
+        dirs.forEach(function(d) {
+          var val = data[d.key] || '';
+          if (val) html += '<div class="snap-row"><span class="snap-badge ' + d.cls + '">' + d.label + '</span><span class="snap-text">' + val + '</span></div>';
+        });
+        if (data['brave-step']) {
+          html += '<div class="snap-divider"></div><div class="snap-row"><span class="snap-badge snap-badge-spark">Step</span><span class="snap-text">' + data['brave-step'] + '</span></div>';
+        }
+      }
+
+      else if (toolKey === 'birdsong' || toolKey === 'birdsong') {
+        var cur = data.current || {};
+        var des = data.desired || {};
+        var modes = ['solo','melody','harmony','lullaby','resonance'];
+        var biggest = modes.reduce(function(best, m) {
+          var diff = (des[m]||0) - (cur[m]||0);
+          return diff > best.diff ? { name: m, diff: diff } : best;
+        }, { name: '', diff: -999 });
+        var modeColors = { solo:'#8a9ab0', melody:'#9dbf8a', harmony:'#F5C842', lullaby:'#c4956a', resonance:'#7eb8c9' };
+        modes.slice(0, 3).forEach(function(m) {
+          var pct = Math.round(((cur[m]||1)/10)*100);
+          var col = modeColors[m] || 'var(--session-col)';
+          html += '<div class="snap-bar-wrap"><div class="snap-bar-label"><span style="text-transform:capitalize">' + m + '</span><span style="color:' + col + '">' + (cur[m]||1) + '/10</span></div><div class="snap-bar-track"><div class="snap-bar-fill" style="width:' + pct + '%;background:' + col + '"></div></div></div>';
+        });
+      }
+
+      else if (toolKey === 'forest' || toolKey === 'forest') {
+        var people = data.people || {};
+        var canopy = (people.canopy || []).slice(0, 2);
+        var lone   = (people.lone   || []).slice(0, 1);
+        canopy.forEach(function(p) {
+          html += '<div class="snap-row"><span class="snap-badge snap-badge-soar">Canopy</span><span class="snap-text">' + p.name + '</span></div>';
+        });
+        lone.forEach(function(p) {
+          html += '<div class="snap-row"><span class="snap-badge snap-badge-plunge">Lone</span><span class="snap-text">' + p.name + '</span></div>';
+        });
+        if (data.intention) {
+          html += '<div class="snap-divider"></div><div class="snap-row"><span class="snap-text" style="font-style:italic;color:rgba(240,236,228,0.5)">' + data.intention.slice(0, 80) + '</span></div>';
+        }
+      }
+
+      return html ? '<div class="tool-snapshot">' + html + '</div>' : '';
+    }
+
     function renderToolCard(toolKey, toolInfo, container) {
-      var isUsed = openedTools[toolKey] || false;
-      var wrap   = document.createElement('div');
+      var isUsed   = openedTools[toolKey] || false;
+      var wrap     = document.createElement('div');
       wrap.className = 'tool-card-msg';
-      var emoji = (activeSession && activeSession.emoji) ? activeSession.emoji : '🪶';
+      var emoji    = (activeSession && activeSession.emoji) ? activeSession.emoji : '\u{1FAB6}';
+      var dbKey    = toolKey.replace(/-/g,'_');
+      var snapData = toolOutputsCache[dbKey] || toolOutputsCache[toolKey] || null;
+      var snapHtml = (isUsed && snapData) ? renderToolSnapshot(toolKey, snapData) : '';
+      var actHtml  = isUsed ? '<div class="tool-card-actions"><button class="tool-card-action tool-revisit-btn">Revisit</button><button class="tool-card-action tool-dismiss-btn">Close</button></div>' : '';
+
       wrap.innerHTML =
         '<div class="msg-avatar" style="background:var(--session-col);width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0;margin-top:2px;">' + emoji + '</div>' +
         '<div class="tool-card' + (isUsed ? ' used' : '') + '" data-key="' + toolKey + '">' +
           '<div class="tool-card-icon">' + toolInfo.icon + '</div>' +
           '<div class="tool-card-body">' +
-            '<div class="tool-card-label">' + (isUsed ? 'Done' : 'Tool ready') + '</div>' +
+            '<div class="tool-card-label">' + (isUsed ? 'Completed' : 'Tool ready') + '</div>' +
             '<div class="tool-card-name">' + toolInfo.name + '</div>' +
-            '<div class="tool-card-hint">' + toolInfo.hint + '</div>' +
+            (isUsed ? '' : '<div class="tool-card-hint">' + toolInfo.hint + '</div>') +
           '</div>' +
           '<div class="tool-card-arrow">' + (isUsed ? '&#x2713;' : '&rarr;') + '</div>' +
-        '</div>';
+        '</div>' +
+        snapHtml + actHtml;
+
       if (!isUsed) {
         var card = wrap.querySelector('.tool-card');
         card.addEventListener('click', function() {
           openedTools[toolKey] = true;
           card.classList.add('used');
-          card.querySelector('.tool-card-label').textContent = 'Done';
+          card.querySelector('.tool-card-label').textContent = 'Completed';
           card.querySelector('.tool-card-arrow').innerHTML = '&#x2713;';
+          var hint = card.querySelector('.tool-card-hint');
+          if (hint) hint.style.display = 'none';
           openToolEmbed(toolKey, toolInfo);
         });
+      } else {
+        var revisitBtn = wrap.querySelector('.tool-revisit-btn');
+        var dismissBtn = wrap.querySelector('.tool-dismiss-btn');
+        if (revisitBtn) revisitBtn.addEventListener('click', function() { openToolEmbed(toolKey, toolInfo); });
+        if (dismissBtn) dismissBtn.addEventListener('click', function() { wrap.style.display = 'none'; });
       }
+
       container.appendChild(wrap);
       container.scrollTop = container.scrollHeight;
     }
 
+    function updateToolCardSnapshot(toolKey, snapData) {
+      var cards = document.querySelectorAll('.tool-card[data-key="' + toolKey + '"]');
+      cards.forEach(function(card) {
+        var msg = card.closest('.tool-card-msg');
+        if (!msg) return;
+        var old = msg.querySelector('.tool-snapshot');
+        if (old) old.remove();
+        var oldAct = msg.querySelector('.tool-card-actions');
+        if (oldAct) oldAct.remove();
+        card.classList.add('used');
+        var lbl = card.querySelector('.tool-card-label');
+        if (lbl) lbl.textContent = 'Completed';
+        var arr = card.querySelector('.tool-card-arrow');
+        if (arr) arr.innerHTML = '&#x2713;';
+        var hint = card.querySelector('.tool-card-hint');
+        if (hint) hint.style.display = 'none';
+        var snapHtml = renderToolSnapshot(toolKey, snapData);
+        var actHtml  = '<div class="tool-card-actions"><button class="tool-card-action tool-revisit-btn">Revisit</button><button class="tool-card-action tool-dismiss-btn">Close</button></div>';
+        card.insertAdjacentHTML('afterend', snapHtml + actHtml);
+        var msg2 = card.closest('.tool-card-msg');
+        if (!msg2) return;
+        var rb = msg2.querySelector('.tool-revisit-btn');
+        var db = msg2.querySelector('.tool-dismiss-btn');
+        var ti = TOOL_MAP[toolKey];
+        if (rb && ti) rb.addEventListener('click', function() { openToolEmbed(toolKey, ti); });
+        if (db) db.addEventListener('click', function() { msg2.style.display = 'none'; });
+      });
+    }
     function showTyping() {
       const el = document.getElementById('chat-messages');
       const wrap = document.createElement('div');
