@@ -773,7 +773,11 @@
 
       // Render left col
       const toolsHtml = session.tools.length ? '<div class="tools-section"><div class="tools-label">Tools in this session</div><div class="tool-list">' +
-        session.tools.map(t => '<span class="tool-item clickable" onclick="openTool(\'' + t.file + '\')"><span class="tool-dot"></span>' + t.name + '<span class="tool-tag">' + t.tag + '</span></span>').join('') +
+        session.tools.map(function(t) {
+          var k = Object.keys(TOOL_MAP).find(function(key) { return TOOL_MAP[key].file === t.file; });
+          var oc = k ? ('openToolEmbed(\'' + k + '\',TOOL_MAP[\'' + k + '\'])') : ('openTool(\'' + t.file + '\')');
+          return '<span class="tool-item clickable" onclick="' + oc + '"><span class="tool-dot"></span>' + t.name + '<span class="tool-tag">' + t.tag + '</span></span>';
+        }).join('') +
         '</div></div>' : '';
 
       const videoHtml = session.videoUrl
@@ -806,6 +810,12 @@
           poster.classList.add('hidden');
           video.play();
         });
+        // Click video to pause/resume
+        video.addEventListener('click', () => {
+          if (video.paused) { video.play(); poster.classList.add('hidden'); }
+          else { video.pause(); }
+        });
+        video.style.cursor = 'pointer';
         video.addEventListener('pause', () => { if (!video.ended) poster.classList.remove('hidden'); });
         video.addEventListener('ended', () => poster.classList.remove('hidden'));
       }
@@ -820,9 +830,11 @@
       document.getElementById('complete-panel').classList.remove('visible');
       document.getElementById('complete-title').textContent = session.completeTitle;
       document.getElementById('complete-desc').textContent  = session.completeDesc;
-      document.getElementById('tools-nudge').innerHTML = session.tools.slice(0, 2).map(t =>
-        '<span class="tool-nudge-chip" onclick="openTool(\'' + t.file + '\')">' + t.name + ' →</span>'
-      ).join('');
+      document.getElementById('tools-nudge').innerHTML = session.tools.slice(0, 2).map(function(t) {
+        var k = Object.keys(TOOL_MAP).find(function(key) { return TOOL_MAP[key].file === t.file; });
+        var oc = k ? ('openToolEmbed(\'' + k + '\',TOOL_MAP[\'' + k + '\'])') : ('openTool(\'' + t.file + '\')');
+        return '<span class="tool-nudge-chip" onclick="' + oc + '">' + t.name + ' →</span>';
+      }).join('');
 
       // Clear chat
       document.getElementById('chat-messages').innerHTML = '';
@@ -841,7 +853,7 @@
           chatMsgs = memory.messages;
           chatMsgs.forEach(m => renderMessage(m.role, m.content));
           exchangeCount = chatMsgs.filter(m => m.role === 'user').length;
-          if (exchangeCount >= session.minExchanges) document.getElementById('complete-panel').classList.add('visible');
+          // Complete panel shown only when AI sends [COMPLETE] signal
         } else {
           setTimeout(() => {
             const greeting = buildGreeting(sessionNumber);
@@ -1104,12 +1116,12 @@
       const withTimeout = (p, ms) => Promise.race([p, new Promise(r => setTimeout(() => r(null), ms))]);
 
       try {
-        let summary = '', keyWords = [];
+        let summary = '', keyWords = [], actionPoint = '';
         const result = await withTimeout(
           fetch(WORKER_URL + '/summarise', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ session_number: activeSession.number, messages: chatMsgs, user_name: userProfile?.full_name?.split(' ')[0] || null }) }).then(r => r.ok ? r.json() : null),
           8000
         );
-        if (result) { summary = result.summary || ''; keyWords = result.key_words || []; }
+        if (result) { summary = result.summary || ''; keyWords = result.key_words || []; actionPoint = result.action_point || ''; }
 
         await sb.from('ai_memory').upsert({ user_id: currentUser.id, session_number: activeSession.number, messages: chatMsgs, summary, key_words: keyWords }, { onConflict: 'user_id,session_number' });
         await sb.from('session_progress').update({ status: 'complete', completed_at: new Date().toISOString() }).eq('user_id', currentUser.id).eq('session_number', activeSession.number);
@@ -1122,10 +1134,12 @@
         sb.from('course_users').select('email, full_name').eq('id', currentUser.id).single().then(({ data: profile }) => {
           if (!profile?.email) return;
           const nextSession = SESSIONS[nextNum];
-          fetch(WORKER_URL + '/session-email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: profile.email, user_name: profile.full_name || '', session_number: activeSession.number, summary, next_session_title: nextSession ? nextSession.title + ' — ' + nextSession.teaser : '' }) }).catch(() => {});
+          fetch(WORKER_URL + '/session-email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: profile.email, user_name: profile.full_name || '', session_number: activeSession.number, summary, action_point: actionPoint, next_session_title: nextSession ? nextSession.title + ' — ' + nextSession.teaser : '' }) }).catch(() => {});
         }).catch(() => {});
 
         // Back to dashboard — NO navigation
+        btn.textContent = 'Mark complete & continue →';
+        btn.disabled = false;
         await loadSessionProgress();
         renderDashboard();
         showView('view-dashboard');
@@ -1150,6 +1164,11 @@
         e.stopPropagation();
         closeToolEmbed();
       }
+    });
+
+    // Listen for postMessage from embedded tool iframes
+    window.addEventListener('message', function(e) {
+      if (e.data === 'tool-close') closeToolEmbed();
     });
 
     chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (!btnSend.disabled) sendMessage(chatInput.value); } });
