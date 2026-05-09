@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- lilbird deep-profile build: v5-stress-20260509 (27 chat Qs + stress-aware dual read; requires worker v5) -->
+<!-- lilbird deep-profile build: v5.2-voice-20260509 (27 chat Qs + stress-aware dual read + 5V order + voice/anti-repetition pass; requires worker v5.2) -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1530,7 +1530,7 @@
 // ═══════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════
-const DEEP_PROFILE_BUILD = 'v5-stress-20260509';
+const DEEP_PROFILE_BUILD = 'v5.2-voice-20260509';
 const WORKER_URL     = 'https://lilbird-assessment.cwwq46sn7m.workers.dev';
 console.info("lil' bird deep profile", DEEP_PROFILE_BUILD, '| questions:', 27, '| worker:', WORKER_URL);
 const STRIPE_PK      = 'pk_live_51QSMYQGAu36WZ7DdlsoNqzwPnsf4HUoOj6F1NZAeGnnH1TPjDEdEQudXIGgTLaUq079aQMI1W2MS6UpMItmTjgxy00HbouBx2g';
@@ -1966,6 +1966,13 @@ function _buildTagRow(label, chipsHtml){
   if(!chipsHtml) return '';
   return `<div class="result-tag-row"><span class="result-tag-row-label">${label}</span><div class="result-tag-chips">${chipsHtml}</div></div>`;
 }
+function _voicesLabel(order, lead){
+  if(Array.isArray(order) && order.length){
+    return '5V: '+order.join(' › ');
+  }
+  if(lead) return '5V: '+lead;
+  return '';
+}
 function _expressionTagChips(p){
   let h='';
   h+=_resultTagChip('gold', p.mbti);
@@ -1973,7 +1980,8 @@ function _expressionTagChips(p){
   if(p.enneagramSubtype) h+=`<span class="ftag ember" style="opacity:0.75;">${p.enneagramSubtype} subtype</span>`;
   h+=_resultTagChip('', p.attachment);
   if(p.centerOfIntelligence) h+=`<span class="ftag" style="color:var(--gold-dim);">${p.centerOfIntelligence} Centre</span>`;
-  if(p.fiveVoicesNod) h+=`<span class="ftag" style="color:var(--text-muted);opacity:0.7;">5V: ${p.fiveVoicesNod}</span>`;
+  const v=_voicesLabel(p.fiveVoicesOrder, p.fiveVoicesNod);
+  if(v) h+=`<span class="ftag" style="color:var(--text-muted);opacity:0.75;">${v}</span>`;
   return h;
 }
 function _likelyCoreTagChips(p){
@@ -1983,7 +1991,8 @@ function _likelyCoreTagChips(p){
   if(p.likelyCoreEnneagramSubtype) h+=`<span class="ftag ember" style="opacity:0.75;">${p.likelyCoreEnneagramSubtype} subtype</span>`;
   h+=_resultTagChip('', p.likelyCoreAttachment);
   if(p.likelyCoreCenterOfIntelligence) h+=`<span class="ftag" style="color:var(--gold-dim);">${p.likelyCoreCenterOfIntelligence} Centre</span>`;
-  if(p.likelyCoreFiveVoicesNod) h+=`<span class="ftag" style="color:var(--text-muted);opacity:0.7;">5V: ${p.likelyCoreFiveVoicesNod}</span>`;
+  const v=_voicesLabel(p.likelyCoreFiveVoicesOrder, p.likelyCoreFiveVoicesNod);
+  if(v) h+=`<span class="ftag" style="color:var(--text-muted);opacity:0.75;">${v}</span>`;
   return h;
 }
 
@@ -2014,7 +2023,7 @@ function renderResults(profile){
   tags.innerHTML=tagHtml;
 
   const dualityWrap=document.getElementById('result-duality-wrap');
-  const dualityText=[profile.expressionVersusCoreSummary, profile.betweenPresentAndCore].filter(Boolean).join('\n\n');
+  const dualityText=(profile.expressionVersusCoreSummary||'').trim();
   if(dualityWrap){
     if(dualityText){
       dualityWrap.style.display='block';
@@ -2046,9 +2055,19 @@ function renderResults(profile){
   setSection('result-subtype',   profile.subtypeProfile);
   setSection('result-wound',     profile.coreWoundAndGift);
   setSection('result-attachment',profile.attachmentDetail);
-  setSection('result-health',    profile.healthReflection);
   setSection('result-remember',  profile.thingsToRemember);
   setSection('result-stuck',     profile.stuckPlaces);
+
+  // v5.2 — healthReflection retired; hide its block if worker doesn't send it
+  const healthSection=document.getElementById('result-health-section');
+  if(healthSection){
+    if(profile.healthReflection&&profile.healthReflection.trim()){
+      healthSection.style.display='block';
+      setSection('result-health', profile.healthReflection);
+    }else{
+      healthSection.style.display='none';
+    }
+  }
 
   // Wing title — baseline wings only in copy; label clarifies when expression ≠ baseline
   const wingTitleEl=document.getElementById('result-wing-title');
