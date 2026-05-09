@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- lilbird deep-profile build: v5.2-voice-20260509 (27 chat Qs + stress-aware dual read + 5V order + voice/anti-repetition pass; requires worker v5.2) -->
+<!-- lilbird deep-profile build: v5.3-preview-20260509 (adds mid-flow "I heard you say…" preview/clarification step between canvas and final read; requires worker v5.3) -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -298,6 +298,55 @@
   .ftag { font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.1em; border-radius: 100px; padding: 0.3rem 0.85rem; border: 1px solid rgba(245,200,66,0.25); color: var(--text-muted); background: var(--gold-faint); }
   .ftag.gold { color: var(--gold); border-color: rgba(245,200,66,0.4); }
   .ftag.ember { color: var(--ember); border-color: rgba(232,115,74,0.4); background: var(--ember-faint); }
+
+  /* PREVIEW READ — mid-flow "I heard you say…" clarification screen */
+  .preview-loading { text-align: center; padding: 6rem 1rem; color: var(--text-muted); font-family: 'DM Mono', monospace; font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; }
+  .preview-loading em { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.4rem; color: var(--gold); display: block; margin-top: 0.75rem; letter-spacing: 0; text-transform: none; }
+  .preview-error { text-align: center; padding: 4rem 1rem; color: var(--ember); font-family: 'DM Sans', sans-serif; }
+
+  .preview-dual { background: var(--dark-mid); border: 1px solid rgba(245,200,66,0.18); border-radius: 12px; padding: 1.5rem 1.75rem; margin-bottom: 1.5rem; }
+  .preview-dual-row { display: flex; gap: 1rem; flex-wrap: wrap; align-items: baseline; margin-bottom: 0.4rem; }
+  .preview-dual-label { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-dim); min-width: 110px; }
+  .preview-dual-types { color: var(--text-main); font-family: 'DM Sans', sans-serif; font-size: 0.95rem; }
+  .preview-dual-types strong { color: var(--gold); font-weight: 500; }
+  .preview-bridge { color: var(--text-main); font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.05rem; line-height: 1.6; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(245,200,66,0.08); }
+
+  .preview-reasoning { background: rgba(255,255,255,0.02); border: 1px solid rgba(245,200,66,0.08); border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 2rem; }
+  .preview-reasoning-row { margin-bottom: 0.75rem; }
+  .preview-reasoning-row:last-child { margin-bottom: 0; }
+  .preview-reasoning-label { font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold-dim); display: block; margin-bottom: 0.3rem; }
+  .preview-reasoning-text { color: var(--text-main); font-size: 0.92rem; line-height: 1.65; opacity: 0.92; }
+
+  .preview-instruction { color: var(--text-muted); font-size: 0.88rem; line-height: 1.7; margin: 0.75rem 0 1.5rem; }
+  .preview-instruction strong { color: var(--gold); font-weight: 500; }
+
+  .preview-obs-list { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem; }
+  .preview-obs-card { background: var(--dark-card); border: 1px solid var(--dark-border); border-radius: 10px; padding: 1.25rem 1.4rem; transition: border-color 0.2s; }
+  .preview-obs-card.is-agree    { border-color: rgba(74,222,168,0.4); }
+  .preview-obs-card.is-disagree { border-color: rgba(232,115,74,0.45); }
+  .preview-obs-card.is-nuance   { border-color: rgba(245,200,66,0.45); }
+  .preview-obs-quote { font-family: 'Playfair Display', serif; font-style: italic; color: var(--gold); font-size: 1rem; line-height: 1.5; margin-bottom: 0.5rem; }
+  .preview-obs-quote::before { content: '"'; opacity: 0.65; margin-right: 0.1em; }
+  .preview-obs-quote::after  { content: '"'; opacity: 0.65; margin-left: 0.1em; }
+  .preview-obs-read { color: var(--text-main); font-size: 0.92rem; line-height: 1.65; opacity: 0.92; margin-bottom: 0.85rem; }
+  .preview-obs-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .preview-action-btn { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.5rem 0.95rem; border-radius: 100px; border: 1px solid rgba(245,200,66,0.18); background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.18s; }
+  .preview-action-btn:hover { border-color: var(--gold-dim); color: var(--text-main); }
+  .preview-action-btn.is-active.btn-agree    { background: rgba(74,222,168,0.12); border-color: rgba(74,222,168,0.55); color: #4adea8; }
+  .preview-action-btn.is-active.btn-disagree { background: rgba(232,115,74,0.12); border-color: rgba(232,115,74,0.55); color: var(--ember); }
+  .preview-action-btn.is-active.btn-nuance   { background: rgba(245,200,66,0.12); border-color: rgba(245,200,66,0.55); color: var(--gold); }
+  .preview-obs-note { display: none; width: 100%; margin-top: 0.85rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(245,200,66,0.18); border-radius: 8px; color: var(--text-main); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; line-height: 1.55; padding: 0.7rem 0.9rem; resize: vertical; min-height: 70px; }
+  .preview-obs-note:focus { outline: none; border-color: var(--gold); }
+  .preview-obs-note.is-open { display: block; }
+
+  .preview-extra-note { margin: 1.5rem 0 2rem; }
+  .preview-extra-label { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold-dim); display: block; margin-bottom: 0.5rem; }
+  .preview-extra-textarea { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(245,200,66,0.15); border-radius: 8px; color: var(--text-main); font-family: 'DM Sans', sans-serif; font-size: 0.93rem; line-height: 1.6; padding: 0.8rem 1rem; min-height: 84px; resize: vertical; transition: border-color 0.2s; }
+  .preview-extra-textarea:focus { outline: none; border-color: var(--gold); }
+  .preview-extra-help { font-size: 0.78rem; color: var(--text-muted); opacity: 0.7; margin-top: 0.4rem; }
+
+  .preview-cta-row { display: flex; gap: 0.85rem; flex-wrap: wrap; align-items: center; margin-top: 1rem; padding-top: 1.5rem; border-top: 1px solid var(--dark-border); }
+  .preview-cta-meta { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-left: auto; opacity: 0.7; }
   .result-section { margin-bottom: 2.5rem; }
   .result-section-label { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-dim); margin-bottom: 0.75rem; opacity: 0.8; }
   .result-section p { color: var(--text-main); font-size: 1rem; line-height: 1.8; margin-bottom: 1rem; }
@@ -1169,6 +1218,58 @@
 </div>
 
 <!-- ══════════════════════════════════════
+     PREVIEW READ — "I heard you say…" mid-flow check
+══════════════════════════════════════ -->
+<div class="screen" id="screen-preview">
+  <div class="inner">
+
+    <!-- Loading state -->
+    <div id="preview-loading" class="preview-loading">
+      reading carefully<em>your story is being heard…</em>
+      <p style="margin-top:1.5rem;font-family:'DM Sans',sans-serif;font-size:0.85rem;letter-spacing:0;text-transform:none;opacity:0.7;">Pulling out the threads I'm hearing — give us about 15 seconds.</p>
+    </div>
+
+    <!-- Error state -->
+    <div id="preview-error" class="preview-error" style="display:none;">
+      <p>The first-pass read couldn't load. We can still build your full profile from your answers.</p>
+      <div class="btn-row" style="justify-content:center;">
+        <button class="btn btn-gold" onclick="skipPreviewToFinal()">Read me my Nest →</button>
+      </div>
+    </div>
+
+    <!-- Main preview content -->
+    <div id="preview-content" style="display:none;">
+      <p class="eyebrow">before I commit · a quick check</p>
+      <h2>Does this<br><em>land?</em></h2>
+      <p class="preview-instruction">
+        Here's my first-pass read of you. <strong>Tell me where I'm warm, off, or only half-right</strong> — and I'll factor that into your full Nest. The corrections get equal weight to anything you typed.
+      </p>
+
+      <div class="preview-dual" id="preview-dual"></div>
+
+      <div class="preview-reasoning" id="preview-reasoning"></div>
+
+      <p class="result-section-label" style="margin-bottom:0.85rem;">things I heard you saying</p>
+      <div class="preview-obs-list" id="preview-obs-list"></div>
+
+      <div class="preview-extra-note">
+        <label class="preview-extra-label" for="preview-extra-text">Anything else I should weigh? <span style="opacity:0.6;">(optional)</span></label>
+        <textarea id="preview-extra-text" class="preview-extra-textarea" placeholder="e.g. 'You're reading the energy as social — it's actually professional pressure.' Or anything I missed."></textarea>
+        <p class="preview-extra-help">Skip this if the read above already feels close enough.</p>
+      </div>
+
+      <div class="preview-cta-row">
+        <button class="btn btn-gold" onclick="submitPreviewToFinal()">Read me my full Nest →</button>
+        <button class="btn btn-outline" onclick="skipPreviewToFinal()">Skip — just give me the Nest</button>
+        <span class="preview-cta-meta" id="preview-cta-meta">0 marked</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
      LANDING (AI processing)
 ══════════════════════════════════════ -->
 <div class="screen" id="screen-landing">
@@ -1530,7 +1631,7 @@
 // ═══════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════
-const DEEP_PROFILE_BUILD = 'v5.2-voice-20260509';
+const DEEP_PROFILE_BUILD = 'v5.3-preview-20260509';
 const WORKER_URL     = 'https://lilbird-assessment.cwwq46sn7m.workers.dev';
 console.info("lil' bird deep profile", DEEP_PROFILE_BUILD, '| questions:', 27, '| worker:', WORKER_URL);
 const STRIPE_PK      = 'pk_live_51QSMYQGAu36WZ7DdlsoNqzwPnsf4HUoOj6F1NZAeGnnH1TPjDEdEQudXIGgTLaUq079aQMI1W2MS6UpMItmTjgxy00HbouBx2g';
@@ -1553,7 +1654,8 @@ let profileData    = null;
 const PROGRESS = {
   'screen-intro':0,
   'screen-chat':5,
-  'screen-canvas':99,
+  'screen-canvas':95,
+  'screen-preview':98,
   'screen-landing':99,'screen-snapshot':100,'screen-pay':100,'screen-results':100,
 };
 
@@ -1585,6 +1687,7 @@ function goTo(screenId){
   document.getElementById('progressBar').style.width=(PROGRESS[screenId]??0)+'%';
   if(screenId==='screen-pay' && !stripeInstance) initStripe();
   if(screenId==='screen-pay') prefillPayEmail();
+  if(screenId==='screen-preview') runPreview();
   if(screenId==='screen-landing') runAnalysis();
   // Don't populate snapshot until email gate is passed — submitEmail handles that
 }
@@ -1830,6 +1933,206 @@ function collectResponses(){
 }
 
 // ═══════════════════════════════════════
+// PREVIEW READ — mid-flow "I heard you say…" check
+// ═══════════════════════════════════════
+let previewData = null;
+let previewClarifications = {};   // { obsId: { status: 'agree'|'disagree'|'nuance', note: '' } }
+
+async function runPreview(){
+  const loadingEl = document.getElementById('preview-loading');
+  const errorEl   = document.getElementById('preview-error');
+  const contentEl = document.getElementById('preview-content');
+  if(loadingEl) loadingEl.style.display = 'block';
+  if(errorEl)   errorEl.style.display   = 'none';
+  if(contentEl) contentEl.style.display = 'none';
+
+  previewClarifications = {};
+
+  const responses = collectResponses();
+  try{
+    const r = await fetch(`${WORKER_URL}/preview-read`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ responses })
+    });
+    if(!r.ok){
+      const t = await r.text();
+      console.error('preview-read HTTP error:', r.status, t.slice(0,200));
+      throw new Error('Preview HTTP ' + r.status);
+    }
+    const raw = await r.text();
+    let data;
+    try { data = JSON.parse(raw); }
+    catch(e){
+      console.error('preview-read JSON parse error:', e.message, raw.slice(0,300));
+      throw new Error('Preview parse failed');
+    }
+    previewData = data;
+    renderPreview(data);
+    if(loadingEl) loadingEl.style.display = 'none';
+    if(contentEl) contentEl.style.display = 'block';
+  }catch(e){
+    console.error('Preview read failed — offering skip:', e.message);
+    previewData = null;
+    if(loadingEl) loadingEl.style.display = 'none';
+    if(errorEl)   errorEl.style.display   = 'block';
+  }
+}
+
+function _previewTypesLine(layer){
+  if(!layer) return '<em style="opacity:0.6;">—</em>';
+  const parts = [];
+  if(layer.mbti)      parts.push(`<strong>${_escHtml(layer.mbti)}</strong>`);
+  if(layer.enneagram) parts.push(`<strong>${_escHtml(layer.enneagram)}</strong>`);
+  let line = parts.join(' · ');
+  if(layer.archetype) line += ` <span style="opacity:0.75;font-style:italic;">— ${_escHtml(layer.archetype)}</span>`;
+  return line || '<em style="opacity:0.6;">—</em>';
+}
+function _escHtml(s){
+  return String(s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+}
+
+function renderPreview(data){
+  if(!data) return;
+
+  // Dual read box
+  const dualEl = document.getElementById('preview-dual');
+  if(dualEl){
+    dualEl.innerHTML =
+      `<div class="preview-dual-row">
+         <span class="preview-dual-label">Showing up now</span>
+         <span class="preview-dual-types">${_previewTypesLine(data.expression)}</span>
+       </div>
+       <div class="preview-dual-row">
+         <span class="preview-dual-label">Likely baseline</span>
+         <span class="preview-dual-types">${_previewTypesLine(data.likelyCore)}</span>
+       </div>` +
+      (data.bridge ? `<p class="preview-bridge">${_escHtml(data.bridge)}</p>` : '');
+  }
+
+  // Reasoning trail
+  const reasonEl = document.getElementById('preview-reasoning');
+  if(reasonEl){
+    const rows = [];
+    if(data.tiltedToBaseline)   rows.push(`<div class="preview-reasoning-row"><span class="preview-reasoning-label">What tilted me toward the baseline read</span><div class="preview-reasoning-text">${_escHtml(data.tiltedToBaseline)}</div></div>`);
+    if(data.tiltedToExpression) rows.push(`<div class="preview-reasoning-row"><span class="preview-reasoning-label">What kept me reading the present this way</span><div class="preview-reasoning-text">${_escHtml(data.tiltedToExpression)}</div></div>`);
+    if(data.leastSure)          rows.push(`<div class="preview-reasoning-row"><span class="preview-reasoning-label">What I'm least sure about</span><div class="preview-reasoning-text">${_escHtml(data.leastSure)}</div></div>`);
+    reasonEl.innerHTML = rows.join('');
+    reasonEl.style.display = rows.length ? 'block' : 'none';
+  }
+
+  // Observations
+  const listEl = document.getElementById('preview-obs-list');
+  const obs = Array.isArray(data.observations) ? data.observations : [];
+  if(listEl){
+    listEl.innerHTML = obs.map(o => {
+      const id = _escHtml(o.id || '');
+      const quote = _escHtml(o.quote || '');
+      const read  = _escHtml(o.read  || '');
+      return `<div class="preview-obs-card" id="preview-card-${id}" data-obs-id="${id}">
+        ${quote ? `<div class="preview-obs-quote">${quote}</div>` : ''}
+        ${read  ? `<div class="preview-obs-read">${read}</div>`  : ''}
+        <div class="preview-obs-actions">
+          <button type="button" class="preview-action-btn btn-agree"    onclick="setPreviewObs('${id}','agree')">Sounds right</button>
+          <button type="button" class="preview-action-btn btn-disagree" onclick="setPreviewObs('${id}','disagree')">Not quite</button>
+          <button type="button" class="preview-action-btn btn-nuance"   onclick="setPreviewObs('${id}','nuance')">Add nuance</button>
+        </div>
+        <textarea class="preview-obs-note" id="preview-note-${id}" rows="2" placeholder="" oninput="updatePreviewNote('${id}', this.value)"></textarea>
+      </div>`;
+    }).join('');
+  }
+
+  updatePreviewMeta();
+}
+
+function setPreviewObs(id, status){
+  if(!id) return;
+  const card = document.getElementById('preview-card-' + id);
+  const note = document.getElementById('preview-note-' + id);
+  if(!card) return;
+
+  const current = previewClarifications[id];
+  // Toggle off if clicking the same status again
+  if(current && current.status === status){
+    delete previewClarifications[id];
+    card.classList.remove('is-agree','is-disagree','is-nuance');
+    card.querySelectorAll('.preview-action-btn').forEach(b => b.classList.remove('is-active'));
+    if(note){ note.classList.remove('is-open'); note.value=''; }
+    updatePreviewMeta();
+    return;
+  }
+
+  previewClarifications[id] = {
+    status,
+    note: (current && current.note) || ''
+  };
+  card.classList.remove('is-agree','is-disagree','is-nuance');
+  card.classList.add('is-' + status);
+  card.querySelectorAll('.preview-action-btn').forEach(b => b.classList.remove('is-active'));
+  const map = { agree:'.btn-agree', disagree:'.btn-disagree', nuance:'.btn-nuance' };
+  const activeBtn = card.querySelector(map[status]);
+  if(activeBtn) activeBtn.classList.add('is-active');
+
+  if(note){
+    if(status === 'disagree' || status === 'nuance'){
+      note.placeholder = status === 'disagree'
+        ? "What did I get wrong? (e.g. 'It's professional pressure, not social.')"
+        : "What's the more accurate version? (e.g. 'Half right — but only when I'm tired.')";
+      note.classList.add('is-open');
+      setTimeout(()=>{ try{ note.focus(); }catch(_){} }, 60);
+    } else {
+      note.classList.remove('is-open');
+      note.value = '';
+      if(previewClarifications[id]) previewClarifications[id].note = '';
+    }
+  }
+
+  updatePreviewMeta();
+}
+
+function updatePreviewNote(id, val){
+  if(!previewClarifications[id]) return;
+  previewClarifications[id].note = (val || '').trim();
+}
+
+function updatePreviewMeta(){
+  const el = document.getElementById('preview-cta-meta');
+  if(!el) return;
+  const n = Object.keys(previewClarifications).length;
+  el.textContent = n === 0 ? '0 marked' : (n === 1 ? '1 marked' : n + ' marked');
+}
+
+function _collectClarificationsPayload(){
+  if(!previewData) return null;
+  const obsArr = Array.isArray(previewData.observations) ? previewData.observations : [];
+  const enriched = obsArr
+    .filter(o => previewClarifications[o.id])
+    .map(o => ({
+      id: o.id,
+      quote: o.quote || '',
+      read:  o.read  || '',
+      status: previewClarifications[o.id].status,
+      note:   previewClarifications[o.id].note || '',
+    }));
+  const noteEl = document.getElementById('preview-extra-text');
+  const note = noteEl ? noteEl.value.trim() : '';
+  if(!enriched.length && !note) return null;
+  return { observations: enriched, note };
+}
+
+function submitPreviewToFinal(){
+  goTo('screen-landing');
+}
+
+function skipPreviewToFinal(){
+  // Wipe any partial clarifications so /analyze runs clean
+  previewClarifications = {};
+  const noteEl = document.getElementById('preview-extra-text');
+  if(noteEl) noteEl.value = '';
+  goTo('screen-landing');
+}
+
+// ═══════════════════════════════════════
 // AI ANALYSIS
 // ═══════════════════════════════════════
 async function runAnalysis(){
@@ -1837,8 +2140,13 @@ async function runAnalysis(){
   nestId=generateNestId();
   document.getElementById('nest-id').textContent=nestId;
   document.getElementById('loadingOverlay').classList.add('active');
+  const clarifications = _collectClarificationsPayload();
+  const previewReadForFinal = clarifications && previewData
+    ? { expression: previewData.expression, likelyCore: previewData.likelyCore, bridge: previewData.bridge }
+    : null;
+  console.log('Final analyze — clarifications:', clarifications ? `${clarifications.observations.length} marked, note=${clarifications.note ? 'yes':'no'}` : 'none');
   try{
-    const r=await fetch(`${WORKER_URL}/analyze`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({responses,nestId})});
+    const r=await fetch(`${WORKER_URL}/analyze`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({responses,nestId,clarifications,previewRead:previewReadForFinal})});
     if(!r.ok){
       const errText = await r.text();
       console.error('Analysis HTTP error:', r.status, errText);
@@ -2541,7 +2849,7 @@ function collectCanvasData() {
 
 function submitCanvas() {
   collectCanvasData();
-  goTo('screen-landing');
+  goTo('screen-preview');
 }
 
 function setCanvasView(v){
