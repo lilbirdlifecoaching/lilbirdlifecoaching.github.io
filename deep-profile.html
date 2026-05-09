@@ -279,6 +279,21 @@
 
   .result-header { border-bottom: 1px solid var(--dark-border); padding-bottom: 2rem; margin-bottom: 2.5rem; }
   .result-tags { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+  .result-tags.result-tags-wrap { flex-direction: column; align-items: flex-start; gap: 1rem; }
+  .result-tag-row { width: 100%; }
+  .result-tag-row-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.45rem;
+    display: block;
+    opacity: 0.85;
+  }
+  .result-tag-chips { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+  .result-duality { margin-bottom: 2rem; }
+  .result-duality .result-section-label { margin-bottom: 0.75rem; }
   .ftag { font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.1em; border-radius: 100px; padding: 0.3rem 0.85rem; border: 1px solid rgba(245,200,66,0.25); color: var(--text-muted); background: var(--gold-faint); }
   .ftag.gold { color: var(--gold); border-color: rgba(245,200,66,0.4); }
   .ftag.ember { color: var(--ember); border-color: rgba(232,115,74,0.4); background: var(--ember-faint); }
@@ -1014,7 +1029,7 @@
     <div class="btn-row">
       <button class="btn btn-gold" onclick="startChat()">Begin → 🐦</button>
     </div>
-    <p class="intro-note">Takes about 15–20 minutes. The more honest you are, the more accurate it gets.</p>
+    <p class="intro-note">Takes about 20–25 minutes. The more honest you are, the more accurate it gets.</p>
   </div>
 </div>
 
@@ -1290,8 +1305,9 @@
     <div class="result-header">
       <p class="eyebrow">your nest</p>
       <h1 id="result-archetype" style="margin-bottom:0.25rem;">The Connector</h1>
-      <p id="result-archetype-sub" style="color:var(--gold-dim);font-family:'Playfair Display',serif;font-style:italic;font-size:1.05rem;margin-bottom:1.25rem;"></p>
-      <div class="result-tags" id="result-tags"></div>
+      <p id="result-archetype-sub" style="color:var(--gold-dim);font-family:'Playfair Display',serif;font-style:italic;font-size:1.05rem;margin-bottom:0.35rem;"></p>
+      <p id="result-likely-archetype" style="display:none;color:var(--text-muted);font-family:'Playfair Display',serif;font-style:italic;font-size:0.98rem;margin-bottom:1rem;line-height:1.5;"></p>
+      <div class="result-tags result-tags-wrap" id="result-tags"></div>
     </div>
 
     <!-- DASHBOARD LAYOUT — profile + sidebar -->
@@ -1300,13 +1316,23 @@
       <!-- MAIN PROFILE COLUMN -->
       <div class="dashboard-main">
 
+        <div class="nest-box result-duality" id="result-duality-wrap" style="display:none;">
+          <p class="result-section-label">where you are · where you're from</p>
+          <div id="result-duality-body"></div>
+        </div>
+
+        <div class="result-section" id="result-showing-wrap" style="display:none;">
+          <p class="result-section-label">how you're showing up (now)</p>
+          <div id="result-showing-up"></div>
+        </div>
+
         <div class="result-section">
           <p class="result-section-label">who you are</p>
           <div id="result-who"></div>
         </div>
 
         <div class="result-section">
-          <p class="result-section-label">how you're wired</p>
+          <p class="result-section-label">your likely baseline wiring</p>
           <div id="result-wired"></div>
         </div>
 
@@ -1333,6 +1359,11 @@
         <div class="result-section" id="result-health-section">
           <p class="result-section-label">right now</p>
           <div id="result-health"></div>
+        </div>
+
+        <div class="result-section" id="result-ideal-wrap" style="display:none;">
+          <p class="result-section-label">ideal life · present reality</p>
+          <div id="result-ideal-present"></div>
         </div>
 
         <div id="result-quote">
@@ -1782,6 +1813,9 @@ function collectResponses(){
   const r={};
   ids.forEach(id=>{ r['ch'+id]=document.getElementById(id)?.value?.trim()||''; });
   r.currentRole   = document.getElementById('c6d')?.value?.trim()||'';
+  r.ch7a = document.getElementById('c7a')?.value?.trim()||'';
+  r.ch7b = document.getElementById('c7b')?.value?.trim()||'';
+  r.ch7c = document.getElementById('c7c')?.value?.trim()||'';
   r.canvasScores  = canvasScores;
   r.canvasTexts   = canvasTexts;
   return r;
@@ -1836,13 +1870,27 @@ async function runAnalysis(){
 function populateSnapshot(profile){
   if(!profile) return;
   const m=document.getElementById('snap-mbti');
-  if(m && profile.mbti){
-    m.textContent=profile.mbti;
-    // Also show enneagram in badge if available
-    if(profile.enneagram) m.textContent=profile.mbti+' · '+profile.enneagram;
+  if(m){
+    const nowLine=[profile.mbti,profile.enneagram].filter(Boolean).join(' · ');
+    const baseLine=[profile.likelyCoreMbti,profile.likelyCoreEnneagram].filter(Boolean).join(' · ');
+    if(baseLine && nowLine && baseLine!==nowLine){
+      m.innerHTML='<span style="display:block;opacity:0.95;">Now: '+nowLine+'</span><span style="display:block;margin-top:0.35rem;opacity:0.85;">Likely baseline: '+baseLine+'</span>';
+    }else if(nowLine){
+      m.textContent=nowLine;
+    }else if(baseLine){
+      m.textContent=baseLine;
+    }
   }
   const a=document.getElementById('snap-archetype');
-  if(a) a.textContent=(profile.archetype||'Your Type')+(profile.archetypeSub?' — '+profile.archetypeSub:'');
+  if(a){
+    const nowA=(profile.archetype||'Your Type')+(profile.archetypeSub?' — '+profile.archetypeSub:'');
+    if(profile.likelyCoreArchetype){
+      const sub=profile.likelyCoreArchetypeSub?' — '+profile.likelyCoreArchetypeSub:'';
+      a.innerHTML='<span style="display:block;">'+nowA+'</span><span style="display:block;margin-top:0.35rem;opacity:0.85;font-size:0.92em;">Likely baseline: '+profile.likelyCoreArchetype+sub+'</span>';
+    }else{
+      a.textContent=nowA;
+    }
+  }
   const prev=document.getElementById('snap-preview');
   if(prev && profile.whoYouAre){
     const paras=profile.whoYouAre.split(/\n\n/).slice(0,2);
@@ -1878,6 +1926,8 @@ async function submitEmail(){
           {name:'archetype',  value:profileData?.archetype  || ''},
           {name:'mbti',       value:profileData?.mbti       || ''},
           {name:'enneagram',  value:profileData?.enneagram  || ''},
+          {name:'likely_core_mbti', value:profileData?.likelyCoreMbti || ''},
+          {name:'likely_core_enneagram', value:profileData?.likelyCoreEnneagram || ''},
           {name:'attachment', value:profileData?.attachment  || ''},
           {name:'nest_id',    value:nestId                   || ''},
           {name:'source',     value:'deep-profile-snapshot'       },
@@ -1899,20 +1949,88 @@ async function submitEmail(){
 // ═══════════════════════════════════════
 // RENDER RESULTS
 // ═══════════════════════════════════════
+function _resultTagChip(cls, text){
+  if(!text) return '';
+  const c = cls ? ` ${cls}` : '';
+  return `<span class="ftag${c}">${text}</span>`;
+}
+function _buildTagRow(label, chipsHtml){
+  if(!chipsHtml) return '';
+  return `<div class="result-tag-row"><span class="result-tag-row-label">${label}</span><div class="result-tag-chips">${chipsHtml}</div></div>`;
+}
+function _expressionTagChips(p){
+  let h='';
+  h+=_resultTagChip('gold', p.mbti);
+  h+=_resultTagChip('ember', p.enneagram);
+  if(p.enneagramSubtype) h+=`<span class="ftag ember" style="opacity:0.75;">${p.enneagramSubtype} subtype</span>`;
+  h+=_resultTagChip('', p.attachment);
+  if(p.centerOfIntelligence) h+=`<span class="ftag" style="color:var(--gold-dim);">${p.centerOfIntelligence} Centre</span>`;
+  if(p.fiveVoicesNod) h+=`<span class="ftag" style="color:var(--text-muted);opacity:0.7;">5V: ${p.fiveVoicesNod}</span>`;
+  return h;
+}
+function _likelyCoreTagChips(p){
+  let h='';
+  h+=_resultTagChip('gold', p.likelyCoreMbti);
+  h+=_resultTagChip('ember', p.likelyCoreEnneagram);
+  if(p.likelyCoreEnneagramSubtype) h+=`<span class="ftag ember" style="opacity:0.75;">${p.likelyCoreEnneagramSubtype} subtype</span>`;
+  h+=_resultTagChip('', p.likelyCoreAttachment);
+  if(p.likelyCoreCenterOfIntelligence) h+=`<span class="ftag" style="color:var(--gold-dim);">${p.likelyCoreCenterOfIntelligence} Centre</span>`;
+  if(p.likelyCoreFiveVoicesNod) h+=`<span class="ftag" style="color:var(--text-muted);opacity:0.7;">5V: ${p.likelyCoreFiveVoicesNod}</span>`;
+  return h;
+}
+
 function renderResults(profile){
   if(!profile) return;
 
-  document.getElementById('result-archetype').textContent=profile.archetype||'The Connector';
+  document.getElementById('result-archetype').textContent=profile.archetype||'Your Nest';
   document.getElementById('result-archetype-sub').textContent=profile.archetypeSub||'';
 
+  const likelyArchEl=document.getElementById('result-likely-archetype');
+  if(likelyArchEl){
+    if(profile.likelyCoreArchetype){
+      const sub=profile.likelyCoreArchetypeSub?` — ${profile.likelyCoreArchetypeSub}`:'';
+      likelyArchEl.textContent=`Likely baseline archetype: ${profile.likelyCoreArchetype}${sub}`;
+      likelyArchEl.style.display='block';
+    }else{
+      likelyArchEl.style.display='none';
+      likelyArchEl.textContent='';
+    }
+  }
+
   const tags=document.getElementById('result-tags');
-  tags.innerHTML='';
-  if(profile.mbti)              tags.innerHTML+=`<span class="ftag gold">${profile.mbti}</span>`;
-  if(profile.enneagram)         tags.innerHTML+=`<span class="ftag ember">${profile.enneagram}</span>`;
-  if(profile.enneagramSubtype)  tags.innerHTML+=`<span class="ftag ember" style="opacity:0.75;">${profile.enneagramSubtype} subtype</span>`;
-  if(profile.attachment)        tags.innerHTML+=`<span class="ftag">${profile.attachment}</span>`;
-  if(profile.centerOfIntelligence) tags.innerHTML+=`<span class="ftag" style="color:var(--gold-dim);">${profile.centerOfIntelligence} Centre</span>`;
-  if(profile.fiveVoicesNod)     tags.innerHTML+=`<span class="ftag" style="color:var(--text-muted);opacity:0.7;">5V: ${profile.fiveVoicesNod}</span>`;
+  const nowChips=_expressionTagChips(profile);
+  const likelyChips=_likelyCoreTagChips(profile);
+  const hasLikely=!!(profile.likelyCoreMbti||profile.likelyCoreEnneagram||profile.likelyCoreArchetype);
+  let tagHtml=_buildTagRow('Showing up now', nowChips||_resultTagChip('', 'See narrative below'));
+  if(hasLikely) tagHtml+=_buildTagRow('Likely baseline (when resourced)', likelyChips);
+  tags.innerHTML=tagHtml;
+
+  const dualityWrap=document.getElementById('result-duality-wrap');
+  const dualityText=[profile.expressionVersusCoreSummary, profile.betweenPresentAndCore].filter(Boolean).join('\n\n');
+  if(dualityWrap){
+    if(dualityText){
+      dualityWrap.style.display='block';
+      setSection('result-duality-body', dualityText);
+    }else{
+      dualityWrap.style.display='none';
+    }
+  }
+
+  const showWrap=document.getElementById('result-showing-wrap');
+  if(showWrap){
+    if(profile.howYoureShowingUp&&profile.howYoureShowingUp.trim()){
+      showWrap.style.display='block';
+      setSection('result-showing-up', profile.howYoureShowingUp);
+    }else showWrap.style.display='none';
+  }
+
+  const idealWrap=document.getElementById('result-ideal-wrap');
+  if(idealWrap){
+    if(profile.idealVersusPresent&&profile.idealVersusPresent.trim()){
+      idealWrap.style.display='block';
+      setSection('result-ideal-present', profile.idealVersusPresent);
+    }else idealWrap.style.display='none';
+  }
 
   setSection('result-who',       profile.whoYouAre);
   setSection('result-wired',     profile.howWired);
@@ -1983,6 +2101,8 @@ function logToSheet(profile,amount,responses,promoCode=''){
     archetype:profile.archetype||'',
     mbti:profile.mbti||'',
     enneagram:profile.enneagram||'',
+    likelyCoreMbti:profile.likelyCoreMbti||'',
+    likelyCoreEnneagram:profile.likelyCoreEnneagram||'',
     attachment:profile.attachment||'',
     amount:amount||0,
     paid: amount > 0 || promoCode ? 'yes' : 'no',
@@ -2060,8 +2180,19 @@ function getFallbackProfile(){
     centerOfIntelligence:'Heart',
     healthLevel:'growing',
     fiveVoicesNod:'Connector',
-    whoYouAre:'You are the person who walks into a room and immediately, almost involuntarily, takes its temperature. Not for danger — for who looks like they need someone to talk to. Your warmth is structural. People feel seen around you faster than they can explain why.\n\nThis isn\'t performance. It\'s just how you\'re made. And it\'s one of your most significant gifts — even when it costs you.',
-    howWired:'Your mind processes the world relationally before it processes it logically. You\'re energised by people, make decisions through the lens of impact, and carry a quiet but persistent drive to make things better for everyone around you.\n\nIf you\'ve come across 5 Voices, the Connector voice probably feels very familiar — the one who builds bridges between people and ideas before anyone else has noticed there\'s a gap.',
+    likelyCoreArchetype:'The Trailblazer (Pioneer)',
+    likelyCoreArchetypeSub:'with Creative undertones',
+    likelyCoreMbti:'INTJ',
+    likelyCoreEnneagram:'Enneagram 7w8',
+    likelyCoreEnneagramSubtype:'Social',
+    likelyCoreAttachment:'Secure-leaning',
+    likelyCoreCenterOfIntelligence:'Head',
+    likelyCoreFiveVoicesNod:'Pioneer',
+    expressionVersusCoreSummary:'What you\'re living right now can look more caretaking and visible than the part of you that usually plans three moves ahead and chases possibility.',
+    betweenPresentAndCore:'Under strain, many people slide toward dutiful precision and emotional attunement — even when their baseline is bolder and more independent.\n\nThat doesn\'t make either version false. It means your context is borrowing extra bandwidth from patterns that keep you safe.\n\nThe invitation is to let both be named: the survival self and the self that remembers what freedom felt like.',
+    howYoureShowingUp:'Right now you may be showing up as the person who holds the room together, reads the emotional weather, and keeps things moving — even when you\'re tired.\n\nThat can look like a Connector-leaning season: relational energy out front, performance pressure nearby, and a quiet hunger to be known without having to manage the moment.',
+    whoYouAre:'You are the person who walks into a room and immediately, almost involuntarily, takes its temperature. Not for danger — for who looks like they need someone to talk to. Your warmth is structural. People feel seen around you faster than they can explain why.\n\nThis isn\'t performance. It\'s just how you\'re made. And it\'s one of your most significant gifts — even when it costs you.\n\nThere is also a through-line in you that is less sentimental and more strategic — a mind that likes a map, a future, and a door that still opens. Both belong in your story.',
+    howWired:'When you\'re closer to baseline, your mind likes distance, pattern, and a clean read on the board before you emote about it. You tend toward independence not because you don\'t care — but because clarity feels like oxygen.\n\nThere\'s also a hunger for momentum and possibility in you — the part that would rather build a future than rehearse a problem. That 7-ish edge shows up as options, humour, and refusal to let life shrink you — when you\'re not running on fumes.',
     wingProfile:'You\'re a 3 with both wings present in different contexts — your 4 wing shows up in your interior life, the part of you that sits with the deeper questions and craves meaning and authenticity. Your 2 wing comes forward in how you relate — warm, generous, attuned to what others need. This makes you more complex than most 3 descriptions give you credit for.',
     subtypeProfile:'There\'s a social subtype flavour to how you move through the world — you\'re aware of your role within groups, attuned to belonging and contribution, and energised by being part of something that matters.',
     coreWoundAndGift:'Your gift is authentic inspiration — the ability to show people what\'s possible and make them feel like they can actually do it. Under pressure, that same gift can quietly become performing worth rather than living it. The shift from doing to being is your ongoing invitation.\n\nYou probably already notice when it flips. Trust that noticing.',
@@ -2073,6 +2204,7 @@ function getFallbackProfile(){
     wingTitle:'Your Enneagram wings',
     wing:'',
     quote:'Clarity changes everything. And you already have more of it than you think — you just haven\'t given yourself permission to act on it yet.',
+    idealVersusPresent:'The life you want probably has more room — mentally, temporally, relationally — than the one you\'re gritting through.\n\nNaming that gap without shame is how the Nest stops being a label and starts being a compass.',
     partnerDynamicReady:true,
   };
 }
@@ -2114,6 +2246,11 @@ const QUESTIONS = [
   { id:'q17', text:"The last time you completely lost track of time doing something — what were you doing, and what does that tell you?", placeholder:"That feeling of flow where hours disappear..." },
   { id:'q18', text:"What would you do differently if you were completely sure it would work?", placeholder:"Don't edit it. What actually comes up..." },
   { id:'q19', text:"Tell me about your work right now — what you do, how it feels day to day, and honestly whether it fits.", placeholder:"Role, how it feels, what's working and what isn't..." },
+
+  // Chapter 7 — Baseline & ideal (likely core vs present reality)
+  { id:'q20', text:"Step outside this week for a moment. When life has felt steadier — not perfect, just not this squeezed — how do you actually recharge after a full day? People, alone, or a mix? What does it look like?", placeholder:"Think of a better season, not a fantasy one..." },
+  { id:'q21', text:"Same steadier season: when you make a decision you still respect later, what tends to happen inside you first — data, gut, consulting others, mapping scenarios, something else?", placeholder:"Walk through the inner sequence..." },
+  { id:'q22', text:"If pressure and obligation weren't steering: paint the life you'd honestly want — not fantasy perfection, just the shape of it. How is it different from where you find yourself right now?", placeholder:"Ideal shape vs present reality..." },
 ];
 
 // ── STATE ──────────────────────────────
@@ -2282,6 +2419,9 @@ function collectChatResponses() {
     ch6c: chatAnswers.q18 || '',
     ch6d: chatAnswers.q19 || '',
     currentRole: chatAnswers.q19 || '',
+    ch7a: chatAnswers.q20 || '',
+    ch7b: chatAnswers.q21 || '',
+    ch7c: chatAnswers.q22 || '',
     canvasScores,
     canvasTexts,
   };
