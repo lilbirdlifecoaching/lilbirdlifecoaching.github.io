@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- lilbird deep-profile build: v4-dual-20260509 (22 chat Qs + expression vs baseline UI; requires worker v4) -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1029,7 +1030,7 @@
     <div class="btn-row">
       <button class="btn btn-gold" onclick="startChat()">Begin → 🐦</button>
     </div>
-    <p class="intro-note">Takes about 20–25 minutes. The more honest you are, the more accurate it gets.</p>
+    <p class="intro-note">Takes about 20–25 minutes — <strong>22</strong> story questions, then the Life Canvas. The more honest you are, the more accurate it gets.</p>
   </div>
 </div>
 
@@ -1529,7 +1530,9 @@
 // ═══════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════
+const DEEP_PROFILE_BUILD = 'v4-dual-20260509';
 const WORKER_URL     = 'https://lilbird-assessment.cwwq46sn7m.workers.dev';
+console.info("lil' bird deep profile", DEEP_PROFILE_BUILD, '| questions:', 22, '| worker:', WORKER_URL);
 const STRIPE_PK      = 'pk_live_51QSMYQGAu36WZ7DdlsoNqzwPnsf4HUoOj6F1NZAeGnnH1TPjDEdEQudXIGgTLaUq079aQMI1W2MS6UpMItmTjgxy00HbouBx2g';
 const SHEETS_URL     = 'https://script.google.com/macros/s/AKfycbwPoMHcmTKO8JiDt8VS4fVsvGKqw-CQGLktQKImKeUPsfqX7WhH1IJCsG2M2fF7lyL6/exec';
 const BEEHIIV_PUB_ID = '53a4cafc-9b30-41d5-bd5e-4dc0026b4308';
@@ -2042,8 +2045,19 @@ function renderResults(profile){
   setSection('result-remember',  profile.thingsToRemember);
   setSection('result-stuck',     profile.stuckPlaces);
 
-  // Wing title
-  if(profile.wingTitle) document.getElementById('result-wing-title').textContent=profile.wingTitle;
+  // Wing title — baseline wings only in copy; label clarifies when expression ≠ baseline
+  const wingTitleEl=document.getElementById('result-wing-title');
+  if(wingTitleEl && profile.wingTitle){
+    const base=profile.likelyCoreEnneagram||'';
+    const expr=profile.enneagram||'';
+    let label=profile.wingTitle;
+    if(base && expr && base!==expr){
+      label=`${profile.wingTitle} (for ${base})`;
+    }else if(base){
+      label=`${profile.wingTitle} (${base})`;
+    }
+    wingTitleEl.textContent=label;
+  }
 
   // Quote
   if(profile.quote) document.querySelector('#result-quote blockquote').textContent=`"${profile.quote}"`;
