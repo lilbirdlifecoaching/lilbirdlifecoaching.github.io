@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- lilbird deep-profile build: v4-dual-20260509 (22 chat Qs + expression vs baseline UI; requires worker v4) -->
+<!-- lilbird deep-profile build: v5-stress-20260509 (27 chat Qs + stress-aware dual read; requires worker v5) -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1030,7 +1030,7 @@
     <div class="btn-row">
       <button class="btn btn-gold" onclick="startChat()">Begin → 🐦</button>
     </div>
-    <p class="intro-note">Takes about 20–25 minutes — <strong>22</strong> story questions, then the Life Canvas. The more honest you are, the more accurate it gets.</p>
+    <p class="intro-note">Takes about 25–30 minutes — <strong>27</strong> story questions, then the Life Canvas. The more honest you are, the more accurate it gets.</p>
   </div>
 </div>
 
@@ -1530,9 +1530,9 @@
 // ═══════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════
-const DEEP_PROFILE_BUILD = 'v4-dual-20260509';
+const DEEP_PROFILE_BUILD = 'v5-stress-20260509';
 const WORKER_URL     = 'https://lilbird-assessment.cwwq46sn7m.workers.dev';
-console.info("lil' bird deep profile", DEEP_PROFILE_BUILD, '| questions:', 22, '| worker:', WORKER_URL);
+console.info("lil' bird deep profile", DEEP_PROFILE_BUILD, '| questions:', 27, '| worker:', WORKER_URL);
 const STRIPE_PK      = 'pk_live_51QSMYQGAu36WZ7DdlsoNqzwPnsf4HUoOj6F1NZAeGnnH1TPjDEdEQudXIGgTLaUq079aQMI1W2MS6UpMItmTjgxy00HbouBx2g';
 const SHEETS_URL     = 'https://script.google.com/macros/s/AKfycbwPoMHcmTKO8JiDt8VS4fVsvGKqw-CQGLktQKImKeUPsfqX7WhH1IJCsG2M2fF7lyL6/exec';
 const BEEHIIV_PUB_ID = '53a4cafc-9b30-41d5-bd5e-4dc0026b4308';
@@ -1819,6 +1819,11 @@ function collectResponses(){
   r.ch7a = document.getElementById('c7a')?.value?.trim()||'';
   r.ch7b = document.getElementById('c7b')?.value?.trim()||'';
   r.ch7c = document.getElementById('c7c')?.value?.trim()||'';
+  r.ch7d = document.getElementById('c7d')?.value?.trim()||'';
+  r.ch7e = document.getElementById('c7e')?.value?.trim()||'';
+  r.ch7f = document.getElementById('c7f')?.value?.trim()||'';
+  r.ch7g = document.getElementById('c7g')?.value?.trim()||'';
+  r.ch7h = document.getElementById('c7h')?.value?.trim()||'';
   r.canvasScores  = canvasScores;
   r.canvasTexts   = canvasTexts;
   return r;
@@ -2265,6 +2270,13 @@ const QUESTIONS = [
   { id:'q20', text:"Step outside this week for a moment. When life has felt steadier — not perfect, just not this squeezed — how do you actually recharge after a full day? People, alone, or a mix? What does it look like?", placeholder:"Think of a better season, not a fantasy one..." },
   { id:'q21', text:"Same steadier season: when you make a decision you still respect later, what tends to happen inside you first — data, gut, consulting others, mapping scenarios, something else?", placeholder:"Walk through the inner sequence..." },
   { id:'q22', text:"If pressure and obligation weren't steering: paint the life you'd honestly want — not fantasy perfection, just the shape of it. How is it different from where you find yourself right now?", placeholder:"Ideal shape vs present reality..." },
+
+  // Chapter 7 (extended) — baseline-discriminating
+  { id:'q23', text:"Think back to a season before this one — even years ago — when life felt like it was working and you felt most yourself. What were you like then? What did people say about you that they don't say now?", placeholder:"Who were you when you were on top of your game..." },
+  { id:'q24', text:"When you're at your best version of yourself — not most successful, most YOU — what does that look like in a normal week?", placeholder:"Energy, focus, mood, what you're doing..." },
+  { id:'q25', text:"What's something you used to do or be that you've drifted from — and you suspect you shouldn't have?", placeholder:"What you miss being or doing..." },
+  { id:'q26', text:"When you make a plan or set a goal, do you light up at possibility or lock into execution? Which one comes first, honestly — and what does the other feel like?", placeholder:"Possibility vs execution — which is the buzz..." },
+  { id:'q27', text:"When something is boring or repetitive, what actually happens to you internally? Do you wilt, comply, find something else to do, or get oddly satisfied by it?", placeholder:"Honest reaction to boredom..." },
 ];
 
 // ── STATE ──────────────────────────────
@@ -2436,6 +2448,11 @@ function collectChatResponses() {
     ch7a: chatAnswers.q20 || '',
     ch7b: chatAnswers.q21 || '',
     ch7c: chatAnswers.q22 || '',
+    ch7d: chatAnswers.q23 || '',
+    ch7e: chatAnswers.q24 || '',
+    ch7f: chatAnswers.q25 || '',
+    ch7g: chatAnswers.q26 || '',
+    ch7h: chatAnswers.q27 || '',
     canvasScores,
     canvasTexts,
   };
