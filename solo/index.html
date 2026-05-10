@@ -297,6 +297,23 @@
       .chat-textarea { font-size: 16px; }
       .complete-panel { border-radius: 0; margin-top: 0; border-left: none; border-right: none; }
     }
+
+    /* ── Stripe checkout modal ─────────────────────────────── */
+    .checkout-modal { position: fixed; inset: 0; z-index: 1000; background: rgba(15, 16, 22, 0.92); backdrop-filter: blur(8px); display: none; align-items: flex-start; justify-content: center; padding: 2rem 1rem; overflow-y: auto; animation: fadeIn 0.2s ease; }
+    .checkout-modal.active { display: flex; }
+    .checkout-modal-inner { background: var(--dark-card); border: 1px solid var(--gold-border); border-radius: 20px; width: 100%; max-width: 540px; padding: 1.5rem 1.25rem 1.25rem; position: relative; margin-top: 2rem; box-shadow: 0 30px 80px rgba(0,0,0,0.5); }
+    .checkout-modal-header { display: flex; align-items: center; justify-content: space-between; padding: 0 0.5rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 1rem; }
+    .checkout-modal-title { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); }
+    .checkout-modal-close { background: transparent; border: none; color: var(--text-dim); font-size: 1.5rem; line-height: 1; cursor: pointer; padding: 0.25rem 0.5rem; border-radius: 4px; transition: color 0.15s, background 0.15s; }
+    .checkout-modal-close:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+    .checkout-modal-body { min-height: 400px; }
+    .checkout-loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem 1rem; color: var(--text-dim); gap: 1rem; }
+    .checkout-loading-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); animation: pulse 1.2s infinite ease-in-out; }
+    .checkout-loading-text { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; }
+    .checkout-error { padding: 2rem 1rem; text-align: center; color: var(--ember); }
+    .checkout-error p { color: var(--text-dim); font-size: 0.85rem; line-height: 1.7; margin: 0.5rem 0 0; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes pulse { 0%, 100% { opacity: 0.3; transform: scale(0.85); } 50% { opacity: 1; transform: scale(1); } }
   </style>
 </head>
 <body>
@@ -394,11 +411,32 @@
     </div>
   </div>
 
+  <!-- Stripe Embedded Checkout modal — mounted on demand from the purchase gate -->
+  <div id="checkout-modal" class="checkout-modal" role="dialog" aria-modal="true" aria-labelledby="checkout-modal-title">
+    <div class="checkout-modal-inner">
+      <div class="checkout-modal-header">
+        <div class="checkout-modal-title" id="checkout-modal-title">Secure checkout · Stripe</div>
+        <button class="checkout-modal-close" id="checkout-modal-close" aria-label="Close checkout">×</button>
+      </div>
+      <div class="checkout-modal-body" id="checkout-modal-body">
+        <div class="checkout-loading" id="checkout-loading">
+          <div class="checkout-loading-dot"></div>
+          <div class="checkout-loading-text">Preparing checkout…</div>
+        </div>
+        <div id="checkout-mount"></div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="https://js.stripe.com/v3/"></script>
   <script>
     const SUPABASE_URL  = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
     const WORKER_URL    = 'https://worker-solo.cwwq46sn7m.workers.dev';
+    // Stripe publishable key — safe to ship in client code.
+    // Use pk_test_... while testing, swap to pk_live_... when going live.
+    const STRIPE_PUBLISHABLE_KEY = 'pk_live_51QSMYQGAu36WZ7DdlsoNqzwPnsf4HUoOj6F1NZAeGnnH1TPjDEdEQudXIGgTLaUq079aQMI1W2MS6UpMItmTjgxy00HbouBx2g';
     const { createClient } = supabase;
     const sb = createClient(SUPABASE_URL, SUPABASE_ANON, {
       auth: { storageKey: 'lilbird-solo-auth', autoRefreshToken: true, persistSession: true, detectSessionInUrl: false }
@@ -415,8 +453,14 @@
       { number: 7, tag: 'Session 07', title: 'Full Flight', desc: "You've done the work. Now own it. This session pulls everything together into a plan that's genuinely yours — and a document worth keeping.", teaser: "Your story. Your vision. Your plan. All of it — yours.", color: '#F5C842', emoji: '🪶', dim: 'rgba(245,200,66,0.12)', border: 'rgba(245,200,66,0.22)', minExchanges: 6, videoLen: '5 min', duration: '50–70 min', videoUrl: 'https://pub-f84f2be51fb44bd69d2d2271666a9506.r2.dev/session-7.mp4', completeTitle: "Full flight.", completeDesc: "You showed up. You did the work. You went to the places most people avoid. Your Full Flight Plan is being assembled.", tools: [ { name: 'Full Flight Plan', file: 'tools/tool-full-flight-plan.html', tag: 'Final output' }, { name: 'Glow Map — final', file: 'tools/tool-glow-map.html', tag: 'Before/after' } ] },
     ];
 
-    const PROMO_CODES = { 'SOLO50': { discount: 0.5, label: '50% off applied — $48.50' }, 'IMREADY': { discount: 0.25, label: '25% off applied — $72.75' } };
-    const BASE_PRICE = 97;
+    const BASE_PRICE = 197;
+    function formatPrice(amount) {
+      const n = Number(amount);
+      return '$' + (Number.isInteger(n) ? n : n.toFixed(2));
+    }
+    const PROMO_CODES = {
+      'SOLO50': { discount: 0.5, label: () => '50% off applied — ' + formatPrice(BASE_PRICE * 0.5) },
+    };
 
     function getDbKey(toolKey, sessionNumber) {
       var sn = sessionNumber !== undefined ? sessionNumber : (activeSession ? activeSession.number : 0);
@@ -496,6 +540,7 @@
         await loadToolOutputs();
         renderDashboard();
         showView('view-dashboard');
+        await handlePostPurchaseReturn();
       } catch (err) { console.error('Dashboard error:', err); showView('view-auth'); }
     }
 
@@ -531,7 +576,7 @@
       const content = document.getElementById('dash-content');
       if (!purchased) {
         document.getElementById('dash-progress').style.display = 'none';
-        document.getElementById('dash-subtext').textContent = 'Seven sessions. Your pace. The same depth as working with a coach — in a format built around you.';
+        document.getElementById('dash-subtext').textContent = 'Eight sessions. Your pace. The same depth as working with a coach — in a format built around you.';
         content.innerHTML = renderPurchaseGate(); bindPurchaseGate(); return;
       }
       document.getElementById('dash-subtext').textContent = 'Pick up where you left off. The work you do between sessions matters as much as the sessions themselves.';
@@ -562,17 +607,153 @@
     }
 
     function renderPurchaseGate() {
-      return '<div class="purchase-gate"><span class="bird-glyph">🪶</span><h3>Ready to begin?</h3><p>Seven sessions. Fully self-paced. An AI coaching guide that actually listens — and tools that help you see yourself clearly.</p><div class="purchase-price"><div class="price-amount" id="display-price">$97</div><div class="price-label">one-time · lifetime access</div></div><div class="promo-input-wrap"><input class="promo-input" id="promo-input" type="text" placeholder="Have a promo code?" /><button class="btn-apply-promo" id="btn-apply-promo">Apply</button></div><div class="promo-message" id="promo-message"></div><button class="btn-purchase" id="btn-purchase">Begin my journey →</button></div>';
+      return '<div class="purchase-gate"><span class="bird-glyph">🪶</span><h3>Ready to begin?</h3><p>Eight sessions. Fully self-paced. An AI coaching guide that actually listens — and tools that help you see yourself clearly.</p><div class="purchase-price"><div class="price-amount" id="display-price">'+formatPrice(BASE_PRICE)+'</div><div class="price-label">one-time · lifetime access</div></div><div class="promo-input-wrap"><input class="promo-input" id="promo-input" type="text" placeholder="Have a promo code?" /><button class="btn-apply-promo" id="btn-apply-promo">Apply</button></div><div class="promo-message" id="promo-message"></div><button class="btn-purchase" id="btn-purchase">Begin my journey →</button></div>';
     }
 
     function bindPurchaseGate() {
       document.getElementById('btn-apply-promo').addEventListener('click', () => {
         const code = document.getElementById('promo-input').value.trim().toUpperCase();
         const promo = PROMO_CODES[code], msgEl = document.getElementById('promo-message'), priceEl = document.getElementById('display-price');
-        if (promo) { activePromo = promo; const final = (BASE_PRICE*(1-promo.discount)).toFixed(2); priceEl.textContent = '$'+(parseFloat(final)%1===0?parseInt(final):final); msgEl.textContent = promo.label; msgEl.className = 'promo-message promo-success'; }
-        else { activePromo = null; priceEl.textContent = '$'+BASE_PRICE; msgEl.textContent = code ? "That code doesn't look right." : ''; msgEl.className = 'promo-message promo-error'; }
+        if (promo) {
+          activePromo = { ...promo, code };
+          priceEl.textContent = formatPrice(BASE_PRICE * (1 - promo.discount));
+          msgEl.textContent = typeof promo.label === 'function' ? promo.label() : promo.label;
+          msgEl.className = 'promo-message promo-success';
+        } else if (code) {
+          // Unknown to the frontend — still send to Stripe, which is the source
+          // of truth. If Stripe doesn't recognise it either, checkout opens at
+          // full price and the user can re-type inside the embedded form.
+          activePromo = { code, discount: 0, label: code + ' will be checked at checkout' };
+          priceEl.textContent = formatPrice(BASE_PRICE);
+          msgEl.textContent = code + ' will be applied at checkout if valid.';
+          msgEl.className = 'promo-message promo-success';
+        } else {
+          activePromo = null;
+          priceEl.textContent = formatPrice(BASE_PRICE);
+          msgEl.textContent = '';
+          msgEl.className = 'promo-message';
+        }
       });
-      document.getElementById('btn-purchase').addEventListener('click', () => { const price = activePromo ? (BASE_PRICE*(1-activePromo.discount)).toFixed(2) : BASE_PRICE; alert('Stripe checkout coming soon.\nPrice: $'+price+'\nUser: '+currentUser.email); });
+      document.getElementById('btn-purchase').addEventListener('click', startCheckout);
+    }
+
+    // ── Stripe Embedded Checkout ─────────────────────────────────────
+    // Lifecycle:
+    //   1. POST { user_id, email, promo_code? } → /create-checkout-session
+    //   2. Mount stripe.initEmbeddedCheckout({ clientSecret }) into #checkout-mount
+    //   3. Stripe handles the payment UI inside the modal
+    //   4. On successful payment, Stripe redirects to return_url:
+    //        https://lilbird.life/solo?purchase=success&session_id=...
+    //      which is detected by handlePostPurchaseReturn() on the next page load.
+    let stripeInstance = null;
+    let embeddedCheckout = null;
+    function getStripe() {
+      if (!stripeInstance) {
+        if (typeof Stripe !== 'function') throw new Error('Stripe.js failed to load.');
+        if (!STRIPE_PUBLISHABLE_KEY || STRIPE_PUBLISHABLE_KEY.includes('REPLACE_ME')) {
+          throw new Error('Stripe publishable key is not configured.');
+        }
+        stripeInstance = Stripe(STRIPE_PUBLISHABLE_KEY);
+      }
+      return stripeInstance;
+    }
+
+    async function startCheckout() {
+      const btn = document.getElementById('btn-purchase');
+      if (btn) { btn.disabled = true; btn.textContent = 'Opening checkout…'; }
+
+      openCheckoutModal();
+
+      try {
+        const stripe = getStripe();
+
+        const res = await fetch(WORKER_URL + '/create-checkout-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id:    currentUser.id,
+            email:      currentUser.email,
+            promo_code: activePromo ? activePromo.code : null,
+          }),
+        });
+
+        if (!res.ok) {
+          const errBody = await res.json().catch(() => ({}));
+          throw new Error(errBody.error || 'Could not start checkout (HTTP ' + res.status + ').');
+        }
+
+        const { client_secret } = await res.json();
+        if (!client_secret) throw new Error('Stripe did not return a checkout session.');
+
+        if (embeddedCheckout) { try { embeddedCheckout.destroy(); } catch(e){} embeddedCheckout = null; }
+
+        embeddedCheckout = await stripe.initEmbeddedCheckout({ clientSecret: client_secret });
+        document.getElementById('checkout-loading').style.display = 'none';
+        embeddedCheckout.mount('#checkout-mount');
+
+      } catch (err) {
+        console.error('Checkout error:', err);
+        showCheckoutError(err.message || 'Something went wrong starting checkout.');
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = 'Begin my journey →'; }
+      }
+    }
+
+    function openCheckoutModal() {
+      document.getElementById('checkout-mount').innerHTML = '';
+      document.getElementById('checkout-loading').style.display = '';
+      document.getElementById('checkout-modal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeCheckoutModal() {
+      document.getElementById('checkout-modal').classList.remove('active');
+      document.body.style.overflow = '';
+      if (embeddedCheckout) { try { embeddedCheckout.destroy(); } catch(e){} embeddedCheckout = null; }
+      document.getElementById('checkout-mount').innerHTML = '';
+    }
+
+    function showCheckoutError(msg) {
+      document.getElementById('checkout-loading').style.display = 'none';
+      document.getElementById('checkout-mount').innerHTML =
+        '<div class="checkout-error"><strong>Couldn\'t start checkout</strong><p>' +
+        (msg || 'Please try again, or email hello@lilbird.life if this keeps happening.') +
+        '</p></div>';
+    }
+
+    document.getElementById('checkout-modal-close').addEventListener('click', closeCheckoutModal);
+    document.getElementById('checkout-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'checkout-modal') closeCheckoutModal();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && document.getElementById('checkout-modal').classList.contains('active')) closeCheckoutModal();
+    });
+
+    // Detect return from Stripe Checkout (?purchase=success&session_id=...).
+    // The webhook is the source of truth for purchased_at, but it can race the
+    // redirect by 1–3 seconds, so we poll briefly until the profile updates.
+    async function handlePostPurchaseReturn() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('purchase') !== 'success') return;
+      if (!currentUser) return;
+
+      for (let attempt = 0; attempt < 6; attempt++) {
+        try {
+          const { data: profile } = await sb.from('course_users').select('*').eq('id', currentUser.id).single();
+          if (profile && profile.purchased_at) {
+            userProfile = profile;
+            break;
+          }
+        } catch (e) { /* retry */ }
+        await new Promise(r => setTimeout(r, 1000));
+      }
+
+      const cleanUrl = window.location.pathname + window.location.hash;
+      window.history.replaceState({}, document.title, cleanUrl);
+
+      await loadSessionProgress();
+      await loadToolOutputs();
+      renderDashboard();
     }
 
     async function bypassGate(nextSession) {
