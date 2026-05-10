@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- lilbird deep-profile build: v5.3-preview-20260509 (adds mid-flow "I heard you say…" preview/clarification step between canvas and final read; requires worker v5.3) -->
+<!-- lilbird deep-profile build: v6.0-phase1-20260509 (Phase 1: chat chips + particles + saved-flash + plain-language archetypes + tooltip glossary + confidence badges + clarify-card source context; requires worker v6.0) -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -783,6 +783,269 @@
     margin-top: 1rem;
   }
 
+  /* ─── v6.0 — TAP-TO-ANSWER CHIPS ──────────────────────────── */
+  .chat-chips-wrap {
+    margin: 0.75rem 0 1.1rem;
+    display: none;
+  }
+  .chat-chips-wrap.is-active { display: block; }
+  .chat-chips-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    opacity: 0.65;
+    margin-bottom: 0.55rem;
+    display: block;
+  }
+  .chat-chips-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .chat-chip {
+    background: rgba(245,200,66,0.05);
+    border: 1px solid rgba(245,200,66,0.18);
+    border-radius: 100px;
+    padding: 0.45rem 0.95rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.18s;
+    line-height: 1.3;
+  }
+  .chat-chip:hover {
+    background: rgba(245,200,66,0.12);
+    border-color: rgba(245,200,66,0.45);
+    color: var(--gold);
+    transform: translateY(-1px);
+  }
+  .chat-chip:active { transform: translateY(0); }
+
+  /* ─── v6.0 — "✓ Saved" mini flash (matches lil' bird tool family) ── */
+  .saved-flash {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(74,222,168,0.12);
+    border: 1px solid rgba(74,222,168,0.4);
+    color: #4adea8;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    padding: 0.5rem 1.1rem;
+    border-radius: 100px;
+    pointer-events: none;
+    opacity: 0;
+    transition: all 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 9000;
+    backdrop-filter: blur(6px);
+  }
+  .saved-flash.is-visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ─── v6.0 — PARTICLE DRIFT (matches Deep Roots tool aesthetic) ─── */
+  .particle-drift {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .particle-drift > .ember {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    opacity: 0;
+    animation: ember-drift linear infinite;
+  }
+  .particle-drift > .ember:nth-child(1)  { left:  6%; background: #F5C842; animation-duration: 22s; animation-delay:  0s; }
+  .particle-drift > .ember:nth-child(2)  { left: 14%; background: #c9a130; animation-duration: 28s; animation-delay: -4s; }
+  .particle-drift > .ember:nth-child(3)  { left: 22%; background: #F5C842; animation-duration: 19s; animation-delay: -2s; opacity: 0; width: 2px; height: 2px; }
+  .particle-drift > .ember:nth-child(4)  { left: 31%; background: #e8734a; animation-duration: 33s; animation-delay: -7s; }
+  .particle-drift > .ember:nth-child(5)  { left: 40%; background: #F5C842; animation-duration: 25s; animation-delay: -12s; }
+  .particle-drift > .ember:nth-child(6)  { left: 49%; background: #7eb8c9; animation-duration: 30s; animation-delay: -3s; width: 2px; height: 2px; }
+  .particle-drift > .ember:nth-child(7)  { left: 58%; background: #c9a130; animation-duration: 24s; animation-delay: -9s; }
+  .particle-drift > .ember:nth-child(8)  { left: 66%; background: #F5C842; animation-duration: 35s; animation-delay: -15s; }
+  .particle-drift > .ember:nth-child(9)  { left: 74%; background: #9dbf8a; animation-duration: 27s; animation-delay: -6s; width: 2px; height: 2px; }
+  .particle-drift > .ember:nth-child(10) { left: 82%; background: #F5C842; animation-duration: 21s; animation-delay: -11s; }
+  .particle-drift > .ember:nth-child(11) { left: 89%; background: #c9a130; animation-duration: 32s; animation-delay: -18s; }
+  .particle-drift > .ember:nth-child(12) { left: 95%; background: #e8734a; animation-duration: 29s; animation-delay: -8s; width: 2px; height: 2px; }
+  @keyframes ember-drift {
+    0%   { transform: translateY(110vh) translateX(0px) scale(1); opacity: 0; }
+    15%  { opacity: 0.55; }
+    50%  { transform: translateY(50vh)  translateX(14px) scale(1.05); opacity: 0.7; }
+    85%  { opacity: 0.4; }
+    100% { transform: translateY(-10vh) translateX(-8px) scale(0.9); opacity: 0; }
+  }
+  #screen-chat { position: relative; }
+  #screen-chat .chat-screen { position: relative; z-index: 1; }
+
+  /* ─── v6.0 — RESULT: plain-language archetype hero + technical sub ── */
+  .result-archetype-plain {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 2.1rem;
+    color: var(--text-main);
+    line-height: 1.15;
+    margin-bottom: 0.3rem;
+  }
+  .result-archetype-plain-desc {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 0.65rem;
+    max-width: 520px;
+  }
+  .result-archetype-technical {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    opacity: 0.85;
+    margin-bottom: 1.25rem;
+    display: block;
+  }
+
+  /* ─── v6.0 — CONFIDENCE BADGES in tag rows ───────────────── */
+  .ftag.has-glossary { cursor: help; border-bottom-style: dotted; }
+  .conf-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.55rem;
+    border-radius: 100px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.02);
+    color: var(--text-muted);
+    opacity: 0.75;
+    margin-left: 0.35rem;
+    vertical-align: middle;
+  }
+  .conf-badge::before {
+    content: '';
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.85;
+  }
+  .conf-badge.is-high   { color: #4adea8; border-color: rgba(74,222,168,0.3); background: rgba(74,222,168,0.06); opacity: 0.95; }
+  .conf-badge.is-medium { color: var(--gold); border-color: rgba(245,200,66,0.3); background: rgba(245,200,66,0.06); opacity: 0.92; }
+  .conf-badge.is-low    { color: var(--ember); border-color: rgba(232,115,74,0.32); background: rgba(232,115,74,0.06); opacity: 0.92; }
+
+  .confidence-summary {
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(245,200,66,0.1);
+    border-radius: 10px;
+    padding: 0.85rem 1.1rem;
+    margin-top: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .confidence-summary-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    opacity: 0.82;
+  }
+  .confidence-summary-note {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    line-height: 1.55;
+    opacity: 0.92;
+  }
+
+  /* ─── v6.0 — INLINE TOOLTIP GLOSSARY ──────────────────────── */
+  .glossary-popover {
+    position: fixed;
+    z-index: 10000;
+    max-width: 320px;
+    background: var(--dark-mid);
+    border: 1px solid rgba(245,200,66,0.35);
+    border-radius: 10px;
+    padding: 1rem 1.15rem;
+    box-shadow: 0 10px 32px rgba(0,0,0,0.45);
+    color: var(--text-main);
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.18s, transform 0.18s;
+    pointer-events: none;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .glossary-popover.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .glossary-popover-term {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--gold);
+    margin-bottom: 0.55rem;
+  }
+  .glossary-popover-tech {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    opacity: 0.75;
+    margin-bottom: 0.65rem;
+    display: block;
+  }
+  .glossary-popover-body {
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--text-main);
+    opacity: 0.95;
+  }
+  .glossary-popover-body p { margin-bottom: 0.55rem; }
+  .glossary-popover-body p:last-child { margin-bottom: 0; }
+  .glossary-trigger {
+    border-bottom: 1px dotted rgba(245,200,66,0.55);
+    cursor: help;
+    transition: color 0.18s, border-color 0.18s;
+  }
+  .glossary-trigger:hover { color: var(--gold); border-bottom-color: var(--gold); }
+
+  /* ─── v6.0 — preview observation card upgrade ─────────────── */
+  .preview-obs-source {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    opacity: 0.78;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+  .preview-obs-source-chapter {
+    color: var(--text-muted);
+    margin-right: 0.45rem;
+  }
+  .preview-obs-source-chapter::after {
+    content: '·';
+    margin-left: 0.45rem;
+    opacity: 0.4;
+  }
+
   /* ══════════════════════════════════════
      DASHBOARD LAYOUT
   ══════════════════════════════════════ */
@@ -1088,6 +1351,14 @@
      CHAT ASSESSMENT — single unified screen
 ══════════════════════════════════════ -->
 <div class="screen" id="screen-chat">
+  <!-- v6.0: ambient ember drift, matches lil' bird tool family -->
+  <div class="particle-drift" aria-hidden="true">
+    <span class="ember"></span><span class="ember"></span><span class="ember"></span>
+    <span class="ember"></span><span class="ember"></span><span class="ember"></span>
+    <span class="ember"></span><span class="ember"></span><span class="ember"></span>
+    <span class="ember"></span><span class="ember"></span><span class="ember"></span>
+  </div>
+
   <div class="chat-screen">
 
     <div class="chat-messages" id="chat-messages">
@@ -1098,6 +1369,12 @@
       <div class="chat-thinking-dot"></div>
       <div class="chat-thinking-dot"></div>
       <div class="chat-thinking-dot"></div>
+    </div>
+
+    <!-- v6.0: tap-to-answer chips populated per question -->
+    <div class="chat-chips-wrap" id="chat-chips-wrap" aria-label="Quick starters">
+      <span class="chat-chips-label">Or tap a starter — edit, add, or send as-is</span>
+      <div class="chat-chips-row" id="chat-chips-row"></div>
     </div>
 
     <div class="chat-input-area" id="chat-input-area">
@@ -1111,10 +1388,14 @@
       <button class="chat-mic-btn no-speech-hide" id="chat-mic" onclick="toggleChatMic()" type="button" title="Speak your answer">🎤</button>
       <button class="chat-send-btn" id="chat-send" onclick="sendChatAnswer()" type="button">→</button>
     </div>
-    <p class="chat-hint">Press Enter to send · Shift+Enter for new line · 🎤 to speak</p>
+    <p class="chat-hint">Press Enter to send · Shift+Enter for new line · 🎤 to speak · Tap a starter to begin</p>
 
   </div>
 </div>
+
+<!-- v6.0 — global "✓ Saved" mini flash + glossary popover -->
+<div class="saved-flash" id="saved-flash" aria-live="polite">✓ Saved</div>
+<div class="glossary-popover" id="glossary-popover" role="tooltip" aria-hidden="true"></div>
 
 
 <!-- ══════════════════════════════════════
@@ -1408,8 +1689,14 @@
       <p class="eyebrow">your nest</p>
       <h1 id="result-archetype" style="margin-bottom:0.25rem;">The Connector</h1>
       <p id="result-archetype-sub" style="color:var(--gold-dim);font-family:'Playfair Display',serif;font-style:italic;font-size:1.05rem;margin-bottom:0.35rem;"></p>
+      <p id="result-archetype-plain-desc" class="result-archetype-plain-desc" style="display:none;"></p>
+      <span id="result-archetype-technical" class="result-archetype-technical" style="display:none;"></span>
       <p id="result-likely-archetype" style="display:none;color:var(--text-muted);font-family:'Playfair Display',serif;font-style:italic;font-size:0.98rem;margin-bottom:1rem;line-height:1.5;"></p>
       <div class="result-tags result-tags-wrap" id="result-tags"></div>
+      <div class="confidence-summary" id="result-confidence-summary" style="display:none;">
+        <span class="confidence-summary-label">How firm this read is</span>
+        <span class="confidence-summary-note" id="result-confidence-note"></span>
+      </div>
     </div>
 
     <!-- DASHBOARD LAYOUT — profile + sidebar -->
@@ -1631,7 +1918,7 @@
 // ═══════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════
-const DEEP_PROFILE_BUILD = 'v5.3-preview-20260509';
+const DEEP_PROFILE_BUILD = 'v6.0-phase1-20260509';
 const WORKER_URL     = 'https://lilbird-assessment.cwwq46sn7m.workers.dev';
 console.info("lil' bird deep profile", DEEP_PROFILE_BUILD, '| questions:', 27, '| worker:', WORKER_URL);
 const STRIPE_PK      = 'pk_live_51QSMYQGAu36WZ7DdlsoNqzwPnsf4HUoOj6F1NZAeGnnH1TPjDEdEQudXIGgTLaUq079aQMI1W2MS6UpMItmTjgxy00HbouBx2g';
@@ -2026,10 +2313,18 @@ function renderPreview(data){
   const obs = Array.isArray(data.observations) ? data.observations : [];
   if(listEl){
     listEl.innerHTML = obs.map(o => {
-      const id = _escHtml(o.id || '');
-      const quote = _escHtml(o.quote || '');
-      const read  = _escHtml(o.read  || '');
+      const id      = _escHtml(o.id || '');
+      const quote   = _escHtml(o.quote || '');
+      const read    = _escHtml(o.read  || '');
+      const chap    = _escHtml(o.chapter || '');
+      const qShort  = _escHtml(o.questionShort || '');
+      // v6.0: source line shows "Chapter · the question topic" so the user has
+      // context for which answer prompted the read
+      const sourceHtml = (chap || qShort)
+        ? `<span class="preview-obs-source">${chap ? `<span class="preview-obs-source-chapter">${chap}</span>` : ''}${qShort ? `From your answer about ${qShort}` : ''}</span>`
+        : '';
       return `<div class="preview-obs-card" id="preview-card-${id}" data-obs-id="${id}">
+        ${sourceHtml}
         ${quote ? `<div class="preview-obs-quote">${quote}</div>` : ''}
         ${read  ? `<div class="preview-obs-read">${read}</div>`  : ''}
         <div class="preview-obs-actions">
@@ -2111,6 +2406,9 @@ function _collectClarificationsPayload(){
       id: o.id,
       quote: o.quote || '',
       read:  o.read  || '',
+      questionRef:   o.questionRef   || '',
+      questionShort: o.questionShort || '',
+      chapter:       o.chapter       || '',
       status: previewClarifications[o.id].status,
       note:   previewClarifications[o.id].note || '',
     }));
@@ -2199,10 +2497,14 @@ function populateSnapshot(profile){
   }
   const a=document.getElementById('snap-archetype');
   if(a){
-    const nowA=(profile.archetype||'Your Type')+(profile.archetypeSub?' — '+profile.archetypeSub:'');
-    if(profile.likelyCoreArchetype){
-      const sub=profile.likelyCoreArchetypeSub?' — '+profile.likelyCoreArchetypeSub:'';
-      a.innerHTML='<span style="display:block;">'+nowA+'</span><span style="display:block;margin-top:0.35rem;opacity:0.85;font-size:0.92em;">Likely baseline: '+profile.likelyCoreArchetype+sub+'</span>';
+    // v6.0: prefer the plain-language archetype name in the snapshot too
+    const heroPlain = profile.archetypePlain || profile.archetype || 'Your Type';
+    const nowA = heroPlain + (profile.archetypePlainDescription ? ' — ' + profile.archetypePlainDescription : (profile.archetypeSub ? ' — ' + profile.archetypeSub : ''));
+    const baselinePlain = profile.likelyCoreArchetypePlain || profile.likelyCoreArchetype;
+    if(baselinePlain && baselinePlain !== heroPlain){
+      const baseDesc = profile.likelyCoreArchetypePlainDescription || profile.likelyCoreArchetypeSub || '';
+      const sub = baseDesc ? ' — ' + baseDesc : '';
+      a.innerHTML='<span style="display:block;">'+nowA+'</span><span style="display:block;margin-top:0.35rem;opacity:0.85;font-size:0.92em;">Likely baseline: '+baselinePlain+sub+'</span>';
     }else{
       a.textContent=nowA;
     }
@@ -2265,10 +2567,236 @@ async function submitEmail(){
 // ═══════════════════════════════════════
 // RENDER RESULTS
 // ═══════════════════════════════════════
-function _resultTagChip(cls, text){
+// ═══════════════════════════════════════════════════════════════
+// v6.0 — INLINE GLOSSARY SYSTEM
+// Maps technical labels (MBTI, Enneagram types/wings/subtypes, attachment,
+// centre of intelligence, 5 Voices) to plain-English explainers shown as
+// hover/tap popovers in the result.
+// ═══════════════════════════════════════════════════════════════
+const GLOSSARY = (function(){
+  // MBTI four-letter types — each entry: { plain: 'Plain English summary' }
+  const mbtiPlain = {
+    INTJ: 'You see patterns and possibilities first, then plan three moves ahead. Decisive, independent, future-focused.',
+    INTP: 'You think in systems and ideas. Curious, open, slow to commit until something genuinely makes sense.',
+    ENTJ: 'You drive forward with vision and structure. Decisive, organising, allergic to wasted time.',
+    ENTP: 'You spark ideas and play with possibility. Quick, contrarian, energised by debate and what-ifs.',
+    INFJ: 'You read between the lines and feel the meaning of things. Quietly intense, future-oriented, hard to know fully.',
+    INFP: 'You feel the world deeply and live by your values. Imaginative, gentle, fiercely private.',
+    ENFJ: 'You take the temperature of a room and warm it. Relational, future-thinking, want everyone to land well.',
+    ENFP: 'You light up with people and possibility. Curious, expressive, follow the energy.',
+    ISTJ: 'You keep the world running on what works. Steady, responsible, value evidence and tradition.',
+    ISFJ: 'You hold the people around you. Warm, thorough, remember the small things others forget.',
+    ESTJ: 'You organise reality into something that runs. Direct, structured, trust what has been proven.',
+    ESFJ: 'You knit people together. Warm, attentive, attuned to the emotional weather of the group.',
+    ISTP: 'You watch first, then act precisely. Quietly capable, hands-on, allergic to fuss.',
+    ISFP: 'You live by what feels true and beautiful. Gentle, present, expressive in your own way.',
+    ESTP: 'You move on the moment. Direct, action-led, full presence with what is in front of you.',
+    ESFP: 'You bring warmth, presence and joy. Spontaneous, expressive, alive in the room.',
+  };
+  // Enneagram core types — each entry: { plain }
+  const ennPlain = {
+    1: 'The principled improver. Driven to do things rightly, holds high standards for self and the world.',
+    2: 'The warm helper. Tunes in to what others need; gives generously, struggles to receive.',
+    3: 'The accomplished achiever. Performance-oriented, image-aware, drawn to visible success.',
+    4: 'The deep individualist. Feels things vividly; longs to be authentic and rare.',
+    5: 'The observant thinker. Pulls back to study, conserves energy, prizes competence and privacy.',
+    6: 'The loyal questioner. Scans for risk, deeply trustworthy, seeks safety and certainty.',
+    7: 'The bright explorer. Future-focused, allergic to limitation, chases possibility and stimulation.',
+    8: 'The strong protector. Decisive, direct, defends the vulnerable and refuses to be controlled.',
+    9: 'The peacemaker. Harmonising, easygoing, struggles to know and assert their own preference.',
+  };
+  function ennEntry(num){
+    return { plain: ennPlain[num] || '' };
+  }
+  // Enneagram with wing — handles "Enneagram 7w8", "7w8", etc.
+  function parseEnneagramWithWing(label){
+    const m = String(label||'').match(/(\d)\s*w\s*(\d)/i);
+    if(!m) {
+      const c = String(label||'').match(/(\d)/);
+      return c ? { core: c[1], wing: '' } : null;
+    }
+    return { core: m[1], wing: m[2] };
+  }
+  function attachmentEntry(label){
+    const t = String(label||'').toLowerCase();
+    if(t.includes('avoid'))   return { plain: 'You self-protect by creating distance. Independence comes easily; closeness asks something of you.' };
+    if(t.includes('disorg'))  return { plain: 'You move toward and away in close relationships. Connection is wanted and feared at the same time.' };
+    if(t.includes('anxious') && t.includes('secure')) return { plain: 'You can connect deeply, but under stress you scan for whether the bond is safe. You read closely.' };
+    if(t.includes('anxious')) return { plain: 'You attune very closely to the people you love and worry about the bond when stressed.' };
+    if(t.includes('secure'))  return { plain: 'You move toward connection without losing yourself. Trust comes more easily than it does for most.' };
+    return { plain: 'How you tend to bond with the people closest to you under pressure.' };
+  }
+  function centreEntry(label){
+    const t = String(label||'').toLowerCase();
+    if(t.includes('head'))  return { plain: 'You process the world through thought first — analysis, scenarios, planning. Mental energy is your default lens.' };
+    if(t.includes('heart')) return { plain: 'You process the world through relationship and image first — what does this mean for me, for them, for the bond?' };
+    if(t.includes('gut') || t.includes('body')) return { plain: 'You process the world through instinct and embodied response first — the body knows before the mind catches up.' };
+    return { plain: 'Your default channel for taking in and responding to the world.' };
+  }
+  const subtypePlain = {
+    'self-preservation': 'Tunes in first to safety, comfort, energy, money, food, sleep — the body and the basics.',
+    'self-pres': 'Tunes in first to safety, comfort, energy, money, food, sleep — the body and the basics.',
+    'sp': 'Tunes in first to safety, comfort, energy, money, food, sleep — the body and the basics.',
+    'social': 'Tunes in first to belonging, role, group dynamics, contribution — where do I fit, who is my people?',
+    'so': 'Tunes in first to belonging, role, group dynamics, contribution — where do I fit, who is my people?',
+    'sexual': 'Tunes in first to one-on-one intensity, chemistry, deep particular bonds — the few that matter most.',
+    'one-to-one': 'Tunes in first to one-on-one intensity, chemistry, deep particular bonds — the few that matter most.',
+    'sx': 'Tunes in first to one-on-one intensity, chemistry, deep particular bonds — the few that matter most.',
+  };
+  function subtypeEntry(label){
+    const key = String(label||'').toLowerCase().trim().replace(/\s+subtype$/, '');
+    return { plain: subtypePlain[key] || 'One of three Enneagram instinctual subtypes — where your core type points its first attention.' };
+  }
+  const voicesPlain = {
+    Pioneer:   'Driving forward, future-focused, decisive. Lights up at vision and direction.',
+    Connector: 'Relationally warm, persuasive, keeps people engaged and enrolled.',
+    Creative:  'Sees possibilities others miss. Imaginative, system-thinking, generative.',
+    Guardian:  'Steady, responsible, protects what matters. Catches what others overlook.',
+    Nurturer:  'Tunes in to people, holds the group, attends to wellbeing first.',
+  };
+  function voicesEntry(label){
+    const key = String(label||'').trim();
+    return { plain: voicesPlain[key] || 'One of the five GiANT voices — your most natural register in groups and leadership.' };
+  }
+
+  // Lookup function: takes a typed label, returns { term, technical, body }
+  function lookup(text){
+    if(!text) return null;
+    const raw = String(text).trim();
+
+    // MBTI — take first 4-letter all-caps token
+    const mbtiM = raw.match(/^([IE][NS][TF][JP])\b/);
+    if(mbtiM) {
+      const k = mbtiM[1];
+      const p = mbtiPlain[k];
+      if(p) return {
+        term: k,
+        technical: 'MBTI · 4-letter type',
+        body: `<p>${p}</p><p style="opacity:0.75;font-style:italic;">The four letters describe how you draw energy, take in information, decide, and prefer to live day to day.</p>`,
+      };
+    }
+
+    // Enneagram with optional wing — "Enneagram 7w8" or "Enneagram 4"
+    if(/enneagram\s*\d/i.test(raw) || /^\d(w\d)?$/.test(raw)) {
+      const parsed = parseEnneagramWithWing(raw);
+      if(parsed){
+        const coreEntry = ennEntry(parsed.core);
+        let body = `<p>${coreEntry.plain}</p>`;
+        if(parsed.wing){
+          const wingEntry = ennEntry(parsed.wing);
+          body += `<p style="opacity:0.85;"><strong>Wing ${parsed.wing}:</strong> ${wingEntry.plain}</p>`;
+          body += `<p style="opacity:0.7;font-style:italic;">A "wing" is the neighbouring type that flavours your core. You're a ${parsed.core} with a ${parsed.wing} accent.</p>`;
+        } else {
+          body += `<p style="opacity:0.7;font-style:italic;">The Enneagram is a 9-type system describing core motivations and how each type moves under stress and growth.</p>`;
+        }
+        return { term: `Enneagram ${parsed.core}${parsed.wing ? 'w'+parsed.wing : ''}`, technical: 'Enneagram · core' + (parsed.wing ? ' + wing' : ''), body };
+      }
+    }
+
+    // Subtype
+    if(/subtype/i.test(raw) || /^(self-?pres(ervation)?|social|sexual|sp|so|sx|one-to-one)$/i.test(raw.trim())){
+      const e = subtypeEntry(raw);
+      return { term: raw, technical: 'Enneagram · instinctual subtype', body: `<p>${e.plain}</p><p style="opacity:0.7;font-style:italic;">Three subtypes (self-pres, social, sexual) describe where your core type spends its first attention.</p>` };
+    }
+
+    // Attachment styles
+    if(/attach|secure|anxious|avoid|disorganis|disorganized/i.test(raw)){
+      const e = attachmentEntry(raw);
+      return { term: raw, technical: 'Attachment · relational style', body: `<p>${e.plain}</p><p style="opacity:0.7;font-style:italic;">Attachment style describes the patterns you fall into in close relationships under stress.</p>` };
+    }
+
+    // Centre of intelligence
+    if(/centre|center/i.test(raw) || /^(head|heart|gut|body)$/i.test(raw)){
+      const e = centreEntry(raw);
+      return { term: raw, technical: 'Enneagram · centre of intelligence', body: `<p>${e.plain}</p><p style="opacity:0.7;font-style:italic;">Each Enneagram type belongs to one of three centres (head, heart, gut) — your dominant processing channel.</p>` };
+    }
+
+    // 5 Voices
+    if(/^5V:/.test(raw) || /\b(Pioneer|Connector|Creative|Guardian|Nurturer)\b/.test(raw)){
+      const m = raw.match(/Pioneer|Connector|Creative|Guardian|Nurturer/);
+      if(m){
+        const e = voicesEntry(m[0]);
+        return { term: raw, technical: '5 Voices · GiANT framework', body: `<p>${e.plain}</p><p style="opacity:0.7;font-style:italic;">The 5 Voices is a framework of five core leadership/relational voices — yours are ordered by how naturally each one comes.</p>` };
+      }
+    }
+
+    return null;
+  }
+
+  // Wire up the popover element
+  function showPopover(triggerEl){
+    const pop = document.getElementById('glossary-popover');
+    if(!pop || !triggerEl) return;
+    const data = lookup(triggerEl.getAttribute('data-glossary') || triggerEl.textContent);
+    if(!data) return;
+    pop.innerHTML = `
+      <div class="glossary-popover-term">${data.term}</div>
+      <span class="glossary-popover-tech">${data.technical}</span>
+      <div class="glossary-popover-body">${data.body}</div>
+    `;
+    // Position above trigger, clamped to viewport
+    const r = triggerEl.getBoundingClientRect();
+    pop.style.visibility = 'hidden';
+    pop.classList.add('is-visible');
+    const popRect = pop.getBoundingClientRect();
+    let left = r.left + (r.width / 2) - (popRect.width / 2);
+    left = Math.max(12, Math.min(window.innerWidth - popRect.width - 12, left));
+    let top = r.top - popRect.height - 10;
+    if(top < 12) top = r.bottom + 10;
+    pop.style.left = left + 'px';
+    pop.style.top  = top + 'px';
+    pop.style.visibility = '';
+    pop.setAttribute('aria-hidden', 'false');
+  }
+  function hidePopover(){
+    const pop = document.getElementById('glossary-popover');
+    if(!pop) return;
+    pop.classList.remove('is-visible');
+    pop.setAttribute('aria-hidden', 'true');
+  }
+
+  return { lookup, showPopover, hidePopover };
+})();
+
+// Initialize glossary event listeners after DOM is ready
+function initGlossaryHandlers(){
+  document.addEventListener('mouseover', (e) => {
+    const t = e.target.closest('.glossary-trigger');
+    if(t) GLOSSARY.showPopover(t);
+  });
+  document.addEventListener('mouseout', (e) => {
+    const t = e.target.closest('.glossary-trigger');
+    if(t) GLOSSARY.hidePopover();
+  });
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('.glossary-trigger');
+    if(t) {
+      e.preventDefault();
+      // On touch, toggle: if popover already showing for this trigger, hide
+      const pop = document.getElementById('glossary-popover');
+      if(pop && pop.classList.contains('is-visible')) GLOSSARY.hidePopover();
+      else GLOSSARY.showPopover(t);
+      return;
+    }
+    // Click outside dismisses
+    if(!e.target.closest('#glossary-popover')) GLOSSARY.hidePopover();
+  });
+  window.addEventListener('scroll', () => GLOSSARY.hidePopover(), { passive: true });
+  window.addEventListener('resize', () => GLOSSARY.hidePopover());
+}
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', initGlossaryHandlers);
+} else {
+  initGlossaryHandlers();
+}
+
+function _resultTagChip(cls, text, opts){
   if(!text) return '';
   const c = cls ? ` ${cls}` : '';
-  return `<span class="ftag${c}">${text}</span>`;
+  const conf = opts && opts.conf ? `<span class="conf-badge is-${opts.conf}" title="Confidence: ${opts.conf}">${opts.conf}</span>` : '';
+  // Mark every tag as a glossary trigger; the lookup function filters out any
+  // text the glossary doesn't know how to explain (the popover just won't open).
+  return `<span class="ftag${c} glossary-trigger has-glossary" tabindex="0" data-glossary="${String(text).replace(/"/g,'&quot;')}">${text}</span>${conf}`;
 }
 function _buildTagRow(label, chipsHtml){
   if(!chipsHtml) return '';
@@ -2281,40 +2809,100 @@ function _voicesLabel(order, lead){
   if(lead) return '5V: '+lead;
   return '';
 }
+function _confLevel(c){
+  const v = String(c||'').toLowerCase();
+  return (v === 'high' || v === 'medium' || v === 'low') ? v : '';
+}
 function _expressionTagChips(p){
+  const conf = p.confidence || {};
   let h='';
-  h+=_resultTagChip('gold', p.mbti);
-  h+=_resultTagChip('ember', p.enneagram);
-  if(p.enneagramSubtype) h+=`<span class="ftag ember" style="opacity:0.75;">${p.enneagramSubtype} subtype</span>`;
-  h+=_resultTagChip('', p.attachment);
-  if(p.centerOfIntelligence) h+=`<span class="ftag" style="color:var(--gold-dim);">${p.centerOfIntelligence} Centre</span>`;
+  h+=_resultTagChip('gold',  p.mbti,      { conf: _confLevel(conf.mbti) });
+  h+=_resultTagChip('ember', p.enneagram, { conf: _confLevel(conf.enneagram) });
+  if(p.enneagramSubtype){
+    const subConf = _confLevel(conf.subtype);
+    h+=`<span class="ftag ember glossary-trigger has-glossary" tabindex="0" data-glossary="${String(p.enneagramSubtype).replace(/"/g,'&quot;')}" style="opacity:0.75;">${p.enneagramSubtype} subtype</span>${subConf?`<span class="conf-badge is-${subConf}" title="Confidence: ${subConf}">${subConf}</span>`:''}`;
+  }
+  h+=_resultTagChip('', p.attachment, { conf: _confLevel(conf.attachment) });
+  if(p.centerOfIntelligence) h+=`<span class="ftag glossary-trigger has-glossary" tabindex="0" data-glossary="${String(p.centerOfIntelligence).replace(/"/g,'&quot;')} centre" style="color:var(--gold-dim);">${p.centerOfIntelligence} Centre</span>`;
   const v=_voicesLabel(p.fiveVoicesOrder, p.fiveVoicesNod);
-  if(v) h+=`<span class="ftag" style="color:var(--text-muted);opacity:0.75;">${v}</span>`;
+  if(v) h+=`<span class="ftag glossary-trigger has-glossary" tabindex="0" data-glossary="${String(p.fiveVoicesNod || (p.fiveVoicesOrder && p.fiveVoicesOrder[0]) || '').replace(/"/g,'&quot;')}" style="color:var(--text-muted);opacity:0.75;">${v}</span>`;
   return h;
 }
 function _likelyCoreTagChips(p){
+  const conf = p.confidence || {};
   let h='';
-  h+=_resultTagChip('gold', p.likelyCoreMbti);
-  h+=_resultTagChip('ember', p.likelyCoreEnneagram);
-  if(p.likelyCoreEnneagramSubtype) h+=`<span class="ftag ember" style="opacity:0.75;">${p.likelyCoreEnneagramSubtype} subtype</span>`;
-  h+=_resultTagChip('', p.likelyCoreAttachment);
-  if(p.likelyCoreCenterOfIntelligence) h+=`<span class="ftag" style="color:var(--gold-dim);">${p.likelyCoreCenterOfIntelligence} Centre</span>`;
+  h+=_resultTagChip('gold',  p.likelyCoreMbti,      { conf: _confLevel(conf.mbti) });
+  h+=_resultTagChip('ember', p.likelyCoreEnneagram, { conf: _confLevel(conf.enneagram) });
+  if(p.likelyCoreEnneagramSubtype){
+    const subConf = _confLevel(conf.subtype);
+    h+=`<span class="ftag ember glossary-trigger has-glossary" tabindex="0" data-glossary="${String(p.likelyCoreEnneagramSubtype).replace(/"/g,'&quot;')}" style="opacity:0.75;">${p.likelyCoreEnneagramSubtype} subtype</span>${subConf?`<span class="conf-badge is-${subConf}" title="Confidence: ${subConf}">${subConf}</span>`:''}`;
+  }
+  h+=_resultTagChip('', p.likelyCoreAttachment, { conf: _confLevel(conf.attachment) });
+  if(p.likelyCoreCenterOfIntelligence) h+=`<span class="ftag glossary-trigger has-glossary" tabindex="0" data-glossary="${String(p.likelyCoreCenterOfIntelligence).replace(/"/g,'&quot;')} centre" style="color:var(--gold-dim);">${p.likelyCoreCenterOfIntelligence} Centre</span>`;
   const v=_voicesLabel(p.likelyCoreFiveVoicesOrder, p.likelyCoreFiveVoicesNod);
-  if(v) h+=`<span class="ftag" style="color:var(--text-muted);opacity:0.75;">${v}</span>`;
+  if(v) h+=`<span class="ftag glossary-trigger has-glossary" tabindex="0" data-glossary="${String(p.likelyCoreFiveVoicesNod || (p.likelyCoreFiveVoicesOrder && p.likelyCoreFiveVoicesOrder[0]) || '').replace(/"/g,'&quot;')}" style="color:var(--text-muted);opacity:0.75;">${v}</span>`;
   return h;
 }
 
 function renderResults(profile){
   if(!profile) return;
 
-  document.getElementById('result-archetype').textContent=profile.archetype||'Your Nest';
-  document.getElementById('result-archetype-sub').textContent=profile.archetypeSub||'';
+  // v6.0: plain-language archetype is the hero. If the worker hasn't sent a
+  // plain version yet (older payload), fall back to the existing archetype.
+  const heroPlain = profile.archetypePlain || profile.archetype || 'Your Nest';
+  document.getElementById('result-archetype').textContent = heroPlain;
+  document.getElementById('result-archetype-sub').textContent = profile.archetypeSub || '';
+
+  const plainDescEl = document.getElementById('result-archetype-plain-desc');
+  if(plainDescEl){
+    if(profile.archetypePlainDescription){
+      plainDescEl.textContent = profile.archetypePlainDescription;
+      plainDescEl.style.display = 'block';
+    } else {
+      plainDescEl.style.display = 'none';
+      plainDescEl.textContent = '';
+    }
+  }
+
+  // Technical subtitle line — only shown if the technical archetype differs
+  // from the plain hero name (i.e. there's something extra to say).
+  const techEl = document.getElementById('result-archetype-technical');
+  if(techEl){
+    const techParts = [];
+    if(profile.archetype && profile.archetype !== heroPlain) techParts.push(profile.archetype);
+    if(profile.mbti)      techParts.push(profile.mbti);
+    if(profile.enneagram) techParts.push(profile.enneagram);
+    if(techParts.length){
+      techEl.textContent = techParts.join(' · ');
+      techEl.style.display = 'block';
+    } else {
+      techEl.style.display = 'none';
+      techEl.textContent = '';
+    }
+  }
+
+  // Confidence summary — shown if worker reported confidence with a note
+  const confSummary = document.getElementById('result-confidence-summary');
+  const confNote    = document.getElementById('result-confidence-note');
+  if(confSummary && confNote){
+    const note = profile.confidence && profile.confidence.notes ? String(profile.confidence.notes).trim() : '';
+    if(note){
+      confNote.textContent = note;
+      confSummary.style.display = 'flex';
+    } else {
+      confSummary.style.display = 'none';
+      confNote.textContent = '';
+    }
+  }
 
   const likelyArchEl=document.getElementById('result-likely-archetype');
   if(likelyArchEl){
-    if(profile.likelyCoreArchetype){
-      const sub=profile.likelyCoreArchetypeSub?` — ${profile.likelyCoreArchetypeSub}`:'';
-      likelyArchEl.textContent=`Likely baseline archetype: ${profile.likelyCoreArchetype}${sub}`;
+    // v6.0: prefer plain-language baseline archetype if present
+    const baselinePlain = profile.likelyCoreArchetypePlain || profile.likelyCoreArchetype;
+    if(baselinePlain && baselinePlain !== heroPlain){
+      const desc = profile.likelyCoreArchetypePlainDescription || profile.likelyCoreArchetypeSub || '';
+      const descSuffix = desc ? ` — ${desc}` : '';
+      likelyArchEl.textContent=`Likely baseline: ${baselinePlain}${descSuffix}`;
       likelyArchEl.style.display='block';
     }else{
       likelyArchEl.style.display='none';
@@ -2518,6 +3106,8 @@ function clearAndRestart(){
 function getFallbackProfile(){
   return {
     archetype:'The Connector',
+    archetypePlain:'The Tuned-In Companion',
+    archetypePlainDescription:'Holds the room steady, reads emotional weather before words, gives more than they take.',
     archetypeSub:'with a strong Dreamer influence',
     mbti:'ENFJ',
     enneagram:'Enneagram 3w4',
@@ -2527,6 +3117,8 @@ function getFallbackProfile(){
     healthLevel:'growing',
     fiveVoicesNod:'Connector',
     likelyCoreArchetype:'The Trailblazer (Pioneer)',
+    likelyCoreArchetypePlain:'The Restless Cartographer',
+    likelyCoreArchetypePlainDescription:'Future-focused, possibility-led, builds maps three moves ahead and refuses small.',
     likelyCoreArchetypeSub:'with Creative undertones',
     likelyCoreMbti:'INTJ',
     likelyCoreEnneagram:'Enneagram 7w8',
@@ -2534,6 +3126,10 @@ function getFallbackProfile(){
     likelyCoreAttachment:'Secure-leaning',
     likelyCoreCenterOfIntelligence:'Head',
     likelyCoreFiveVoicesNod:'Pioneer',
+    confidence: {
+      mbti:'high', enneagram:'high', wing:'medium', subtype:'low', attachment:'medium', baselineDivergence:'high',
+      notes:'Subtype is the soft call here — your answers point both ways. Everything else is settled.'
+    },
     expressionVersusCoreSummary:'What you\'re living right now can look more caretaking and visible than the part of you that usually plans three moves ahead and chases possibility.',
     betweenPresentAndCore:'Under strain, many people slide toward dutiful precision and emotional attunement — even when their baseline is bolder and more independent.\n\nThat doesn\'t make either version false. It means your context is borrowing extra bandwidth from patterns that keep you safe.\n\nThe invitation is to let both be named: the survival self and the self that remembers what freedom felt like.',
     howYoureShowingUp:'Right now you may be showing up as the person who holds the room together, reads the emotional weather, and keeps things moving — even when you\'re tired.\n\nThat can look like a Connector-leaning season: relational energy out front, performance pressure nearby, and a quiet hunger to be known without having to manage the moment.',
@@ -2611,6 +3207,266 @@ let chatAnswers = {};
 let currentQIndex = 0;
 let chatMicActive = false;
 
+// ── v6.0 — TAP-TO-ANSWER CHIP STARTERS ───────────────
+// Short, on-brand starter answers per question. The user can tap to begin,
+// then edit, extend, or send as-is. They are deliberately structural
+// (representative answer-shapes) so the AI gets clean signal even when the
+// user "just taps" — but each remains a real human starting point.
+const CHIPS_BY_QUESTION = {
+  q01: [
+    "Money / what's coming",
+    "A relationship that's wobbly",
+    "Work I'm dragging through",
+    "Something about my body",
+    "A grief I don't know what to do with",
+    "What I want my life to look like",
+  ],
+  q02: [
+    "How tired I actually am",
+    "How lonely it's been",
+    "That a relationship isn't working",
+    "That I've outgrown what I'm doing",
+    "How much I'm masking",
+    "That I'm scared",
+  ],
+  q03: [
+    "Somewhere quieter, simpler",
+    "I made the brave move",
+    "I let go of what I needed to",
+    "Honestly — I'm not sure yet",
+    "The same place but lighter",
+    "A whole new chapter",
+  ],
+  q04: [
+    "On from the moment I wake",
+    "Slow start, late night",
+    "Caretaking until I'm empty",
+    "All work, no edges",
+    "Holding it together for everyone",
+    "Surviving more than living",
+  ],
+  q05: [
+    "Mapped out options first, then chose",
+    "Felt my way to it — gut decision",
+    "Talked it through with a few people",
+    "Slept on it and woke knowing",
+    "Wrote it down until it got clear",
+    "Just moved when the moment came",
+  ],
+  q06: [
+    "Time alone in silence",
+    "Close people, low energy",
+    "Movement, no talking",
+    "More people, different ones",
+    "A long shower and bed",
+    "Honestly — to disappear",
+  ],
+  q07: [
+    "They take forever to decide",
+    "They lead with feelings, I lead with logic",
+    "They need constant connection",
+    "They're chaotic where I'm structured",
+    "They're cold where I'd be warm",
+    "They risk things I'd never risk",
+  ],
+  q08: [
+    "My partner — and yes, I would",
+    "A close friend — and yes, I would",
+    "A parent or sibling — and yes",
+    "I'd call but feel guilty about it",
+    "I'd think about it and not call",
+    "Honestly, I don't have someone like that",
+  ],
+  q09: [
+    "A friend I almost let drift",
+    "Someone I met by accident",
+    "A colleague who became more",
+    "Someone much older or younger",
+    "An ex who became a friend",
+    "Someone I almost wrote off",
+  ],
+  q10: [
+    "Snapped, regretted it later",
+    "Went cold and quiet",
+    "Held it in until I cried",
+    "Cut someone off",
+    "Got cuttingly direct",
+    "Left the room and processed alone",
+  ],
+  q11: [
+    "Just my closest few people, slow day",
+    "A big party — full house",
+    "Travel — somewhere I've never been",
+    "Honestly, I'd rather skip it",
+    "Quiet day with my partner",
+    "A meal I cooked, the people I love",
+  ],
+  q12: [
+    "To be properly seen",
+    "To stop performing",
+    "To rest without guilt",
+    "To do something risky",
+    "To be loved without earning it",
+    "To matter to someone",
+  ],
+  q13: [
+    "Scrolling instead of resting",
+    "Saying yes when I mean no",
+    "Drinking more than I should",
+    "Staying in something that's done",
+    "Avoiding the hard conversation",
+    "Working when I should stop",
+  ],
+  q14: [
+    "I'm warm but I disappear",
+    "I'm capable but exhausting myself",
+    "I'm funny but guarded",
+    "I'm steady but slow to open up",
+    "I'm intense but loyal",
+    "I'm thoughtful but distant",
+  ],
+  q15: [
+    "I always pick the same kind of person",
+    "I push too hard, then withdraw",
+    "I expect it to fall apart",
+    "I bail before they can",
+    "I outgrow people fast",
+    "I keep choosing the wrong rooms",
+  ],
+  q16: [
+    "Slow morning, walk, no plan",
+    "Make something — cook, build, write",
+    "See one person, properly",
+    "Get out of the city",
+    "Sleep, then read",
+    "Honestly — get jobs done",
+  ],
+  q17: [
+    "Reading or writing",
+    "Building or fixing something",
+    "A deep conversation",
+    "Outdoors — hiking, gardening, swimming",
+    "Music or making art",
+    "Solving a problem at work",
+  ],
+  q18: [
+    "Start the thing I keep almost starting",
+    "Leave the situation I'm in",
+    "Have the honest conversation",
+    "Move somewhere new",
+    "Bet on the wild idea",
+    "Say what I actually want",
+  ],
+  q19: [
+    "It fits — mostly",
+    "It pays but it's killing me",
+    "It's a placeholder",
+    "I love it but it's heavy",
+    "I'm in transition",
+    "I haven't figured out what I want",
+  ],
+  q20: [
+    "Quiet alone time, then one person",
+    "A run or walk, then bed",
+    "Deep conversation with someone close",
+    "Cook, music, low light",
+    "A bath and a book",
+    "Out in nature, no agenda",
+  ],
+  q21: [
+    "I imagine it forward in scenarios",
+    "I check in with my body / gut",
+    "I talk it through with someone",
+    "I list pros and cons",
+    "I sleep on it",
+    "I go quiet until something clicks",
+  ],
+  q22: [
+    "More space — less rushing",
+    "Closer to nature, slower pace",
+    "Same shape, less pressure",
+    "Doing my own work, my way",
+    "Honest relationships, fewer obligations",
+    "Somewhere that feels like mine",
+  ],
+  q23: [
+    "Bolder, funnier, more myself",
+    "Calmer, more confident",
+    "More creative, more curious",
+    "Lighter — people said I lit a room",
+    "More decisive, less in my head",
+    "Honestly, I haven't felt that in a long time",
+  ],
+  q24: [
+    "I'm playful and present",
+    "I'm focused and creating",
+    "I'm warm with my people",
+    "I'm outdoors, moving, lit up",
+    "I'm calm and decisive",
+    "I'm building something I love",
+  ],
+  q25: [
+    "Making art / writing / creating",
+    "Being in nature regularly",
+    "Reading deeply",
+    "Saying what I actually think",
+    "A particular friendship I let go",
+    "Being physically active",
+  ],
+  q26: [
+    "Possibility — execution drains me",
+    "Execution — possibility paralyses me",
+    "Possibility first, then I lock in",
+    "Execution first, then I get curious",
+    "Both at once, depending on the thing",
+    "Honestly — neither feels easy right now",
+  ],
+  q27: [
+    "I wilt — get foggy and restless",
+    "I comply, but I disappear inside",
+    "I find something else to do",
+    "I get oddly satisfied by it",
+    "I make it interesting somehow",
+    "I avoid it until it becomes urgent",
+  ],
+};
+
+function renderChatChips(qid) {
+  const wrap = document.getElementById('chat-chips-wrap');
+  const row  = document.getElementById('chat-chips-row');
+  if(!wrap || !row) return;
+  const chips = CHIPS_BY_QUESTION[qid] || [];
+  if(!chips.length){
+    wrap.classList.remove('is-active');
+    row.innerHTML = '';
+    return;
+  }
+  row.innerHTML = chips.map(text => {
+    const safe = String(text).replace(/"/g,'&quot;');
+    return `<button type="button" class="chat-chip" onclick="useChatChip('${safe.replace(/'/g, "\\'")}')">${safe}</button>`;
+  }).join('');
+  wrap.classList.add('is-active');
+}
+
+function useChatChip(text){
+  const ta = document.getElementById('chat-textarea');
+  if(!ta) return;
+  const current = (ta.value || '').trim();
+  ta.value = current ? `${current} ${text}` : text;
+  ta.focus();
+  // Place cursor at end
+  try { ta.setSelectionRange(ta.value.length, ta.value.length); } catch(_) {}
+}
+
+// ── v6.0 — "✓ Saved" mini flash ─────────────────────
+function showSavedFlash(){
+  const el = document.getElementById('saved-flash');
+  if(!el) return;
+  el.classList.add('is-visible');
+  clearTimeout(el._hideTimer);
+  el._hideTimer = setTimeout(()=> el.classList.remove('is-visible'), 1400);
+}
+
 // ── INIT CHAT ──────────────────────────
 function startChat() {
   currentQIndex = 0;
@@ -2654,6 +3510,9 @@ function renderChatQuestion(idx) {
   }
   if(sendBtn) sendBtn.disabled = false;
 
+  // v6.0: render question-specific tap-to-answer chips
+  renderChatChips(q.id);
+
   // Update progress bar
   const pct = Math.round((idx / QUESTIONS.length) * 97);
   const pb = document.getElementById('progressBar');
@@ -2686,9 +3545,14 @@ async function sendChatAnswer() {
   messagesEl.appendChild(userBubble);
   userBubble.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
-  // Disable input while processing
+  // Disable input while processing + clear chips
   if(sendBtn) sendBtn.disabled = true;
   if(textareaEl) textareaEl.value = '';
+  const chipsWrap = document.getElementById('chat-chips-wrap');
+  if(chipsWrap) chipsWrap.classList.remove('is-active');
+
+  // v6.0: gentle "✓ Saved" flash — matches the rest of the lil' bird tool family
+  showSavedFlash();
 
   // Last question — go to canvas
   if(currentQIndex >= QUESTIONS.length - 1) {
