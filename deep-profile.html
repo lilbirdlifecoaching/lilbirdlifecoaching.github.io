@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- lilbird deep-profile build: v6.0-phase1-20260509 (Phase 1: chat chips + particles + saved-flash + plain-language archetypes + tooltip glossary + confidence badges + clarify-card source context; requires worker v6.0) -->
+<!-- lilbird deep-profile build: v7.0-20260509 (full roadmap: two paths, mid-read, depth+nests, gamification, Peak&Plunge, Birdsong hero, snapshot card, Forest bridge, Saturday opt-in — requires worker v7.0) -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -91,8 +91,8 @@
   .nav-back { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold-dim); text-decoration: none; transition: color 0.2s; }
   .nav-back:hover { color: var(--gold); }
 
-  .progress-bar-wrap { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 200; background: rgba(255,255,255,0.06); }
-  .progress-bar-fill { height: 100%; background: linear-gradient(to right, var(--gold), var(--ember)); transition: width 0.6s ease; }
+  .progress-bar-wrap { position: fixed; top: 0; left: 0; right: 0; z-index: 200; background: rgba(30,32,40,0.92); }
+  .progress-bar-fill { height: 3px; background: linear-gradient(to right, var(--gold), var(--ember)); transition: width 0.6s ease; }
 
   .screen { display: none; min-height: 100vh; padding: 7rem 1.5rem 4rem; position: relative; z-index: 2; }
   .screen.active { display: block; }
@@ -279,6 +279,147 @@
   .pay-reassure { font-size: 0.8rem; color: var(--text-muted); opacity: 0.7; text-align: center; margin-top: 0.5rem; }
 
   .result-header { border-bottom: 1px solid var(--dark-border); padding-bottom: 2rem; margin-bottom: 2.5rem; }
+  .result-hero-landing { max-width: 540px; margin-bottom: 1.25rem; }
+  .result-header .eyebrow { margin-bottom: 0.35rem; }
+  .result-header h1 { margin-bottom: 0.35rem; line-height: 1.15; }
+  #result-archetype-sub { margin-bottom: 0.5rem !important; }
+
+  /* Collapsible technical codes — default closed so the hero stays human-first */
+  .result-hero-codes {
+    margin: 0.75rem 0 1rem;
+    border-radius: 10px;
+    border: 1px solid rgba(245,200,66,0.12);
+    background: rgba(255,255,255,0.02);
+    padding: 0 0.85rem;
+    max-width: 520px;
+  }
+  .result-hero-codes summary {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    cursor: pointer;
+    list-style: none;
+    padding: 0.65rem 0;
+    user-select: none;
+  }
+  .result-hero-codes summary::-webkit-details-marker { display: none; }
+  .result-hero-codes summary::after {
+    content: ' +';
+    color: var(--text-muted);
+    opacity: 0.7;
+    font-weight: 400;
+  }
+  .result-hero-codes[open] summary::after { content: ' −'; }
+  .result-hero-codes .result-archetype-technical {
+    margin-bottom: 0.85rem;
+    padding-bottom: 0.5rem;
+    border-top: 1px solid rgba(245,200,66,0.08);
+    padding-top: 0.65rem;
+  }
+
+  /* Two-lane snapshot: now vs resourced */
+  .result-hero-snapshot {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    max-width: 720px;
+  }
+  .result-hero-snapshot.result-hero-snapshot--single {
+    grid-template-columns: 1fr;
+    max-width: 420px;
+  }
+  @media (max-width: 640px) {
+    .result-hero-snapshot { grid-template-columns: 1fr; }
+  }
+  .result-hero-lane {
+    border-radius: 14px;
+    padding: 1.1rem 1.2rem 1.15rem;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .result-hero-lane--now {
+    background: linear-gradient(145deg, rgba(232,115,74,0.07) 0%, rgba(30,32,40,0.5) 100%);
+    border-color: rgba(232,115,74,0.18);
+  }
+  .result-hero-lane--core {
+    background: linear-gradient(145deg, rgba(157,191,138,0.08) 0%, rgba(30,32,40,0.5) 100%);
+    border-color: rgba(157,191,138,0.2);
+  }
+  .result-hero-lane-kicker {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--text-main);
+    margin: 0 0 0.35rem;
+  }
+  .result-hero-lane-lede {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.45;
+    margin: 0 0 0.85rem;
+    opacity: 0.92;
+  }
+  .result-hero-lane-narrative {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin: 0 0 0.85rem;
+  }
+  .result-hero-lane-chips { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+  .result-hero-lane-chips .ftag { font-size: 0.68rem; padding: 0.28rem 0.75rem; }
+
+  /* Single confidence strip — replaces per-tag HIGH/MEDIUM pills in the hero */
+  .result-hero-meter-wrap {
+    max-width: 720px;
+    margin-bottom: 1.15rem;
+  }
+  .result-hero-meter-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin: 0 0 0.55rem;
+    letter-spacing: 0.02em;
+  }
+  .result-hero-meter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem 1.25rem;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(245,200,66,0.1);
+  }
+  .result-hero-meter-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .conf-dots {
+    display: inline-flex;
+    gap: 3px;
+    align-items: center;
+  }
+  .conf-dots span {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+  }
+  .conf-dots span.is-on { background: var(--gold); opacity: 0.9; }
+  .conf-dots.is-strong span.is-on { background: #4adea8; }
+  .conf-dots.is-soft span.is-on { background: var(--ember); opacity: 0.85; }
+
   .result-tags { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
   .result-tags.result-tags-wrap { flex-direction: column; align-items: flex-start; gap: 1rem; }
   .result-tag-row { width: 100%; }
@@ -1206,6 +1347,230 @@
     text-align: right;
   }
 
+  /* ─── v7 — path picker + depth meter + nest + overlays ─── */
+  .path-picker {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    max-width: 640px;
+    margin: 1.5rem 0 1.25rem;
+  }
+  @media (max-width: 600px) { .path-picker { grid-template-columns: 1fr; } }
+  .path-card {
+    text-align: left;
+    background: var(--dark-card);
+    border: 1px solid var(--dark-border);
+    border-radius: 14px;
+    padding: 1rem 1.15rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    color: inherit;
+    font: inherit;
+  }
+  .path-card:hover { border-color: rgba(245,200,66,0.35); }
+  .path-card-active {
+    border-color: rgba(245,200,66,0.55);
+    background: rgba(245,200,66,0.06);
+    box-shadow: 0 0 0 1px rgba(245,200,66,0.15);
+  }
+  .path-card-kicker {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    display: block;
+    margin-bottom: 0.35rem;
+  }
+  .path-card-title { font-family: 'Playfair Display', serif; font-size: 1.05rem; color: var(--text-main); display: block; margin-bottom: 0.4rem; }
+  .path-card-body { font-size: 0.82rem; color: var(--text-muted); line-height: 1.45; display: block; }
+  .know-fields { max-width: 640px; margin-bottom: 1rem; }
+  .know-fields-hint { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.65rem; }
+  .know-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; }
+  @media (max-width: 700px) { .know-grid { grid-template-columns: 1fr; } }
+  .know-field { font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold-dim); display: flex; flex-direction: column; gap: 0.35rem; }
+  .know-field input {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    text-transform: none;
+    letter-spacing: 0;
+    padding: 0.55rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid rgba(245,200,66,0.2);
+    background: rgba(255,255,255,0.04);
+    color: var(--text-main);
+  }
+
+  .depth-meter-strip {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.35rem 1.25rem 0.5rem;
+    background: rgba(30,32,40,0.92);
+    border-bottom: 1px solid rgba(245,200,66,0.08);
+    max-width: 100vw;
+  }
+  .depth-meter-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    opacity: 0.85;
+  }
+  .depth-meter-label {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--gold);
+    min-width: 7.5rem;
+  }
+  .depth-meter-track {
+    flex: 1;
+    height: 4px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 4px;
+    overflow: hidden;
+    max-width: 220px;
+  }
+  .depth-meter-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, rgba(157,191,138,0.5), var(--gold));
+    transition: width 0.6s cubic-bezier(0.22,1,0.36,1);
+  }
+
+  .nest-corner {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    width: 72px;
+    height: 72px;
+    z-index: 50;
+    pointer-events: none;
+    opacity: 0.95;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.35));
+  }
+  .nest-corner svg { width: 100%; height: 100%; }
+
+  .evidence-toast {
+    position: fixed;
+    right: 1rem;
+    bottom: 5.5rem;
+    max-width: 300px;
+    background: var(--dark-mid);
+    border: 1px solid rgba(157,191,138,0.35);
+    border-radius: 12px;
+    padding: 0.85rem 1rem;
+    font-size: 0.88rem;
+    line-height: 1.45;
+    color: var(--text-main);
+    box-shadow: 0 8px 28px rgba(0,0,0,0.4);
+    z-index: 60;
+    transform: translateX(120%);
+    transition: transform 0.45s cubic-bezier(0.22,1,0.36,1);
+  }
+  .evidence-toast.is-show { transform: translateX(0); }
+  .evidence-toast-kicker {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    display: block;
+    margin-bottom: 0.35rem;
+  }
+
+  .dp-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10,11,14,0.72);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+  }
+  .dp-modal-overlay.is-open { display: flex; }
+  .dp-modal {
+    background: var(--dark-card);
+    border: 1px solid rgba(245,200,66,0.2);
+    border-radius: 16px;
+    padding: 1.5rem 1.75rem;
+    max-width: 420px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .dp-modal h3 { margin: 0 0 0.5rem; font-family: 'Playfair Display', serif; font-size: 1.25rem; }
+  .dp-modal p { margin: 0 0 1rem; font-size: 0.92rem; color: var(--text-muted); line-height: 1.55; }
+  .pair-these-grid { display: flex; flex-direction: column; gap: 0.65rem; margin-bottom: 1rem; }
+  .pair-row { display: flex; gap: 0.5rem; }
+  .pair-row button {
+    flex: 1;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    padding: 0.65rem 0.75rem;
+    border-radius: 10px;
+    border: 1px solid rgba(245,200,66,0.25);
+    background: rgba(255,255,255,0.03);
+    color: var(--text-main);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .pair-row button:hover { border-color: var(--gold); background: rgba(245,200,66,0.08); }
+
+  .peak-svg-wrap {
+    background: rgba(255,255,255,0.03);
+    border-radius: 12px;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    touch-action: manipulation;
+  }
+  .peak-svg-wrap svg { width: 100%; height: auto; display: block; }
+
+  .birdsong-radar-wrap {
+    margin: 1.5rem 0 2rem;
+    padding: 1.25rem;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(245,200,66,0.12);
+    border-radius: 14px;
+    max-width: 420px;
+  }
+  .birdsong-radar-wrap canvas { display: block; margin: 0 auto; }
+
+  .nest-snapshot-card {
+    margin: 1.5rem 0 2rem;
+    padding: 1.5rem;
+    border-radius: 16px;
+    border: 1px solid rgba(245,200,66,0.25);
+    background: linear-gradient(165deg, rgba(245,200,66,0.07) 0%, rgba(30,32,40,0.9) 100%);
+    max-width: 480px;
+  }
+  .nest-snapshot-card .snap-main { font-family: 'Playfair Display', serif; font-size: 1.45rem; color: var(--gold); margin: 0 0 0.35rem; }
+  .nest-snapshot-card .snap-sub { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin: 0 0 1rem; }
+  .bridge-card {
+    margin-top: 1.5rem;
+    padding: 1.25rem 1.35rem;
+    border-radius: 14px;
+    border: 1px solid rgba(157,191,138,0.25);
+    background: rgba(157,191,138,0.06);
+    max-width: 480px;
+  }
+  .bridge-card a { color: var(--gold); text-decoration: none; border-bottom: 1px dotted rgba(245,200,66,0.5); }
+  .bridge-card a:hover { color: var(--text-main); }
+  .saturday-opt {
+    margin-top: 1rem;
+    padding: 1rem 1.15rem;
+    border-radius: 12px;
+    border: 1px solid rgba(245,200,66,0.15);
+    background: rgba(255,255,255,0.02);
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    max-width: 480px;
+  }
+  .saturday-opt label { display: flex; gap: 0.65rem; align-items: flex-start; cursor: pointer; }
+
   /* RESPONSIVE */
   @media (max-width: 860px) {
     .dashboard-layout {
@@ -1313,6 +1678,11 @@
 </nav>
 
 <div class="progress-bar-wrap">
+  <div class="depth-meter-strip" id="depth-meter-strip" aria-live="polite">
+    <span class="depth-meter-eyebrow">Depth</span>
+    <span class="depth-meter-label" id="depth-meter-label">Surface</span>
+    <div class="depth-meter-track"><div class="depth-meter-fill" id="depth-meter-fill" style="width:8%"></div></div>
+  </div>
   <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
 </div>
 
@@ -1339,10 +1709,36 @@
         <div><p><strong>Your Nest</strong> — a permanent link to your profile you can return to any time</p></div>
       </div>
     </div>
+    <div class="path-picker" role="group" aria-label="Choose assessment path">
+      <button type="button" class="path-card path-card-active" id="path-full" onclick="selectAssessmentPath('full')">
+        <span class="path-card-kicker">Full arc</span>
+        <span class="path-card-title">Read me from scratch</span>
+        <span class="path-card-body">27 story questions — we discover your wiring together. Best if you're curious or unsure.</span>
+      </button>
+      <button type="button" class="path-card" id="path-know" onclick="selectAssessmentPath('know')">
+        <span class="path-card-kicker">Shorter</span>
+        <span class="path-card-title">I already know my type</span>
+        <span class="path-card-body">Tell us your letters — then we go deep on stress, season, and what it means right now.</span>
+      </button>
+    </div>
+    <div class="know-fields" id="know-type-fields" style="display:none;">
+      <p class="know-fields-hint">Optional but helpful — we won't quiz you on labels you've already earned.</p>
+      <div class="know-grid">
+        <label class="know-field">MBTI (if you know it)
+          <input type="text" id="know-mbti" maxlength="4" placeholder="e.g. INFJ" autocomplete="off" style="text-transform:uppercase;">
+        </label>
+        <label class="know-field">Enneagram
+          <input type="text" id="know-enneagram" maxlength="16" placeholder="e.g. 4w5" autocomplete="off">
+        </label>
+        <label class="know-field">Attachment (if you know it)
+          <input type="text" id="know-attachment" maxlength="24" placeholder="e.g. anxious-secure" autocomplete="off">
+        </label>
+      </div>
+    </div>
     <div class="btn-row">
       <button class="btn btn-gold" onclick="startChat()">Begin → 🐦</button>
     </div>
-    <p class="intro-note">Takes about 25–30 minutes — <strong>27</strong> story questions, then the Life Canvas. The more honest you are, the more accurate it gets.</p>
+    <p class="intro-note" id="intro-timing-note">Full path: about 25–35 minutes — <strong>27</strong> questions, then Life Canvas. Shorter path: ~12 focused questions. Honesty beats speed.</p>
   </div>
 </div>
 
@@ -1357,6 +1753,18 @@
     <span class="ember"></span><span class="ember"></span><span class="ember"></span>
     <span class="ember"></span><span class="ember"></span><span class="ember"></span>
     <span class="ember"></span><span class="ember"></span><span class="ember"></span>
+  </div>
+
+  <div class="nest-corner" id="nest-corner" aria-hidden="true">
+    <svg viewBox="0 0 100 100" id="nest-svg">
+      <ellipse cx="50" cy="78" rx="38" ry="10" fill="none" stroke="rgba(245,200,66,0.25)" stroke-width="1.2"/>
+      <path id="nest-twigs" d="" fill="none" stroke="rgba(157,191,138,0.45)" stroke-width="1.4" stroke-linecap="round"/>
+      <circle id="nest-glow" cx="50" cy="52" r="4" fill="rgba(245,200,66,0.35)" opacity="0"/>
+    </svg>
+  </div>
+  <div class="evidence-toast" id="evidence-toast" role="status">
+    <span class="evidence-toast-kicker">Picking up</span>
+    <span id="evidence-toast-body"></span>
   </div>
 
   <div class="chat-screen">
@@ -1396,6 +1804,47 @@
 <!-- v6.0 — global "✓ Saved" mini flash + glossary popover -->
 <div class="saved-flash" id="saved-flash" aria-live="polite">✓ Saved</div>
 <div class="glossary-popover" id="glossary-popover" role="tooltip" aria-hidden="true"></div>
+
+<div class="dp-modal-overlay" id="modal-early-read" role="dialog" aria-modal="true" aria-labelledby="early-read-title">
+  <div class="dp-modal">
+    <h3 id="early-read-title">Think we've got enough?</h3>
+    <p>I'm reading you clearly enough that we could stop here for a solid Nest — or keep going for the deepest cut. No wrong answer. Some people love closure; some love thoroughness.</p>
+    <div class="btn-row" style="flex-wrap:wrap;">
+      <button type="button" class="btn btn-gold" onclick="confirmEarlyExit(false)">Keep going — I want the deep version</button>
+      <button type="button" class="btn btn-outline" onclick="confirmEarlyExit(true)">Jump to Life Canvas →</button>
+    </div>
+  </div>
+</div>
+
+<div class="dp-modal-overlay" id="modal-pair-these" role="dialog" aria-modal="true">
+  <div class="dp-modal">
+    <h3 id="pair-title">Quick tie-breaker</h3>
+    <p id="pair-instruction">Tap the option that lands closer — gut first.</p>
+    <div class="pair-these-grid" id="pair-these-rows"></div>
+    <button type="button" class="btn btn-gold" style="width:100%;justify-content:center;" id="pair-done-btn" onclick="closePairThese()" disabled>Continue →</button>
+  </div>
+</div>
+
+<div class="dp-modal-overlay" id="modal-peak-plunge" role="dialog" aria-modal="true">
+  <div class="dp-modal" style="max-width:480px;">
+    <h3>Peak &amp; Plunge</h3>
+    <p>Optional — tap the curve at each decade to mark a high or low. Messy is fine; we're reading shape, not polish.</p>
+    <div class="peak-svg-wrap" id="peak-svg-wrap">
+      <svg id="peak-svg" viewBox="0 0 400 180" xmlns="http://www.w3.org/2000/svg">
+        <line x1="40" y1="90" x2="360" y2="90" stroke="rgba(245,200,66,0.35)" stroke-width="2"/>
+        <text x="40" y="105" fill="rgba(240,236,228,0.45)" font-size="10" font-family="DM Mono,monospace">20s</text>
+        <text x="120" y="105" fill="rgba(240,236,228,0.45)" font-size="10" font-family="DM Mono,monospace">30s</text>
+        <text x="200" y="105" fill="rgba(240,236,228,0.45)" font-size="10" font-family="DM Mono,monospace">40s</text>
+        <text x="280" y="105" fill="rgba(240,236,228,0.45)" font-size="10" font-family="DM Mono,monospace">50s+</text>
+        <polyline id="peak-line" fill="none" stroke="#9dbf8a" stroke-width="2.5" points=""/>
+      </svg>
+    </div>
+    <div class="btn-row">
+      <button type="button" class="btn btn-outline" onclick="skipPeakPlunge()">Skip — I'll stick to words</button>
+      <button type="button" class="btn btn-gold" onclick="savePeakPlunge()">Save curve →</button>
+    </div>
+  </div>
+</div>
 
 
 <!-- ══════════════════════════════════════
@@ -1687,15 +2136,44 @@
     <!-- HEADER -->
     <div class="result-header">
       <p class="eyebrow">your nest</p>
-      <h1 id="result-archetype" style="margin-bottom:0.25rem;">The Connector</h1>
-      <p id="result-archetype-sub" style="color:var(--gold-dim);font-family:'Playfair Display',serif;font-style:italic;font-size:1.05rem;margin-bottom:0.35rem;"></p>
-      <p id="result-archetype-plain-desc" class="result-archetype-plain-desc" style="display:none;"></p>
-      <span id="result-archetype-technical" class="result-archetype-technical" style="display:none;"></span>
-      <p id="result-likely-archetype" style="display:none;color:var(--text-muted);font-family:'Playfair Display',serif;font-style:italic;font-size:0.98rem;margin-bottom:1rem;line-height:1.5;"></p>
-      <div class="result-tags result-tags-wrap" id="result-tags"></div>
+      <div class="result-hero-landing">
+        <h1 id="result-archetype" style="margin-bottom:0.25rem;">The Connector</h1>
+        <p id="result-archetype-sub" style="color:var(--gold-dim);font-family:'Playfair Display',serif;font-style:italic;font-size:1.05rem;margin-bottom:0.35rem;"></p>
+        <p id="result-archetype-plain-desc" class="result-archetype-plain-desc" style="display:none;"></p>
+        <details class="result-hero-codes" id="result-hero-codes" style="display:none;">
+          <summary>Labels &amp; type codes</summary>
+          <span id="result-archetype-technical" class="result-archetype-technical"></span>
+        </details>
+      </div>
+      <div class="result-hero-snapshot" id="result-hero-snapshot"></div>
+      <div class="result-hero-meter-wrap" id="result-hero-meter-wrap" style="display:none;">
+        <p class="result-hero-meter-label">How settled each layer of this read is</p>
+        <div class="result-hero-meter" id="result-hero-meter"></div>
+      </div>
       <div class="confidence-summary" id="result-confidence-summary" style="display:none;">
-        <span class="confidence-summary-label">How firm this read is</span>
+        <span class="confidence-summary-label">What shaped this read</span>
         <span class="confidence-summary-note" id="result-confidence-note"></span>
+      </div>
+
+      <div class="birdsong-radar-wrap" id="birdsong-radar-wrap">
+        <p class="sidebar-card-eyebrow" style="margin-bottom:0.5rem;">expression vs baseline</p>
+        <canvas id="birdsong-radar" width="340" height="340" aria-label="Dual radar comparing current expression and likely baseline"></canvas>
+        <p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.5rem;">Overlapping shape ≈ how season matches wiring. Gap ≈ the tension you're carrying.</p>
+      </div>
+
+      <div class="nest-snapshot-card" id="nest-snapshot-card">
+        <p class="snap-main" id="nest-snap-title"></p>
+        <p class="snap-sub" id="nest-snap-sub"></p>
+        <p style="font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.12em;color:var(--gold-dim);margin:0;" id="nest-snap-tags"></p>
+      </div>
+
+      <div class="bridge-card" id="bridge-forest-card">
+        <p style="margin:0 0 0.35rem;font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-dim);">From here</p>
+        <p style="margin:0;font-size:0.92rem;line-height:1.55;color:var(--text-main);">Want to map how people sit in your life next? <a href="https://lilbird.life/solo/tools/tool-forest.html" target="_blank" rel="noopener">Forest of Connections →</a></p>
+      </div>
+
+      <div class="saturday-opt" id="saturday-opt-box">
+        <label><input type="checkbox" id="saturday-opt-in"> <span><strong>Saturday pulse</strong> — one short email with a link back here for a 2-minute canvas check-in. Low noise. You can turn it off anytime from your Nest.</span></label>
       </div>
     </div>
 
@@ -1918,9 +2396,9 @@
 // ═══════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════
-const DEEP_PROFILE_BUILD = 'v6.0-phase1-20260509';
+const DEEP_PROFILE_BUILD = 'v7.0-20260509';
 const WORKER_URL     = 'https://lilbird-assessment.cwwq46sn7m.workers.dev';
-console.info("lil' bird deep profile", DEEP_PROFILE_BUILD, '| questions:', 27, '| worker:', WORKER_URL);
+console.info("lil' bird deep profile", DEEP_PROFILE_BUILD, '| worker:', WORKER_URL);
 const STRIPE_PK      = 'pk_live_51QSMYQGAu36WZ7DdlsoNqzwPnsf4HUoOj6F1NZAeGnnH1TPjDEdEQudXIGgTLaUq079aQMI1W2MS6UpMItmTjgxy00HbouBx2g';
 const SHEETS_URL     = 'https://script.google.com/macros/s/AKfycbwPoMHcmTKO8JiDt8VS4fVsvGKqw-CQGLktQKImKeUPsfqX7WhH1IJCsG2M2fF7lyL6/exec';
 const BEEHIIV_PUB_ID = '53a4cafc-9b30-41d5-bd5e-4dc0026b4308';
@@ -2140,7 +2618,7 @@ async function processPayment(){
       if(SHEETS_URL && profileData) logToSheet(profileData, 0, collectResponses(), 'promo');
       try{
         // Store profile in KV first so Nest link works
-        await fetch(`${WORKER_URL}/store-profile`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nestId,profile:profileData,canvasScores,canvasHistory:[]})});
+        await fetch(`${WORKER_URL}/store-profile`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nestId,profile:profileData,canvasScores,canvasHistory:[],assessmentMode: assessmentPath === 'know' ? 'know-type' : 'full',peakPlunge: peakPlungeData,pairTheseLog})});
         // Then send email (which also marks as paid in KV)
         console.log('Sending promo profile email to:', emailVal);
         const emailRes = await fetch(`${WORKER_URL}/send-profile-email`,{
@@ -2444,7 +2922,17 @@ async function runAnalysis(){
     : null;
   console.log('Final analyze — clarifications:', clarifications ? `${clarifications.observations.length} marked, note=${clarifications.note ? 'yes':'no'}` : 'none');
   try{
-    const r=await fetch(`${WORKER_URL}/analyze`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({responses,nestId,clarifications,previewRead:previewReadForFinal})});
+    const analyzePayload = {
+      responses,
+      nestId,
+      clarifications,
+      previewRead:previewReadForFinal,
+      assessmentMode: assessmentPath === 'know' ? 'know-type' : 'full',
+      userDeclaredTypes: assessmentPath === 'know' ? userDeclaredTypes : undefined,
+      peakPlunge: responses.peakPlunge,
+      pairTheseLog: responses.pairTheseLog,
+    };
+    const r=await fetch(`${WORKER_URL}/analyze`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(analyzePayload)});
     if(!r.ok){
       const errText = await r.text();
       console.error('Analysis HTTP error:', r.status, errText);
@@ -2458,7 +2946,7 @@ async function runAnalysis(){
       console.error('Profile JSON parse error:', parseErr.message, 'Raw:', raw.slice(0,300));
       throw new Error('Profile parsing failed');
     }
-    await fetch(`${WORKER_URL}/store-profile`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nestId,profile:profileData,canvasScores,canvasHistory:[]})});
+    await fetch(`${WORKER_URL}/store-profile`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nestId,profile:profileData,canvasScores,canvasHistory:[],assessmentMode: assessmentPath === 'know' ? 'know-type' : 'full',peakPlunge: peakPlungeData,pairTheseLog})});
   }catch(e){
     console.error('Analysis error — using fallback:', e.message);
     profileData=getFallbackProfile();
@@ -2790,17 +3278,20 @@ if(document.readyState === 'loading'){
   initGlossaryHandlers();
 }
 
+function _escapeHeroHtml(s){
+  return String(s||'')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;');
+}
 function _resultTagChip(cls, text, opts){
   if(!text) return '';
   const c = cls ? ` ${cls}` : '';
-  const conf = opts && opts.conf ? `<span class="conf-badge is-${opts.conf}" title="Confidence: ${opts.conf}">${opts.conf}</span>` : '';
+  const skip = opts && opts.skipConfidence;
+  const conf = (!skip && opts && opts.conf) ? `<span class="conf-badge is-${opts.conf}" title="Confidence: ${opts.conf}">${opts.conf}</span>` : '';
   // Mark every tag as a glossary trigger; the lookup function filters out any
   // text the glossary doesn't know how to explain (the popover just won't open).
   return `<span class="ftag${c} glossary-trigger has-glossary" tabindex="0" data-glossary="${String(text).replace(/"/g,'&quot;')}">${text}</span>${conf}`;
-}
-function _buildTagRow(label, chipsHtml){
-  if(!chipsHtml) return '';
-  return `<div class="result-tag-row"><span class="result-tag-row-label">${label}</span><div class="result-tag-chips">${chipsHtml}</div></div>`;
 }
 function _voicesLabel(order, lead){
   if(Array.isArray(order) && order.length){
@@ -2809,39 +3300,218 @@ function _voicesLabel(order, lead){
   if(lead) return '5V: '+lead;
   return '';
 }
+function _voicesHeroLead(p, isLikely){
+  const order = isLikely ? p.likelyCoreFiveVoicesOrder : p.fiveVoicesOrder;
+  const nod = isLikely ? p.likelyCoreFiveVoicesNod : p.fiveVoicesNod;
+  const lead = (Array.isArray(order) && order.length) ? order[0] : nod;
+  if(!lead) return '';
+  const g = String(lead).replace(/"/g,'&quot;');
+  return `<span class="ftag glossary-trigger has-glossary" tabindex="0" data-glossary="${g}" style="color:var(--text-muted);border-color:rgba(255,255,255,0.1);">Lead · ${lead}</span>`;
+}
+function _confDots(level){
+  const v = _confLevel(level);
+  let n = 0;
+  let extra = '';
+  if(v === 'high'){ n = 3; extra = 'is-strong'; }
+  else if(v === 'medium'){ n = 2; }
+  else if(v === 'low'){ n = 1; extra = 'is-soft'; }
+  const title = v ? v : 'not rated';
+  const dots = [1,2,3].map(i => `<span class="${i <= n ? 'is-on' : ''}"></span>`).join('');
+  return `<span class="conf-dots ${extra}" title="${title}">${dots}</span>`;
+}
+function _buildHeroMeter(conf){
+  if(!conf || typeof conf !== 'object') return '';
+  const pairs = [
+    ['mbti','Type'],
+    ['enneagram','Ennea'],
+    ['wing','Wing'],
+    ['subtype','Subtype'],
+    ['attachment','Attach'],
+    ['baselineDivergence','Now vs core']
+  ];
+  let h = '';
+  for(const [key, label] of pairs){
+    if(conf[key] == null || conf[key] === '') continue;
+    h += `<span class="result-hero-meter-item"><span>${label}</span>${_confDots(conf[key])}</span>`;
+  }
+  return h;
+}
 function _confLevel(c){
   const v = String(c||'').toLowerCase();
   return (v === 'high' || v === 'medium' || v === 'low') ? v : '';
 }
-function _expressionTagChips(p){
+function _expressionTagChips(p, options){
+  const hero = options && options.hero;
+  const skip = options && options.skipConfidence;
+  const oSub = skip ? { skipConfidence: true } : {};
   const conf = p.confidence || {};
   let h='';
-  h+=_resultTagChip('gold',  p.mbti,      { conf: _confLevel(conf.mbti) });
-  h+=_resultTagChip('ember', p.enneagram, { conf: _confLevel(conf.enneagram) });
+  h+=_resultTagChip('gold',  p.mbti,      skip ? oSub : { conf: _confLevel(conf.mbti) });
+  h+=_resultTagChip('ember', p.enneagram, skip ? oSub : { conf: _confLevel(conf.enneagram) });
   if(p.enneagramSubtype){
     const subConf = _confLevel(conf.subtype);
-    h+=`<span class="ftag ember glossary-trigger has-glossary" tabindex="0" data-glossary="${String(p.enneagramSubtype).replace(/"/g,'&quot;')}" style="opacity:0.75;">${p.enneagramSubtype} subtype</span>${subConf?`<span class="conf-badge is-${subConf}" title="Confidence: ${subConf}">${subConf}</span>`:''}`;
+    const esc = String(p.enneagramSubtype).replace(/"/g,'&quot;');
+    if(skip){
+      h+=`<span class="ftag ember glossary-trigger has-glossary" tabindex="0" data-glossary="${esc}" style="opacity:0.85;">${p.enneagramSubtype} subtype</span>`;
+    }else{
+      h+=`<span class="ftag ember glossary-trigger has-glossary" tabindex="0" data-glossary="${esc}" style="opacity:0.75;">${p.enneagramSubtype} subtype</span>${subConf?`<span class="conf-badge is-${subConf}" title="Confidence: ${subConf}">${subConf}</span>`:''}`;
+    }
   }
-  h+=_resultTagChip('', p.attachment, { conf: _confLevel(conf.attachment) });
+  h+=_resultTagChip('', p.attachment, skip ? oSub : { conf: _confLevel(conf.attachment) });
   if(p.centerOfIntelligence) h+=`<span class="ftag glossary-trigger has-glossary" tabindex="0" data-glossary="${String(p.centerOfIntelligence).replace(/"/g,'&quot;')} centre" style="color:var(--gold-dim);">${p.centerOfIntelligence} Centre</span>`;
-  const v=_voicesLabel(p.fiveVoicesOrder, p.fiveVoicesNod);
-  if(v) h+=`<span class="ftag glossary-trigger has-glossary" tabindex="0" data-glossary="${String(p.fiveVoicesNod || (p.fiveVoicesOrder && p.fiveVoicesOrder[0]) || '').replace(/"/g,'&quot;')}" style="color:var(--text-muted);opacity:0.75;">${v}</span>`;
+  if(hero){
+    h+=_voicesHeroLead(p, false);
+  }else{
+    const v=_voicesLabel(p.fiveVoicesOrder, p.fiveVoicesNod);
+    if(v) h+=`<span class="ftag glossary-trigger has-glossary" tabindex="0" data-glossary="${String(p.fiveVoicesNod || (p.fiveVoicesOrder && p.fiveVoicesOrder[0]) || '').replace(/"/g,'&quot;')}" style="color:var(--text-muted);opacity:0.75;">${v}</span>`;
+  }
   return h;
 }
-function _likelyCoreTagChips(p){
+function _likelyCoreTagChips(p, options){
+  const hero = options && options.hero;
+  const skip = options && options.skipConfidence;
+  const oSub = skip ? { skipConfidence: true } : {};
   const conf = p.confidence || {};
   let h='';
-  h+=_resultTagChip('gold',  p.likelyCoreMbti,      { conf: _confLevel(conf.mbti) });
-  h+=_resultTagChip('ember', p.likelyCoreEnneagram, { conf: _confLevel(conf.enneagram) });
+  h+=_resultTagChip('gold',  p.likelyCoreMbti,      skip ? oSub : { conf: _confLevel(conf.mbti) });
+  h+=_resultTagChip('ember', p.likelyCoreEnneagram, skip ? oSub : { conf: _confLevel(conf.enneagram) });
   if(p.likelyCoreEnneagramSubtype){
     const subConf = _confLevel(conf.subtype);
-    h+=`<span class="ftag ember glossary-trigger has-glossary" tabindex="0" data-glossary="${String(p.likelyCoreEnneagramSubtype).replace(/"/g,'&quot;')}" style="opacity:0.75;">${p.likelyCoreEnneagramSubtype} subtype</span>${subConf?`<span class="conf-badge is-${subConf}" title="Confidence: ${subConf}">${subConf}</span>`:''}`;
+    const esc = String(p.likelyCoreEnneagramSubtype).replace(/"/g,'&quot;');
+    if(skip){
+      h+=`<span class="ftag ember glossary-trigger has-glossary" tabindex="0" data-glossary="${esc}" style="opacity:0.85;">${p.likelyCoreEnneagramSubtype} subtype</span>`;
+    }else{
+      h+=`<span class="ftag ember glossary-trigger has-glossary" tabindex="0" data-glossary="${esc}" style="opacity:0.75;">${p.likelyCoreEnneagramSubtype} subtype</span>${subConf?`<span class="conf-badge is-${subConf}" title="Confidence: ${subConf}">${subConf}</span>`:''}`;
+    }
   }
-  h+=_resultTagChip('', p.likelyCoreAttachment, { conf: _confLevel(conf.attachment) });
+  h+=_resultTagChip('', p.likelyCoreAttachment, skip ? oSub : { conf: _confLevel(conf.attachment) });
   if(p.likelyCoreCenterOfIntelligence) h+=`<span class="ftag glossary-trigger has-glossary" tabindex="0" data-glossary="${String(p.likelyCoreCenterOfIntelligence).replace(/"/g,'&quot;')} centre" style="color:var(--gold-dim);">${p.likelyCoreCenterOfIntelligence} Centre</span>`;
-  const v=_voicesLabel(p.likelyCoreFiveVoicesOrder, p.likelyCoreFiveVoicesNod);
-  if(v) h+=`<span class="ftag glossary-trigger has-glossary" tabindex="0" data-glossary="${String(p.likelyCoreFiveVoicesNod || (p.likelyCoreFiveVoicesOrder && p.likelyCoreFiveVoicesOrder[0]) || '').replace(/"/g,'&quot;')}" style="color:var(--text-muted);opacity:0.75;">${v}</span>`;
+  if(hero){
+    h+=_voicesHeroLead(p, true);
+  }else{
+    const v=_voicesLabel(p.likelyCoreFiveVoicesOrder, p.likelyCoreFiveVoicesNod);
+    if(v) h+=`<span class="ftag glossary-trigger has-glossary" tabindex="0" data-glossary="${String(p.likelyCoreFiveVoicesNod || (p.likelyCoreFiveVoicesOrder && p.likelyCoreFiveVoicesOrder[0]) || '').replace(/"/g,'&quot;')}" style="color:var(--text-muted);opacity:0.75;">${v}</span>`;
+  }
   return h;
+}
+function _buildHeroSnapshotHtml(profile, heroPlain){
+  const hasLikely = !!(profile.likelyCoreMbti||profile.likelyCoreEnneagram||profile.likelyCoreArchetype);
+  const baselinePlain = profile.likelyCoreArchetypePlain || profile.likelyCoreArchetype;
+  const baselineDesc = profile.likelyCoreArchetypePlainDescription || profile.likelyCoreArchetypeSub || '';
+  const nowChips = _expressionTagChips(profile, { hero: true, skipConfidence: true });
+  let baselineNarrative = '';
+  if(hasLikely && baselinePlain){
+    if(baselinePlain === heroPlain && !(baselineDesc && String(baselineDesc).trim())){
+      baselineNarrative = '<p class="result-hero-lane-narrative">Your durable wiring lines up with how you\'re showing up right now.</p>';
+    }else if(baselineDesc && String(baselineDesc).trim()){
+      baselineNarrative = '<p class="result-hero-lane-narrative">' + _escapeHeroHtml(baselinePlain) + ' — ' + _escapeHeroHtml(baselineDesc) + '</p>';
+    }else{
+      baselineNarrative = '<p class="result-hero-lane-narrative">' + _escapeHeroHtml(baselinePlain) + '</p>';
+    }
+  }
+  const likelyChips = hasLikely ? _likelyCoreTagChips(profile, { hero: true, skipConfidence: true }) : '';
+  const laneNow =
+    '<div class="result-hero-lane result-hero-lane--now">' +
+    '<p class="result-hero-lane-kicker">Right now</p>' +
+    '<p class="result-hero-lane-lede">What we\'re seeing in how you answered — under today\'s load and season.</p>' +
+    '<div class="result-hero-lane-chips">' + (nowChips || '<span class="ftag">See narrative below</span>') + '</div></div>';
+  if(!hasLikely) return laneNow;
+  const laneCore =
+    '<div class="result-hero-lane result-hero-lane--core">' +
+    '<p class="result-hero-lane-kicker">When you\'re resourced</p>' +
+    '<p class="result-hero-lane-lede">Your likely baseline — the pattern that tends to show when life isn\'t squeezing you.</p>' +
+    baselineNarrative +
+    '<div class="result-hero-lane-chips">' + likelyChips + '</div></div>';
+  return laneNow + laneCore;
+}
+
+function mbtiRadarVec(m){
+  if(!m || String(m).length < 4) return [0.5, 0.5, 0.5, 0.5];
+  var u = String(m).toUpperCase().slice(0, 4);
+  return [
+    u.charAt(0) === 'E' ? 1 : 0,
+    u.charAt(1) === 'N' ? 1 : 0,
+    u.charAt(2) === 'F' ? 1 : 0,
+    u.charAt(3) === 'P' ? 1 : 0
+  ];
+}
+
+function drawBirdsongRadar(profile){
+  var c = document.getElementById('birdsong-radar');
+  var wrap = document.getElementById('birdsong-radar-wrap');
+  if(!c || !wrap || !profile) return;
+  var ctx = c.getContext('2d');
+  var cx = c.width / 2;
+  var cy = c.height / 2;
+  var R = Math.min(cx, cy) - 36;
+  var labels = ['E–I', 'N–S', 'F–T', 'P–J'];
+  var n = 4;
+  var ax = [];
+  for(var i = 0; i < n; i++){
+    var ang = -Math.PI / 2 + (i * 2 * Math.PI) / n;
+    ax.push({ x: Math.cos(ang), y: Math.sin(ang) });
+  }
+  function polyFor(vec){
+    var pts = [];
+    for(var j = 0; j < n; j++){
+      var t = vec[j];
+      var rx = cx + ax[j].x * R * (0.2 + 0.8 * t);
+      var ry = cy + ax[j].y * R * (0.2 + 0.8 * t);
+      pts.push({ x: rx, y: ry });
+    }
+    return pts;
+  }
+  function strokePoly(pts, stroke, fill){
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for(var k = 1; k < pts.length; k++) ctx.lineTo(pts[k].x, pts[k].y);
+    ctx.closePath();
+    if(fill){
+      ctx.fillStyle = fill;
+      ctx.fill();
+    }
+    ctx.strokeStyle = stroke;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.strokeStyle = 'rgba(245,200,66,0.15)';
+  ctx.lineWidth = 1;
+  for(var g = 1; g <= 4; g++){
+    ctx.beginPath();
+    var rg = (R * g) / 4;
+    for(var i = 0; i <= n; i++){
+      var ii = i % n;
+      var ang = -Math.PI / 2 + (ii * 2 * Math.PI) / n;
+      var px = cx + Math.cos(ang) * rg;
+      var py = cy + Math.sin(ang) * rg;
+      if(i === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.stroke();
+  }
+  for(var li = 0; li < n; li++){
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + ax[li].x * R, cy + ax[li].y * R);
+    ctx.strokeStyle = 'rgba(245,200,66,0.12)';
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(240,236,228,0.45)';
+    ctx.font = '11px DM Sans,sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(labels[li], cx + ax[li].x * (R + 18), cy + ax[li].y * (R + 18));
+  }
+  var vE = mbtiRadarVec(profile.mbti);
+  var vB = mbtiRadarVec(profile.likelyCoreMbti || profile.mbti);
+  strokePoly(polyFor(vB), 'rgba(157,191,138,0.9)', 'rgba(157,191,138,0.12)');
+  strokePoly(polyFor(vE), 'rgba(245,200,66,0.95)', 'rgba(245,200,66,0.14)');
+  ctx.fillStyle = 'rgba(240,236,228,0.55)';
+  ctx.font = '10px DM Mono,monospace';
+  ctx.textAlign = 'left';
+  ctx.fillText('◇ baseline', 12, c.height - 28);
+  ctx.fillStyle = 'rgba(245,200,66,0.85)';
+  ctx.fillText('◇ showing up now', 12, c.height - 12);
 }
 
 function renderResults(profile){
@@ -2867,6 +3537,7 @@ function renderResults(profile){
   // Technical subtitle line — only shown if the technical archetype differs
   // from the plain hero name (i.e. there's something extra to say).
   const techEl = document.getElementById('result-archetype-technical');
+  const codesWrap = document.getElementById('result-hero-codes');
   if(techEl){
     const techParts = [];
     if(profile.archetype && profile.archetype !== heroPlain) techParts.push(profile.archetype);
@@ -2875,9 +3546,14 @@ function renderResults(profile){
     if(techParts.length){
       techEl.textContent = techParts.join(' · ');
       techEl.style.display = 'block';
+      if(codesWrap){
+        codesWrap.style.display = '';
+        codesWrap.open = false;
+      }
     } else {
-      techEl.style.display = 'none';
       techEl.textContent = '';
+      techEl.style.display = 'none';
+      if(codesWrap) codesWrap.style.display = 'none';
     }
   }
 
@@ -2895,28 +3571,25 @@ function renderResults(profile){
     }
   }
 
-  const likelyArchEl=document.getElementById('result-likely-archetype');
-  if(likelyArchEl){
-    // v6.0: prefer plain-language baseline archetype if present
-    const baselinePlain = profile.likelyCoreArchetypePlain || profile.likelyCoreArchetype;
-    if(baselinePlain && baselinePlain !== heroPlain){
-      const desc = profile.likelyCoreArchetypePlainDescription || profile.likelyCoreArchetypeSub || '';
-      const descSuffix = desc ? ` — ${desc}` : '';
-      likelyArchEl.textContent=`Likely baseline: ${baselinePlain}${descSuffix}`;
-      likelyArchEl.style.display='block';
-    }else{
-      likelyArchEl.style.display='none';
-      likelyArchEl.textContent='';
-    }
+  const snapEl = document.getElementById('result-hero-snapshot');
+  if(snapEl){
+    const hasLikely = !!(profile.likelyCoreMbti||profile.likelyCoreEnneagram||profile.likelyCoreArchetype);
+    snapEl.innerHTML = _buildHeroSnapshotHtml(profile, heroPlain);
+    snapEl.classList.toggle('result-hero-snapshot--single', !hasLikely);
   }
 
-  const tags=document.getElementById('result-tags');
-  const nowChips=_expressionTagChips(profile);
-  const likelyChips=_likelyCoreTagChips(profile);
-  const hasLikely=!!(profile.likelyCoreMbti||profile.likelyCoreEnneagram||profile.likelyCoreArchetype);
-  let tagHtml=_buildTagRow('Showing up now', nowChips||_resultTagChip('', 'See narrative below'));
-  if(hasLikely) tagHtml+=_buildTagRow('Likely baseline (when resourced)', likelyChips);
-  tags.innerHTML=tagHtml;
+  const meterWrap = document.getElementById('result-hero-meter-wrap');
+  const meterEl = document.getElementById('result-hero-meter');
+  if(meterWrap && meterEl){
+    const meterHtml = _buildHeroMeter(profile.confidence);
+    if(meterHtml){
+      meterEl.innerHTML = meterHtml;
+      meterWrap.style.display = 'block';
+    }else{
+      meterEl.innerHTML = '';
+      meterWrap.style.display = 'none';
+    }
+  }
 
   const dualityWrap=document.getElementById('result-duality-wrap');
   const dualityText=(profile.expressionVersusCoreSummary||'').trim();
@@ -3007,6 +3680,29 @@ function renderResults(profile){
   renderCanvasResults(canvasScores, synthesis);
   renderCanvasHistory();
 
+  drawBirdsongRadar(profile);
+  var st = document.getElementById('nest-snap-title');
+  var ss = document.getElementById('nest-snap-sub');
+  var stag = document.getElementById('nest-snap-tags');
+  if(st) st.textContent = profile.archetypePlain || profile.archetype || '';
+  if(ss) ss.textContent = profile.archetypePlainDescription || profile.archetypeSub || '';
+  if(stag){
+    var tagBits = [profile.mbti, profile.enneagram].filter(Boolean);
+    if(profile.likelyCoreMbti && profile.likelyCoreMbti !== profile.mbti) tagBits.push('baseline ' + profile.likelyCoreMbti);
+    stag.textContent = tagBits.join(' · ');
+  }
+  var satIn = document.getElementById('saturday-opt-in');
+  if(satIn){
+    satIn.onchange = function(){
+      if(!nestId) return;
+      var em = '';
+      try{
+        em = (document.getElementById('pay-email') && document.getElementById('pay-email').value) || '';
+      }catch(e){}
+      fetch(WORKER_URL + '/nest-preferences', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ nestId, saturdayReminder: satIn.checked, email: em }) }).catch(function(){});
+    };
+  }
+
   // Nest ID
   if(nestId){
     document.getElementById('result-nest-id').textContent=`lilbird.life/deep-profile.html?nest=${nestId}`;
@@ -3095,6 +3791,14 @@ function clearAndRestart(){
   // Reset chat state
   chatAnswers = {};
   currentQIndex = 0;
+  earlyExitToCanvas = false;
+  earlyReadPromptShown = false;
+  pairTheseLog = {};
+  peakPlungeData = null;
+  midReadDepthCache = 12;
+  window._peakPts = null;
+  const peakSvg = document.getElementById('peak-svg');
+  if(peakSvg) peakSvg.dataset.bound = '';
   const messagesEl = document.getElementById('chat-messages');
   if(messagesEl) messagesEl.innerHTML = '';
   if(activeRecognitionId) stopMic();
@@ -3202,7 +3906,44 @@ const QUESTIONS = [
   { id:'q27', text:"When something is boring or repetitive, what actually happens to you internally? Do you wilt, comply, find something else to do, or get oddly satisfied by it?", placeholder:"Honest reaction to boredom..." },
 ];
 
+const KNOW_TYPE_QUESTION_IDS = [
+  'q01','q02','q03',
+  'q10','q11','q04',
+  'q16','q20','q21','q22',
+  'q23','q24','q25',
+];
+
+function getActiveQuestions(){
+  if(assessmentPath === 'know'){
+    return KNOW_TYPE_QUESTION_IDS.map(id => QUESTIONS.find(q => q.id === id)).filter(Boolean);
+  }
+  return QUESTIONS;
+}
+
+function selectAssessmentPath(p){
+  assessmentPath = p;
+  const pf = document.getElementById('path-full');
+  const pk = document.getElementById('path-know');
+  if(pf) pf.classList.toggle('path-card-active', p === 'full');
+  if(pk) pk.classList.toggle('path-card-active', p === 'know');
+  const kf = document.getElementById('know-type-fields');
+  if(kf) kf.style.display = p === 'know' ? 'block' : 'none';
+  const note = document.getElementById('intro-timing-note');
+  if(note){
+    note.innerHTML = p === 'know'
+      ? 'Shorter path: <strong>12</strong> focused questions, then Life Canvas — same Nest journey, less repetition.'
+      : 'Full path: about 25–35 minutes — <strong>27</strong> questions, then Life Canvas. Honesty beats speed.';
+  }
+}
+
 // ── STATE ──────────────────────────────
+let assessmentPath = 'full';
+let userDeclaredTypes = { mbti:'', enneagram:'', attachment:'' };
+let pairTheseLog = {};
+let peakPlungeData = null;
+let earlyExitToCanvas = false;
+let midReadDepthCache = 12;
+let earlyReadPromptShown = false;
 let chatAnswers = {};
 let currentQIndex = 0;
 let chatMicActive = false;
@@ -3471,13 +4212,34 @@ function showSavedFlash(){
 function startChat() {
   currentQIndex = 0;
   chatAnswers = {};
+  earlyExitToCanvas = false;
+  earlyReadPromptShown = false;
+  pairTheseLog = {};
+  peakPlungeData = null;
+  midReadDepthCache = 12;
+  window._peakPts = null;
+  if(assessmentPath === 'know'){
+    var km = document.getElementById('know-mbti');
+    var ke = document.getElementById('know-enneagram');
+    var ka = document.getElementById('know-attachment');
+    userDeclaredTypes = {
+      mbti: (km && km.value) ? km.value.trim().toUpperCase().slice(0,4) : '',
+      enneagram: (ke && ke.value) ? ke.value.trim() : '',
+      attachment: (ka && ka.value) ? ka.value.trim() : '',
+    };
+  }else{
+    userDeclaredTypes = { mbti:'', enneagram:'', attachment:'' };
+  }
+  updateNestVisual(0);
+  updateDepthMeter(12);
   renderChatQuestion(0);
   goTo('screen-chat');
 }
 
 // ── RENDER QUESTION ────────────────────
 function renderChatQuestion(idx) {
-  const q = QUESTIONS[idx];
+  const AQ = getActiveQuestions();
+  const q = AQ[idx];
   if(!q) return;
 
   const messagesEl = document.getElementById('chat-messages');
@@ -3514,12 +4276,193 @@ function renderChatQuestion(idx) {
   renderChatChips(q.id);
 
   // Update progress bar
-  const pct = Math.round((idx / QUESTIONS.length) * 97);
+  const pct = Math.round((idx / Math.max(AQ.length,1)) * 97);
   const pb = document.getElementById('progressBar');
   if(pb) pb.style.width = pct + '%';
+  updateDepthMeter(midReadDepthCache);
 }
 
 // ── SEND ANSWER ────────────────────────
+function updateDepthMeter(score){
+  const s = typeof score === 'number' && !isNaN(score) ? Math.max(4, Math.min(100, score)) : midReadDepthCache;
+  midReadDepthCache = s;
+  const labels = ['Surface','Settling in','Going deep','Nearly there','Full picture'];
+  const li = s < 22 ? 0 : s < 45 ? 1 : s < 68 ? 2 : s < 86 ? 3 : 4;
+  const lab = document.getElementById('depth-meter-label');
+  const fill = document.getElementById('depth-meter-fill');
+  if(lab) lab.textContent = labels[li];
+  if(fill) fill.style.width = s + '%';
+}
+
+function updateNestVisual(step){
+  const tw = document.getElementById('nest-twigs');
+  const glow = document.getElementById('nest-glow');
+  if(tw){
+    const n = Math.min(step, 12);
+    let d = 'M30 78 ';
+    for(let i=0;i<n;i++){
+      const x = 28 + i * 5 + (i%2)*3;
+      const y = 72 - Math.min(i*4, 28);
+      d += `L${x} ${y} `;
+    }
+    tw.setAttribute('d', d);
+  }
+  if(glow){
+    glow.setAttribute('opacity', Math.min(0.15 + step * 0.06, 0.95));
+    glow.setAttribute('r', 4 + Math.min(step, 10) * 0.35);
+  }
+}
+
+let peakPlungeDoneResolve = null;
+function openPeakPlungeModal(){
+  const el = document.getElementById('modal-peak-plunge');
+  if(el) el.classList.add('is-open');
+  initPeakPlungeSvg();
+  return new Promise(function(resolve){ peakPlungeDoneResolve = resolve; });
+}
+
+function initPeakPlungeSvg(){
+  const svg = document.getElementById('peak-svg');
+  if(!svg || svg.dataset.bound) return;
+  svg.dataset.bound = '1';
+  const xs = [60, 140, 220, 300];
+  const pts = peakPlungeData && peakPlungeData.length ? peakPlungeData : xs.map(function(x){ return { x:x, y:90 }; });
+  window._peakPts = pts;
+  svg.addEventListener('click', function(ev){
+    const rect = svg.getBoundingClientRect();
+    const mx = (ev.clientX - rect.left) / rect.width * 400;
+    let best = 0;
+    let dist = 9999;
+    for(let i=0;i<xs.length;i++){
+      const d = Math.abs(mx - xs[i]);
+      if(d < dist){ dist = d; best = i; }
+    }
+    const my = Math.max(30, Math.min(150, (ev.clientY - rect.top) / rect.height * 180));
+    window._peakPts[best] = { x: xs[best], y: my };
+    drawPeakLine();
+  });
+  drawPeakLine();
+}
+
+function drawPeakLine(){
+  const line = document.getElementById('peak-line');
+  if(!line || !window._peakPts) return;
+  const pts = window._peakPts;
+  const s = pts.map(function(p){ return p.x + ',' + p.y; }).join(' ');
+  line.setAttribute('points', s);
+}
+
+function skipPeakPlunge(){
+  peakPlungeData = [];
+  const el = document.getElementById('modal-peak-plunge');
+  if(el) el.classList.remove('is-open');
+  if(el && el.querySelector('#peak-svg')) el.querySelector('#peak-svg').dataset.bound = '';
+  if(peakPlungeDoneResolve){ peakPlungeDoneResolve(); peakPlungeDoneResolve = null; }
+}
+
+function savePeakPlunge(){
+  peakPlungeData = (window._peakPts || []).map(function(p){ return { x:p.x, y:p.y }; });
+  const el = document.getElementById('modal-peak-plunge');
+  if(el) el.classList.remove('is-open');
+  if(peakPlungeDoneResolve){ peakPlungeDoneResolve(); peakPlungeDoneResolve = null; }
+}
+
+async function runMidChapterPulse(chaptersComplete){
+  const responses = collectChatResponses();
+  try{
+    const res = await fetch(WORKER_URL + '/mid-read', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ responses, chaptersComplete }),
+    });
+    if(!res.ok) return;
+    const mid = await res.json();
+    if(typeof mid.depthScore === 'number'){
+      updateDepthMeter(mid.depthScore);
+    }
+    const toast = document.getElementById('evidence-toast');
+    const tb = document.getElementById('evidence-toast-body');
+    if(toast && tb && mid.evidenceLine){
+      tb.textContent = mid.evidenceLine;
+      toast.classList.add('is-show');
+      setTimeout(function(){ toast.classList.remove('is-show'); }, 5200);
+    }
+    if(mid.firstHunch && mid.firstHunch.line){
+      const h = document.createElement('div');
+      h.className = 'chat-bubble';
+      h.innerHTML = '<div class="chat-bubble-content chat-ack"><p><strong>Early hunch:</strong> '+mid.firstHunch.line+'</p></div>';
+      const messagesEl = document.getElementById('chat-messages');
+      if(messagesEl){ messagesEl.appendChild(h); h.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+      await sleep(600);
+    }
+    if(mid.pairThese && mid.pairThese.pairs && mid.pairThese.pairs.length === 3){
+      await openPairThese(mid.pairThese);
+    }
+    if(mid.earlyReadEligible && !earlyReadPromptShown && !earlyExitToCanvas){
+      earlyReadPromptShown = true;
+      const modal = document.getElementById('modal-early-read');
+      if(modal){
+        modal.classList.add('is-open');
+        await new Promise(function(resolve){
+          window._earlyReadResolve = resolve;
+        });
+      }
+    }
+  }catch(e){
+    console.warn('mid-read', e);
+  }
+}
+
+function confirmEarlyExit(go){
+  const modal = document.getElementById('modal-early-read');
+  if(modal) modal.classList.remove('is-open');
+  if(go){
+    earlyExitToCanvas = true;
+    currentQIndex = getActiveQuestions().length;
+    finishChat();
+  }
+  if(window._earlyReadResolve){
+    window._earlyReadResolve();
+    window._earlyReadResolve = null;
+  }
+}
+
+function openPairThese(pt){
+  return new Promise(function(resolve){
+    document.getElementById('pair-instruction').textContent = pt.instruction || 'Pick what lands closer.';
+    const grid = document.getElementById('pair-these-rows');
+    const rows = pt.pairs.map(function(pr, i){
+      return '<div class="pair-row" data-i="'+i+'"><button type="button"></button><button type="button"></button></div>';
+    }).join('');
+    grid.innerHTML = rows;
+    const rowsEls = grid.querySelectorAll('.pair-row');
+    pt.pairs.forEach(function(pr, i){
+      const btns = rowsEls[i].querySelectorAll('button');
+      btns[0].textContent = pr.a;
+      btns[1].textContent = pr.b;
+    });
+    rowsEls.forEach(function(row){
+      row.querySelectorAll('button').forEach(function(btn, bi){
+        btn.addEventListener('click', function(){
+          const dim = pt.dimension || 'pair';
+          pairTheseLog[dim + '_' + row.dataset.i] = bi === 0 ? 'a' : 'b';
+          row.style.opacity = '0.45';
+        });
+      });
+    });
+    document.getElementById('modal-pair-these').classList.add('is-open');
+    document.getElementById('pair-done-btn').disabled = false;
+    window._pairFinish = function(){
+      document.getElementById('modal-pair-these').classList.remove('is-open');
+      resolve();
+    };
+  });
+}
+
+function closePairThese(){
+  if(window._pairFinish){ window._pairFinish(); window._pairFinish = null; }
+}
+
 async function sendChatAnswer() {
   const textareaEl = document.getElementById('chat-textarea');
   const sendBtn    = document.getElementById('chat-send');
@@ -3529,8 +4472,10 @@ async function sendChatAnswer() {
   const answer = textareaEl?.value?.trim() || '';
   if(answer.length < 2) return;
 
+  const AQ = getActiveQuestions();
+
   // Store answer
-  const q = QUESTIONS[currentQIndex];
+  const q = AQ[currentQIndex];
   chatAnswers[q.id] = answer;
 
   // Show user bubble
@@ -3555,7 +4500,7 @@ async function sendChatAnswer() {
   showSavedFlash();
 
   // Last question — go to canvas
-  if(currentQIndex >= QUESTIONS.length - 1) {
+  if(currentQIndex >= AQ.length - 1) {
     setTimeout(() => {
       finishChat();
     }, 600);
@@ -3566,7 +4511,7 @@ async function sendChatAnswer() {
   if(thinkingEl) thinkingEl.classList.add('active');
 
   // Get acknowledgment from AI
-  const ack = await getAcknowledgment(q.text, answer, QUESTIONS[currentQIndex + 1]?.text);
+  const ack = await getAcknowledgment(q.text, answer, AQ[currentQIndex + 1]?.text);
 
   // Hide thinking
   if(thinkingEl) thinkingEl.classList.remove('active');
@@ -3586,8 +4531,33 @@ async function sendChatAnswer() {
     await sleep(800);
   }
 
-  // Next question
+  if(earlyExitToCanvas) return;
+
+  const idxDone = currentQIndex;
+  const chaptersComplete = Math.max(1, Math.ceil((idxDone + 1) / 3));
+  const aq = getActiveQuestions();
+  const shouldPulse =
+    assessmentPath === 'full'
+      ? (idxDone + 1) % 3 === 0 && idxDone + 1 < aq.length
+      : (idxDone + 1) % 4 === 0 && idxDone + 1 < aq.length;
+  if(shouldPulse){
+    try {
+      await runMidChapterPulse(chaptersComplete);
+    } catch(e) {
+      console.warn('mid-read', e);
+    }
+  }
+
+  if(earlyExitToCanvas) return;
+
+  const nextIdx = idxDone + 1;
+  const nextQ = aq[nextIdx];
+  if(assessmentPath === 'full' && nextQ && nextQ.id === 'q23' && peakPlungeData === null){
+    await openPeakPlungeModal();
+  }
+
   currentQIndex++;
+  updateNestVisual(currentQIndex);
   renderChatQuestion(currentQIndex);
 }
 
@@ -3646,6 +4616,8 @@ function collectChatResponses() {
     ch7h: chatAnswers.q27 || '',
     canvasScores,
     canvasTexts,
+    peakPlunge: peakPlungeData || undefined,
+    pairTheseLog: Object.keys(pairTheseLog).length ? pairTheseLog : undefined,
   };
 }
 
@@ -4143,6 +5115,9 @@ window.addEventListener('DOMContentLoaded', function() {
         document.getElementById('nest-id').textContent = nestId;
         renderResults(profileData);
         goTo('screen-results');
+        if (params.get('checkin') === '1' && typeof showCanvasRedo === 'function') {
+          setTimeout(function () { showCanvasRedo(); }, 500);
+        }
       }
     } catch(e) { /* no profile found — start fresh */ }
   })();
