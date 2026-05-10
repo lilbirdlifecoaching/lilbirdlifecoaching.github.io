@@ -4385,6 +4385,34 @@ function savePeakPlunge(){
   if(peakPlungeDoneResolve){ peakPlungeDoneResolve(); peakPlungeDoneResolve = null; }
 }
 
+function showEvidenceToast(mid){
+  if(!mid || !mid.evidenceLine) return;
+  const toast = document.getElementById('evidence-toast');
+  const tb = document.getElementById('evidence-toast-body');
+  const tact = document.getElementById('evidence-toast-actions');
+  if(!toast || !tb) return;
+  tb.textContent = mid.evidenceLine;
+  if(tact){
+    tact.innerHTML = '<button type="button" data-ev="yes">That lands</button><button type="button" data-ev="no">Not quite</button>';
+  }
+  toast.classList.add('is-show');
+  var hideEv = setTimeout(hideToast, 9500);
+  function hideToast(){
+    toast.classList.remove('is-show');
+    if(tact) tact.innerHTML = '';
+  }
+  if(tact){
+    tact.querySelectorAll('button').forEach(function(btn){
+      btn.onclick = function(){
+        if(!pairTheseLog.evidencePulses) pairTheseLog.evidencePulses = [];
+        pairTheseLog.evidencePulses.push({ line: mid.evidenceLine, resonate: btn.getAttribute('data-ev') === 'yes', at: Date.now() });
+        clearTimeout(hideEv);
+        hideToast();
+      };
+    });
+  }
+}
+
 async function runMidChapterPulse(chaptersComplete){
   const responses = collectChatResponses();
   try{
@@ -4398,32 +4426,15 @@ async function runMidChapterPulse(chaptersComplete){
     if(typeof mid.depthScore === 'number'){
       updateDepthMeter(mid.depthScore);
     }
-    const toast = document.getElementById('evidence-toast');
-    const tb = document.getElementById('evidence-toast-body');
-    const tact = document.getElementById('evidence-toast-actions');
-    if(toast && tb && mid.evidenceLine){
-      tb.textContent = mid.evidenceLine;
-      if(tact){
-        tact.innerHTML = '<button type="button" data-ev="yes">That lands</button><button type="button" data-ev="no">Not quite</button>';
-      }
-      toast.classList.add('is-show');
-      var hideEv = null;
-      function hideToast(){
-        toast.classList.remove('is-show');
-        if(tact) tact.innerHTML = '';
-      }
-      hideEv = setTimeout(hideToast, 9500);
-      if(tact){
-        tact.querySelectorAll('button').forEach(function(btn){
-          btn.onclick = function(){
-            if(!pairTheseLog.evidencePulses) pairTheseLog.evidencePulses = [];
-            pairTheseLog.evidencePulses.push({ line: mid.evidenceLine, resonate: btn.getAttribute('data-ev') === 'yes', at: Date.now() });
-            clearTimeout(hideEv);
-            hideToast();
-          };
-        });
-      }
+    var hasPair = mid.pairThese && mid.pairThese.choices && mid.pairThese.choices.length >= 2;
+    var hasEvidence = !!mid.evidenceLine;
+
+    // Evidence card + tie-breaker at once caused the toast timer to expire during the modal.
+    // No tie-breaker: toast first (same as before). With tie-breaker: toast only after the modal closes.
+    if(!hasPair && hasEvidence){
+      showEvidenceToast(mid);
     }
+
     if(mid.firstHunch && mid.firstHunch.line){
       const h = document.createElement('div');
       h.className = 'chat-bubble';
@@ -4432,8 +4443,11 @@ async function runMidChapterPulse(chaptersComplete){
       if(messagesEl){ messagesEl.appendChild(h); h.scrollIntoView({behavior:'smooth',block:'nearest'}); }
       await sleep(600);
     }
-    if(mid.pairThese && mid.pairThese.choices && mid.pairThese.choices.length >= 2){
+    if(hasPair){
       await openPairThese(mid.pairThese);
+    }
+    if(hasPair && hasEvidence){
+      showEvidenceToast(mid);
     }
     if(mid.earlyReadEligible && !earlyReadPromptShown && !earlyExitToCanvas){
       earlyReadPromptShown = true;
