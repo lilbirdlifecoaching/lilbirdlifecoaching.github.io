@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- lilbird deep-profile build: v7.0-20260509 (full roadmap: two paths, mid-read, depth+nests, gamification, Peak&Plunge, Birdsong hero, snapshot card, Forest bridge, Saturday opt-in — requires worker v7.0) -->
+<!-- lilbird deep-profile build: v7.0-20260509 (two paths, mid-read, depth+nests, Peak&Plunge, strain hero, Solo /solo next beat, Saturday opt-in — worker v7.0) -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1588,28 +1588,7 @@
   }
   .result-gap-kicker { font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ember); margin: 0 0 0.35rem; }
   .result-gap-body { margin: 0; font-size: 0.95rem; line-height: 1.55; color: var(--text-main); }
-  .bridge-card .forest-sub { font-size: 0.8rem; color: var(--text-muted); margin: 0.5rem 0 0.75rem; line-height: 1.45; }
 
-  .nest-snapshot-card {
-    margin: 1.5rem 0 2rem;
-    padding: 1.5rem;
-    border-radius: 16px;
-    border: 1px solid rgba(245,200,66,0.25);
-    background: linear-gradient(165deg, rgba(245,200,66,0.07) 0%, rgba(30,32,40,0.9) 100%);
-    max-width: 480px;
-  }
-  .nest-snapshot-card .snap-main { font-family: 'Playfair Display', serif; font-size: 1.45rem; color: var(--gold); margin: 0 0 0.35rem; }
-  .nest-snapshot-card .snap-sub { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin: 0 0 1rem; }
-  .bridge-card {
-    margin-top: 1.5rem;
-    padding: 1.25rem 1.35rem;
-    border-radius: 14px;
-    border: 1px solid rgba(157,191,138,0.25);
-    background: rgba(157,191,138,0.06);
-    max-width: 480px;
-  }
-  .bridge-card a { color: var(--gold); text-decoration: none; border-bottom: 1px dotted rgba(245,200,66,0.5); }
-  .bridge-card a:hover { color: var(--text-main); }
   .saturday-opt {
     margin-top: 1rem;
     padding: 1rem 1.15rem;
@@ -1621,6 +1600,7 @@
     max-width: 480px;
   }
   .saturday-opt label { display: flex; gap: 0.65rem; align-items: flex-start; cursor: pointer; }
+  .saturday-opt-hint { margin: 0.6rem 0 0 1.85rem; font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; }
 
   /* RESPONSIVE */
   @media (max-width: 860px) {
@@ -1717,7 +1697,7 @@
 <div id="loadingOverlay">
   <div class="loading-bird">🐦</div>
   <p class="loading-text">Reading your story…</p>
-  <p class="loading-sub">This takes about 20 seconds</p>
+  <p class="loading-sub">This can take up to a minute</p>
 </div>
 
 <nav>
@@ -2002,7 +1982,7 @@
     <!-- Loading state -->
     <div id="preview-loading" class="preview-loading">
       reading carefully<em>your story is being heard…</em>
-      <p style="margin-top:1.5rem;font-family:'DM Sans',sans-serif;font-size:0.85rem;letter-spacing:0;text-transform:none;opacity:0.7;">Pulling out the threads I'm hearing — give us about 15 seconds.</p>
+      <p style="margin-top:1.5rem;font-family:'DM Sans',sans-serif;font-size:0.85rem;letter-spacing:0;text-transform:none;opacity:0.7;">Pulling out the threads I'm hearing — may take up to a minute.</p>
     </div>
 
     <!-- Error state -->
@@ -2052,7 +2032,7 @@
   <div class="inner" style="text-align:center;padding-top:6rem;">
     <p class="eyebrow" style="justify-content:center;">almost there</p>
     <h2>Your story is<br><em>being read.</em></h2>
-    <p style="max-width:420px;margin:1.5rem auto;">Give us about 20 seconds — the AI is working through everything you wrote and building something specific to you.</p>
+    <p style="max-width:420px;margin:1.5rem auto;">Give it up to a minute — the AI is working through everything you wrote and building something specific to you.</p>
     <p style="font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.12em;color:var(--gold-dim);margin-top:2rem;text-transform:uppercase;">Your Nest ID: <span id="nest-id" style="color:var(--gold);">generating…</span></p>
   </div>
 </div>
@@ -2221,22 +2201,9 @@
         <div class="nest-next-actions" id="nest-next-actions"></div>
       </div>
 
-      <div class="nest-snapshot-card" id="nest-snapshot-card">
-        <p class="snap-main" id="nest-snap-title"></p>
-        <p class="snap-sub" id="nest-snap-sub"></p>
-        <p style="font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.12em;color:var(--gold-dim);margin:0;" id="nest-snap-tags"></p>
-      </div>
-
-      <div class="bridge-card" id="bridge-forest-card">
-        <p style="margin:0 0 0.35rem;font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-dim);">From here</p>
-        <p style="margin:0;font-size:0.92rem;line-height:1.55;color:var(--text-main);">Want to map how people sit in your life next? <a href="https://lilbird.life/solo/tools/tool-forest.html" target="_blank" rel="noopener" id="forest-link">Forest of Connections →</a></p>
-        <p class="forest-sub">Opens in a new tab so this Nest stays open. The Solo Course &quot;back&quot; buttons may not return here — that's a course quirk we're not changing from this project.</p>
-        <button type="button" class="btn btn-outline" id="forest-milestone-btn" style="margin-top:0.65rem;">I've opened Forest — note it on my Nest</button>
-        <p id="forest-milestone-note" style="margin:0.5rem 0 0;font-size:0.8rem;color:var(--text-muted);line-height:1.4;"></p>
-      </div>
-
       <div class="saturday-opt" id="saturday-opt-box">
         <label><input type="checkbox" id="saturday-opt-in"> <span><strong>Saturday pulse</strong> — one short email with a link back here for a 2-minute canvas check-in. Low noise. You can turn it off anytime from your Nest.</span></label>
+        <p class="saturday-opt-hint" id="saturday-opt-hint">Saves as soon as you check or uncheck — we use the email you already gave at pay / unlock.</p>
       </div>
     </div>
 
@@ -3684,82 +3651,49 @@ function renderResults(profile){
   renderCanvasHistory();
 
   renderStrainBend(profile);
+  var SOLO_NEST_URL = 'https://lilbird.life/solo/';
   var nxc = document.getElementById('nest-next-card');
-  if(nxc && profile.nestNextSteps){
+  if(nxc){
     nxc.style.display = 'block';
-    var ns = profile.nestNextSteps;
+    var ns = profile.nestNextSteps || {};
     var tierEl = document.getElementById('nest-next-tier');
     if(tierEl) tierEl.textContent = (ns.tier === 'anchor' ? 'Next beat · deeper support' : ns.tier === 'bridge' ? 'Next beat · bridge' : 'Next beat · light touch');
-    document.getElementById('nest-next-headline').textContent = ns.headline || '';
-    document.getElementById('nest-next-body').textContent = ns.body || '';
+    document.getElementById('nest-next-headline').textContent = ns.headline || 'Keep walking with Lil\' Bird';
+    document.getElementById('nest-next-body').textContent = ns.body || 'The Solo experience is in beta — same world as this Nest, with more tools and pace when you\'re ready.';
     var act = document.getElementById('nest-next-actions');
     act.innerHTML = '';
-    var p = ns.primaryCta || ns.primarycta;
-    var s = ns.secondaryCta || ns.secondarycta;
-    if(p && p.label){
-      var a1 = document.createElement('a');
-      a1.className = 'primary';
-      a1.href = p.url || '#';
-      a1.target = '_blank';
-      a1.rel = 'noopener';
-      a1.textContent = p.label;
-      act.appendChild(a1);
-    }
-    if(s && s.label){
-      var a2 = document.createElement('a');
-      a2.className = 'secondary';
-      a2.href = s.url || '#';
-      a2.target = '_blank';
-      a2.rel = 'noopener';
-      a2.textContent = s.label;
-      act.appendChild(a2);
-    }
-  }else if(nxc){ nxc.style.display = 'none'; }
-  var st = document.getElementById('nest-snap-title');
-  var ss = document.getElementById('nest-snap-sub');
-  var stag = document.getElementById('nest-snap-tags');
-  if(st) st.textContent = profile.archetypePlain || profile.archetype || '';
-  if(ss) ss.textContent = profile.archetypePlainDescription || profile.archetypeSub || '';
-  if(stag){
-    var tagBits = [profile.mbti, profile.enneagram].filter(Boolean);
-    if(profile.likelyCoreMbti && profile.likelyCoreMbti !== profile.mbti) tagBits.push('baseline ' + profile.likelyCoreMbti);
-    stag.textContent = tagBits.join(' · ');
+    var soloA = document.createElement('a');
+    soloA.className = 'primary';
+    soloA.href = SOLO_NEST_URL;
+    soloA.target = '_blank';
+    soloA.rel = 'noopener';
+    soloA.textContent = 'Solo course (beta) →';
+    act.appendChild(soloA);
   }
   var satIn = document.getElementById('saturday-opt-in');
-  if(satIn){
-    satIn.onchange = function(){
-      if(!nestId) return;
-      var em = '';
-      try{
-        em = (document.getElementById('pay-email') && document.getElementById('pay-email').value) || '';
-      }catch(e){}
-      fetch(WORKER_URL + '/nest-preferences', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ nestId, saturdayReminder: satIn.checked, email: em }) }).catch(function(){});
-    };
-  }
-
-  const forestMilestoneBtn = document.getElementById('forest-milestone-btn');
-  if(forestMilestoneBtn && nestId){
-    const forestNote = document.getElementById('forest-milestone-note');
-    const markForest = function(){
-      forestMilestoneBtn.disabled = true;
-      forestMilestoneBtn.textContent = 'Saved';
-      if(forestNote) forestNote.textContent = 'Noted on your Nest.';
-      fetch(WORKER_URL + '/nest-preferences', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nestId, milestones: { forestVisitedAt: new Date().toISOString() } })
-      }).catch(function(){ forestMilestoneBtn.disabled = false; forestMilestoneBtn.textContent = 'Note it on my Nest'; });
-    };
-    forestMilestoneBtn.onclick = markForest;
+  var satHint = document.getElementById('saturday-opt-hint');
+  if(satIn && nestId){
     fetch(WORKER_URL + '/nest-preferences?nestId=' + encodeURIComponent(nestId))
       .then(function(r){ return r.json(); })
       .then(function(d){
-        if(d && d.milestones && d.milestones.forestVisitedAt){
-          forestMilestoneBtn.disabled = true;
-          forestMilestoneBtn.textContent = 'Already noted';
-          if(forestNote) forestNote.textContent = 'You already noted this visit.';
-        }
+        if(d && typeof d.saturdayReminder === 'boolean') satIn.checked = d.saturdayReminder;
       }).catch(function(){});
+    satIn.onchange = function(){
+      var em = (typeof userEmail === 'string' && userEmail.trim()) ? userEmail.trim() : '';
+      if(!em){
+        try{
+          var pe = document.getElementById('pay-email');
+          em = (pe && pe.value) ? String(pe.value).trim() : '';
+        }catch(e){}
+      }
+      if(!em && satIn.checked){
+        if(satHint) satHint.textContent = 'We need an email on file for Saturday mail — the one you used to unlock is best. Email hello@lilbird.life if you need help linking it.';
+        satIn.checked = false;
+        return;
+      }
+      if(satHint) satHint.textContent = 'Saves as soon as you check or uncheck — we use the email you already gave at pay / unlock.';
+      fetch(WORKER_URL + '/nest-preferences', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ nestId, saturdayReminder: satIn.checked, email: em }) }).catch(function(){});
+    };
   }
 
   // Nest ID
@@ -3933,7 +3867,7 @@ function getFallbackProfile(){
       headline: 'Your next move in the Lil\' Bird world',
       body: 'You\'re carrying a real gap between how you\'re wired and how you\'re showing up. That\'s not failure — it\'s data. A structured next step can help you bridge it without burning out.',
       primaryCta: { label: 'Explore 1:1 coaching', href: 'https://lilbird.life/coaching', kind: 'coaching' },
-      secondaryCta: { label: 'Solo course — Forest of Connections', href: 'https://lilbird.life/solo-course', kind: 'solo' },
+      secondaryCta: { label: 'Solo course (beta)', href: 'https://lilbird.life/solo/', kind: 'solo' },
       tier: 'bridge',
       badge: 'Next chapter'
     },
@@ -5204,6 +5138,7 @@ window.addEventListener('DOMContentLoaded', function() {
       if (data.profile) {
         nestId = existingNest;
         profileData = data.profile;
+        if (data.email) userEmail = data.email;
         // Load stored canvas data
         if(data.canvasScores) canvasScores = data.canvasScores;
         if(data.canvasHistory) canvasHistory = data.canvasHistory;
