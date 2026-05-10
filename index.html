@@ -845,7 +845,7 @@
     /* ─── MEET LUKE ─── */
     .luke-grid {
       display: grid;
-      grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
+      grid-template-columns: minmax(200px, 320px) minmax(0, 1fr);
       gap: clamp(2rem, 5vw, 3.75rem);
       align-items: center;
       margin: 2.5rem 0;
@@ -854,25 +854,24 @@
       display: flex;
       justify-content: center;
     }
-    /* PNG may include transparent margins; zoom crops them visually (overflow clips). Trim in an editor only if you want exact framing. */
+    /* Portrait frame; object-fit: cover crops side transparency in the PNG. aspect-ratio slightly narrower than 501/984 to zoom past empty wings. */
     .luke-photo-frame {
-      --luke-photo-zoom: 1.14;
       margin: 0;
       width: 100%;
-      max-width: 280px;
+      max-width: 300px;
+      aspect-ratio: 3 / 7;
       border-radius: 6px;
       overflow: hidden;
       border: 1px solid var(--dark-border);
       box-shadow: 0 20px 48px rgba(0, 0, 0, 0.28);
       background: var(--dark-mid);
-      line-height: 0;
     }
     .luke-photo-vertical {
       width: 100%;
-      height: auto;
+      height: 100%;
       display: block;
-      transform: scale(var(--luke-photo-zoom));
-      transform-origin: center center;
+      object-fit: cover;
+      object-position: 50% 40%;
       filter: sepia(0.12) contrast(1.04);
     }
     .luke-body {
@@ -925,7 +924,7 @@
       .carousel-track { grid-template-columns: repeat(5, 100%); }
       .luke-grid { grid-template-columns: 1fr; gap: 2rem; align-items: start; }
       .luke-photo-column { justify-content: flex-start; }
-      .luke-photo-frame { max-width: min(260px, 72vw); }
+      .luke-photo-frame { max-width: min(280px, 78vw); aspect-ratio: 3 / 7; }
       .newsletter-section { padding: 3.5rem 1.25rem; }
       .hero-actions { flex-direction: column; align-items: flex-start; }
     }
@@ -1348,7 +1347,7 @@
     <div class="luke-grid">
       <div class="luke-photo-column reveal reveal-delay-1">
         <figure class="luke-photo-frame">
-          <img src="lil-luke.png" alt="Luke Haythorpe, founder of lil' bird coaching" class="luke-photo-vertical" width="1006" height="984" loading="lazy" decoding="async" />
+          <img src="lil-luke.png" alt="Luke Haythorpe, founder of lil' bird coaching" class="luke-photo-vertical" width="501" height="984" loading="lazy" decoding="async" />
         </figure>
       </div>
 
