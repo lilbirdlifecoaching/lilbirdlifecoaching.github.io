@@ -387,22 +387,22 @@
 
       <!-- Session type selector -->
       <div class="session-options reveal reveal-delay-3">
-        <div class="session-option active" data-url="https://calendly.com/lilbirdlifecoaching/first-flight-session" onclick="switchCalendly(this)">
+        <div class="session-option active" data-url="https://calendly.com/lukehaythorpe-orangery/first-flight-session" onclick="switchCalendly(this)">
           <p class="opt-name">The First Flight</p>
           <p class="opt-tag">1 session · 2 hours · start here</p>
           <p class="opt-desc">One conversation to map your story, find the real issue, and leave with your next brave step. No commitment beyond the conversation. This is where most people begin.</p>
         </div>
-        <div class="session-option" data-url="https://calendly.com/lilbirdlifecoaching/packages/141b4b4c-dca7-46e5-9314-a8fc55f4320f" onclick="switchCalendly(this)">
+        <div class="session-option" data-url="https://calendly.com/lukehaythorpe-orangery/packages/141b4b4c-dca7-46e5-9314-a8fc55f4320f" onclick="switchCalendly(this)">
           <p class="opt-name">Life Change Sessions</p>
           <p class="opt-tag">7 sessions · 2 hours each · full curriculum</p>
           <p class="opt-desc">The whole journey. Seven deep sessions built around a curriculum that goes all the way — your story, your wiring, your relationships, your next chapter. By the end you won't just have clarity about what's next. You'll understand <em>why</em> you are the way you are, and what to do with that.</p>
         </div>
-        <div class="session-option" data-url="https://calendly.com/lilbirdlifecoaching/coaching" onclick="switchCalendly(this)">
+        <div class="session-option" data-url="https://calendly.com/lukehaythorpe-orangery/coaching" onclick="switchCalendly(this)">
           <p class="opt-name">Monthly Coaching</p>
           <p class="opt-tag">flexible · recurring or once-off</p>
           <p class="opt-desc">Some people need a regular thinking partner. Some just need one good conversation right now. Monthly coaching works both ways — a standing session to keep you moving, or a one-off when something specific needs working through. No pressure to commit to more than you need.</p>
         </div>
-        <div class="session-option" data-url="https://calendly.com/lilbirdlifecoaching/30min" onclick="switchCalendly(this)">
+        <div class="session-option" data-url="https://calendly.com/lukehaythorpe-orangery/30min" onclick="switchCalendly(this)">
           <p class="opt-name">Discovery Call</p>
           <p class="opt-tag">free · 30 minutes · no hard sell</p>
           <p class="opt-desc">Not sure if this is for you? That's exactly what this call is for. We'll spend 30 minutes getting honest about where you are and whether we're the right fit. No script, no pitch. If we're not the right match, we'll tell you. Our bias is always you.</p>
@@ -435,7 +435,7 @@
       <div
         class="calendly-inline-widget"
         id="calendly-widget"
-        data-url="https://calendly.com/lilbirdlifecoaching/first-flight-session?hide_event_type_details=1&hide_gdpr_banner=1&background_color=2a2d38&text_color=f0ead8&primary_color=F5C842"
+        data-url="https://calendly.com/lukehaythorpe-orangery/first-flight-session?hide_event_type_details=1&hide_gdpr_banner=1&background_color=2a2d38&text_color=f0ead8&primary_color=F5C842"
       ></div>
     </div>
 
@@ -448,6 +448,7 @@
       <a href="https://lilbirddeepprofile.netlify.app/">Take the Assessment</a>
       <a href="format.html">How It Works</a>
       <a href="index.html">Home</a>
+      <a href="mailto:hello@lilbird.life" id="footer-feedback-link" title="Broken link, typo, bug, or idea">Site feedback</a>
     </div>
     <span class="footer-note">part of the Orangery Solutions ecosystem</span>
   </footer>
@@ -508,6 +509,18 @@
       }
       setTimeout(() => document.getElementById('cal-loading').classList.add('hidden'), 4000);
     }
+
+    (function () {
+      const a = document.getElementById('footer-feedback-link');
+      if (!a) return;
+      const subject = encodeURIComponent('lilbird.life — site feedback');
+      const body = encodeURIComponent(
+        'What went wrong or what would help?\n' +
+        '(broken link, typo, bug, confusing copy, feature idea)\n\n' +
+        '—\nPage: ' + window.location.href + '\n'
+      );
+      a.href = 'mailto:hello@lilbird.life?subject=' + subject + '&body=' + body;
+    })();
   </script>
 </body>
 </html>

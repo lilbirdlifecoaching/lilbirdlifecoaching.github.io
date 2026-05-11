@@ -625,7 +625,7 @@
         </div>
         <div class="step-content">
           <p class="step-title">🐦 The First Flight <span style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;color:var(--gold-dim);margin-left:0.5rem;">— start here</span></p>
-          <p class="step-desc">One 2-hour session. Map your story, find the real issue, leave with your next brave step. No commitment beyond the conversation. <a href="https://calendly.com/lilbirdlifecoaching/first-flight-session" style="color:var(--gold);text-decoration:none;">Book a First Flight →</a></p>
+          <p class="step-desc">One 2-hour session. Map your story, find the real issue, leave with your next brave step. No commitment beyond the conversation. <a href="https://calendly.com/lukehaythorpe-orangery/first-flight-session" style="color:var(--gold);text-decoration:none;">Book a First Flight →</a></p>
         </div>
       </div>
       <div class="journey-step reveal reveal-delay-1">
@@ -906,6 +906,7 @@
     <div class="footer-links">
       <a href="deep-profile.html">Find Your Deep Profile</a>
       <a href="index.html">Home</a>
+      <a href="mailto:hello@lilbird.life" id="footer-feedback-link" title="Broken link, typo, bug, or idea">Site feedback</a>
     </div>
     <span class="footer-note">part of the Orangery Solutions ecosystem</span>
   </footer>
@@ -939,6 +940,18 @@
         if (!isOpen) item.classList.add('open');
       });
     });
+
+    (function () {
+      const a = document.getElementById('footer-feedback-link');
+      if (!a) return;
+      const subject = encodeURIComponent('lilbird.life — site feedback');
+      const body = encodeURIComponent(
+        'What went wrong or what would help?\n' +
+        '(broken link, typo, bug, confusing copy, feature idea)\n\n' +
+        '—\nPage: ' + window.location.href + '\n'
+      );
+      a.href = 'mailto:hello@lilbird.life?subject=' + subject + '&body=' + body;
+    })();
   </script>
 </body>
 </html>
