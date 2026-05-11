@@ -405,6 +405,83 @@
       line-height: 1.6;
     }
 
+    /* ─── PATHFINDER (starting points) ─── */
+    .pathfinder-grid {
+      display: flex;
+      flex-direction: column;
+      margin: 2rem 0 0;
+      border: 1px solid var(--dark-border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .pathfinder-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.75rem 1.25rem;
+      align-items: center;
+      padding: 1.2rem 1.5rem;
+      text-decoration: none;
+      color: inherit;
+      border-bottom: 1px solid var(--dark-border);
+      background: var(--dark-card);
+      transition: background 0.25s ease;
+    }
+    .pathfinder-row:last-child { border-bottom: none; }
+    .pathfinder-row:hover { background: #2f3240; }
+    .pf-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      color: var(--text-main);
+      margin-bottom: 0.2rem;
+    }
+    .pf-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+    .pf-go {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      white-space: nowrap;
+    }
+    .pathfinder-chat-note {
+      margin-top: 1.75rem;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+      max-width: 560px;
+    }
+    .pathfinder-chat-note button {
+      background: none;
+      border: none;
+      color: var(--gold);
+      font-family: inherit;
+      font-size: inherit;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      padding: 0;
+    }
+    .engage-strip {
+      margin: 2.5rem 0 0;
+      padding: 1.25rem 1.5rem;
+      border: 1px solid var(--dark-border);
+      border-radius: 4px;
+      background: rgba(245,200,66,0.04);
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+    .engage-strip a {
+      color: var(--gold-dim);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(245,200,66,0.35);
+    }
+    .engage-strip a:hover { color: var(--gold); }
+
     /* ─── JOURNEY STEPS ─── */
     .journey-steps {
       margin: 3rem 0;
@@ -795,6 +872,15 @@
       margin-right: 0.1em;
     }
     .testimonial-author { display: flex; align-items: center; gap: 0.85rem; }
+    .testimonial-face {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      border: 1px solid var(--dark-border);
+      background: var(--dark-mid);
+    }
     .testimonial-name { font-size: 0.9rem; color: var(--text-main); font-weight: 500; }
     .testimonial-role {
       font-family: 'DM Mono', monospace;
@@ -930,6 +1016,8 @@
       .luke-photo-frame { max-width: min(280px, 78vw); aspect-ratio: 3 / 7; }
       .newsletter-section { padding: 3.5rem 1.25rem; }
       .hero-actions { flex-direction: column; align-items: flex-start; }
+      .pathfinder-row { grid-template-columns: 1fr; }
+      .pf-go { justify-self: start; }
     }
   </style>
   <!-- Google Analytics 4 -->
@@ -968,15 +1056,15 @@
       <em>shouldn't feel like this.</em>
     </h1>
     <p class="hero-sub reveal reveal-delay-2">
-      You feel it before you can name it. A tightness in the chest. A low-grade anxiety that doesn't really lift. The week ahead. The same questions. A version of your life that looks fine from the outside and feels hollow from the inside.<br/><br/>
-      One honest conversation changes that. Not because it has all the answers — but because it asks the right ones.
+      You feel it before you can name it — tight chest, low-grade dread, the same inner argument on repeat. From the outside your life looks fine. From the inside it doesn't quite feel like yours.<br/><br/>
+      One honest conversation can shift that — not because someone has your answers, but because you finally get to hear yourself think.
     </p>
     <div class="hero-actions reveal reveal-delay-3">
       <a href="https://calendly.com/lukehaythorpe-orangery/first-flight-session" class="btn-primary">
         Start with a First Flight
         <span>→</span>
       </a>
-      <a href="#the-story" class="btn-secondary">See how it works</a>
+      <a href="#pathfinder" class="btn-secondary">Pick your starting point</a>
     </div>
     <div class="hero-scroll-hint reveal reveal-delay-4">
       <span class="scroll-arrow"></span>
@@ -1005,6 +1093,66 @@
     </div>
   </section>
 
+  <!-- ══════════════════════════════════
+       PATHFINDER — all ways in
+  ══════════════════════════════════ -->
+  <section class="story-section" id="pathfinder" style="padding-top: 3rem;">
+    <p class="section-label reveal">map the doors</p>
+    <h2 class="story-headline reveal reveal-delay-1">
+      Pick where to<br/><em>start.</em>
+    </h2>
+    <p class="story-body reveal reveal-delay-2">
+      No single "right" first step — just the one that fits today. Self-serve tools and live sessions all live here; the acts below explain how coaching works once you're in the room (or on the call).
+    </p>
+    <div class="pathfinder-grid reveal reveal-delay-2">
+      <a class="pathfinder-row" href="am-i-ready-for-coaching.html">
+        <div>
+          <p class="pf-name">Am I Ready?</p>
+          <p class="pf-desc">Short survey — is coaching the right kind of help for what you're carrying?</p>
+        </div>
+        <span class="pf-go">Start →</span>
+      </a>
+      <a class="pathfinder-row" href="deep-profile.html">
+        <div>
+          <p class="pf-name">Inner Compass — Deep Profile</p>
+          <p class="pf-desc">A structured read on your wiring — language for what you feel but haven't been able to name.</p>
+        </div>
+        <span class="pf-go">Explore →</span>
+      </a>
+      <a class="pathfinder-row" href="https://lilbird.life/solo/">
+        <div>
+          <p class="pf-name">Life Change Sessions — Solo Course</p>
+          <p class="pf-desc">The curriculum at your own pace — same arc, without the standing appointments.</p>
+        </div>
+        <span class="pf-go">Go to solo →</span>
+      </a>
+      <a class="pathfinder-row" href="https://calendly.com/lukehaythorpe-orangery/first-flight-session">
+        <div>
+          <p class="pf-name">First Flight</p>
+          <p class="pf-desc">One 2-hour in-person session — map your story, surface the real issue, leave with your next brave step.</p>
+        </div>
+        <span class="pf-go">Book →</span>
+      </a>
+      <a class="pathfinder-row" href="book.html#intensive">
+        <div>
+          <p class="pf-name">Life Change Intensive</p>
+          <p class="pf-desc">The full in-person package — deep runway for people who know they need more than a single session.</p>
+        </div>
+        <span class="pf-go">Book →</span>
+      </a>
+      <a class="pathfinder-row" href="https://calendly.com/lukehaythorpe-orangery/30min">
+        <div>
+          <p class="pf-name">Discovery call</p>
+          <p class="pf-desc">30 minutes, no hard sell — figure out together if this is the right fit.</p>
+        </div>
+        <span class="pf-go">Schedule →</span>
+      </a>
+    </div>
+    <p class="pathfinder-chat-note reveal reveal-delay-3">
+      Quick questions while you browse? Tap the bird — <button type="button" id="pathfinder-chat-trigger">open chat</button>.
+    </p>
+  </section>
+
   <div class="divider reveal"><div class="divider-line"></div><span class="divider-glyph">✦</span><div class="divider-line"></div></div>
 
   <!-- ══════════════════════════════════
@@ -1014,12 +1162,12 @@
     <p class="section-label reveal">act one — the moment</p>
 
     <h2 class="story-headline reveal reveal-delay-1">
-      Something has to<br><em>change.</em>
+      Something has to<br/><em>change.</em>
     </h2>
 
     <p class="story-body reveal reveal-delay-2">
-      You feel it before you can name it. A tightness in the chest. A low-grade anxiety that doesn't really lift. The week ahead. A version of your life that looks fine from the outside but feels hollow on the inside.<br/><br/>
-      One honest conversation changes that. Not because it has all the answers — but because it asks the right ones.
+      The problem usually isn't a missing spreadsheet or a lack of discipline. It's living in the gap — between the life you built and the life that fits who you're becoming. Nothing is "wrong enough" to justify stopping. Nothing feels right enough to keep going. So you default to another week of performing fine.<br/><br/>
+      Coaching isn't a pep talk. It's a pause long enough to tell yourself the truth — and choose a next step you can actually own.
     </p>
   </section>
 
@@ -1029,13 +1177,13 @@
        ACT 2 — The Approach
   ══════════════════════════════════ -->
   <section class="story-section">
-    <p class="section-label reveal">act two — the approach</p>
+    <p class="section-label reveal">act two — how we work</p>
     <h2 class="story-headline reveal reveal-delay-1">
       Less advice.<br/>
       More <em>listening.</em>
     </h2>
     <p class="story-body reveal reveal-delay-2">
-      A good coach never tells you what to do. Because the answer is almost always already inside you. It just needs the right conditions to surface. We start with you — your story, your wiring, your energy.
+      I won't script your life. The workable answer is almost always already in you — it needs air, not another opinion. We start with your story and your wiring, not a template.
     </p>
 
     <div class="journey-steps">
@@ -1046,7 +1194,7 @@
         </div>
         <div class="step-content">
           <p class="step-title">The Glow Map — your story, mapped</p>
-          <p class="step-desc">We start with where you've been. Your past doesn't have to be baggage — it's better as data. Together we draw the map of what's lit you up, drained you, and shaped who you've become.</p>
+          <p class="step-desc">Where you've been isn't baggage — it's data. We map what lit you up, what drained you, and what actually shaped you (not the résumé version).</p>
         </div>
       </div>
       <div class="journey-step reveal reveal-delay-1">
@@ -1056,7 +1204,7 @@
         </div>
         <div class="step-content">
           <p class="step-title">Relational Intelligence — the voice beneath the noise</p>
-          <p class="step-desc">We go deep on how you relate — to yourself, to others, to work. Most people skip this because it's really hard work, but it's usually where the real issue lies.</p>
+          <p class="step-desc">How you relate to yourself, to the people who matter, and to work — most "stuck" lives trace back here. We go there on purpose.</p>
         </div>
       </div>
       <div class="journey-step reveal reveal-delay-2">
@@ -1066,7 +1214,7 @@
         </div>
         <div class="step-content">
           <p class="step-title">Rhythm & Flow — tools that actually work</p>
-          <p class="step-desc">Visual maps. Relationship inventories. Writing prompts. You leave every session with something tangible. A new way to see, not just something to think about.</p>
+          <p class="step-desc">Maps, inventories, prompts — you leave with something you can hold. A new way to see, not another thing to ruminate on alone.</p>
         </div>
       </div>
       <div class="journey-step reveal reveal-delay-3">
@@ -1076,18 +1224,22 @@
         </div>
         <div class="step-content">
           <p class="step-title">The next brave step — yours to take</p>
-          <p class="step-desc">We don't hand you a five-year plan. We help you find the next true move — one you can own, not one everyone else thinks you should.</p>
+          <p class="step-desc">No five-year fantasy plan. One honest next move — small enough to do, true enough that you'll still respect yourself in a month.</p>
         </div>
       </div>
     </div>
 
     <div class="card-block reveal">
       <p class="card-block-eyebrow">the format</p>
-      <p class="card-block-headline">2-hour sessions. Story-first structure. Zero hype. All heart.</p>
-      <p class="card-block-body">Every session is different because every person is different. But the throughline is always the same: we slow down, go real, and work with the actual you — not the version you think you're supposed to be.</p>
+      <p class="card-block-headline">Two hours. Story first. No slide deck.</p>
+      <p class="card-block-body">Sessions vary person to person. The spine doesn't: slow down, go real, work with the you in the room — not the version you perform for everyone else.</p>
     </div>
 
-    <a href="format.html" class="btn-secondary reveal" style="display:inline-block;">See the full format →</a>
+    <a href="format.html" class="btn-secondary reveal" style="display:inline-block;">See session-by-session detail →</a>
+
+    <p class="engage-strip reveal">
+      Want a lighter on-ramp first? Try <a href="am-i-ready-for-coaching.html">Am I Ready?</a>, the <a href="deep-profile.html">Inner Compass profile</a>, or the <a href="https://lilbird.life/solo/">Solo course</a> — then come back when you're ready to go live.
+    </p>
   </section>
 
   <div class="divider reveal"><div class="divider-line"></div><span class="divider-glyph">✦</span><div class="divider-line"></div></div>
@@ -1096,49 +1248,35 @@
        ACT 3 — What We Believe
   ══════════════════════════════════ -->
   <section class="story-section">
-    <p class="section-label reveal">act three — what we believe</p>
+    <p class="section-label reveal">act three — what holds</p>
     <h2 class="story-headline reveal reveal-delay-1">
-      What makes us<br/>
-      <em>different</em> here.
+      What you can<br/>
+      <em>count on.</em>
     </h2>
     <p class="story-body reveal reveal-delay-2">
-      These aren't slogans. They're the actual things we refuse to compromise on.
+      Three non-negotiables — the stuff clients say mattered when the work got hard.
     </p>
 
     <div class="values-list">
       <div class="value-item reveal">
         <div class="value-marker"></div>
         <div>
-          <p class="value-name">Stay Curious</p>
-          <p class="value-desc">Curiosity is a superpower. We ask questions you may never have heard. We know growth starts when you lean into the unknown — not away from it.</p>
+          <p class="value-name">No fixing you</p>
+          <p class="value-desc">You're not a project. I ask, reflect, and challenge — I don't take over your decisions or perform "expert" on your life.</p>
         </div>
       </div>
       <div class="value-item reveal reveal-delay-1">
         <div class="value-marker"></div>
         <div>
-          <p class="value-name">Be Real</p>
-          <p class="value-desc">The most powerful version of you is the one that's fully, unapologetically you. No filters, no performance. We're not here for the polished version.</p>
+          <p class="value-name">Safety without fluff</p>
+          <p class="value-desc">Real warmth, real directness. You can name the embarrassing, tired, angry parts without being managed out of them.</p>
         </div>
       </div>
       <div class="value-item reveal reveal-delay-2">
         <div class="value-marker"></div>
         <div>
-          <p class="value-name">Glow Fierce</p>
-          <p class="value-desc">Resilience is more than bouncing back — it's glowing brighter, stronger, and braver because of what you've been through. That's the goal.</p>
-        </div>
-      </div>
-      <div class="value-item reveal reveal-delay-3">
-        <div class="value-marker"></div>
-        <div>
-          <p class="value-name">Choose Growth</p>
-          <p class="value-desc">Growth isn't about having it figured out. It's staying open, learning, and taking small brave steps. Especially when it's hard.</p>
-        </div>
-      </div>
-      <div class="value-item reveal reveal-delay-4">
-        <div class="value-marker"></div>
-        <div>
-          <p class="value-name">Live Known</p>
-          <p class="value-desc">Real connection happens when you feel safe enough to be seen as you are — the messy moments, the big victories, and everything in between. We're here for all of it.</p>
+          <p class="value-name">Something to walk away with</p>
+          <p class="value-desc">Insight that dies in the parking lot isn't the point. You leave with clarity you can act on — or at least one move you're willing to try.</p>
         </div>
       </div>
     </div>
@@ -1152,40 +1290,47 @@
   <section class="story-section">
     <p class="section-label reveal">act four — your move</p>
     <h2 class="story-headline reveal reveal-delay-1">
-      Begin your<br/>
-      <em>adventure.</em>
+      Live work,<br/>
+      <em>your pace.</em>
     </h2>
     <p class="story-body reveal reveal-delay-2">
-      Whether you want to start with a single session or go deeper with monthly support, this is where you take the first actual step.
+      Most people start with a <strong>First Flight</strong> — one long session to see if this kind of depth fits. The <strong>Life Change Intensive</strong> is the full in-person runway. <strong>Monthly</strong> is for keeping momentum. Prefer to move alone first? That's what the <a href="https://lilbird.life/solo/" style="color:var(--gold-dim);text-decoration:none;border-bottom:1px solid rgba(245,200,66,0.35);">Solo course</a> is for. Full menu: <a href="#pathfinder" style="color:var(--gold-dim);text-decoration:none;border-bottom:1px solid rgba(245,200,66,0.35);">starting points</a>.
     </p>
 
     <div class="offering-grid">
       <a href="https://calendly.com/lukehaythorpe-orangery/first-flight-session" class="offering-card featured reveal" style="grid-column:1/-1;">
-        <p class="offering-tag">🐦 start here</p>
-        <p class="offering-title">The First Flight</p>
-        <p class="offering-desc">One 2-hour session. Map your story, find the real issue, leave with your next brave step. No commitment beyond the conversation. This is where most people begin.</p>
+        <p class="offering-tag">most start here</p>
+        <p class="offering-title">First Flight</p>
+        <p class="offering-desc">One 2-hour in-person session. Story mapped, real issue surfaced, one brave next step — no ongoing commitment required.</p>
+      </a>
+      <a href="book.html#intensive" class="offering-card reveal reveal-delay-1">
+        <p class="offering-tag">in person · full runway</p>
+        <p class="offering-title">Life Change Intensive</p>
+        <p class="offering-desc">The complete multi-session journey — for when you already know you need depth, not a single conversation.</p>
+      </a>
+      <a href="https://lilbird.life/solo/" class="offering-card reveal reveal-delay-2">
+        <p class="offering-tag">your timeline</p>
+        <p class="offering-title">Solo course</p>
+        <p class="offering-desc">Same curriculum arc as the intensive — self-paced, no standing appointments. Add live coaching when you're ready.</p>
       </a>
       <a href="book.html" class="offering-card reveal reveal-delay-1">
-        <p class="offering-tag">full journey</p>
-        <p class="offering-title">Life Change Sessions</p>
-        <p class="offering-desc">An 8-session deep dive through the full curriculum. Some people need a bit more runway — we work with that.</p>
+        <p class="offering-tag">rhythm</p>
+        <p class="offering-title">Monthly coaching</p>
+        <p class="offering-desc">A steady thinking partner — recurring or one-off when something specific needs working through.</p>
       </a>
-      <a href="book.html" class="offering-card reveal reveal-delay-2">
-        <p class="offering-tag">ongoing support</p>
-        <p class="offering-title">Monthly Coaching</p>
-        <p class="offering-desc">A regular thinking partner. Recurring or once-off. No pressure to commit to more than you need.</p>
+      <a href="https://calendly.com/lukehaythorpe-orangery/30min" class="offering-card reveal reveal-delay-2">
+        <p class="offering-tag">free · 30 min</p>
+        <p class="offering-title">Discovery call</p>
+        <p class="offering-desc">Not sure this is for you? Short call — we name what's going on and whether we're a fit. No pitch.</p>
       </a>
       <div class="offering-card offering-card-soon reveal reveal-delay-2" style="grid-column: 1 / -1; opacity: 0.75; cursor: default;">
         <p class="offering-tag">✦ coming soon</p>
-        <p class="offering-title">Community &amp; Group Coaching</p>
-        <p class="offering-desc">Something is being built for the ones who want to grow alongside others — not just in private. A space for shared story, collective wisdom, and real connection. More soon.</p>
-        <p class="offering-notify" style="font-size:0.82rem; color:var(--text-muted); margin-top:0.5rem;">Want to know when it launches? <a href="https://subscribe-forms.beehiiv.com/8d432d00-8b5d-4842-aca7-682776d54c79" style="color:var(--gold-dim); text-decoration:none;">Join the newsletter →</a></p>
+        <p class="offering-title">Community &amp; group</p>
+        <p class="offering-desc">For people who want to grow alongside others — shared story, not only private sessions. Building it now.</p>
+        <p class="offering-notify" style="font-size:0.82rem; color:var(--text-muted); margin-top:0.5rem;">Get notified: <a href="https://subscribe-forms.beehiiv.com/8d432d00-8b5d-4842-aca7-682776d54c79" style="color:var(--gold-dim); text-decoration:none;">newsletter →</a></p>
       </div>
     </div>
 
-    <p class="story-body reveal" style="font-size:0.9rem; margin-top: 0.5rem;">
-      Not sure which is right? That's what the discovery call is for.
-    </p>
   </section>
 
   <!-- ══════════════════════════════════
@@ -1196,21 +1341,92 @@
   <section class="story-section" id="testimonials">
     <p class="section-label reveal">what people say</p>
     <h2 class="story-headline reveal reveal-delay-1">
-      Real people.<br/><em>Real change.</em>
+      Voices from<br/>
+      <em>the work.</em>
     </h2>
     <p class="story-body reveal reveal-delay-2">
-      We don't ask for testimonials often. When people offer them, we take it seriously.
+      Honest transitions up front — moves, creative crossroads, whole-life stuckness. Leadership and specialist voices after. Same coach, different résumés, so you can find a mirror before the marquee names.
     </p>
 
     <div class="testimonial-carousel reveal reveal-delay-2" id="testimonial-carousel">
       <div class="carousel-viewport"><div class="carousel-track" id="carousel-track">
 
         <div class="testimonial-card">
+          <p class="testimonial-quote">"Working with Luke has been a great way to kickstart my journey towards wholeness and being centred. He's amazing at reflecting your own emotions and desires back to you in a way that helps you focus on what you truly want out of life. I would absolutely recommend him."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-meta">
+              <p class="testimonial-name">Brianna M</p>
+              <p class="testimonial-role">Coaching client · clarity & desire</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <p class="testimonial-quote">"Luke's a fantastic guide — his style is very laid back, allowing me to work myself verbally towards the direction I want to go. Judgement doesn't exist with him and he has no agenda. He'll give you nudges and challenges, but he will not outright tell you what to do."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-meta">
+              <p class="testimonial-name">Goodwyn D</p>
+              <p class="testimonial-role">Coaching client · self-led pace</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <p class="testimonial-quote">"I was dealing with a tough transition — moving across the country, figuring out my career path, and dealing with post-lock-in emotional fatigue. Luke asked me to dream, something I hadn't done in a long time. I'm confident that even after one session, you will feel empowered and capable."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-meta">
+              <p class="testimonial-name">Wanda L</p>
+              <p class="testimonial-role">Coaching client · big life move</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <p class="testimonial-quote">"I came with four objectives: health, finance, work, and relationships. Luke's encouragement, listening skills, and supportive coaching style helped me delve into each area. I've reached a greater work/life balance, more confidence, and a clear vision for my future."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-meta">
+              <p class="testimonial-name">Deb B</p>
+              <p class="testimonial-role">Coaching client · whole-life audit</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <p class="testimonial-quote">"One welcome surprise was the lack of tracking toward specific professional goals — the exercises focused on deeper themes and passions in life. An important breakthrough was realising the calling didn't have to be about duty. It was OK to ask, 'Ed, what do <em>you</em> want?' I'd recommend this to anyone at a transition in life."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-meta">
+              <p class="testimonial-name">Ed Barker</p>
+              <p class="testimonial-role">Coaching client · calling & duty</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <p class="testimonial-quote">"My time with Luke has felt nothing short of a gift. As the seasons changed, Luke showed up to help guide me as a whole person — not just in the workplace, but how I show up in life and relationships as well."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-meta">
+              <p class="testimonial-name">Mel B</p>
+              <p class="testimonial-role">Coaching client · work & relationships</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <p class="testimonial-quote">"What's helped me most has been Luke's encouragement to be curious about what might be different if I tried something new — and how life might look if I follow the creative idea that comes to me. Allowing time to reflect during and after our sessions has been so helpful."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-meta">
+              <p class="testimonial-name">Anna H</p>
+              <p class="testimonial-role">Coaching client · creative next steps</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
           <p class="testimonial-quote">"His coaching gave me the clarity, tools, and confidence to lead with purpose — and the impact showed up in both my personal life and professional recognition."</p>
           <div class="testimonial-author">
             <div class="testimonial-meta">
               <p class="testimonial-name">Confidence Udegbue</p>
-              <p class="testimonial-role">VP of Product, Freeletics · Forbes 30u30</p>
+              <p class="testimonial-role">VP of Product · leadership & life</p>
             </div>
           </div>
         </div>
@@ -1220,7 +1436,7 @@
           <div class="testimonial-author">
             <div class="testimonial-meta">
               <p class="testimonial-name">Nathan Dunn</p>
-              <p class="testimonial-role">Mechanical Engineering Manager, Lam Research</p>
+              <p class="testimonial-role">Engineering manager · identity at work</p>
             </div>
           </div>
         </div>
@@ -1240,7 +1456,7 @@
           <div class="testimonial-author">
             <div class="testimonial-meta">
               <p class="testimonial-name">J. Todd Vinson</p>
-              <p class="testimonial-role">Principal, Overlander Consulting</p>
+              <p class="testimonial-role">Principal consultant</p>
             </div>
           </div>
         </div>
@@ -1250,78 +1466,7 @@
           <div class="testimonial-author">
             <div class="testimonial-meta">
               <p class="testimonial-name">Jen Dorrough</p>
-              <p class="testimonial-role">Director, YWAM North Cascades</p>
-            </div>
-          </div>
-        </div>
-
-      
-        <div class="testimonial-card">
-          <p class="testimonial-quote">"Working with Luke has been a great way to kickstart my journey towards wholeness and being centred. He's amazing at reflecting your own emotions and desires back to you in a way that helps you focus on what you truly want out of life. I would absolutely recommend him."</p>
-          <div class="testimonial-author">
-            <div class="testimonial-meta">
-              <p class="testimonial-name">Brianna M</p>
-              <p class="testimonial-role">Life Coaching Client</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="testimonial-card">
-          <p class="testimonial-quote">"Luke's a fantastic guide — his style is very laid back, allowing me to work myself verbally towards the direction I want to go. Judgement doesn't exist with him and he has no agenda. He'll give you nudges and challenges, but he will not outright tell you what to do."</p>
-          <div class="testimonial-author">
-            <div class="testimonial-meta">
-              <p class="testimonial-name">Goodwyn D</p>
-              <p class="testimonial-role">Life Coaching Client</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="testimonial-card">
-          <p class="testimonial-quote">"I was dealing with a tough transition — moving across the country, figuring out my career path, and dealing with post-lock-in emotional fatigue. Luke asked me to dream, something I hadn't done in a long time. I'm confident that even after one session, you will feel empowered and capable."</p>
-          <div class="testimonial-author">
-            <div class="testimonial-meta">
-              <p class="testimonial-name">Wanda L</p>
-              <p class="testimonial-role">Life Coaching Client</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="testimonial-card">
-          <p class="testimonial-quote">"I came with four objectives: health, finance, work, and relationships. Luke's encouragement, listening skills, and supportive coaching style helped me delve into each area. I've reached a greater work/life balance, more confidence, and a clear vision for my future."</p>
-          <div class="testimonial-author">
-            <div class="testimonial-meta">
-              <p class="testimonial-name">Deb B</p>
-              <p class="testimonial-role">Life Coaching Client</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="testimonial-card">
-          <p class="testimonial-quote">"One welcome surprise was the lack of tracking toward specific professional goals — the exercises focused on deeper themes and passions in life. An important breakthrough was realising the calling didn't have to be about duty. It was OK to ask, 'Ed, what do <em>you</em> want?' I'd recommend this to anyone at a transition in life."</p>
-          <div class="testimonial-author">
-            <div class="testimonial-meta">
-              <p class="testimonial-name">Ed Barker</p>
-              <p class="testimonial-role">Life Coaching Client</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="testimonial-card">
-          <p class="testimonial-quote">"My time with Luke has felt nothing short of a gift. As the seasons changed, Luke showed up to help guide me as a whole person — not just in the workplace, but how I show up in life and relationships as well."</p>
-          <div class="testimonial-author">
-            <div class="testimonial-meta">
-              <p class="testimonial-name">Mel B</p>
-              <p class="testimonial-role">Life Coaching Client</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="testimonial-card">
-          <p class="testimonial-quote">"What's helped me most has been Luke's encouragement to be curious about what might be different if I tried something new — and how life might look if I follow the creative idea that comes to me. Allowing time to reflect during and after our sessions has been so helpful."</p>
-          <div class="testimonial-author">
-            <div class="testimonial-meta">
-              <p class="testimonial-name">Anna H</p>
-              <p class="testimonial-role">Life Coaching Client</p>
+              <p class="testimonial-role">Nonprofit director</p>
             </div>
           </div>
         </div>
@@ -1361,7 +1506,7 @@
         <p class="luke-body reveal reveal-delay-3" style="margin-top: 1rem;">
           lil' bird is what happens when you take that instinct — to stay with people in the hard middle — and build a proper container around it. Not therapy. Not advice. Just enough steadiness that you can hear yourself think again.
         </p>
-        <a href="https://www.orangery.solutions/about-orangery" class="btn-secondary reveal reveal-delay-4" style="display:inline-block; margin-top: 2rem;">More about Luke →</a>
+        <a href="about-luke.html" class="btn-secondary reveal reveal-delay-4" style="display:inline-block; margin-top: 2rem;">More about Luke →</a>
       </div>
     </div>
   </section>
@@ -1375,7 +1520,7 @@
     <div class="newsletter-inner">
       <p class="section-label reveal" style="justify-content:center;">stay connected</p>
       <h2 class="newsletter-headline reveal reveal-delay-1">The lil' bird letter</h2>
-      <p class="newsletter-body reveal reveal-delay-2">Real stories about real change. Plus coaching tools, relational intelligence insights, and the occasional nudge when you need one. Free, always.</p>
+      <p class="newsletter-body reveal reveal-delay-2">Letters for people in transition — short reads, tools that hold up, and the occasional nudge. Free.</p>
       <div class="newsletter-embed reveal reveal-delay-3">
         <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script>
         <iframe src="https://subscribe-forms.beehiiv.com/8d432d00-8b5d-4842-aca7-682776d54c79" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 759px; height: 379px; margin: 0; border-radius: 0px 0px 0px 0px !important; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"></iframe>
@@ -1395,11 +1540,11 @@
         <em>That's the right place to start.</em>
       </h2>
       <p class="discovery-body reveal reveal-delay-2">
-        No hard sell. No script. Just an open door. We want to understand what's going on for you — and if we're not the right fit, we'll tell you. Our bias is always you.
+        Thirty minutes. No pitch. If we're not the match, we'll say so. The point is understanding what's actually going on — not booking you into something you don't need.
       </p>
       <div class="discovery-actions reveal reveal-delay-3">
-        <a href="https://calendly.com/lukehaythorpe-orangery/30min" class="btn-primary">Talk to a Human →</a>
-        <a href="book.html" class="btn-secondary">Just Book a Session</a>
+        <a href="https://calendly.com/lukehaythorpe-orangery/30min" class="btn-primary">Book a discovery call →</a>
+        <a href="book.html" class="btn-secondary">Open the calendar</a>
       </div>
     </div>
   </div>
@@ -1411,11 +1556,11 @@
     <div class="final-inner">
       <img src="bird-logo.png" alt="lil bird" class="final-bird reveal" style="border-radius:16px;" />
       <h2 class="final-headline reveal reveal-delay-1">
-        Ready for the<br/>
-        <em>adventure?</em>
+        Ready to stop<br/>
+        <em>looping alone?</em>
       </h2>
       <p class="final-body reveal reveal-delay-2">
-        You've read enough to know something resonates. That feeling is worth following. The First Flight is one conversation — no commitment, no agenda beyond being honest together.
+        If something here landed, that matters. First Flight is one long honest conversation — no package pressure, no performance. Or step in wherever fits: <a href="#pathfinder" style="color:var(--gold-dim);text-decoration:none;border-bottom:1px solid rgba(245,200,66,0.35);">pick your door</a>.
       </p>
       <a href="https://calendly.com/lukehaythorpe-orangery/first-flight-session" class="btn-primary reveal reveal-delay-3" style="display:inline-flex;">
         Start with a First Flight →
@@ -1429,8 +1574,9 @@
   <footer>
     <span class="footer-brand">lil' bird</span>
     <div class="footer-links">
+      <a href="about-luke.html">About Luke</a>
       <a href="deep-profile.html">Find Your Deep Profile</a>
-      <a href="book.html">Discovery Call</a>
+      <a href="book.html">Book</a>
       <a href="mailto:hello@lilbird.life" id="footer-feedback-link" title="Broken link, typo, bug, or idea">Site feedback</a>
     </div>
     <span class="footer-note">part of the Orangery Solutions ecosystem</span>
@@ -1525,7 +1671,11 @@
 
 <!-- lil' bird chat widget -->
 <style>
-#lb-chat-btn{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;width:58px;height:58px;border-radius:50%;background:#F5C842;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(245,200,66,0.4);transition:transform 0.3s,box-shadow 0.3s;}
+.lb-chat-launch{position:fixed;bottom:1.25rem;right:1.25rem;z-index:9999;display:flex;flex-direction:column;align-items:flex-end;gap:0.35rem;pointer-events:none;}
+.lb-chat-launch #lb-chat-btn{pointer-events:auto;}
+.lb-chat-hint{margin:0;max-width:12.5rem;text-align:right;font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.1em;text-transform:uppercase;color:#a09880;line-height:1.45;opacity:0.92;}
+.lb-chat-arrow{display:block;text-align:center;color:#F5C842;font-size:0.85rem;line-height:1;margin-bottom:1px;opacity:0.9;}
+#lb-chat-btn{position:static;width:58px;height:58px;border-radius:50%;background:#F5C842;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(245,200,66,0.4);transition:transform 0.3s,box-shadow 0.3s;}
 #lb-chat-btn:hover{transform:scale(1.08) translateY(-2px);box-shadow:0 8px 28px rgba(245,200,66,0.5);}
 #lb-chat-btn img{width:36px;height:36px;border-radius:8px;}
 .lb-notif{position:absolute;top:-2px;right:-2px;width:14px;height:14px;background:#e8734a;border-radius:50%;border:2px solid #1e2028;animation:lb-pulse 2s ease infinite;}
@@ -1555,13 +1705,16 @@
 #lb-input::placeholder{color:#a09880;}#lb-input:focus{border-color:rgba(245,200,66,0.45);}
 #lb-send{width:36px;height:36px;border-radius:8px;background:#F5C842;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.2s,transform 0.2s;color:#1e2028;font-size:1rem;}
 #lb-send:hover{background:#fff;transform:scale(1.05);}.lb-cta-btn{display:inline-block;margin-top:0.5rem;padding:0.5rem 1rem;background:#F5C842;color:#1e2028;border-radius:4px;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;}
-@media(max-width:480px){#lb-win{width:calc(100vw - 2rem);right:1rem;}#lb-chat-btn{right:1rem;bottom:1rem;}}
+@media(max-width:480px){#lb-win{width:calc(100vw - 2rem);right:1rem;}.lb-chat-launch{bottom:1rem;right:1rem;}.lb-chat-hint{max-width:10rem;font-size:0.52rem;}}
 </style>
 
-<button id="lb-chat-btn" aria-label="Chat with lil bird">
-  <img src="bird-logo.png" alt="lil bird" />
-  <span class="lb-notif"></span>
-</button>
+<div class="lb-chat-launch">
+  <p class="lb-chat-hint" aria-hidden="true"><span class="lb-chat-arrow">↓</span>Questions? He knows this site cold.</p>
+  <button type="button" id="lb-chat-btn" aria-label="Chat with lil bird">
+    <img src="bird-logo.png" alt="" />
+    <span class="lb-notif"></span>
+  </button>
+</div>
 
 <div id="lb-win">
   <div class="lb-hdr">
@@ -1585,6 +1738,8 @@
   var OPEN_MSG="Hey. You showed up — that already says something.\n\nI\'m here to listen, not lecture. What\'s going on for you right now?";
   var msgs=[],isOpen=false,typing=false;
   var btn=document.getElementById('lb-chat-btn');
+  var pathTrig=document.getElementById('pathfinder-chat-trigger');
+  if(pathTrig&&btn){pathTrig.addEventListener('click',function(){btn.click();});}
   var win=document.getElementById('lb-win');
   var closeBtn=document.getElementById('lb-close');
   var msgsEl=document.getElementById('lb-msgs');
