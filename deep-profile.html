@@ -2435,8 +2435,22 @@
 </div>
 
 <footer class="page-footer">
-  <p>lil' bird life coaching · <a href="index.html">lilbird.life</a> · hello@lilbird.life</p>
+  <p>lil' bird life coaching · <a href="index.html">lilbird.life</a> · <a href="mailto:hello@lilbird.life">hello@lilbird.life</a> · <a href="mailto:hello@lilbird.life" id="footer-feedback-link">Site feedback</a></p>
 </footer>
+
+<script>
+(function () {
+  const a = document.getElementById('footer-feedback-link');
+  if (!a) return;
+  const subject = encodeURIComponent('lilbird.life — site feedback');
+  const body = encodeURIComponent(
+    'What went wrong or what would help?\n' +
+    '(broken link, typo, bug, confusing copy, feature idea)\n\n' +
+    '—\nPage: ' + window.location.href + '\n'
+  );
+  a.href = 'mailto:hello@lilbird.life?subject=' + subject + '&body=' + body;
+})();
+</script>
 
 
 <script>
