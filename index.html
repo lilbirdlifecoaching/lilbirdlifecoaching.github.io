@@ -325,6 +325,11 @@
     .story-section + .story-section {
       padding-top: 0;
     }
+    /* Room for 3–4 testimonial cards side by side */
+    #testimonials.story-section {
+      box-sizing: border-box;
+      max-width: min(1180px, 100vw);
+    }
 
     .section-label {
       font-family: 'DM Mono', monospace;
@@ -846,14 +851,33 @@
       background: var(--dark-card);
       border: 1px solid var(--dark-border);
       border-radius: 4px;
-      padding: 2rem 1.75rem;
-      flex: 0 0 calc(50% - 0.625rem);
-      min-width: calc(50% - 0.625rem);
+      padding: 1.5rem 1.25rem;
+      flex: 0 0 100%;
+      min-width: 100%;
+      box-sizing: border-box;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 1.5rem;
-      min-height: 220px;
+      gap: 1.25rem;
+      min-height: 200px;
+    }
+    @media (min-width: 640px) {
+      .testimonial-card {
+        flex: 0 0 calc((100% - 1.25rem) / 2);
+        min-width: calc((100% - 1.25rem) / 2);
+      }
+    }
+    @media (min-width: 960px) {
+      .testimonial-card {
+        flex: 0 0 calc((100% - 2 * 1.25rem) / 3);
+        min-width: calc((100% - 2 * 1.25rem) / 3);
+      }
+    }
+    @media (min-width: 1240px) {
+      .testimonial-card {
+        flex: 0 0 calc((100% - 3 * 1.25rem) / 4);
+        min-width: calc((100% - 3 * 1.25rem) / 4);
+      }
     }
     .testimonial-quote {
       font-family: 'Playfair Display', serif;
@@ -1010,7 +1034,6 @@
       .discovery-section { padding: 4rem 1.25rem; }
       .final-section { padding: 4rem 1.25rem; }
       footer { padding: 2rem 1.25rem; flex-direction: column; align-items: flex-start; }
-      .carousel-track { grid-template-columns: repeat(5, 100%); }
       .luke-grid { grid-template-columns: 1fr; gap: 2rem; align-items: start; }
       .luke-photo-column { justify-content: flex-start; }
       .luke-photo-frame { max-width: min(280px, 78vw); aspect-ratio: 3 / 7; }
@@ -1345,66 +1368,16 @@
       <em>the work.</em>
     </h2>
     <p class="story-body reveal reveal-delay-2">
-      Honest transitions up front — moves, creative crossroads, whole-life stuckness. Leadership and specialist voices after. Same coach, different résumés, so you can find a mirror before the marquee names.
+      A mixed chorus — life-transition stories up front, leadership and specialist voices woven in. Same coach, different résumés; scroll the row to see more faces and voices.
     </p>
 
     <div class="testimonial-carousel reveal reveal-delay-2" id="testimonial-carousel">
       <div class="carousel-viewport"><div class="carousel-track" id="carousel-track">
 
         <div class="testimonial-card">
-          <p class="testimonial-quote">"His coaching gave me the clarity, tools, and confidence to lead with purpose — and the impact showed up in both my personal life and professional recognition."</p>
-          <div class="testimonial-author">
-            <div class="testimonial-meta">
-              <p class="testimonial-name">Confidence Udegbue</p>
-              <p class="testimonial-role">VP of Product, Freeletics · Forbes 30u30</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="testimonial-card">
-          <p class="testimonial-quote">"I uncovered blind spots, gained practical tools, and felt recognised for who I was becoming — not just what I was producing. A powerful experience for anyone ready to grow."</p>
-          <div class="testimonial-author">
-            <div class="testimonial-meta">
-              <p class="testimonial-name">Nathan Dunn</p>
-              <p class="testimonial-role">Mechanical Engineering Manager, Lam Research</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="testimonial-card">
-          <p class="testimonial-quote">"Luke possesses an uncanny and uncommon ability to build immediate trust and safety."</p>
-          <div class="testimonial-author">
-            <div class="testimonial-meta">
-              <p class="testimonial-name">Andrew Robinson</p>
-              <p class="testimonial-role">Partner, GiANT Worldwide</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="testimonial-card">
-          <p class="testimonial-quote">"If you want to be led by someone who lives out what they are talking about, Luke is the real deal."</p>
-          <div class="testimonial-author">
-            <div class="testimonial-meta">
-              <p class="testimonial-name">J. Todd Vinson</p>
-              <p class="testimonial-role">Principal, Overlander Consulting</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="testimonial-card">
-          <p class="testimonial-quote">"If you're looking to elevate your game and find a coach who genuinely sees you — Luke is your go-to."</p>
-          <div class="testimonial-author">
-            <div class="testimonial-meta">
-              <p class="testimonial-name">Jen Dorrough</p>
-              <p class="testimonial-role">Director, YWAM North Cascades</p>
-            </div>
-          </div>
-        </div>
-
-      
-        <div class="testimonial-card">
           <p class="testimonial-quote">"Working with Luke has been a great way to kickstart my journey towards wholeness and being centred. He's amazing at reflecting your own emotions and desires back to you in a way that helps you focus on what you truly want out of life. I would absolutely recommend him."</p>
           <div class="testimonial-author">
+            <img class="testimonial-face" src="testimonials/Brianna-M.jpeg" alt="Brianna M" loading="lazy" decoding="async" />
             <div class="testimonial-meta">
               <p class="testimonial-name">Brianna M</p>
               <p class="testimonial-role">Life Coaching Client</p>
@@ -1415,6 +1388,7 @@
         <div class="testimonial-card">
           <p class="testimonial-quote">"Luke's a fantastic guide — his style is very laid back, allowing me to work myself verbally towards the direction I want to go. Judgement doesn't exist with him and he has no agenda. He'll give you nudges and challenges, but he will not outright tell you what to do."</p>
           <div class="testimonial-author">
+            <img class="testimonial-face" src="testimonials/Goodwyn-D.jpeg" alt="Goodwyn D" loading="lazy" decoding="async" />
             <div class="testimonial-meta">
               <p class="testimonial-name">Goodwyn D</p>
               <p class="testimonial-role">Life Coaching Client</p>
@@ -1425,6 +1399,7 @@
         <div class="testimonial-card">
           <p class="testimonial-quote">"I was dealing with a tough transition — moving across the country, figuring out my career path, and dealing with post-lock-in emotional fatigue. Luke asked me to dream, something I hadn't done in a long time. I'm confident that even after one session, you will feel empowered and capable."</p>
           <div class="testimonial-author">
+            <img class="testimonial-face" src="testimonials/Wanda-L.JPG" alt="Wanda L" loading="lazy" decoding="async" />
             <div class="testimonial-meta">
               <p class="testimonial-name">Wanda L</p>
               <p class="testimonial-role">Life Coaching Client</p>
@@ -1433,8 +1408,20 @@
         </div>
 
         <div class="testimonial-card">
+          <p class="testimonial-quote">"Luke possesses an uncanny and uncommon ability to build immediate trust and safety."</p>
+          <div class="testimonial-author">
+            <img class="testimonial-face" src="testimonials/Andrew-R.jpeg" alt="Andrew Robinson" loading="lazy" decoding="async" />
+            <div class="testimonial-meta">
+              <p class="testimonial-name">Andrew Robinson</p>
+              <p class="testimonial-role">Partner, GiANT Worldwide</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
           <p class="testimonial-quote">"I came with four objectives: health, finance, work, and relationships. Luke's encouragement, listening skills, and supportive coaching style helped me delve into each area. I've reached a greater work/life balance, more confidence, and a clear vision for my future."</p>
           <div class="testimonial-author">
+            <img class="testimonial-face" src="testimonials/Deb-B.png" alt="Deb B" loading="lazy" decoding="async" />
             <div class="testimonial-meta">
               <p class="testimonial-name">Deb B</p>
               <p class="testimonial-role">Life Coaching Client</p>
@@ -1443,8 +1430,20 @@
         </div>
 
         <div class="testimonial-card">
+          <p class="testimonial-quote">"I uncovered blind spots, gained practical tools, and felt recognised for who I was becoming — not just what I was producing. A powerful experience for anyone ready to grow."</p>
+          <div class="testimonial-author">
+            <img class="testimonial-face" src="testimonials/Nathan-D.jpeg" alt="Nathan Dunn" loading="lazy" decoding="async" />
+            <div class="testimonial-meta">
+              <p class="testimonial-name">Nathan Dunn</p>
+              <p class="testimonial-role">Mechanical Engineering Manager, Lam Research</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
           <p class="testimonial-quote">"One welcome surprise was the lack of tracking toward specific professional goals — the exercises focused on deeper themes and passions in life. An important breakthrough was realising the calling didn't have to be about duty. It was OK to ask, 'Ed, what do <em>you</em> want?' I'd recommend this to anyone at a transition in life."</p>
           <div class="testimonial-author">
+            <img class="testimonial-face" src="testimonials/Ed-B.jpeg" alt="Ed Barker" loading="lazy" decoding="async" />
             <div class="testimonial-meta">
               <p class="testimonial-name">Ed Barker</p>
               <p class="testimonial-role">Life Coaching Client</p>
@@ -1453,11 +1452,34 @@
         </div>
 
         <div class="testimonial-card">
+          <p class="testimonial-quote">"If you want to be led by someone who lives out what they are talking about, Luke is the real deal."</p>
+          <div class="testimonial-author">
+            <img class="testimonial-face" src="testimonials/Todd-V.jpeg" alt="J. Todd Vinson" loading="lazy" decoding="async" />
+            <div class="testimonial-meta">
+              <p class="testimonial-name">J. Todd Vinson</p>
+              <p class="testimonial-role">Principal, Overlander Consulting</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
           <p class="testimonial-quote">"My time with Luke has felt nothing short of a gift. As the seasons changed, Luke showed up to help guide me as a whole person — not just in the workplace, but how I show up in life and relationships as well."</p>
           <div class="testimonial-author">
+            <img class="testimonial-face" src="testimonials/MelB.jpeg" alt="Mel B" loading="lazy" decoding="async" />
             <div class="testimonial-meta">
               <p class="testimonial-name">Mel B</p>
               <p class="testimonial-role">Life Coaching Client</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <p class="testimonial-quote">"If you're looking to elevate your game and find a coach who genuinely sees you — Luke is your go-to."</p>
+          <div class="testimonial-author">
+            <img class="testimonial-face" src="testimonials/Jen-D.jpg" alt="Jen Dorrough" loading="lazy" decoding="async" />
+            <div class="testimonial-meta">
+              <p class="testimonial-name">Jen Dorrough</p>
+              <p class="testimonial-role">Director, YWAM North Cascades</p>
             </div>
           </div>
         </div>
@@ -1468,6 +1490,17 @@
             <div class="testimonial-meta">
               <p class="testimonial-name">Anna H</p>
               <p class="testimonial-role">Life Coaching Client</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <p class="testimonial-quote">"His coaching gave me the clarity, tools, and confidence to lead with purpose — and the impact showed up in both my personal life and professional recognition."</p>
+          <div class="testimonial-author">
+            <img class="testimonial-face" src="testimonials/Confidence-U.png" alt="Confidence Udegbue" loading="lazy" decoding="async" />
+            <div class="testimonial-meta">
+              <p class="testimonial-name">Confidence Udegbue</p>
+              <p class="testimonial-role">VP of Product, Freeletics · Forbes 30u30</p>
             </div>
           </div>
         </div>
@@ -1627,33 +1660,54 @@
       a.href = 'mailto:hello@lilbird.life?subject=' + subject + '&body=' + body;
     })();
 
-    // ─── TESTIMONIAL CAROUSEL ───
+    // ─── TESTIMONIAL CAROUSEL (1 / 2 / 3 / 4 visible — matches CSS breakpoints) ───
     (function() {
       const track = document.getElementById('carousel-track');
       const dotsContainer = document.getElementById('carousel-dots');
       const prevBtn = document.getElementById('carousel-prev');
       const nextBtn = document.getElementById('carousel-next');
-      if (!track) return;
+      if (!track || !dotsContainer || !prevBtn || !nextBtn) return;
 
       const cards = track.querySelectorAll('.testimonial-card');
       const total = cards.length;
-      const visible = window.innerWidth < 640 ? 1 : 2;
-      const steps = total - visible; // how many positions we can scroll
+      let steps = 0;
       let current = 0;
 
-      // Build dots
-      for (let i = 0; i <= steps; i++) {
-        const dot = document.createElement('button');
-        dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
-        dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
-        dot.addEventListener('click', () => goTo(i));
-        dotsContainer.appendChild(dot);
+      function getVisible() {
+        const w = window.innerWidth;
+        if (w < 640) return 1;
+        if (w < 960) return 2;
+        if (w < 1240) return 3;
+        return 4;
+      }
+
+      function gapPx() {
+        const n = parseFloat(getComputedStyle(track).gap);
+        return Number.isFinite(n) ? n : 20;
+      }
+
+      function stepPx() {
+        if (!cards.length) return 0;
+        return cards[0].offsetWidth + gapPx();
+      }
+
+      function buildDots() {
+        steps = Math.max(0, total - getVisible());
+        dotsContainer.innerHTML = '';
+        for (let i = 0; i <= steps; i++) {
+          const dot = document.createElement('button');
+          dot.type = 'button';
+          dot.className = 'carousel-dot' + (i === current ? ' active' : '');
+          dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+          dot.addEventListener('click', () => goTo(i));
+          dotsContainer.appendChild(dot);
+        }
       }
 
       function goTo(index) {
         current = Math.max(0, Math.min(index, steps));
-        const cardWidth = cards[0].offsetWidth + 20; // 20 = gap
-        track.style.transform = `translateX(-${current * cardWidth}px)`;
+        const sp = stepPx();
+        track.style.transform = sp ? 'translateX(-' + (current * sp) + 'px)' : 'translateX(0)';
         dotsContainer.querySelectorAll('.carousel-dot').forEach((d, i) => {
           d.classList.toggle('active', i === current);
         });
@@ -1661,12 +1715,23 @@
         nextBtn.disabled = current === steps;
       }
 
+      function refresh() {
+        current = Math.min(current, Math.max(0, total - getVisible()));
+        buildDots();
+        goTo(current);
+      }
+
       prevBtn.addEventListener('click', () => goTo(current - 1));
       nextBtn.addEventListener('click', () => goTo(current + 1));
 
-      // Init
+      buildDots();
       goTo(0);
-      window.addEventListener('resize', () => goTo(0));
+
+      let resizeT;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeT);
+        resizeT = setTimeout(refresh, 80);
+      });
     })();
   </script>
 
