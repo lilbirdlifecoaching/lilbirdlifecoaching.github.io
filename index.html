@@ -1672,11 +1672,15 @@
 
 <!-- lil' bird chat widget -->
 <style>
-.lb-chat-launch{position:fixed;bottom:1.25rem;right:1.25rem;z-index:9999;display:flex;flex-direction:column;align-items:flex-end;gap:0.35rem;pointer-events:none;}
+.lb-chat-launch{position:fixed;bottom:1.25rem;right:1.25rem;z-index:9999;display:flex;flex-direction:column;align-items:flex-end;gap:0;pointer-events:none;}
 .lb-chat-launch #lb-chat-btn{pointer-events:auto;}
-.lb-chat-hint{margin:0;max-width:12.5rem;text-align:right;font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.1em;text-transform:uppercase;color:#a09880;line-height:1.45;opacity:0.92;}
-.lb-chat-arrow{display:block;text-align:center;color:#F5C842;font-size:0.85rem;line-height:1;margin-bottom:1px;opacity:0.9;}
-#lb-chat-btn{position:static;width:58px;height:58px;border-radius:50%;background:#F5C842;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(245,200,66,0.4);transition:transform 0.3s,box-shadow 0.3s;}
+.lb-chat-prompt{position:relative;display:flex;flex-direction:column;align-items:flex-end;max-width:14rem;text-align:right;margin-bottom:0.15rem;padding-right:2px;}
+.lb-chat-hint{margin:0;font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.11em;text-transform:uppercase;color:#a09880;line-height:1.5;opacity:0.95;}
+.lb-chat-hint-line1{display:block;color:#c9b896;}
+.lb-chat-hint-line2{display:block;margin-top:0.2em;color:#a09880;}
+.lb-chat-arrow-svg{display:block;width:7.85rem;height:auto;margin:0.25rem 1rem 0.05rem 0;overflow:visible;flex-shrink:0;}
+.lb-chat-arrow-svg path{vector-effect:non-scaling-stroke;}
+#lb-chat-btn{position:static;width:58px;height:58px;border-radius:50%;background:#F5C842;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(245,200,66,0.4);transition:transform 0.3s,box-shadow 0.3s;margin-top:2px;}
 #lb-chat-btn:hover{transform:scale(1.08) translateY(-2px);box-shadow:0 8px 28px rgba(245,200,66,0.5);}
 #lb-chat-btn img{width:36px;height:36px;border-radius:8px;}
 .lb-notif{position:absolute;top:-2px;right:-2px;width:14px;height:14px;background:#e8734a;border-radius:50%;border:2px solid #1e2028;animation:lb-pulse 2s ease infinite;}
@@ -1706,11 +1710,26 @@
 #lb-input::placeholder{color:#a09880;}#lb-input:focus{border-color:rgba(245,200,66,0.45);}
 #lb-send{width:36px;height:36px;border-radius:8px;background:#F5C842;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.2s,transform 0.2s;color:#1e2028;font-size:1rem;}
 #lb-send:hover{background:#fff;transform:scale(1.05);}.lb-cta-btn{display:inline-block;margin-top:0.5rem;padding:0.5rem 1rem;background:#F5C842;color:#1e2028;border-radius:4px;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;}
-@media(max-width:480px){#lb-win{width:calc(100vw - 2rem);right:1rem;}.lb-chat-launch{bottom:1rem;right:1rem;}.lb-chat-hint{max-width:10rem;font-size:0.52rem;}}
+@media(max-width:480px){#lb-win{width:calc(100vw - 2rem);right:1rem;}.lb-chat-launch{bottom:1rem;right:1rem;}.lb-chat-prompt{max-width:11rem;}.lb-chat-hint{font-size:0.52rem;letter-spacing:0.09em;}.lb-chat-arrow-svg{width:6.6rem;margin-right:0.85rem;}}
 </style>
 
 <div class="lb-chat-launch">
-  <p class="lb-chat-hint" aria-hidden="true"><span class="lb-chat-arrow">↓</span>Questions? He knows this site cold.</p>
+  <div class="lb-chat-prompt" aria-hidden="true">
+    <p class="lb-chat-hint">
+      <span class="lb-chat-hint-line1">Questions?</span>
+      <span class="lb-chat-hint-line2">He knows this site cold.</span>
+    </p>
+    <svg class="lb-chat-arrow-svg" viewBox="0 0 132 58" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+      <defs>
+        <marker id="lbChatArrowHead" markerWidth="7" markerHeight="7" refX="5.8" refY="3.5" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L7,3.5 L0,7 Z" fill="#F5C842" opacity="0.95"/>
+        </marker>
+      </defs>
+      <!-- Wider shadow stroke for a slightly hand-drawn weight -->
+      <path d="M 8 12 C 44 2, 96 8, 122 42" fill="none" stroke="rgba(30,32,40,0.55)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M 8 12 C 44 2, 96 8, 122 42" fill="none" stroke="#e8bc3a" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#lbChatArrowHead)" opacity="0.94"/>
+    </svg>
+  </div>
   <button type="button" id="lb-chat-btn" aria-label="Chat with lil bird">
     <img src="bird-logo.png" alt="" />
     <span class="lb-notif"></span>
