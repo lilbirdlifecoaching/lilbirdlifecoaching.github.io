@@ -109,6 +109,9 @@
       90%  { opacity: 0.1; }
       100% { transform: translateY(-10vh) translateX(-20px) scale(0.3); opacity: 0; }
     }
+    @media (prefers-reduced-motion: reduce) {
+      .embers { display: none !important; }
+    }
 
     /* ─── SCROLL REVEAL ─── */
     .reveal {
@@ -1399,7 +1402,7 @@
         <div class="testimonial-card">
           <p class="testimonial-quote">"I was dealing with a tough transition — moving across the country, figuring out my career path, and dealing with post-lock-in emotional fatigue. Luke asked me to dream, something I hadn't done in a long time. I'm confident that even after one session, you will feel empowered and capable."</p>
           <div class="testimonial-author">
-            <img class="testimonial-face" src="/Testimonials/Wanda-L.JPG" alt="Wanda L" loading="lazy" decoding="async" />
+            <img class="testimonial-face" src="/Testimonials/Wanda-L-web.jpg" alt="Wanda L" loading="lazy" decoding="async" />
             <div class="testimonial-meta">
               <p class="testimonial-name">Wanda L</p>
               <p class="testimonial-role">Life Coaching Client</p>
@@ -1421,7 +1424,7 @@
         <div class="testimonial-card">
           <p class="testimonial-quote">"I came with four objectives: health, finance, work, and relationships. Luke's encouragement, listening skills, and supportive coaching style helped me delve into each area. I've reached a greater work/life balance, more confidence, and a clear vision for my future."</p>
           <div class="testimonial-author">
-            <img class="testimonial-face" src="/Testimonials/Deb-B.png" alt="Deb B" loading="lazy" decoding="async" />
+            <img class="testimonial-face" src="/Testimonials/Deb-B-web.jpg" alt="Deb B" loading="lazy" decoding="async" />
             <div class="testimonial-meta">
               <p class="testimonial-name">Deb B</p>
               <p class="testimonial-role">Life Coaching Client</p>
@@ -1497,7 +1500,7 @@
         <div class="testimonial-card">
           <p class="testimonial-quote">"His coaching gave me the clarity, tools, and confidence to lead with purpose — and the impact showed up in both my personal life and professional recognition."</p>
           <div class="testimonial-author">
-            <img class="testimonial-face" src="/Testimonials/Confidence-U.png" alt="Confidence Udegbue" loading="lazy" decoding="async" />
+            <img class="testimonial-face" src="/Testimonials/Confidence-U-web.jpg" alt="Confidence Udegbue" loading="lazy" decoding="async" />
             <div class="testimonial-meta">
               <p class="testimonial-name">Confidence Udegbue</p>
               <p class="testimonial-role">VP of Product, Freeletics · Forbes 30u30</p>
@@ -1555,10 +1558,8 @@
       <p class="section-label reveal" style="justify-content:center;">stay connected</p>
       <h2 class="newsletter-headline reveal reveal-delay-1">The lil' bird letter</h2>
       <p class="newsletter-body reveal reveal-delay-2">Letters for people in transition — short reads, tools that hold up, and the occasional nudge. Free.</p>
-      <div class="newsletter-embed reveal reveal-delay-3">
-        <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script>
-        <iframe src="https://subscribe-forms.beehiiv.com/8d432d00-8b5d-4842-aca7-682776d54c79" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 759px; height: 379px; margin: 0; border-radius: 0px 0px 0px 0px !important; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"></iframe>
-        <script type="text/javascript" async src="https://subscribe-forms.beehiiv.com/attribution.js"></script>
+      <div class="newsletter-embed reveal reveal-delay-3" id="beehiiv-slot">
+        <p class="beehiiv-placeholder" style="font-size:0.85rem;color:var(--text-muted);">Loading signup form…</p>
       </div>
     </div>
   </section>
@@ -1619,18 +1620,62 @@
   <script>
     // ─── EMBER PARTICLES ───
     const emberContainer = document.getElementById('embers');
-    for (let i = 0; i < 18; i++) {
-      const e = document.createElement('div');
-      e.className = 'ember';
-      e.style.left = Math.random() * 100 + '%';
-      e.style.animationDuration = (8 + Math.random() * 14) + 's';
-      e.style.animationDelay = (Math.random() * 12) + 's';
-      e.style.width = e.style.height = (1 + Math.random() * 2.5) + 'px';
-      e.style.opacity = '0';
-      // alternate colors
-      if (Math.random() > 0.6) e.style.background = '#e8734a';
-      emberContainer.appendChild(e);
+    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (emberContainer && !reduceMotion) {
+      for (let i = 0; i < 18; i++) {
+        const e = document.createElement('div');
+        e.className = 'ember';
+        e.style.left = Math.random() * 100 + '%';
+        e.style.animationDuration = (8 + Math.random() * 14) + 's';
+        e.style.animationDelay = (Math.random() * 12) + 's';
+        e.style.width = e.style.height = (1 + Math.random() * 2.5) + 'px';
+        e.style.opacity = '0';
+        if (Math.random() > 0.6) e.style.background = '#e8734a';
+        emberContainer.appendChild(e);
+      }
     }
+
+    // ─── BEEHIIV (lazy: load when newsletter block nears viewport) ───
+    (function () {
+      const slot = document.getElementById('beehiiv-slot');
+      if (!slot) return;
+      let loaded = false;
+      function loadBeehiiv() {
+        if (loaded) return;
+        loaded = true;
+        slot.innerHTML = '';
+        const s1 = document.createElement('script');
+        s1.async = true;
+        s1.src = 'https://subscribe-forms.beehiiv.com/embed.js';
+        document.head.appendChild(s1);
+        const iframe = document.createElement('iframe');
+        iframe.className = 'beehiiv-embed';
+        iframe.setAttribute('data-test-id', 'beehiiv-embed');
+        iframe.setAttribute('frameborder', '0');
+        iframe.setAttribute('scrolling', 'no');
+        iframe.title = 'Newsletter signup';
+        iframe.style.cssText = 'width:759px;height:379px;margin:0;border-radius:0;background-color:transparent;box-shadow:none;max-width:100%;';
+        iframe.src = 'https://subscribe-forms.beehiiv.com/8d432d00-8b5d-4842-aca7-682776d54c79';
+        slot.appendChild(iframe);
+        const s2 = document.createElement('script');
+        s2.async = true;
+        s2.src = 'https://subscribe-forms.beehiiv.com/attribution.js';
+        document.head.appendChild(s2);
+      }
+      if (!('IntersectionObserver' in window)) {
+        loadBeehiiv();
+        return;
+      }
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            loadBeehiiv();
+            obs.disconnect();
+          }
+        });
+      }, { rootMargin: '140px', threshold: 0.01 });
+      obs.observe(slot);
+    })();
 
     // ─── SCROLL REVEAL ───
     // Only enable scroll animations when served over http/https
@@ -1817,6 +1862,7 @@
   </div>
 </div>
 
+<script src="lb-chat-safe.js"></script>
 <script>
 (function(){
   var WORKER='https://lilbird-chat.cwwq46sn7m.workers.dev/';
@@ -1844,7 +1890,7 @@
     if(!trigger)return;
     e.preventDefault();
     var url=trigger.getAttribute('data-url');
-    if(!url)return;
+    if(!url||!(window.lbChatSafe&&window.lbChatSafe.isAllowedCalendlyUrl(url)))return;
     // Open Calendly in a lightweight overlay
     var overlay=document.createElement('div');
     overlay.id='lb-calendly-overlay';
@@ -1871,7 +1917,9 @@
 
   function addBot(t){
     var m=document.createElement('div');m.className='lb-m bot';
-    var b=document.createElement('div');b.className='lb-b';b.innerHTML=t.replace(/\n/g,'<br>');
+    var b=document.createElement('div');b.className='lb-b';
+    var html=(window.lbChatSafe&&window.lbChatSafe.sanitizeAssistantHtml)?window.lbChatSafe.sanitizeAssistantHtml(t):String(t).replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+    b.innerHTML=html;
     m.appendChild(b);msgsEl.appendChild(m);scroll();
     msgs.push({role:'assistant',content:t});
   }
@@ -1899,7 +1947,10 @@
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({messages:msgs.filter(function(m){return m.role==='user'||m.role==='assistant';}).slice(-MAX_HISTORY)})
-    }).then(function(r){return r.json();}).then(function(d){
+    }).then(function(r){
+      if(!r.ok){hideTyping();addBot('The chat service is unavailable right now. Please try again in a moment.');return Promise.reject();}
+      return r.json();
+    }).then(function(d){
       hideTyping();
       if(d.content&&d.content[0])addBot(d.content[0].text);
       else addBot("Something got tangled. Try again in a moment?");

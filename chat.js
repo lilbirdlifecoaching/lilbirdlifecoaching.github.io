@@ -1,9 +1,81 @@
 // lil' bird chat widget v4
 (function() {
+  // Avoid duplicate launcher when a page already embeds the inline chat (e.g. index.html).
+  if (document.getElementById('lb-chat-btn')) return;
   var WORKER = 'https://lilbird-chat.cwwq46sn7m.workers.dev/';
   var FF_URL = 'https://calendly.com/lilbirdlifecoaching/first-flight-session';
   var LCS_URL = 'https://calendly.com/lilbirdlifecoaching/packages/141b4b4c-dca7-46e5-9314-a8fc55f4320f';
   var DISC_URL = 'https://calendly.com/lilbirdlifecoaching/30min';
+
+  if (!window.lbChatSafe) {
+    (function (w) {
+      'use strict';
+      function escapeHtml(s) {
+        return String(s)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+      function isAllowedCalendlyUrl(url) {
+        try {
+          var u = new URL(url);
+          if (u.protocol !== 'https:' || u.hostname !== 'calendly.com') return false;
+          return u.pathname.toLowerCase().indexOf('/lilbirdlifecoaching/') === 0;
+        } catch (e) {
+          return false;
+        }
+      }
+      function sanitizeAssistantHtml(raw) {
+        var placeholders = [];
+        function ph(type, payload) {
+          var i = placeholders.length;
+          placeholders.push({ type: type, payload: payload });
+          return '\x01' + type + i + '\x01';
+        }
+        var s = String(raw);
+        s = s.replace(/<span\s+class="lb-discount"[^>]*>([\s\S]*?)<\/span>/gi, function (full, inner) {
+          var text = String(inner).replace(/<[^>]+>/g, '').trim();
+          return ph('DISC', { text: text });
+        });
+        s = s.replace(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi, function (full, attrs, inner) {
+          if (!/\blb-book-trigger\b/.test(attrs)) return full;
+          var dm = /\bdata-url="([^"]*)"/i.exec(attrs);
+          if (!dm) return full;
+          var url = dm[1];
+          if (!isAllowedCalendlyUrl(url)) return full;
+          var text = String(inner).replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+          return ph('BOOK', { url: url, text: text || 'Book' });
+        });
+        var escaped = escapeHtml(s);
+        for (var j = placeholders.length - 1; j >= 0; j--) {
+          var p = placeholders[j];
+          var rep;
+          if (p.type === 'BOOK') {
+            rep =
+              '<a href="#" class="lb-cta-btn lb-book-trigger" data-url="' +
+              escapeHtml(p.payload.url) +
+              '">' +
+              escapeHtml(p.payload.text) +
+              '</a>';
+          } else if (p.type === 'DISC') {
+            rep = '<span class="lb-discount">' + escapeHtml(p.payload.text) + '</span>';
+          } else {
+            rep = '';
+          }
+          escaped = escaped.split('\x01' + p.type + j + '\x01').join(rep);
+        }
+        return escaped.replace(/\n/g, '<br>');
+      }
+      w.lbChatSafe = {
+        escapeHtml: escapeHtml,
+        isAllowedCalendlyUrl: isAllowedCalendlyUrl,
+        sanitizeAssistantHtml: sanitizeAssistantHtml,
+      };
+    })(window);
+  }
+  var Safe = window.lbChatSafe;
 
   // ── Styles ──────────────────────────────────────────────────────
   var s = document.createElement('style');
@@ -117,6 +189,7 @@
 
   // ── Calendly overlay ────────────────────────────────────────────
   function openCal(url, isFF) {
+    if (!Safe.isAllowedCalendlyUrl(url)) return;
     var themed = url + (url.includes('?') ? '&' : '?') + 'hide_event_type_details=1&hide_gdpr_banner=1&background_color=1e2028&text_color=f0ead8&primary_color=F5C842';
     calFrame.src = themed;
     // Update header
@@ -141,11 +214,12 @@
   // Intercept ANY click on a booking button or Calendly link inside chat
   msgsEl.addEventListener('click', function(e) {
     var t = e.target.closest('[data-cal-url]');
-    if (t) { e.preventDefault(); openCal(t.getAttribute('data-cal-url'), t.getAttribute('data-ff') === '1'); return; }
+    if (t) { e.preventDefault(); var cu = t.getAttribute('data-cal-url'); if (!cu || !Safe.isAllowedCalendlyUrl(cu)) return; openCal(cu, t.getAttribute('data-ff') === '1'); return; }
     // Also catch plain calendly links
     var a = e.target.closest('a');
     if (a && a.href && a.href.includes('calendly.com')) {
       e.preventDefault();
+      if (!Safe.isAllowedCalendlyUrl(a.href)) return;
       var isFF = a.href.includes('first-flight');
       openCal(a.href, isFF);
     }
@@ -212,7 +286,7 @@
 
     var m = document.createElement('div'); m.className = 'lb-m bot';
     var b = document.createElement('div'); b.className = 'lb-b';
-    b.innerHTML = processed.replace(/\n/g,'<br>');
+    b.innerHTML = Safe.sanitizeAssistantHtml(processed);
     m.appendChild(b); msgsEl.appendChild(m);
     m.scrollIntoView({behavior:'smooth', block:'start'});
     msgs.push({role:'assistant', content:text});
@@ -238,7 +312,10 @@
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({messages: msgs.filter(function(m){return m.role==='user'||m.role==='assistant';})})
-    }).then(function(r){return r.json();}).then(function(d){
+    }).then(function(r){
+      if (!r.ok) { hideTyping(); addBot('The chat service is unavailable right now. Please try again in a moment.'); return Promise.reject(); }
+      return r.json();
+    }).then(function(d){
       hideTyping();
       if(d.content&&d.content[0]) addBot(d.content[0].text);
       else addBot("Something got tangled. Try again?");
