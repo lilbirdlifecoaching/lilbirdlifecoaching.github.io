@@ -4702,24 +4702,19 @@ function toggleChatMic() {
   const btn = document.getElementById('chat-mic');
   if(chatMicActive) {
     try { recognition.stop(); } catch(e) {}
-    chatMicActive = false;
-    if(btn) btn.classList.remove('recording');
-  } else {
-    activeRecognitionId = 'chat-textarea';
-    chatMicActive = true;
-    if(btn) btn.classList.add('recording');
-    recognition.onresult = function(e) {
-      const textarea = document.getElementById('chat-textarea');
-      if(!textarea) return;
-      let t = '';
-      for(let i=0;i<e.results.length;i++) t += e.results[i][0].transcript;
-      textarea.value = t;
-    };
-    recognition.onend = function() {
-      chatMicActive = false;
-      if(btn) btn.classList.remove('recording');
-    };
-    try { recognition.start(); } catch(e) {}
+    return;
+  }
+  if(activeRecognitionId) stopMic();
+
+  activeRecognitionId = 'chat-textarea';
+  chatMicActive = true;
+  if(btn) btn.classList.add('recording');
+
+  try {
+    recognition.start();
+  } catch(e) {
+    console.warn('Chat mic start failed:', e);
+    stopMic();
   }
 }
 
@@ -5031,23 +5026,38 @@ function viewHistoricalCanvas(idx){
 // ═══════════════════════════════════════
 let recognition = null;
 let activeRecognitionId = null;
+let speechBaseText = '';
+let speechAccumulated = '';
 
 (function setupSpeech(){
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if(!SpeechRecognition){ document.body.classList.add('no-speech'); return; }
   recognition = new SpeechRecognition();
-  recognition.continuous = true;
+  // iOS / Android WebKit often fails or ends empty with continuous=true; desktop Chrome handles it well.
+  const shortUtteranceMode = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '');
+  recognition.continuous = !shortUtteranceMode;
   recognition.interimResults = true;
   recognition.lang = 'en-US';
+
+  recognition.onstart = function(){
+    speechAccumulated = '';
+    const ta = document.getElementById(activeRecognitionId);
+    speechBaseText = ta ? ta.value : '';
+  };
 
   recognition.onresult = function(e){
     const textarea = document.getElementById(activeRecognitionId);
     if(!textarea) return;
-    let transcript = '';
-    for(let i=0; i<e.results.length; i++){
-      transcript += e.results[i][0].transcript;
+    let interim = '';
+    let newFinal = '';
+    for(let i = e.resultIndex; i < e.results.length; i++){
+      const seg = e.results[i];
+      const t = seg[0] && seg[0].transcript ? seg[0].transcript : '';
+      if(seg.isFinal) newFinal += t;
+      else interim += t;
     }
-    textarea.value = transcript;
+    speechAccumulated += newFinal;
+    textarea.value = speechBaseText + speechAccumulated + interim;
   };
 
   recognition.onerror = function(e){
@@ -5066,7 +5076,6 @@ function toggleMic(textareaId){
     stopMic();
     return;
   }
-  // Stop any existing
   if(activeRecognitionId) stopMic();
 
   activeRecognitionId = textareaId;
@@ -5085,10 +5094,13 @@ function stopMic(){
   if(recognition && activeRecognitionId){
     try{ recognition.stop(); }catch(e){}
   }
+  chatMicActive = false;
   if(activeRecognitionId){
     const btn = document.querySelector(`button[onclick="toggleMic('${activeRecognitionId}')"]`);
     if(btn) btn.classList.remove('recording');
   }
+  const chatBtn = document.getElementById('chat-mic');
+  if(chatBtn) chatBtn.classList.remove('recording');
   activeRecognitionId = null;
 }
 
