@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Younger You · lil' bird</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --dark: #1e2028; --dark-mid: #252830; --dark-card: #2a2d38; --dark-hover: #30333f;
+      --session-col: #7a9e7e; --session-dim: rgba(122,158,126,0.12); --session-border: rgba(122,158,126,0.25);
+      --gold: #F5C842; --gold-dim: rgba(245,200,66,0.15); --gold-border: rgba(245,200,66,0.22);
+      --ember: #e8734a;
+      --text: #f0ece4; --text-dim: rgba(240,236,228,0.58); --text-muted: rgba(240,236,228,0.3);
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body: 'DM Sans', system-ui, sans-serif;
+      --font-mono: 'DM Mono', monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--dark); color: var(--text); font-family: var(--font-body); min-height: 100vh; overflow-x: hidden; }
+    body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; opacity: 0.5; }
+
+    .page { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; padding: 1.5rem 1.25rem 5rem; }
+
+    .nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; }
+    .nav-left { display: flex; align-items: center; gap: 0.6rem; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+    .nav-bird { width: 28px; height: 28px; background: var(--gold); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
+    .nav-back { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); text-decoration: none; border: 1px solid rgba(255,255,255,0.08); border-radius: 5px; padding: 0.4rem 0.75rem; cursor: pointer; }
+
+    .eyebrow { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--session-col); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    .eyebrow::before { content: ''; width: 16px; height: 1px; background: var(--session-col); }
+    h1 { font-family: var(--font-display); font-size: clamp(1.8rem, 5vw, 2.5rem); font-weight: 400; font-style: italic; margin-bottom: 0.6rem; line-height: 1.2; }
+    .intro { color: var(--text-dim); font-size: 0.9rem; line-height: 1.75; margin-bottom: 2rem; }
+
+    .why-card { background: rgba(122,158,126,0.06); border: 1px solid var(--session-border); border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 2rem; }
+    .why-card .why-label { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--session-col); margin-bottom: 0.5rem; }
+    .why-card p { color: var(--text-dim); font-size: 0.85rem; line-height: 1.7; }
+    .why-card p + p { margin-top: 0.6rem; }
+
+    .upload-area {
+      background: var(--dark-card);
+      border: 2px dashed rgba(255,255,255,0.12);
+      border-radius: 18px;
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 1.5rem;
+      min-height: 220px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+    }
+    .upload-area:hover { border-color: var(--session-col); background: var(--dark-hover); }
+    .upload-area.has-file { border-style: solid; border-color: var(--session-border); padding: 1rem; cursor: default; }
+    .upload-area.dragging { border-color: var(--gold); background: rgba(245,200,66,0.04); }
+    .upload-icon { font-size: 2rem; opacity: 0.5; }
+    .upload-prompt { font-family: var(--font-display); font-style: italic; font-size: 1rem; color: var(--text); }
+    .upload-hint { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+    .upload-area input[type=file] { display: none; }
+
+    .preview-wrap { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+    .preview-img { max-width: 100%; max-height: 320px; border-radius: 12px; box-shadow: 0 12px 32px rgba(0,0,0,0.4); }
+    .preview-meta { display: flex; align-items: center; gap: 1rem; font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .btn { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; border: none; border-radius: 8px; padding: 0.75rem 1.25rem; cursor: pointer; transition: background 0.2s, transform 0.1s, opacity 0.2s; }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-primary { background: var(--session-col); color: var(--dark); flex: 1; min-width: 180px; }
+    .btn-primary:hover:not(:disabled) { background: #fff; transform: translateY(-1px); }
+    .btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.1); color: var(--text-dim); }
+    .btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+    .status { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.6rem 0.9rem; border-radius: 8px; display: none; margin-bottom: 1rem; }
+    .status.visible { display: block; animation: fadeUp 0.3s ease both; }
+    .status.success { background: rgba(122,158,126,0.1); color: var(--session-col); border: 1px solid var(--session-border); }
+    .status.error { background: rgba(232,115,74,0.1); color: var(--ember); border: 1px solid rgba(232,115,74,0.3); }
+
+    .saved-state { background: var(--dark-card); border: 1px solid var(--session-border); border-radius: 14px; padding: 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem; }
+    .saved-thumb { width: 56px; height: 56px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+    .saved-text { flex: 1; min-width: 0; }
+    .saved-text .saved-label { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--session-col); margin-bottom: 0.25rem; }
+    .saved-text .saved-name { font-size: 0.85rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .saved-text .saved-date { font-family: var(--font-mono); font-size: 0.62rem; color: var(--text-muted); margin-top: 0.2rem; }
+    .saved-replace { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); cursor: pointer; background: none; border: none; padding: 0.4rem 0.6rem; }
+    .saved-replace:hover { color: var(--text); }
+
+    .skip-row { text-align: center; margin-top: 1.5rem; }
+    .skip-link { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); background: none; border: none; cursor: pointer; padding: 0.5rem; }
+    .skip-link:hover { color: var(--text-dim); }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+<div class="page">
+  <nav class="nav">
+    <div class="nav-left"><div class="nav-bird">🪶</div>lil' bird · Tool</div>
+    <button onclick="goBack()" class="nav-back">← Back</button>
+  </nav>
+
+  <div class="eyebrow">Session 01 · Story</div>
+  <h1>Younger you</h1>
+  <p class="intro">A photo of yourself somewhere between four and eight years old. The version of you before you learned to perform. We'll keep them in your Full Flight Plan as a quiet reminder of where this all began.</p>
+
+  <div class="why-card">
+    <div class="why-label">Why this matters</div>
+    <p>At the end of the course, your illustrator turns this photo into a hand-drawn illustration that sits at the top of your Full Flight Plan — alongside the older you who's writing the plan now.</p>
+    <p>Choose one where you can see their eyes, if you can. Outdoor light is best. Doesn't have to be perfect.</p>
+  </div>
+
+  <div id="saved-block" style="display:none"></div>
+
+  <label class="upload-area" id="upload-area">
+    <input type="file" id="file-input" accept="image/*" />
+    <div class="upload-icon">🖼️</div>
+    <div class="upload-prompt">Tap to choose a photo</div>
+    <div class="upload-hint">JPG · PNG · HEIC · up to 10 MB</div>
+  </label>
+
+  <div class="status" id="status"></div>
+
+  <div class="actions" id="actions" style="display:none">
+    <button class="btn btn-primary" id="btn-save">Save this photo</button>
+    <button class="btn btn-ghost" id="btn-clear">Choose different one</button>
+  </div>
+
+  <div class="skip-row">
+    <button class="skip-link" onclick="goBack()">Skip for now — I'll do this later</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+  const SUPABASE_URL  = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
+  const WORKER_URL    = 'https://worker-solo.cwwq46sn7m.workers.dev';
+  const BUCKET        = 'childhood-photos';
+  const MAX_BYTES     = 10 * 1024 * 1024;
+
+  const { createClient } = supabase;
+  const _urlParams = new URLSearchParams(window.location.search);
+  const _token     = _urlParams.get('token') ? decodeURIComponent(_urlParams.get('token')) : null;
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON, {
+    auth: { persistSession: false, autoRefreshToken: false }
+  });
+
+  let currentUser = null;
+  let pendingFile = null;
+
+  function goBack() {
+    if (window.parent !== window) window.parent.postMessage('tool-close', '*');
+    else history.back();
+  }
+
+  function setStatus(msg, kind) {
+    const el = document.getElementById('status');
+    el.textContent = msg || '';
+    el.className = 'status ' + (kind || '') + (msg ? ' visible' : '');
+  }
+
+  function fileExt(file) {
+    const fromName = (file.name || '').split('.').pop()?.toLowerCase();
+    if (fromName && fromName.length <= 5) return fromName;
+    const fromType = (file.type || '').split('/')[1];
+    return (fromType || 'jpg').toLowerCase();
+  }
+
+  function showSavedBlock(url, savedAt) {
+    const block = document.getElementById('saved-block');
+    const date = savedAt ? new Date(savedAt).toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+    block.innerHTML = ''
+      + '<div class="saved-state">'
+      +   '<img class="saved-thumb" src="' + url + '" alt="Younger you" />'
+      +   '<div class="saved-text">'
+      +     '<div class="saved-label">Saved to your nest</div>'
+      +     '<div class="saved-name">Photo ready for the illustrator</div>'
+      +     (date ? '<div class="saved-date">Uploaded ' + date + '</div>' : '')
+      +   '</div>'
+      +   '<button class="saved-replace" id="btn-replace">Replace</button>'
+      + '</div>';
+    block.style.display = 'block';
+    document.getElementById('btn-replace').addEventListener('click', resetUpload);
+    document.getElementById('upload-area').style.display = 'none';
+  }
+
+  function resetUpload() {
+    pendingFile = null;
+    document.getElementById('saved-block').style.display = 'none';
+    const area = document.getElementById('upload-area');
+    area.classList.remove('has-file');
+    area.style.display = 'flex';
+    area.innerHTML = ''
+      + '<input type="file" id="file-input" accept="image/*" />'
+      + '<div class="upload-icon">🖼️</div>'
+      + '<div class="upload-prompt">Tap to choose a photo</div>'
+      + '<div class="upload-hint">JPG · PNG · HEIC · up to 10 MB</div>';
+    bindFileInput();
+    document.getElementById('actions').style.display = 'none';
+    setStatus('', '');
+  }
+
+  function showPreview(file) {
+    pendingFile = file;
+    const url = URL.createObjectURL(file);
+    const area = document.getElementById('upload-area');
+    area.classList.add('has-file');
+    area.innerHTML = ''
+      + '<div class="preview-wrap">'
+      +   '<img class="preview-img" src="' + url + '" alt="Preview" />'
+      +   '<div class="preview-meta">'
+      +     '<span>' + (file.name || 'photo') + '</span>'
+      +     '<span>·</span>'
+      +     '<span>' + (Math.round(file.size / 1024 / 102.4) / 10) + ' MB</span>'
+      +   '</div>'
+      + '</div>';
+    document.getElementById('actions').style.display = 'flex';
+    setStatus('', '');
+  }
+
+  function bindFileInput() {
+    const input = document.getElementById('file-input');
+    if (!input) return;
+    input.addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) {
+        setStatus('That doesn\'t look like an image file. Try a JPG, PNG, or HEIC.', 'error');
+        return;
+      }
+      if (file.size > MAX_BYTES) {
+        setStatus('That file is over 10 MB. Try a smaller version.', 'error');
+        return;
+      }
+      showPreview(file);
+    });
+  }
+
+  function bindDragDrop() {
+    const area = document.getElementById('upload-area');
+    ['dragenter', 'dragover'].forEach(ev => area.addEventListener(ev, (e) => {
+      e.preventDefault(); e.stopPropagation();
+      area.classList.add('dragging');
+    }));
+    ['dragleave', 'drop'].forEach(ev => area.addEventListener(ev, (e) => {
+      e.preventDefault(); e.stopPropagation();
+      area.classList.remove('dragging');
+    }));
+    area.addEventListener('drop', (e) => {
+      const file = e.dataTransfer?.files?.[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) {
+        setStatus('That doesn\'t look like an image file.', 'error');
+        return;
+      }
+      if (file.size > MAX_BYTES) {
+        setStatus('That file is over 10 MB.', 'error');
+        return;
+      }
+      showPreview(file);
+    });
+  }
+
+  document.getElementById('btn-clear')?.addEventListener('click', resetUpload);
+
+  document.getElementById('btn-save')?.addEventListener('click', async () => {
+    if (!pendingFile || !currentUser) return;
+    const btn = document.getElementById('btn-save');
+    btn.disabled = true; btn.textContent = 'Saving…';
+    setStatus('Uploading your photo…', '');
+
+    try {
+      const ext  = fileExt(pendingFile);
+      // Versioned filename so re-uploads bust caches and the illustrator notification
+      // always references the freshest file. Older versions stay in the bucket as a
+      // safety net — Luke can clean up later if he wants.
+      const path = currentUser.id + '/photo-' + Date.now() + '.' + ext;
+      const { error: upErr } = await sb.storage.from(BUCKET).upload(path, pendingFile, {
+        cacheControl: '3600',
+        contentType:  pendingFile.type || 'image/jpeg',
+        upsert:       false,
+      });
+      if (upErr) throw upErr;
+
+      const { data: pub } = sb.storage.from(BUCKET).getPublicUrl(path);
+      const photoUrl = pub?.publicUrl;
+      if (!photoUrl) throw new Error('Could not generate a public URL for the photo.');
+
+      const { error: dbErr } = await sb.from('course_users')
+        .update({ childhood_photo_url: photoUrl })
+        .eq('id', currentUser.id);
+      if (dbErr) throw dbErr;
+
+      // Fire notification to Luke / the illustrator. Non-blocking — if it fails we
+      // still consider the upload successful, since the file is safe in storage.
+      fetch(WORKER_URL + '/notify-illustrator', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ user_id: currentUser.id, photo_url: photoUrl }),
+      }).catch(() => {});
+
+      // Mirror into tool_outputs so the dashboard knows this tool has been completed
+      sb.from('tool_outputs').upsert({
+        user_id:     currentUser.id,
+        tool_name:   'childhood_photo',
+        output_data: { photo_url: photoUrl, uploaded_at: new Date().toISOString() },
+        updated_at:  new Date().toISOString(),
+      }, { onConflict: 'user_id,tool_name' }).then(() => {});
+
+      setStatus('Saved. Your illustrator gets a heads-up automatically.', 'success');
+      showSavedBlock(photoUrl, new Date().toISOString());
+      document.getElementById('actions').style.display = 'none';
+      pendingFile = null;
+    } catch (err) {
+      console.error('Upload error:', err);
+      setStatus(err.message || 'Something went wrong. Try again or pick a smaller file.', 'error');
+      btn.disabled = false; btn.textContent = 'Save this photo';
+    }
+  });
+
+  bindFileInput();
+  bindDragDrop();
+
+  (async () => {
+    const urlUid = _urlParams.get('uid');
+    if (urlUid) {
+      currentUser = { id: urlUid };
+      if (_token) { try { await sb.auth.setSession({ access_token: _token, refresh_token: '' }); } catch(e) {} }
+    } else {
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        if (session?.user) currentUser = session.user;
+      } catch(e) {}
+    }
+    if (!currentUser) {
+      setStatus('Please sign in from the dashboard to save your photo.', 'error');
+      return;
+    }
+    // If a photo already exists, show the saved state on load
+    try {
+      const { data: profile } = await sb.from('course_users')
+        .select('childhood_photo_url')
+        .eq('id', currentUser.id)
+        .single();
+      if (profile?.childhood_photo_url) {
+        showSavedBlock(profile.childhood_photo_url);
+      }
+    } catch(e) {}
+  })();
+</script>
+</body>
+</html>

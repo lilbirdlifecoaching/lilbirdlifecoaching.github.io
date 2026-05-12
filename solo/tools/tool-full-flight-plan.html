@@ -32,6 +32,19 @@
     h1 { font-family: var(--font-display); font-size: clamp(1.8rem, 5vw, 2.5rem); font-weight: 400; font-style: italic; margin-bottom: 0.6rem; line-height: 1.2; }
     .intro { color: var(--text-dim); font-size: 0.88rem; line-height: 1.75; margin-bottom: 2.5rem; }
 
+    /* Portrait: appears once user has uploaded a childhood photo (or once
+       the illustrator has supplied a hand-drawn illustration). Shows above
+       the form as a quiet continuity reminder, and in the preview card as
+       the headline image of the plan. */
+    .portrait-strip { display: flex; align-items: center; gap: 1rem; padding: 0.85rem 1rem; background: linear-gradient(135deg, rgba(245,200,66,0.06), rgba(245,200,66,0.02)); border: 1px solid var(--gold-border); border-radius: 14px; margin-bottom: 1.5rem; }
+    .portrait-strip img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); flex-shrink: 0; background: var(--dark-mid); }
+    .portrait-text { display: flex; flex-direction: column; gap: 0.2rem; }
+    .portrait-label { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); }
+    .portrait-note { font-size: 0.78rem; color: var(--text-dim); line-height: 1.5; font-style: italic; }
+
+    .preview-portrait { display: flex; justify-content: center; margin: -0.5rem 0 1.5rem; }
+    .preview-portrait img { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); box-shadow: 0 8px 24px rgba(0,0,0,0.35); background: var(--dark-mid); }
+
     /* Sections */
     .section { margin-bottom: 2rem; }
     .section-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.06); }
@@ -105,6 +118,14 @@
     <a href="javascript:void(0)" onclick="goBack()" class="nav-back">← Back</a>
   </nav>
 
+  <div class="portrait-strip" id="portrait-strip" style="display:none">
+    <img id="portrait-img" alt="The younger version of you" />
+    <div class="portrait-text">
+      <div class="portrait-label" id="portrait-label">Younger you</div>
+      <div class="portrait-note" id="portrait-note">The version of you who started this — keeping watch over the plan.</div>
+    </div>
+  </div>
+
   <div class="eyebrow">Session 07 · Full Flight</div>
   <h1>Your Full<br>Flight Plan</h1>
   <p class="intro">This is yours. Built from everything you've uncovered across seven sessions. Take your time with each section — use your own words, not the words you think you should use.</p>
@@ -169,6 +190,9 @@
 
   <!-- Preview -->
   <div class="preview-card" id="preview-card">
+    <div class="preview-portrait" id="preview-portrait" style="display:none">
+      <img id="preview-portrait-img" alt="Younger you" />
+    </div>
     <div class="preview-header">
       <span class="preview-bird">🪶</span>
       <div>
@@ -211,7 +235,8 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
   function goBack() {
     if (window.parent !== window) {
       window.parent.postMessage('tool-close', '*');
@@ -229,8 +254,45 @@
   });
 
   let currentUser = null, saveTimer = null;
+  let portraitUrl = null, portraitIsIllustration = false;
   const NUM_COMMITMENTS = 5;
   const NUM_SUPPORT     = 4;
+
+  // Render the childhood photo (or illustration, if the illustrator has
+  // delivered one) into the form strip + into the preview card.
+  function renderPortrait() {
+    const strip       = document.getElementById('portrait-strip');
+    const stripImg    = document.getElementById('portrait-img');
+    const stripLabel  = document.getElementById('portrait-label');
+    const stripNote   = document.getElementById('portrait-note');
+    const prev        = document.getElementById('preview-portrait');
+    const prevImg     = document.getElementById('preview-portrait-img');
+    if (!portraitUrl) { strip.style.display = 'none'; prev.style.display = 'none'; return; }
+    stripImg.src = portraitUrl;
+    prevImg.src  = portraitUrl;
+    if (portraitIsIllustration) {
+      stripLabel.textContent = 'Younger you · illustrated';
+      stripNote.textContent  = 'Drawn by your illustrator. Sitting at the top of your plan, keeping watch.';
+    } else {
+      stripLabel.textContent = 'Younger you';
+      stripNote.textContent  = 'The version of you who started this. Your illustrator will draw them next.';
+    }
+    strip.style.display = '';
+    prev.style.display  = '';
+  }
+
+  async function loadPortrait() {
+    if (!currentUser) return;
+    try {
+      const { data } = await sb.from('course_users')
+        .select('illustration_url, childhood_photo_url')
+        .eq('id', currentUser.id)
+        .maybeSingle();
+      if (data?.illustration_url) { portraitUrl = data.illustration_url; portraitIsIllustration = true; }
+      else if (data?.childhood_photo_url) { portraitUrl = data.childhood_photo_url; portraitIsIllustration = false; }
+      renderPortrait();
+    } catch (e) { console.warn('Portrait load failed:', e); }
+  }
 
   // Build commitment inputs
   function buildCommitments(values) {
@@ -359,6 +421,7 @@
       } catch(e) {}
     }
     if (currentUser) {
+      loadPortrait();
       const { data } = await sb.from('tool_outputs').select('output_data').eq('user_id', currentUser.id).eq('tool_name', 'full_flight_plan').single();
       if (data?.output_data) { setData(data.output_data); return; }
     }
