@@ -1211,9 +1211,18 @@
       btn.disabled=true; btn.textContent='Saving your session...';
       const withTimeout=(p,ms)=>Promise.race([p,new Promise(r=>setTimeout(()=>r(null),ms))]);
       try {
-        let summary='',keyWords=[],actionPoint='';
+        // Two summary variants come back from /summarise:
+        //   - summary / action_point: third-person, written for AI memory in future sessions
+        //   - summary_for_user / action_point_for_user: second-person, written TO the user for the email
+        let summary='',summaryForUser='',keyWords=[],actionPoint='',actionPointForUser='';
         const result=await withTimeout(fetch(WORKER_URL+'/summarise',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session_number:activeSession.number,messages:chatMsgs,user_name:userProfile?.full_name?.split(' ')[0]||null})}).then(r=>r.ok?r.json():null),8000);
-        if(result){summary=result.summary||'';keyWords=result.key_words||[];actionPoint=result.action_point||'';}
+        if(result){
+          summary=result.summary||'';
+          summaryForUser=result.summary_for_user||result.summary||'';
+          keyWords=result.key_words||[];
+          actionPoint=result.action_point||'';
+          actionPointForUser=result.action_point_for_user||result.action_point||'';
+        }
         await sb.from('ai_memory').upsert({user_id:currentUser.id,session_number:activeSession.number,messages:chatMsgs,summary,key_words:keyWords},{onConflict:'user_id,session_number'});
         await sb.from('session_progress').update({status:'complete',completed_at:new Date().toISOString()}).eq('user_id',currentUser.id).eq('session_number',activeSession.number);
         const nextNum=activeSession.number+1, unlockAt=new Date(Date.now()+48*60*60*1000).toISOString();
@@ -1221,7 +1230,7 @@
         sb.from('course_users').select('email, full_name').eq('id',currentUser.id).single().then(({data:profile})=>{
           if(!profile?.email) return;
           const nextSession=SESSIONS[nextNum];
-          fetch(WORKER_URL+'/session-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:profile.email,user_name:profile.full_name||'',user_id:currentUser.id,session_number:activeSession.number,summary,action_point:actionPoint,next_session_title:nextSession?nextSession.title+' — '+nextSession.teaser:''})}).catch(()=>{});
+          fetch(WORKER_URL+'/session-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:profile.email,user_name:profile.full_name||'',user_id:currentUser.id,session_number:activeSession.number,summary:summaryForUser,action_point:actionPointForUser,next_session_title:nextSession?nextSession.title+' — '+nextSession.teaser:''})}).catch(()=>{});
         }).catch(()=>{});
         btn.textContent='Mark complete & continue →'; btn.disabled=false;
         await loadSessionProgress(); await loadToolOutputs(); renderDashboard(); showView('view-dashboard');
