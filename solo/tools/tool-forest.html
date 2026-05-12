@@ -335,7 +335,7 @@
         if (data.output_data.people) people = { ...people, ...data.output_data.people };
         if (data.output_data.intention) document.getElementById('intention').value = data.output_data.intention;
       }
-    }
+    } 
     ['canopy','understory','floor','lone'].forEach(renderLayer);
     drawForest();
   })();
