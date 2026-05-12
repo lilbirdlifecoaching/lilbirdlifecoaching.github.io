@@ -882,12 +882,18 @@
       }
 
       await sb.from('session_progress').update({ status: 'in_progress', started_at: new Date().toISOString() }).eq('user_id', currentUser.id).eq('session_number', sessionNumber).eq('status', 'available');
-      document.getElementById('chat-input').focus();
+      focusElNoScroll('chat-input');
     }
 
     function openTool(toolFile) { window.open(toolFile + '?uid=' + currentUser.id + '&session=' + (activeSession ? activeSession.number : 0), '_blank'); }
 
     var lastToolKey = null;
+
+    function focusElNoScroll(id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
+    }
 
     function openToolEmbed(toolKey, toolInfo) {
       var wrap = document.getElementById('tool-embed-wrap'), frame = document.getElementById('tool-embed-frame'), title = document.getElementById('tool-embed-title');
@@ -896,6 +902,11 @@
       title.textContent = toolInfo.name;
       var token = '';
       try { var raw = localStorage.getItem('lilbird-solo-auth'); if (raw) { var td = JSON.parse(raw); token = td.access_token || ''; } } catch(e) {}
+      frame.onload = function() {
+        try {
+          if (frame.contentWindow) frame.contentWindow.scrollTo(0, 0);
+        } catch (e) {}
+      };
       frame.src = toolInfo.file + '?uid=' + (currentUser ? currentUser.id : '') + '&session=' + (activeSession ? activeSession.number : 0) + '&token=' + encodeURIComponent(token) + '&embed=1';
       wrap.classList.add('active');
       setTimeout(function() { var c = document.querySelector('.session-chat-col'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
@@ -938,9 +949,9 @@
                 else { var ti = TOOL_MAP[lastToolKey]; if (ti) { var el = document.getElementById('chat-messages'); if (el) renderToolCard(lastToolKey, ti, el); } }
                 updateLeftPanelTool(lastToolKey, toolData);
               }
-              setTimeout(function() { var m = document.getElementById('chat-messages'); if (m) m.scrollTop = m.scrollHeight; document.getElementById('chat-input').focus(); triggerToolReturnAck(); }, 400);
+              setTimeout(function() { var m = document.getElementById('chat-messages'); if (m) m.scrollTop = m.scrollHeight; focusElNoScroll('chat-input'); triggerToolReturnAck(); }, 400);
             })
-            .catch(function() { setTimeout(function() { var m = document.getElementById('chat-messages'); if (m) m.scrollTop = m.scrollHeight; document.getElementById('chat-input').focus(); triggerToolReturnAck(); }, 400); });
+            .catch(function() { setTimeout(function() { var m = document.getElementById('chat-messages'); if (m) m.scrollTop = m.scrollHeight; focusElNoScroll('chat-input'); triggerToolReturnAck(); }, 400); });
         }, 2500); // FIX 4: was 1500, now 2500
       } else {
         var m = document.getElementById('chat-messages'); if (m) setTimeout(function() { m.scrollTop = m.scrollHeight; }, 100);
@@ -1172,7 +1183,7 @@
       } catch(e) {
         hideTyping(); renderMessage('assistant','Welcome back. How did that land for you?'); chatMsgs.push({role:'assistant',content:'Welcome back. How did that land for you?'});
       }
-      isTyping=false; document.getElementById('btn-send').disabled=false; document.getElementById('chat-input').focus();
+      isTyping=false; document.getElementById('btn-send').disabled=false; focusElNoScroll('chat-input');
     }
 
     async function sendMessage(userText) {
@@ -1191,7 +1202,7 @@
       } catch {
         hideTyping(); renderMessage('assistant','Something got in the way there. Take a breath — try sending that again.'); chatMsgs.pop();
       }
-      isTyping=false; document.getElementById('btn-send').disabled=false; document.getElementById('chat-input').focus();
+      isTyping=false; document.getElementById('btn-send').disabled=false; focusElNoScroll('chat-input');
     }
 
     async function completeSession() {
