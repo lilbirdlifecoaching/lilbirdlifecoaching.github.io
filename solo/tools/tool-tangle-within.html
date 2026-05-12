@@ -113,8 +113,7 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js">
   function goBack() {
     if (window.parent !== window) {
       window.parent.postMessage('tool-close', '*');
@@ -172,6 +171,106 @@
       if (data?.output_data) FIELDS.forEach(id => { if (data.output_data[id]) document.getElementById(id).value = data.output_data[id]; });
     }
   })();
+</script>
+<!-- ── Voice input (Web Speech API) ──────────────────────────── -->
+<style>
+  .tool-mic-fab { position: fixed; bottom: max(1.25rem, env(safe-area-inset-bottom)); right: 1.25rem; z-index: 50; width: 52px; height: 52px; background: var(--dark-card); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; color: var(--text-dim); font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(0,0,0,0.35); transition: opacity 0.25s, color 0.2s, border-color 0.2s, background 0.2s, transform 0.15s; opacity: 0.4; }
+  .tool-mic-fab.ready { opacity: 1; }
+  .tool-mic-fab.ready:hover { color: var(--session-col); border-color: var(--session-col); transform: translateY(-1px); }
+  .tool-mic-fab.recording { background: rgba(232,115,74,0.12); border-color: #e8734a; color: #e8734a; opacity: 1; animation: toolMicPulse 1s ease-in-out infinite; }
+  @keyframes toolMicPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(232,115,74,0.4); } 50% { box-shadow: 0 0 0 8px rgba(232,115,74,0); } }
+  body.no-speech .tool-mic-fab { display: none !important; }
+  .mic-status-toast { position: fixed; bottom: 6rem; left: 50%; transform: translateX(-50%) translateY(8px); background: rgba(42,45,56,0.96); border: 1px solid rgba(232,115,74,0.35); color: var(--text); font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.06em; padding: 0.65rem 1rem; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 9999; max-width: 88vw; text-align: center; }
+  .mic-status-toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+<button type="button" class="tool-mic-fab" id="tool-mic-fab" title="Speak into the focused field" aria-label="Voice input">🎤</button>
+<script>
+(function setupToolVoice(){
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) { document.body.classList.add('no-speech'); return; }
+  const fab = document.getElementById('tool-mic-fab');
+  if (!fab) return;
+  let lastTarget = null;
+  document.addEventListener('focusin', (e) => {
+    const t = e.target;
+    if (t && (t.tagName === 'TEXTAREA' || (t.tagName === 'INPUT' && /^(text|search|url|email|tel|)$/i.test(t.type || 'text')))) {
+      lastTarget = t;
+      fab.classList.add('ready');
+    }
+  });
+  fab.addEventListener('mousedown', (e) => { e.preventDefault(); });
+  const recognition = new SpeechRecognition();
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '');
+  recognition.continuous = !isMobile;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+  let active = false, target = null, baseText = '', finalAccumulated = '', gotResult = false, watchdog = null;
+  const WATCHDOG_MS = 9000;
+  let toastEl = null, toastTimer = null;
+  function showToast(msg){
+    if (!toastEl) { toastEl = document.createElement('div'); toastEl.className = 'mic-status-toast'; document.body.appendChild(toastEl); }
+    toastEl.textContent = msg;
+    toastEl.classList.add('visible');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl && toastEl.classList.remove('visible'), 4200);
+  }
+  function armWatchdog(){
+    if (watchdog) clearTimeout(watchdog);
+    watchdog = setTimeout(() => {
+      if (!gotResult) showToast("Mic isn't picking up audio. Check browser & system mic permissions.");
+      stop();
+    }, WATCHDOG_MS);
+  }
+  function start(){
+    if (active) return;
+    if (!lastTarget) { showToast("Tap a text field first, then tap the mic."); return; }
+    target = lastTarget;
+    baseText = target.value || '';
+    finalAccumulated = '';
+    gotResult = false;
+    active = true;
+    fab.classList.add('recording');
+    try { recognition.start(); }
+    catch (e) { console.warn('Mic start failed:', e); showToast("Couldn't start the mic. Try again."); stop(); }
+  }
+  function stop(){
+    if (watchdog) { clearTimeout(watchdog); watchdog = null; }
+    if (active) { try { recognition.stop(); } catch (e) {} }
+    active = false;
+    fab.classList.remove('recording');
+    if (target) {
+      try { target.dispatchEvent(new Event('input',  { bubbles: true })); } catch(e) {}
+      try { target.dispatchEvent(new Event('change', { bubbles: true })); } catch(e) {}
+    }
+    target = null;
+  }
+  recognition.onstart  = () => { armWatchdog(); };
+  recognition.onresult = (e) => {
+    gotResult = true;
+    armWatchdog();
+    if (!target) return;
+    let interim = '', newFinal = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const seg = e.results[i];
+      const t = seg[0] && seg[0].transcript ? seg[0].transcript : '';
+      if (seg.isFinal) newFinal += t; else interim += t;
+    }
+    finalAccumulated += newFinal;
+    target.value = baseText + finalAccumulated + interim;
+    try { target.dispatchEvent(new Event('input', { bubbles: true })); } catch(e) {}
+  };
+  recognition.onerror = (e) => {
+    const code = e && e.error ? e.error : 'unknown';
+    console.warn('Mic error:', code);
+    if (code === 'not-allowed' || code === 'service-not-allowed') showToast("Voice input is blocked. Check your browser/system microphone settings.");
+    else if (code === 'no-speech') { if (!gotResult) showToast("Didn't catch any audio. Try typing instead, or check your mic."); }
+    else if (code === 'audio-capture') showToast("Your device's microphone isn't reachable from this browser.");
+    else if (code === 'network') showToast("Voice transcription needs internet. Check your connection.");
+    stop();
+  };
+  recognition.onend = () => { stop(); };
+  fab.addEventListener('click', () => { active ? stop() : start(); });
+})();
 </script>
 </body>
 </html>
