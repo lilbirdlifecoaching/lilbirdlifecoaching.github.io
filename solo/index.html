@@ -901,9 +901,17 @@
       setTimeout(function() { var c = document.querySelector('.session-chat-col'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
     }
 
+    // Idempotency guard: a single user "save" can trigger closeToolEmbed twice
+    // (once from the tool's postMessage('tool-close') and once from a back-button
+    // click that fires the same event). Without this guard the post-tool AI
+    // ack fires twice → user sees two identical "How did that land for you?".
+    var _lastCloseAt = 0;
     function closeToolEmbed() {
       var wrap = document.getElementById('tool-embed-wrap'), frame = document.getElementById('tool-embed-frame');
       if (!wrap) return;
+      var now = Date.now();
+      if (now - _lastCloseAt < 4000) { wrap.classList.remove('active'); if (frame) setTimeout(function(){ frame.src = 'about:blank'; }, 300); return; }
+      _lastCloseAt = now;
       wrap.classList.remove('active');
       setTimeout(function() { if (frame) frame.src = 'about:blank'; }, 300);
       setTimeout(function() { var m = document.getElementById('chat-messages'); if (m) m.scrollTop = m.scrollHeight; }, 150);
@@ -1057,6 +1065,10 @@
         roots.forEach(r=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-peak">Root</span><span class="snap-text">'+r.text+'</span></div>';});
         if(roots.length&&feathers.length) html+='<div class="snap-divider"></div>';
         feathers.forEach(f=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-plunge">Release</span><span class="snap-text">'+f.text+'</span></div>';});
+        // Reflection fallback so the snapshot isn't empty when the user only journaled.
+        if (!html && data.reflection) {
+          html+='<div class="snap-row"><span class="snap-text" style="font-style:italic;color:rgba(240,236,228,0.55)">"'+String(data.reflection).slice(0,140)+(String(data.reflection).length>140?'…':'')+'"</span></div>';
+        }
       }
       else if (k === 'adventure-map') {
         var now=data['stop-now']||'',north=data['stop-north-title']||'';
@@ -1076,6 +1088,20 @@
         var mbti=data.mbti||'',enn=data.enneagram||'';
         if(mbti) html+='<div class="snap-row"><span class="snap-badge snap-badge-north">MBTI</span><span class="snap-text">'+mbti+'</span></div>';
         if(enn) html+='<div class="snap-row"><span class="snap-badge snap-badge-spark">Enneagram</span><span class="snap-text">'+enn+'</span></div>';
+      }
+
+      // Universal fallback — if no specific handler produced content, scan the
+      // saved data for any text/journal-style field and show the first line.
+      // This guarantees a completed card always shows *something*.
+      if (!html && data && typeof data === 'object') {
+        var candidateKeys = ['reflection','intention','resonance','notes','journal','journal_text','summary','answer','text','content','first_action'];
+        for (var i = 0; i < candidateKeys.length; i++) {
+          var v = data[candidateKeys[i]];
+          if (v && typeof v === 'string' && v.trim()) {
+            html += '<div class="snap-row"><span class="snap-text" style="font-style:italic;color:rgba(240,236,228,0.55)">"'+v.slice(0,140)+(v.length>140?'…':'')+'"</span></div>';
+            break;
+          }
+        }
       }
 
       return html ? '<div class="tool-snapshot">' + html + '</div>' : '';
