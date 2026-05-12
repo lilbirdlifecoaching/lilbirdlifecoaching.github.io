@@ -660,7 +660,7 @@
       if (type === 'feathers') feathers.push(entry);
 
       input.value = '';
-      input.focus();
+      try { input.focus({ preventScroll: true }); } catch (e) { input.focus(); }
       renderList(type);
       autoSave();
     }
