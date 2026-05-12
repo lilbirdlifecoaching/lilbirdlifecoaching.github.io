@@ -217,6 +217,17 @@
     .btn-send { width: 44px; height: 44px; background: var(--session-col); border: none; border-radius: 12px; color: var(--dark); font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: opacity 0.2s, transform 0.15s; }
     .btn-send:hover:not(:disabled) { opacity: 0.85; transform: scale(1.05); }
     .btn-send:disabled { opacity: 0.35; cursor: default; transform: none; }
+
+    /* Voice input — mic button next to send */
+    .btn-mic { width: 44px; height: 44px; background: var(--dark-card); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: var(--text-dim); font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: border-color 0.2s, color 0.2s, background 0.2s; }
+    .btn-mic:hover { border-color: var(--session-col); color: var(--session-col); }
+    .btn-mic.recording { border-color: var(--ember); color: var(--ember); background: rgba(232,115,74,0.08); animation: micPulse 1s ease-in-out infinite; }
+    @keyframes micPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(232,115,74,0.45); } 50% { box-shadow: 0 0 0 6px rgba(232,115,74,0); } }
+    .no-speech .btn-mic, .no-speech-hide { display: none !important; }
+
+    /* Mic status toast */
+    .mic-status-toast { position: fixed; bottom: 6rem; left: 50%; transform: translateX(-50%) translateY(8px); background: rgba(42,45,56,0.96); border: 1px solid rgba(232,115,74,0.35); color: var(--text); font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.06em; padding: 0.65rem 1rem; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 9999; max-width: 88vw; text-align: center; }
+    .mic-status-toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
     .complete-panel { display: none; background: var(--dark-card); border: 1px solid var(--session-border); border-radius: 28px; padding: 2rem; margin-top: 1.25rem; animation: fadeUp 0.5s ease both; text-align: center; }
     .complete-panel.visible { display: block; }
     .complete-panel h3 { font-family: var(--font-display); font-size: 1.4rem; font-weight: 400; font-style: italic; margin-bottom: 0.6rem; }
@@ -391,6 +402,7 @@
           <div class="chat-messages" id="chat-messages"></div>
           <div class="chat-input-wrap">
             <textarea class="chat-textarea" id="chat-input" placeholder="Take your time..." rows="1"></textarea>
+            <button type="button" class="btn-mic no-speech-hide" id="chat-mic" title="Speak your answer" aria-label="Speak your answer">🎤</button>
             <button class="btn-send" id="btn-send" disabled>↑</button>
           </div>
           <div class="tool-embed-wrap" id="tool-embed-wrap">
@@ -444,7 +456,7 @@
 
     const SESSIONS = [
       { number: 0, tag: 'Orientation', title: 'First Flight', desc: 'Name where you are. Glimpse where you could be. Take one real step.', teaser: 'Name where you are. Glimpse where you could be.', color: '#F5C842', emoji: '🪶', dim: 'rgba(245,200,66,0.12)', border: 'rgba(245,200,66,0.22)', minExchanges: 4, videoLen: '3 min', duration: '20–30 min', tools: [], videoUrl: 'https://pub-f84f2be51fb44bd69d2d2271666a9506.r2.dev/session-0.mp4', completeTitle: "That's a good start.", completeDesc: "You've named where you are and glimpsed where you could go. Session 1 is waiting — and it goes deeper. When you're ready." },
-      { number: 1, tag: 'Session 01', title: 'Story', desc: "We don't start with goals. We start with the ground beneath them — your history, your people, the seasons that made you.", teaser: "Before you take flight, know where you've been.", color: '#7a9e7e', emoji: '🌿', dim: 'rgba(122,158,126,0.12)', border: 'rgba(122,158,126,0.25)', minExchanges: 5, videoLen: '4 min', duration: '40–60 min', videoUrl: 'https://pub-f84f2be51fb44bd69d2d2271666a9506.r2.dev/session-1.mp4', completeTitle: "You've done something tender here.", completeDesc: "The story you've told yourself about your life just got a little more honest. Before you move on — try one of the tools to anchor what came up.", tools: [ { name: 'Peak & Plunge Timeline', file: 'tools/tool-peak-plunge.html', tag: 'Interactive' }, { name: 'Nurture & Prune Matrix', file: 'tools/tool-nurture-prune.html', tag: 'Interactive' }, { name: 'Deep Roots Reflection', file: 'tools/tool-deep-roots.html', tag: 'Journaling' }, { name: 'Roots & Feathers Practice', file: 'tools/tool-roots-feathers.html', tag: 'Reflection' } ] },
+      { number: 1, tag: 'Session 01', title: 'Story', desc: "We don't start with goals. We start with the ground beneath them — your history, your people, the seasons that made you.", teaser: "Before you take flight, know where you've been.", color: '#7a9e7e', emoji: '🌿', dim: 'rgba(122,158,126,0.12)', border: 'rgba(122,158,126,0.25)', minExchanges: 5, videoLen: '4 min', duration: '40–60 min', videoUrl: 'https://pub-f84f2be51fb44bd69d2d2271666a9506.r2.dev/session-1.mp4', completeTitle: "You've done something tender here.", completeDesc: "The story you've told yourself about your life just got a little more honest. Before you move on — try one of the tools to anchor what came up.", tools: [ { name: 'Younger You', file: 'tools/tool-childhood-photo.html', tag: 'Upload' }, { name: 'Peak & Plunge Timeline', file: 'tools/tool-peak-plunge.html', tag: 'Interactive' }, { name: 'Nurture & Prune Matrix', file: 'tools/tool-nurture-prune.html', tag: 'Interactive' }, { name: 'Deep Roots Reflection', file: 'tools/tool-deep-roots.html', tag: 'Journaling' }, { name: 'Roots & Feathers Practice', file: 'tools/tool-roots-feathers.html', tag: 'Reflection' } ] },
       { number: 2, tag: 'Session 02', title: 'Vision & Goals', desc: "Clarity changes everything. This session helps you find the why underneath the goal — and the goal underneath the should.", teaser: "Clarify where you're going by discovering what matters most.", color: '#7eb8c9', emoji: '🌅', dim: 'rgba(126,184,201,0.12)', border: 'rgba(126,184,201,0.25)', minExchanges: 5, videoLen: '4 min', duration: '40–60 min', videoUrl: 'https://pub-f84f2be51fb44bd69d2d2271666a9506.r2.dev/session-2.mp4', completeTitle: "Something just got clearer.", completeDesc: "A vision that's truly yours is worth ten goals that belong to someone else. Use the tools below to map what you found.", tools: [ { name: 'Glow Map', file: 'tools/tool-glow-map.html', tag: 'Interactive' }, { name: 'Soar & Steady', file: 'tools/tool-soar-steady.html', tag: 'Interactive' }, { name: 'Adventure Map', file: 'tools/tool-adventure-map.html', tag: 'Visual' } ] },
       { number: 3, tag: 'Session 03', title: 'Identity & Insight', desc: "Know who you are so you can rise with clarity. This session goes to the places most people avoid — the tangles, the shadows, the question underneath the question.", teaser: "Know who you are so you can rise with clarity.", color: '#a89060', emoji: '🌳', dim: 'rgba(168,144,96,0.12)', border: 'rgba(168,144,96,0.25)', minExchanges: 5, videoLen: '5 min', duration: '50–70 min', videoUrl: 'https://pub-f84f2be51fb44bd69d2d2271666a9506.r2.dev/session-3.mp4', completeTitle: "That took courage.", completeDesc: "Most people never look this honestly at what drives them. You just did. Use the tools to map what surfaced.", tools: [ { name: 'Identity Profile', file: 'tools/tool-deep-profile.html', tag: 'Profile' }, { name: 'Shadows & Sparks', file: 'tools/tool-shadows-sparks.html', tag: 'Interactive' }, { name: 'Tangle Within', file: 'tools/tool-tangle-within.html', tag: 'Reflection' } ] },
       { number: 4, tag: 'Session 04', title: 'Navigating Transitions', desc: "When the path gets foggy — slow down, look inward, choose your next step. This session names what's actually in transition and finds the one brave step forward.", teaser: "When the path gets foggy — slow down, look inward, choose your next step.", color: '#8a9ab0', emoji: '🌫️', dim: 'rgba(138,154,176,0.12)', border: 'rgba(138,154,176,0.25)', minExchanges: 4, videoLen: '4 min', duration: '40–55 min', videoUrl: 'https://pub-f84f2be51fb44bd69d2d2271666a9506.r2.dev/session-4.mp4', completeTitle: "You named it.", completeDesc: "Naming what's in transition is half the work. Your Courage Compass is waiting — it'll help you find the next brave step.", tools: [ { name: 'Courage Compass', file: 'tools/tool-courage-compass.html', tag: 'Interactive' }, { name: 'Glow Map revisit', file: 'tools/tool-glow-map.html', tag: 'Check-in' } ] },
@@ -472,6 +484,7 @@
         'courage-compass': 'courage_compass', 'birdsong': 'birdsong',
         'forest': 'forest', 'full-flight-plan': 'full_flight_plan',
         'deep-profile': 'identity_profile',
+        'childhood-photo': 'childhood_photo',
         'glow-map': 'glow_map_s' + sn,
       };
       return map[toolKey] || toolKey.replace(/-/g, '_');
@@ -481,7 +494,7 @@
       'peak_plunge':'peak-plunge','nurture_prune':'nurture-prune','deep_roots':'deep-roots',
       'roots_feathers':'roots-feathers','soar_steady':'soar-steady','adventure_map':'adventure-map',
       'shadows_sparks':'shadows-sparks','tangle_within':'tangle-within','courage_compass':'courage-compass',
-      'birdsong':'birdsong','forest':'forest','full_flight_plan':'full-flight-plan','identity_profile':'deep-profile',
+      'birdsong':'birdsong','forest':'forest','full_flight_plan':'full-flight-plan','identity_profile':'deep-profile','childhood_photo':'childhood-photo',
       'glow_map_s0':'glow-map','glow_map_s1':'glow-map','glow_map_s2':'glow-map','glow_map_s3':'glow-map',
       'glow_map_s4':'glow-map','glow_map_s5':'glow-map','glow_map_s6':'glow-map','glow_map_s7':'glow-map',
     };
@@ -781,6 +794,7 @@
       'birdsong':        { file: 'tools/tool-birdsong.html',        icon: '🎵', name: 'Birdsong Scale',            hint: 'Map your energy states and design your week.' },
       'forest':          { file: 'tools/tool-forest.html',          icon: '🌲', name: 'Forest of Connections',     hint: 'Map the people in your relational landscape.' },
       'full-flight-plan':{ file: 'tools/tool-full-flight-plan.html',icon: '🪶', name: 'Full Flight Plan',          hint: 'Build your plan. In your words.' },
+      'childhood-photo': { file: 'tools/tool-childhood-photo.html', icon: '🖼️', name: 'Younger You',                hint: 'Upload a photo of you between 4 and 8 — for your Full Flight Plan.' },
     };
     var openedTools = {};
 
@@ -1209,6 +1223,119 @@
         currentUser={id:user.id,email:user.email};
         await loadDashboard();
       } catch(e){showView('view-auth');}
+    })();
+
+    // ── Voice input (Web Speech API) ─────────────────────────────────
+    // Wires the #chat-mic button to dictate into #chat-input.
+    // Guards against the common "red button stuck forever" failure modes:
+    //   - Hides the button entirely on browsers without SpeechRecognition (Firefox, etc.)
+    //   - Watchdog: if no transcript arrives within ~9s, auto-stop + show a toast
+    //   - Synchronous UI reset on every stop path (don't trust `onend` to fire on iOS)
+    //   - Maps each error code to a plain-language message
+    (function setupChatVoice(){
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) { document.body.classList.add('no-speech'); return; }
+
+      const micBtn = document.getElementById('chat-mic');
+      const input  = document.getElementById('chat-input');
+      const send   = document.getElementById('btn-send');
+      if (!micBtn || !input) return;
+
+      const recognition = new SpeechRecognition();
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '');
+      recognition.continuous = !isMobile;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+
+      let active = false;
+      let baseText = '';
+      let finalAccumulated = '';
+      let gotResult = false;
+      let watchdog = null;
+      const WATCHDOG_MS = 9000;
+
+      let toastEl = null, toastTimer = null;
+      function showToast(msg){
+        if (!toastEl) { toastEl = document.createElement('div'); toastEl.className = 'mic-status-toast'; document.body.appendChild(toastEl); }
+        toastEl.textContent = msg;
+        toastEl.classList.add('visible');
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastEl && toastEl.classList.remove('visible'), 4200);
+      }
+
+      function armWatchdog(){
+        if (watchdog) clearTimeout(watchdog);
+        watchdog = setTimeout(() => {
+          if (!gotResult) showToast("Mic isn't picking up audio. Check browser & system mic permissions, then try again.");
+          stop();
+        }, WATCHDOG_MS);
+      }
+
+      function setRecordingUI(on){
+        if (on) micBtn.classList.add('recording');
+        else micBtn.classList.remove('recording');
+      }
+
+      function start(){
+        if (active) return;
+        baseText = input.value;
+        finalAccumulated = '';
+        gotResult = false;
+        active = true;
+        setRecordingUI(true);
+        try { recognition.start(); }
+        catch (e) {
+          console.warn('Mic start failed:', e);
+          showToast("Couldn't start the mic. Try again.");
+          stop();
+        }
+      }
+
+      function stop(){
+        if (watchdog) { clearTimeout(watchdog); watchdog = null; }
+        if (active) {
+          try { recognition.stop(); } catch (e) {}
+        }
+        active = false;
+        setRecordingUI(false);
+      }
+
+      recognition.onstart = () => { armWatchdog(); };
+
+      recognition.onresult = (e) => {
+        gotResult = true;
+        armWatchdog();
+        let interim = '', newFinal = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          const seg = e.results[i];
+          const t = seg[0] && seg[0].transcript ? seg[0].transcript : '';
+          if (seg.isFinal) newFinal += t; else interim += t;
+        }
+        finalAccumulated += newFinal;
+        input.value = baseText + finalAccumulated + interim;
+        input.style.height = 'auto';
+        input.style.height = Math.min(input.scrollHeight, 140) + 'px';
+        if (send) send.disabled = !input.value.trim();
+      };
+
+      recognition.onerror = (e) => {
+        const code = e && e.error ? e.error : 'unknown';
+        console.warn('Mic error:', code);
+        if (code === 'not-allowed' || code === 'service-not-allowed') {
+          showToast("Voice input is blocked. Check your browser/system microphone settings.");
+        } else if (code === 'no-speech') {
+          if (!gotResult) showToast("Didn't catch any audio. Try typing instead, or check your mic.");
+        } else if (code === 'audio-capture') {
+          showToast("Your device's microphone isn't reachable from this browser.");
+        } else if (code === 'network') {
+          showToast("Voice transcription needs internet. Check your connection.");
+        }
+        stop();
+      };
+
+      recognition.onend = () => { stop(); };
+
+      micBtn.addEventListener('click', () => { active ? stop() : start(); });
     })();
   </script>
 </body>
