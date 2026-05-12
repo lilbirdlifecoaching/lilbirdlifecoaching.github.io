@@ -308,10 +308,12 @@
   // ── Fetch reply ─────────────────────────────────────────────────
   function fetchReply(userText) {
     snd.disabled = true; busy = true; showTyping();
+    var hist = msgs.filter(function(m){return m.role==='user'||m.role==='assistant';});
+    var userTurnCount = msgs.filter(function(m){return m.role==='user';}).length;
     fetch(WORKER, {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({messages: msgs.filter(function(m){return m.role==='user'||m.role==='assistant';})})
+      body:JSON.stringify({messages: hist, userTurnCount: userTurnCount})
     }).then(function(r){
       if (!r.ok) { hideTyping(); addBot('The chat service is unavailable right now. Please try again in a moment.'); return Promise.reject(); }
       return r.json();
