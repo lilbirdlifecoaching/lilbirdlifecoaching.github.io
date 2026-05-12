@@ -284,7 +284,7 @@
     if (currentUser) {
       const { data } = await sb.from('tool_outputs').select('output_data').eq('user_id', currentUser.id).eq('tool_name', 'soar_steady').single();
       if (data?.output_data?.items) items = data.output_data.items;
-    } 
+    }
     render();
   })();
 </script>
