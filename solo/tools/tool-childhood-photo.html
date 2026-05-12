@@ -145,8 +145,14 @@
   const { createClient } = supabase;
   const _urlParams = new URLSearchParams(window.location.search);
   const _token     = _urlParams.get('token') ? decodeURIComponent(_urlParams.get('token')) : null;
+  // Inject the user's JWT as the Authorization header on every request so that
+  // Supabase Storage + PostgREST both see auth.uid() correctly under RLS.
+  // setSession({ access_token, refresh_token: '' }) silently fails in v2 because
+  // an empty refresh token is invalid, leaving requests anonymous → uploads get
+  // rejected with "new row violates row-level security policy".
   const sb = createClient(SUPABASE_URL, SUPABASE_ANON, {
-    auth: { persistSession: false, autoRefreshToken: false }
+    auth: { persistSession: false, autoRefreshToken: false },
+    global: _token ? { headers: { Authorization: 'Bearer ' + _token } } : {}
   });
 
   let currentUser = null;
@@ -329,7 +335,6 @@
     const urlUid = _urlParams.get('uid');
     if (urlUid) {
       currentUser = { id: urlUid };
-      if (_token) { try { await sb.auth.setSession({ access_token: _token, refresh_token: '' }); } catch(e) {} }
     } else {
       try {
         const { data: { session } } = await sb.auth.getSession();
@@ -339,6 +344,11 @@
     if (!currentUser) {
       setStatus('Please sign in from the dashboard to save your photo.', 'error');
       return;
+    }
+    // Without a token, RLS will reject the upload. Surface a clear hint now
+    // rather than letting the user pick a photo and hit a confusing error later.
+    if (urlUid && !_token) {
+      setStatus('Open this tool from inside the course so we can verify it\'s you.', 'error');
     }
     // If a photo already exists, show the saved state on load
     try {
