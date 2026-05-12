@@ -298,11 +298,22 @@
     .modal-overlay {
       display: none;
       position: fixed;
-      inset: 0;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
+      box-sizing: border-box;
+      padding: max(0.75rem, env(safe-area-inset-top)) 1rem max(0.75rem, env(safe-area-inset-bottom));
       background: rgba(18,20,26,0.8);
       z-index: 200;
       align-items: center;
       justify-content: center;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
       backdrop-filter: blur(4px);
       animation: fadeIn 0.2s ease;
     }
@@ -321,7 +332,8 @@
       padding: 2rem;
       width: 100%;
       max-width: 400px;
-      margin: 1rem;
+      margin: auto;
+      flex-shrink: 0;
       animation: modalUp 0.25s ease;
     }
 
@@ -906,7 +918,15 @@
     title.textContent   = type === 'peak' ? 'What made this a high?' : 'What made this a low?';
 
     modal.classList.add('visible');
-    setTimeout(() => document.getElementById('modal-year').focus(), 50);
+    // Keep the dialog visually tied to the viewport: autofocus scrolls the iframe
+    // document, which used to shove this fixed modal off-screen inside the embed.
+    window.scrollTo(0, 0);
+    modal.scrollTop = 0;
+    setTimeout(function() {
+      var y = document.getElementById('modal-year');
+      if (!y) return;
+      try { y.focus({ preventScroll: true }); } catch (e) { y.focus(); }
+    }, 50);
   });
 
   // ── Modal buttons ────────────────────────────────────────────
@@ -920,7 +940,8 @@
     const note = document.getElementById('modal-note').value.trim();
 
     if (!year || year < 1950 || year > 2026) {
-      document.getElementById('modal-year').focus();
+      var yEl = document.getElementById('modal-year');
+      try { yEl.focus({ preventScroll: true }); } catch (e) { yEl.focus(); }
       return;
     }
 

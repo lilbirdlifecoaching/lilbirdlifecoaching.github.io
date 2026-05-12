@@ -249,7 +249,8 @@
 
   document.getElementById('btn-add').addEventListener('click', () => {
     const input = document.getElementById('task-input');
-    addItem(input.value); input.value = ''; input.focus();
+    addItem(input.value); input.value = '';
+    try { input.focus({ preventScroll: true }); } catch (e) { input.focus(); }
   });
 
   document.getElementById('task-input').addEventListener('keydown', e => {

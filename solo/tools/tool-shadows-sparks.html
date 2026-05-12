@@ -180,7 +180,8 @@
   ['shadow','spark'].forEach(type => {
     document.getElementById(type + '-add').addEventListener('click', () => {
       const input = document.getElementById(type + '-input');
-      addItem(type, input.value); input.value = ''; input.focus();
+      addItem(type, input.value); input.value = '';
+      try { input.focus({ preventScroll: true }); } catch (e) { input.focus(); }
     });
     document.getElementById(type + '-input').addEventListener('keydown', e => {
       if (e.key === 'Enter') { addItem(type, e.target.value); e.target.value = ''; }

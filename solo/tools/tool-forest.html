@@ -288,7 +288,7 @@
     if (!name) return;
     people[layer].push({ id: crypto.randomUUID(), name, note: noteInput.value.trim() });
     nameInput.value = ''; noteInput.value = '';
-    nameInput.focus();
+    try { nameInput.focus({ preventScroll: true }); } catch (e) { nameInput.focus(); }
     renderLayer(layer); drawForest(); autoSave();
   }
 

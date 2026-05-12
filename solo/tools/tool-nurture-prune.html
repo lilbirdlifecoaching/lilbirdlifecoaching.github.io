@@ -660,7 +660,7 @@
     const input = document.getElementById('person-input');
     addPerson(input.value);
     input.value = '';
-    input.focus();
+    try { input.focus({ preventScroll: true }); } catch (e) { input.focus(); }
   });
 
   document.getElementById('person-input').addEventListener('keydown', (e) => {

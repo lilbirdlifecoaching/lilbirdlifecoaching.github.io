@@ -629,7 +629,9 @@
       promptCard.offsetHeight;
       promptCard.style.animation = 'fadeUp 0.45s ease both';
 
-      setTimeout(() => responseArea.focus(), 100);
+      setTimeout(function() {
+        try { responseArea.focus({ preventScroll: true }); } catch (e) { responseArea.focus(); }
+      }, 100);
     }
 
     // ── Render previous responses above current card ──────────
