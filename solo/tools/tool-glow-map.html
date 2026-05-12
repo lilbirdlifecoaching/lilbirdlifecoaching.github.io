@@ -212,7 +212,7 @@
     const s = document.getElementById('save-status');
     s.classList.add('visible');
     if (window.parent !== window) {
-      setTimeout(() => window.parent.postMessage('tool-close', '*'), 2000);
+      setTimeout(function() { window.parent.postMessage('tool-close', '*'); }, 1800);
     } else {
       setTimeout(() => s.classList.remove('visible'), 2500);
     }

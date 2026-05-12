@@ -690,7 +690,11 @@
     await autoSave();
     const status = document.getElementById('save-status');
     status.classList.add('visible');
-    setTimeout(() => status.classList.remove('visible'), 2500);
+    if (window.parent !== window) {
+      setTimeout(function() { window.parent.postMessage('tool-close', '*'); }, 1800);
+    } else {
+      setTimeout(() => status.classList.remove('visible'), 2500);
+    }
   });
 
   // ── Init ─────────────────────────────────────────────────────

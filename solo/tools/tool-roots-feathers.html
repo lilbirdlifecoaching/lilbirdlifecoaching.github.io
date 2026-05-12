@@ -572,7 +572,8 @@
 
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script>
   function goBack() {
     if (window.parent !== window) {
       window.parent.postMessage('tool-close', '*');
@@ -701,7 +702,13 @@
       await autoSave();
       const status = document.getElementById('save-status');
       status.classList.add('visible');
-      setTimeout(() => status.classList.remove('visible'), 2500);
+      // Close iframe + return to session chat after the user sees the "Saved" pulse.
+      // Matches the pattern in the other journaling tools.
+      if (window.parent !== window) {
+        setTimeout(function() { window.parent.postMessage('tool-close', '*'); }, 1800);
+      } else {
+        setTimeout(() => status.classList.remove('visible'), 2500);
+      }
     });
 
     // ── Init ─────────────────────────────────────────────────

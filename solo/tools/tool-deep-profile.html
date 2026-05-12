@@ -331,7 +331,7 @@
     var s = document.getElementById('save-status');
     s.classList.add('visible');
     if (window.parent !== window) {
-      setTimeout(function() { window.parent.postMessage('tool-close', '*'); }, 2000);
+      setTimeout(function() { window.parent.postMessage('tool-close', '*'); }, 1800);
     } else {
       setTimeout(function() { s.classList.remove('visible'); }, 2500);
     }
