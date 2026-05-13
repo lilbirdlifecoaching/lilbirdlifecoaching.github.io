@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- lilbird deep-profile build: v7.0.1-20260512 (signature archetype family vocabulary: Trailblazer/Dreamer/Anchor/Spark/Haven substitutes for raw 5V family language; AI keeps creative freedom for headlines — worker v7.0.1) -->
+<!-- lilbird deep-profile build: v7.0.2-20260513 (course bridge: reads ?launchToken from URL, fire-and-forget POST /link-to-course after analyze so nestId lands in the Solo Course deep_profile_links table — worker v7.0.2) -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2456,9 +2456,63 @@
 // ═══════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════
-const DEEP_PROFILE_BUILD = 'v7.0.1-20260512';
+const DEEP_PROFILE_BUILD = 'v7.0.2-20260513';
 const WORKER_URL     = 'https://lilbird-assessment.cwwq46sn7m.workers.dev';
 console.info("lil' bird Inner Compass", DEEP_PROFILE_BUILD, '| worker:', WORKER_URL);
+
+// ── Course bridge: launchToken (Solo Course → Deep Profile → /link-to-course) ──
+// When the course launches us with ?launchToken=…, we stash it and POST it
+// back to the worker after /analyze completes so the user's nestId gets linked
+// into the course's Supabase `deep_profile_links` table (single-use token).
+function _readLaunchTokenFromUrl(){
+  try{
+    const t = new URLSearchParams(window.location.search).get('launchToken');
+    if(t && /^[0-9a-fA-F-]{10,}$/.test(t)) return t.trim();
+  }catch(_){}
+  return null;
+}
+let launchToken = _readLaunchTokenFromUrl();
+if(launchToken){
+  try{ sessionStorage.setItem('lilbird_launchToken', launchToken); }catch(_){}
+  console.info('Deep Profile launched from Solo Course — launchToken cached.');
+}else{
+  try{ launchToken = sessionStorage.getItem('lilbird_launchToken') || null; }catch(_){}
+}
+
+async function _postCourseLink(nestIdToLink){
+  if(!launchToken || !nestIdToLink) return;
+  const payload = { launchToken, nestId: nestIdToLink };
+  const maxAttempts = 3;
+  for(let attempt=1; attempt<=maxAttempts; attempt++){
+    try{
+      const r = await fetch(`${WORKER_URL}/link-to-course`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      });
+      if(r.ok){
+        console.info('Course link confirmed (attempt', attempt + ').');
+        try{ sessionStorage.removeItem('lilbird_launchToken'); }catch(_){}
+        launchToken = null;
+        return;
+      }
+      const text = await r.text().catch(()=> '');
+      if(r.status === 403){
+        console.warn('Course link rejected (token invalid/used/expired):', text);
+        try{ sessionStorage.removeItem('lilbird_launchToken'); }catch(_){}
+        launchToken = null;
+        return;
+      }
+      console.warn(`Course link attempt ${attempt} failed (${r.status}):`, text.slice(0,200));
+    }catch(e){
+      console.warn(`Course link attempt ${attempt} threw:`, e?.message || e);
+    }
+    if(attempt < maxAttempts){
+      await new Promise(res => setTimeout(res, 600 * attempt));
+    }
+  }
+  console.warn('Course link gave up after', maxAttempts, 'attempts — user can complete in-course manually.');
+}
 const STRIPE_PK      = 'pk_live_51QSMYQGAu36WZ7DdlsoNqzwPnsf4HUoOj6F1NZAeGnnH1TPjDEdEQudXIGgTLaUq079aQMI1W2MS6UpMItmTjgxy00HbouBx2g';
 const SHEETS_URL     = 'https://script.google.com/macros/s/AKfycbwPoMHcmTKO8JiDt8VS4fVsvGKqw-CQGLktQKImKeUPsfqX7WhH1IJCsG2M2fF7lyL6/exec';
 const BEEHIIV_PUB_ID = '53a4cafc-9b30-41d5-bd5e-4dc0026b4308';
@@ -3007,6 +3061,7 @@ async function runAnalysis(){
       throw new Error('Profile parsing failed');
     }
     await fetch(`${WORKER_URL}/store-profile`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nestId,profile:profileData,canvasScores,canvasHistory:[],assessmentMode: assessmentPath === 'know' ? 'know-type' : 'full',peakPlunge: peakPlungeData,pairTheseLog})});
+    if(launchToken){ _postCourseLink(nestId).catch(err => console.warn('Course link unhandled:', err)); }
   }catch(e){
     console.error('Analysis error — using fallback:', e.message);
     profileData=getFallbackProfile();
