@@ -76,6 +76,15 @@ body {
   overflow-x: hidden;
 }
 
+/* ─── PAGE HALFTONE ─── */
+body::after {
+  content:'';
+  position:fixed; inset:0;
+  background-image: radial-gradient(circle, rgba(17,17,17,0.13) 1px, transparent 1px);
+  background-size: 7px 7px;
+  pointer-events:none; z-index:0; opacity:1;
+}
+
 /* ─── GRAIN OVERLAY ─── */
 body::before {
   content:'';
@@ -86,10 +95,10 @@ body::before {
 
 /* ─── HALFTONE (section bg decoration) ─── */
 .halftone {
-  background-image: radial-gradient(circle, rgba(17,17,17,0.12) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(17,17,17,0.18) 1px, transparent 1px);
   background-size: 7px 7px;
   position: absolute; inset: 0;
-  pointer-events: none;
+  pointer-events: none; z-index: 0;
 }
 
 /* ─── FLOATING PARTICLES (replaces embers — tiny dandelion seeds) ─── */
@@ -142,7 +151,7 @@ nav {
   transition: box-shadow 0.3s ease;
 }
 .nav-logo { display:flex; align-items:center; gap:0.65rem; text-decoration:none; }
-.nav-bird { width:34px; height:34px; border-radius:50%; border:2px solid var(--k); }
+.nav-bird { width:42px; height:42px; border-radius:50%; border:2px solid var(--k); object-fit:cover; }
 .nav-wordmark {
   font-family:'Playfair Display', serif;
   font-style:italic; font-size:1.1rem;
@@ -184,12 +193,12 @@ nav {
   opacity:0.22;
 }
 .hero-kids {
-  position:absolute; bottom:0; right:-40px;
-  width:105%; object-fit:contain; object-position:bottom right;
+  position:absolute; bottom:0; right:-80px;
+  width:115%; object-fit:contain; object-position:bottom right;
 }
 .hero-fade {
   position:absolute; inset:0;
-  background:linear-gradient(to right, var(--paper) 30%, rgba(245,242,235,0.5) 65%, transparent 100%);
+  background:linear-gradient(to right, var(--paper) 28%, rgba(245,242,235,0.7) 50%, rgba(245,242,235,0.15) 75%, transparent 100%);
 }
 .hero-eyebrow {
   font-family:'Space Mono', monospace;
@@ -316,26 +325,41 @@ nav {
 }
 .recognition-item {
   background:var(--paper); padding:2.25rem 1.75rem;
-  transition:background 0.25s ease; position:relative;
+  transition: background 0.3s ease, transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s ease;
+  position:relative; overflow:hidden; cursor:default;
 }
 .recognition-item::before {
   content:''; position:absolute;
-  top:0; left:0; width:4px; height:0;
-  transition:height 0.4s ease;
+  top:0; left:0; width:0; height:100%;
+  transition: width 0.4s cubic-bezier(0.22,1,0.36,1);
+  z-index:0;
+}
+.recognition-item::after {
+  content:''; position:absolute; inset:0;
+  opacity:0; transition: opacity 0.3s ease;
+  z-index:0;
 }
 .recognition-item:nth-child(1)::before { background:var(--c); }
 .recognition-item:nth-child(2)::before { background:var(--m); }
 .recognition-item:nth-child(3)::before { background:var(--y); }
-.recognition-item:nth-child(4)::before { background:var(--k); }
+.recognition-item:nth-child(4)::before { background:var(--c); }
 .recognition-item:nth-child(4) { background:var(--k); }
-.recognition-item:nth-child(4) .recognition-text { color:rgba(255,255,255,0.85); }
-.recognition-item:hover { background:var(--paper-mid); }
-.recognition-item:hover::before { height:100%; }
-.recognition-item:nth-child(4):hover { background:#222; }
+.recognition-item:nth-child(4) .recognition-text { color:rgba(255,255,255,0.85); position:relative; z-index:1; }
+.recognition-item:hover {
+  transform: scale(1.02);
+  box-shadow: 6px 6px 0 var(--k);
+  z-index: 2;
+}
+.recognition-item:nth-child(1):hover { background: #c8f4f4; }
+.recognition-item:nth-child(2):hover { background: #f9cfe2; }
+.recognition-item:nth-child(3):hover { background: #fff7b8; }
+.recognition-item:nth-child(4):hover { background: #222222; }
+.recognition-item:hover::before { width:6px; }
 .recognition-text {
   font-family:'Playfair Display', serif;
   font-style:italic; font-size:1.1rem;
   color:var(--k); line-height:1.6;
+  position:relative; z-index:1;
 }
 
 /* ─── PATHFINDER ─── */
@@ -348,10 +372,33 @@ nav {
   gap:0.75rem 1.25rem; align-items:center;
   padding:1.2rem 1.5rem; text-decoration:none; color:inherit;
   border-bottom:1.5px solid rgba(17,17,17,0.15);
-  background:var(--paper); transition:background 0.2s ease;
+  background:var(--paper);
+  transition: background 0.25s ease, transform 0.25s cubic-bezier(0.22,1,0.36,1), box-shadow 0.25s ease, padding-left 0.25s ease;
+  position:relative; overflow:hidden;
 }
+.pathfinder-row::before {
+  content:''; position:absolute;
+  left:0; top:0; bottom:0; width:0;
+  transition: width 0.3s cubic-bezier(0.22,1,0.36,1);
+}
+.pathfinder-row:nth-child(1)::before { background:var(--c); }
+.pathfinder-row:nth-child(2)::before { background:var(--m); }
+.pathfinder-row:nth-child(3)::before { background:var(--y); }
+.pathfinder-row:nth-child(4)::before { background:var(--k); }
+.pathfinder-row:nth-child(5)::before { background:var(--c); }
+.pathfinder-row:nth-child(6)::before { background:var(--m); }
 .pathfinder-row:last-child { border-bottom:none; }
-.pathfinder-row:hover { background:var(--paper-mid); }
+.pathfinder-row:hover {
+  background:var(--paper-mid);
+  padding-left:1.9rem;
+  box-shadow: inset 0 0 0 1.5px rgba(17,17,17,0.1);
+}
+.pathfinder-row:hover::before { width:5px; }
+.pathfinder-row:hover .pf-go {
+  transform: translateX(4px);
+  color: var(--m);
+}
+.pf-go { transition: transform 0.25s ease, color 0.25s ease; }
 .pf-name {
   font-family:'Playfair Display', serif;
   font-size:1.05rem; color:var(--k); margin-bottom:0.2rem;
@@ -436,9 +483,26 @@ nav {
   display:flex; gap:1.25rem; align-items:flex-start;
   padding:1.4rem 1.5rem;
   border:1.5px solid transparent;
-  transition:all 0.25s ease;
+  transition: all 0.3s cubic-bezier(0.22,1,0.36,1);
+  position:relative; overflow:hidden;
 }
-.value-item:hover { background:var(--paper-mid); border-color:rgba(17,17,17,0.12); }
+.value-item::after {
+  content:''; position:absolute;
+  bottom:0; left:1.5rem; right:1.5rem; height:0;
+  transition: height 0.3s ease;
+}
+.value-item:nth-child(1)::after { background:var(--c); }
+.value-item:nth-child(2)::after { background:var(--m); }
+.value-item:nth-child(3)::after { background:var(--y); }
+.value-item:hover { 
+  background:var(--paper-mid); 
+  border-color:rgba(17,17,17,0.12);
+  transform: translateX(6px);
+  box-shadow: -4px 0 0 var(--c);
+}
+.value-item:nth-child(2):hover { box-shadow: -4px 0 0 var(--m); }
+.value-item:nth-child(3):hover { box-shadow: -4px 0 0 var(--y); }
+.value-item:hover::after { height:2px; }
 .value-marker {
   width:10px; height:10px; border-radius:50%;
   flex-shrink:0; margin-top:0.5rem;
@@ -463,21 +527,48 @@ nav {
 .offering-card {
   background:var(--paper); padding:2rem 1.75rem;
   text-decoration:none; display:block; position:relative; overflow:hidden;
-  transition:background 0.2s ease;
+  transition: background 0.3s ease, transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s ease;
 }
-.offering-card:hover { background:var(--paper-mid); }
+.offering-card:nth-child(2) { background: #eefafa; }
+.offering-card:nth-child(3) { background: #fdf0f6; }
+.offering-card:nth-child(4) { background: #fefde8; }
+.offering-card:nth-child(5) { background: #eefafa; }
+.offering-card:nth-child(2):hover { background: #c8f4f4; }
+.offering-card:nth-child(3):hover { background: #f9cfe2; }
+.offering-card:nth-child(4):hover { background: #fff7b8; }
+.offering-card:nth-child(5):hover { background: #c8f4f4; }
+.offering-card::before {
+  content:''; position:absolute;
+  top:0; left:0; right:0; height:0;
+  transition: height 0.35s cubic-bezier(0.22,1,0.36,1);
+  z-index:0;
+}
+.offering-card:nth-child(1)::before { background:var(--y); }
+.offering-card:nth-child(2)::before { background:var(--c); }
+.offering-card:nth-child(3)::before { background:var(--m); }
+.offering-card:nth-child(4)::before { background:var(--y); }
+.offering-card:nth-child(5)::before { background:var(--c); }
+.offering-card:hover { 
+  transform: translateY(-4px);
+  box-shadow: 0 8px 0 var(--k);
+  background:var(--paper-mid);
+  z-index:2;
+}
+.offering-card:hover::before { height:4px; }
 .offering-card.featured {
   background:var(--y); grid-column:1/-1;
 }
-.offering-card.featured:hover { background:#f0d800; }
+.offering-card.featured::before { background:var(--m); }
+.offering-card.featured:hover { background:#f5e800; transform:translateY(-3px); box-shadow:0 6px 0 var(--k); }
 .offering-card::after {
   content:'→'; position:absolute;
   bottom:1.5rem; right:1.5rem;
   font-family:'Space Mono', monospace; font-size:0.85rem;
-  color:var(--c); opacity:0; transform:translateX(-6px);
-  transition:var(--transition);
+  color:var(--c); opacity:0; transform:translateX(-8px);
+  transition:var(--transition); z-index:1;
 }
 .offering-card:hover::after { opacity:1; transform:translateX(0); }
+.offering-tag, .offering-title, .offering-desc { position:relative; z-index:1; }
 .offering-tag {
   font-family:'Space Mono', monospace;
   font-size:0.58rem; letter-spacing:0.18em; text-transform:uppercase;
@@ -637,7 +728,7 @@ nav {
 /* ─── FINAL CTA ─── */
 .final-section { max-width:820px; margin:0 auto; padding:6rem 2.5rem; }
 .final-inner { text-align:center; }
-.final-bird { width:72px; height:72px; margin:0 auto 2rem; display:block; border-radius:50%; border:2px solid var(--k); }
+.final-bird { width:88px; height:88px; margin:0 auto 2rem; display:block; border-radius:50%; border:2px solid var(--k); object-fit:cover; }
 .final-headline {
   font-family:'Playfair Display', serif;
   font-size:clamp(1.75rem,3vw,2.5rem); line-height:1.25; margin-bottom:1rem; color:var(--k);
@@ -1047,7 +1138,7 @@ footer {
       <div class="testimonial-card">
         <p class="testimonial-quote">"Working with Luke has been a great way to kickstart my journey towards wholeness and being centred. He's amazing at reflecting your own emotions and desires back to you in a way that helps you focus on what you truly want out of life. I would absolutely recommend him."</p>
         <div class="testimonial-author">
-          <img class="testimonial-face" src="/Testimonials/Brianna-M.jpeg" alt="Brianna M" loading="lazy" decoding="async" />
+          <img class="testimonial-face" src="https://lilbird.life/Testimonials/Brianna-M.jpeg" alt="Brianna M" loading="lazy" decoding="async" />
           <div class="testimonial-meta"><p class="testimonial-name">Brianna M</p><p class="testimonial-role">Brand strategist · Life coaching client</p></div>
         </div>
       </div>
@@ -1055,7 +1146,7 @@ footer {
       <div class="testimonial-card">
         <p class="testimonial-quote">"Luke's a fantastic guide — his style is very laid back, allowing me to work myself verbally towards the direction I want to go. Judgement doesn't exist with him and he has no agenda. He'll give you nudges and challenges, but he will not outright tell you what to do."</p>
         <div class="testimonial-author">
-          <img class="testimonial-face" src="/Testimonials/Goodwyn-D.jpeg" alt="Goodwyn D" loading="lazy" decoding="async" />
+          <img class="testimonial-face" src="https://lilbird.life/Testimonials/Goodwyn-D.jpeg" alt="Goodwyn D" loading="lazy" decoding="async" />
           <div class="testimonial-meta"><p class="testimonial-name">Goodwyn D</p><p class="testimonial-role">Entrepreneur · Life coaching client</p></div>
         </div>
       </div>
@@ -1063,7 +1154,7 @@ footer {
       <div class="testimonial-card">
         <p class="testimonial-quote">"I was dealing with a tough transition — moving across the country, figuring out my career path, and dealing with post-lock-in emotional fatigue. Luke asked me to dream, something I hadn't done in a long time. I'm confident that even after one session, you will feel empowered and capable."</p>
         <div class="testimonial-author">
-          <img class="testimonial-face" src="/Testimonials/Wanda-L-web.jpg" alt="Wanda L" loading="lazy" decoding="async" />
+          <img class="testimonial-face" src="https://lilbird.life/Testimonials/Wanda-L-web.jpg" alt="Wanda L" loading="lazy" decoding="async" />
           <div class="testimonial-meta"><p class="testimonial-name">Wanda L</p><p class="testimonial-role">Marketing and brand consultant · Life coaching client</p></div>
         </div>
       </div>
@@ -1071,7 +1162,7 @@ footer {
       <div class="testimonial-card">
         <p class="testimonial-quote">"Luke possesses an uncanny and uncommon ability to build immediate trust and safety."</p>
         <div class="testimonial-author">
-          <img class="testimonial-face" src="/Testimonials/Andrew-R.jpeg" alt="Andrew Robinson" loading="lazy" decoding="async" />
+          <img class="testimonial-face" src="https://lilbird.life/Testimonials/Andrew-R.jpeg" alt="Andrew Robinson" loading="lazy" decoding="async" />
           <div class="testimonial-meta"><p class="testimonial-name">Andrew Robinson</p><p class="testimonial-role">Partner, GiANT Worldwide</p></div>
         </div>
       </div>
@@ -1079,7 +1170,7 @@ footer {
       <div class="testimonial-card">
         <p class="testimonial-quote">"I came with four objectives: health, finance, work, and relationships. Luke's encouragement, listening skills, and supportive coaching style helped me delve into each area. I've reached a greater work/life balance, more confidence, and a clear vision for my future."</p>
         <div class="testimonial-author">
-          <img class="testimonial-face" src="/Testimonials/Deb-B-web.jpg" alt="Deb B" loading="lazy" decoding="async" />
+          <img class="testimonial-face" src="https://lilbird.life/Testimonials/Deb-B-web.jpg" alt="Deb B" loading="lazy" decoding="async" />
           <div class="testimonial-meta"><p class="testimonial-name">Deb B</p><p class="testimonial-role">Hair stylist · Life coaching client</p></div>
         </div>
       </div>
@@ -1087,7 +1178,7 @@ footer {
       <div class="testimonial-card">
         <p class="testimonial-quote">"I uncovered blind spots, gained practical tools, and felt recognised for who I was becoming — not just what I was producing. A powerful experience for anyone ready to grow."</p>
         <div class="testimonial-author">
-          <img class="testimonial-face" src="/Testimonials/Nathan-D.jpeg" alt="Nathan Dunn" loading="lazy" decoding="async" />
+          <img class="testimonial-face" src="https://lilbird.life/Testimonials/Nathan-D.jpeg" alt="Nathan Dunn" loading="lazy" decoding="async" />
           <div class="testimonial-meta"><p class="testimonial-name">Nathan Dunn</p><p class="testimonial-role">Mechanical Engineering Manager, Lam Research</p></div>
         </div>
       </div>
@@ -1095,7 +1186,7 @@ footer {
       <div class="testimonial-card">
         <p class="testimonial-quote">"One welcome surprise was the lack of tracking toward specific professional goals — the exercises focused on deeper themes and passions in life. An important breakthrough was realising the calling didn't have to be about duty. It was OK to ask, 'Ed, what do <em>you</em> want?' I'd recommend this to anyone at a transition in life."</p>
         <div class="testimonial-author">
-          <img class="testimonial-face" src="/Testimonials/Ed-B.jpeg" alt="Ed Barker" loading="lazy" decoding="async" />
+          <img class="testimonial-face" src="https://lilbird.life/Testimonials/Ed-B.jpeg" alt="Ed Barker" loading="lazy" decoding="async" />
           <div class="testimonial-meta"><p class="testimonial-name">Ed Barker</p><p class="testimonial-role">VP of Engineering · Life coaching client</p></div>
         </div>
       </div>
@@ -1103,7 +1194,7 @@ footer {
       <div class="testimonial-card">
         <p class="testimonial-quote">"If you want to be led by someone who lives out what they are talking about, Luke is the real deal."</p>
         <div class="testimonial-author">
-          <img class="testimonial-face" src="/Testimonials/Todd-V.jpeg" alt="J. Todd Vinson" loading="lazy" decoding="async" />
+          <img class="testimonial-face" src="https://lilbird.life/Testimonials/Todd-V.jpeg" alt="J. Todd Vinson" loading="lazy" decoding="async" />
           <div class="testimonial-meta"><p class="testimonial-name">J. Todd Vinson</p><p class="testimonial-role">Principal, Overlander Consulting</p></div>
         </div>
       </div>
@@ -1111,7 +1202,7 @@ footer {
       <div class="testimonial-card">
         <p class="testimonial-quote">"My time with Luke has felt nothing short of a gift. As the seasons changed, Luke showed up to help guide me as a whole person — not just in the workplace, but how I show up in life and relationships as well."</p>
         <div class="testimonial-author">
-          <img class="testimonial-face" src="/Testimonials/MelB.jpeg" alt="Mel B" loading="lazy" decoding="async" />
+          <img class="testimonial-face" src="https://lilbird.life/Testimonials/MelB.jpeg" alt="Mel B" loading="lazy" decoding="async" />
           <div class="testimonial-meta"><p class="testimonial-name">Mel B</p><p class="testimonial-role">Video director, producer &amp; teacher · Life coaching client</p></div>
         </div>
       </div>
@@ -1119,7 +1210,7 @@ footer {
       <div class="testimonial-card">
         <p class="testimonial-quote">"If you're looking to elevate your game and find a coach who genuinely sees you — Luke is your go-to."</p>
         <div class="testimonial-author">
-          <img class="testimonial-face" src="/Testimonials/Jen-D.jpg" alt="Jen Dorrough" loading="lazy" decoding="async" />
+          <img class="testimonial-face" src="https://lilbird.life/Testimonials/Jen-D.jpg" alt="Jen Dorrough" loading="lazy" decoding="async" />
           <div class="testimonial-meta"><p class="testimonial-name">Jen Dorrough</p><p class="testimonial-role">Director, YWAM North Cascades</p></div>
         </div>
       </div>
@@ -1134,7 +1225,7 @@ footer {
       <div class="testimonial-card">
         <p class="testimonial-quote">"His coaching gave me the clarity, tools, and confidence to lead with purpose — and the impact showed up in both my personal life and professional recognition."</p>
         <div class="testimonial-author">
-          <img class="testimonial-face" src="/Testimonials/Confidence-U-web.jpg" alt="Confidence Udegbue" loading="lazy" decoding="async" />
+          <img class="testimonial-face" src="https://lilbird.life/Testimonials/Confidence-U-web.jpg" alt="Confidence Udegbue" loading="lazy" decoding="async" />
           <div class="testimonial-meta"><p class="testimonial-name">Confidence Udegbue</p><p class="testimonial-role">VP of Product, Freeletics · Forbes 30u30 · Life coaching client</p></div>
         </div>
       </div>
