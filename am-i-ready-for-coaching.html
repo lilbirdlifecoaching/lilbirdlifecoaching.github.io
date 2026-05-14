@@ -34,38 +34,7 @@
     }
   }
   </script>
-  <!-- ═══════════ SEO META TAGS ═══════════ -->
-  <meta name="description" content="Take the lil' bird coaching readiness quiz and find out if coaching is right for where you are right now." />
-  <meta name="keywords" content="am I ready for coaching, life coaching quiz, lil bird coaching, Luke Haythorpe, coaching readiness, life transitions coach" />
-  <meta name="author" content="Luke Haythorpe" />
-  <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://lilbird.life/am-i-ready-for-coaching.html" />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://lilbird.life/am-i-ready-for-coaching.html" />
-  <meta property="og:title" content="Am I Ready for Coaching? — lil' bird" />
-  <meta property="og:description" content="Take the lil' bird coaching readiness quiz and find out if coaching is right for where you are right now." />
-  <meta property="og:image" content="https://lilbird.life/bird-logo.png" />
-  <meta property="og:site_name" content="lil’ bird coaching" />
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Am I Ready for Coaching? — lil' bird" />
-  <meta name="twitter:description" content="Take the lil' bird coaching readiness quiz and find out if coaching is right for where you are right now." />
-  <meta name="twitter:image" content="https://lilbird.life/bird-logo.png" />
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "ProfessionalService",
-    "name": "lil’ bird coaching",
-    "url": "https://lilbird.life",
-    "logo": "https://lilbird.life/bird-logo.png",
-    "description": "Life and leadership coaching for people in transition.",
-    "founder": {
-      "@type": "Person",
-      "name": "Luke Haythorpe",
-      "url": "https://lilbird.life"
-    }
-  }
-  </script>
-  <title>lil' bird | am I a fit?</title>
+  <title>Am I Ready for Coaching? — lil' bird</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
   <style>
@@ -321,7 +290,25 @@
     .objection-card .rc-label { color: var(--gold); }
     .objection-card .rc-body { color: var(--text); font-size: 0.9rem; line-height: 1.65; }
 
-    .result-ctas { margin-top: 2rem; display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .result-ctas { margin-top: 2rem; display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; }
+    .result-cta-alt-wrap {
+      width: 100%; margin-top: 1.25rem; padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+    }
+    .result-cta-alt-label {
+      font-family: 'DM Mono', monospace; font-size: 0.58rem;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 0.65rem;
+    }
+    .result-cta-alt-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .btn-cta-alt {
+      font-family: 'DM Mono', monospace; font-size: 0.62rem;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--gold-dim); text-decoration: none;
+      border: 1px solid var(--border); border-radius: 6px;
+      padding: 0.55rem 1rem; transition: all 0.2s; display: inline-block;
+    }
+    .btn-cta-alt:hover { border-color: var(--gold); color: var(--gold); }
     .btn-cta {
       background: var(--gold); color: var(--dark); border: none;
       padding: 0.85rem 1.75rem; border-radius: 6px;
@@ -338,6 +325,45 @@
       cursor: pointer; transition: all 0.2s;
     }
     .btn-cta-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* on-page quiz offer (strong fit — before CTAs) */
+    .quiz-offer-highlight {
+      width: 100%;
+      background: rgba(245,200,66,0.1);
+      border: 1px solid rgba(245,200,66,0.38);
+      border-radius: 12px;
+      padding: 1.2rem 1.35rem 1.1rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .quiz-offer-tag {
+      font-family: 'DM Mono', monospace; font-size: 0.58rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 0.65rem; display: inline-block;
+    }
+    .quiz-offer-main {
+      display: flex; align-items: baseline; justify-content: center;
+      gap: 0.65rem; flex-wrap: wrap; margin-bottom: 0.45rem;
+    }
+    .quiz-offer-price {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 2.65rem);
+      font-weight: 700; color: var(--gold); line-height: 1;
+    }
+    .quiz-offer-was {
+      font-size: 0.95rem; color: var(--text-muted);
+      text-decoration: line-through; text-decoration-thickness: 1px;
+    }
+    .quiz-offer-save {
+      font-family: 'DM Mono', monospace; font-size: 0.62rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--green); margin-bottom: 0.55rem;
+    }
+    .quiz-offer-note {
+      font-size: 0.82rem; line-height: 1.55; color: var(--text-muted);
+      max-width: 34rem; margin: 0 auto;
+    }
+    .quiz-offer-note strong { color: var(--text); }
 
     /* capture status */
     #capture-status {
@@ -519,14 +545,14 @@
 <div id="modal-overlay" role="dialog" aria-modal="true" aria-label="First Flight discount">
   <div id="modal-box">
     <button id="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
-    <div class="modal-tag">✦ reader discount</div>
-    <h2 class="modal-headline">25% off your<br/><em>First Flight</em></h2>
-    <p class="modal-sub">Because you showed up and did the work. Use this code at checkout on Calendly to take $75 off — bringing your First Flight to <strong style="color:var(--text)">$224</strong>.</p>
+    <div class="modal-tag">✦ quiz completion discount</div>
+    <h2 class="modal-headline">Half off your<br/><em>First Flight</em></h2>
+    <p class="modal-sub" id="modal-sub-copy">Because you showed up and did the work. Use this code at checkout on Calendly — <strong style="color:var(--text)">$149</strong> for the full 2-hour session (normally $299).</p>
     <div class="modal-code-wrap">
-      <span class="modal-code">IMREADY</span>
+      <span class="modal-code" id="modal-code-display">IMREADY</span>
       <button class="modal-copy-btn" id="copy-btn" onclick="copyCode()">Copy code</button>
     </div>
-    <p class="modal-saving">That's a 2-hour session for <strong>$224</strong> — normally $299.</p>
+    <p class="modal-saving" id="modal-saving-copy">You save <strong>$150</strong> with this quiz offer.</p>
     <a href="https://calendly.com/lilbirdlifecoaching/first-flight-session" target="_blank" class="modal-cta" onclick="closeModal()">Book now with code →</a>
     <button class="modal-skip" onclick="closeModal()">I'll book without the discount</button>
   </div>
@@ -535,12 +561,20 @@
 <script>
 
 // ── CONFIG ────────────────────────────────────────────────────────────────────
+// Calendly: configure coupon FIRST_FLIGHT_COUPON_CODE for a fixed checkout price
+// of FIRST_FLIGHT_QUIZ_PRICE_USD (vs list FIRST_FLIGHT_LIST_USD), or totals will disagree with this page.
 const SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwaLXyQoERqfQ0Dlj0lGCN0TTy-m9aS2GiUmm5l5mOtTbysX5A2gJ5HZPEb9z9mEAvnQg/exec';
 const BEEHIIV_PUBLICATION_ID = 'YOUR_BEEHIIV_PUBLICATION_ID'; // e.g. pub_xxxxxxxx
 const BEEHIIV_API_KEY        = 'YOUR_BEEHIIV_API_KEY';        // keep private — swap for Apps Script proxy if needed
 
-const FREE_CALL_URL  = 'https://calendly.com/lilbirdlifecoaching/30min';
-const PAID_CALL_URL  = 'https://calendly.com/lilbirdlifecoaching/first-flight-session';
+const FREE_CALL_URL   = 'https://calendly.com/lilbirdlifecoaching/30min';
+const PAID_CALL_URL   = 'https://calendly.com/lilbirdlifecoaching/first-flight-session';
+const SOLO_COURSE_URL = 'https://lilbird.life/solo/';
+/** List price for First Flight (must match Calendly base / strikethrough). */
+const FIRST_FLIGHT_LIST_USD = 299;
+/** Fixed quiz-completion checkout price (set same fixed amount on the Calendly coupon). */
+const FIRST_FLIGHT_QUIZ_PRICE_USD = 149;
+const FIRST_FLIGHT_COUPON_CODE = 'IMREADY';
 
 // ── QUESTIONS ─────────────────────────────────────────────────────────────────
 const QUESTIONS = [
@@ -785,7 +819,8 @@ function showResult() {
     sections = [
       { label: '🌱 What this means', text: 'The gap between where you are and where you want to be is real — but it\'s closeable. You have the self-awareness, the motivation, and the honesty it takes to do real work in coaching.' },
       { label: '⚡ What coaching could do for you', text: 'Help you see what you can\'t see on your own. Get out of your own way. Stop repeating the same patterns and start moving with clarity and intention.' },
-      { label: '◈ What happens next', text: 'A First Flight is a focused 2-hour coaching session ($299). It\'s the real thing — not a sales call, not a taster. Come ready to go somewhere and we will.' }
+      { label: '◈ What happens next', html: 'A First Flight is a focused 2-hour coaching session. List price is $' + FIRST_FLIGHT_LIST_USD + '; as a thank-you for finishing this quiz, you can book for <strong>$' + FIRST_FLIGHT_QUIZ_PRICE_USD + '</strong> using the code when you tap Book. It\'s the real thing — not a sales call, not a taster.' },
+      { label: '🪶 Lower-commitment options', html: 'If a two-hour First Flight is more than you want today, that\'s okay. <a href="' + FREE_CALL_URL + '" target="_blank" rel="noopener">Book a free 30-minute discovery call</a> — same honesty, no cost. Prefer self-paced? Try the <a href="' + SOLO_COURSE_URL + '" target="_blank" rel="noopener">Life Change Sessions: Solo Course</a>, then come back when you want live coaching.' }
     ];
   } else if (pct >= 0.42) {
     badgeClass   = 'badge-maybe';
@@ -834,8 +869,11 @@ function showResult() {
   // Sections
   var sectionsEl = document.getElementById('result-sections');
   sectionsEl.innerHTML = sections.map(function(s) {
+    var body = s.html != null
+      ? '<div class="result-section-text">' + s.html + '</div>'
+      : '<div class="result-section-text">' + s.text + '</div>';
     return '<div class="result-section"><div class="result-section-label">' + s.label +
-           '</div><div class="result-section-text">' + s.text + '</div></div>';
+           '</div>' + body + '</div>';
   }).join('');
 
   // Objection block
@@ -848,9 +886,27 @@ function showResult() {
   // CTAs — First Flight triggers discount modal, free call goes direct
   var ctasEl = document.getElementById('result-ctas');
   if (primaryCta === PAID_CALL_URL) {
+    var listP = FIRST_FLIGHT_LIST_USD;
+    var saleP = FIRST_FLIGHT_QUIZ_PRICE_USD;
+    var saveP = listP - saleP;
+    var pctApprox = Math.round((saveP / listP) * 100);
     ctasEl.innerHTML =
-      '<button class="btn-cta" onclick="openModal()">Book a First Flight — $299 →</button>' +
-      '<button class="btn-cta-ghost" onclick="retake()">Retake quiz</button>';
+      '<div class="quiz-offer-highlight" role="region" aria-label="Quiz First Flight offer">' +
+      '<div class="quiz-offer-tag">Quiz completion — First Flight</div>' +
+      '<div class="quiz-offer-main">' +
+      '<span class="quiz-offer-price">$' + saleP + '</span>' +
+      '<span class="quiz-offer-was">$' + listP + '</span></div>' +
+      '<div class="quiz-offer-save">Save $' + saveP + ' · about ' + pctApprox + '% off list</div>' +
+      '<p class="quiz-offer-note">Use code <strong>' + FIRST_FLIGHT_COUPON_CODE + '</strong> at Calendly checkout. Tap <strong>Book First Flight</strong> for the copy button and booking link.</p>' +
+      '</div>' +
+      '<button class="btn-cta" onclick="openModal()">Book First Flight — $' + saleP + ' with code →</button>' +
+      '<button class="btn-cta-ghost" onclick="retake()">Retake quiz</button>' +
+      '<div class="result-cta-alt-wrap">' +
+      '<div class="result-cta-alt-label">Want something lighter on budget or time?</div>' +
+      '<div class="result-cta-alt-row">' +
+      '<a href="' + FREE_CALL_URL + '" class="btn-cta-alt" target="_blank" rel="noopener">Free discovery call</a>' +
+      '<a href="' + SOLO_COURSE_URL + '" class="btn-cta-alt" target="_blank" rel="noopener">Solo course (self-paced)</a>' +
+      '</div></div>';
   } else {
     ctasEl.innerHTML =
       '<a href="' + primaryCta + '" class="btn-cta" target="_blank">' + primaryLabel + '</a>' +
@@ -938,8 +994,25 @@ function retake() {
   document.getElementById('q-count').style.display = 'none';
 }
 
+function syncQuizModalPricing() {
+  var list = FIRST_FLIGHT_LIST_USD;
+  var sale = FIRST_FLIGHT_QUIZ_PRICE_USD;
+  var save = list - sale;
+  var sub = document.getElementById('modal-sub-copy');
+  if (sub) {
+    sub.innerHTML = 'Because you showed up and did the work. Use <strong style="color:var(--text)">' + FIRST_FLIGHT_COUPON_CODE + '</strong> at checkout on Calendly — <strong style="color:var(--text)">$' + sale + '</strong> for the full 2-hour session (list price $' + list + ').';
+  }
+  var saving = document.getElementById('modal-saving-copy');
+  if (saving) {
+    saving.innerHTML = 'You save <strong style="color:var(--green)">$' + save + '</strong> with this quiz offer.';
+  }
+  var codeDisp = document.getElementById('modal-code-display');
+  if (codeDisp) codeDisp.textContent = FIRST_FLIGHT_COUPON_CODE;
+}
+
 // ── MODAL ─────────────────────────────────────────────────────────────────────
 function openModal() {
+  syncQuizModalPricing();
   document.getElementById('modal-overlay').classList.add('open');
   document.getElementById('copy-btn').textContent = 'Copy code';
   document.getElementById('copy-btn').classList.remove('copied');
@@ -948,14 +1021,15 @@ function closeModal() {
   document.getElementById('modal-overlay').classList.remove('open');
 }
 function copyCode() {
-  navigator.clipboard.writeText('IMREADY').then(function() {
+  var code = FIRST_FLIGHT_COUPON_CODE;
+  navigator.clipboard.writeText(code).then(function() {
     var btn = document.getElementById('copy-btn');
     btn.textContent = 'Copied!';
     btn.classList.add('copied');
   }).catch(function() {
     // fallback for older browsers
     var ta = document.createElement('textarea');
-    ta.value = 'IMREADY';
+    ta.value = code;
     document.body.appendChild(ta);
     ta.select();
     document.execCommand('copy');
@@ -975,6 +1049,7 @@ document.addEventListener('keydown', function(e) {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
+  syncQuizModalPricing();
   var btn = document.getElementById('btn-start');
   if (btn) btn.addEventListener('click', startQuiz);
 });
