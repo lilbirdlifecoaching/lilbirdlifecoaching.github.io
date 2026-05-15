@@ -82,6 +82,28 @@
       margin-bottom: 1.5rem;
     }
     h1 em { font-style: italic; color: var(--gold); }
+    .luke-photo-frame {
+      position: relative;
+      margin: 0 auto 2.25rem;
+      width: 100%;
+      max-width: 280px;
+      aspect-ratio: 1 / 1;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--dark-border);
+      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.28);
+      background: var(--dark-mid);
+    }
+    .luke-photo {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      object-position: 50% 18%;
+      filter: sepia(0.12) contrast(1.04);
+    }
     .lead {
       font-size: 1.1rem;
       color: var(--text-muted);
@@ -142,6 +164,9 @@
   <main>
     <p class="eyebrow">the guide</p>
     <h1>Hi. I'm Luke.<br /><em>This started young.</em></h1>
+    <figure class="luke-photo-frame">
+      <img src="luke-head-edit.png" alt="Luke Haythorpe, founder of lil' bird coaching" class="luke-photo" width="800" height="800" loading="eager" decoding="async" />
+    </figure>
     <p class="lead">
       I'm a certified <strong>GiANT Worldwide</strong> practitioner. Before coaching full-time, I spent years in <strong>ministry</strong> — sitting with people in the thick of real life: questions, tension, turning points.
     </p>
