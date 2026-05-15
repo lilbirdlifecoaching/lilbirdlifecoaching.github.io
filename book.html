@@ -455,6 +455,7 @@
 
   <!-- Calendly JS -->
   <script src="https://assets.calendly.com/assets/external/widget.js" async></script>
+  <script src="first-flight-booking.js"></script>
 
   <script>
     // Embers
@@ -487,11 +488,20 @@
       document.getElementById('cal-loading').classList.add('hidden');
     }, 4000);
 
+    function showFirstFlightOffer() {
+      if (window.LbFirstFlight && window.LbFirstFlight.openModal) {
+        window.LbFirstFlight.openModal();
+      }
+    }
+
     // Switch session type
     function switchCalendly(el) {
       document.querySelectorAll('.session-option').forEach(o => o.classList.remove('active'));
       el.classList.add('active');
       const url = el.dataset.url;
+      if (url && url.indexOf('first-flight-session') !== -1) {
+        showFirstFlightOffer();
+      }
       const widget = document.getElementById('calendly-widget');
       // Show loading again
       document.getElementById('cal-loading').classList.remove('hidden');
@@ -509,6 +519,8 @@
       }
       setTimeout(() => document.getElementById('cal-loading').classList.add('hidden'), 4000);
     }
+
+    setTimeout(showFirstFlightOffer, 600);
 
     (function () {
       const a = document.getElementById('footer-feedback-link');

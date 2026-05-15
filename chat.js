@@ -155,7 +155,7 @@
         <div class="lb-cal-hdr">
           <div>
             <div class="lb-cal-title">book your first flight</div>
-            <div class="lb-cal-disc">✦ use code FIRSTFLIGHT for 20% off</div>
+            <div class="lb-cal-disc">✦ use code IMREADY — $149 (list $299)</div>
           </div>
           <button id="lb-cal-x">✕</button>
         </div>
@@ -190,9 +190,12 @@
   // ── Calendly overlay ────────────────────────────────────────────
   function openCal(url, isFF) {
     if (!Safe.isAllowedCalendlyUrl(url)) return;
+    if (isFF && window.LbFirstFlight && window.LbFirstFlight.openModal) {
+      window.LbFirstFlight.openModal();
+      return;
+    }
     var themed = url + (url.includes('?') ? '&' : '?') + 'hide_event_type_details=1&hide_gdpr_banner=1&background_color=1e2028&text_color=f0ead8&primary_color=F5C842';
     calFrame.src = themed;
-    // Update header
     var title = document.querySelector('.lb-cal-title');
     var disc = document.querySelector('.lb-cal-disc');
     if (isFF) {
@@ -258,7 +261,7 @@
     b.innerHTML = 'Great — here\'s a quick look at the options:<br><br><strong style="color:#F5C842">🐦 The First Flight</strong> — one 2-hour session. Map your story, find the real issue, leave with your next step. Best starting point, no commitment beyond the conversation.<br><br><strong style="color:#F5C842">🌿 Life Change Sessions</strong> — the full journey. 7 sessions through the complete curriculum. Story, vision, identity, transitions, rhythms, relationships.<br><br><strong style="color:#F5C842">💛 Monthly Coaching</strong> — ongoing thinking partner. Recurring or once-off, flexible to what you need.';
     var wrap = document.createElement('div'); wrap.className = 'lb-opts'; wrap.style.marginTop = '.75rem';
     [
-      { label: 'Book a First Flight (20% off via this chat)', url: FF_URL, ff: true },
+      { label: 'Book a First Flight — $149 with code IMREADY', url: FF_URL, ff: true },
       { label: 'Book Life Change Sessions', url: LCS_URL, ff: false },
       { label: 'Book a free Discovery Call first', url: DISC_URL, ff: false },
     ].forEach(function(o) {
@@ -268,7 +271,7 @@
       wrap.appendChild(btn);
     });
     var disc = document.createElement('span'); disc.className = 'lb-disc';
-    disc.textContent = '✦ Use code FIRSTFLIGHT at checkout for 20% off your First Flight';
+    disc.textContent = '✦ Use code IMREADY at checkout — $149 for your First Flight (list $299)';
     wrap.appendChild(disc);
     m.appendChild(b); m.appendChild(wrap); msgsEl.appendChild(m);
     msgs.push({role:'assistant', content:'Here are the session options...'});

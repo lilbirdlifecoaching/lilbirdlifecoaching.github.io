@@ -1895,6 +1895,7 @@
   </div>
 </div>
 
+<script src="first-flight-booking.js"></script>
 <script src="lb-chat-safe.js"></script>
 <script>
 (function(){
@@ -1924,6 +1925,10 @@
     e.preventDefault();
     var url=trigger.getAttribute('data-url');
     if(!url||!(window.lbChatSafe&&window.lbChatSafe.isAllowedCalendlyUrl(url)))return;
+    if(window.LbFirstFlight&&window.LbFirstFlight.isFirstFlightUrl(url)){
+      window.LbFirstFlight.openModal();
+      return;
+    }
     // Open Calendly in a lightweight overlay
     var overlay=document.createElement('div');
     overlay.id='lb-calendly-overlay';

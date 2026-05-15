@@ -377,91 +377,6 @@
       #screen-intro, #screen-questions, #screen-capture, #screen-result { padding-left: 1.25rem; padding-right: 1.25rem; }
     }
 
-    /* ── DISCOUNT MODAL ── */
-    #modal-overlay {
-      position: fixed; inset: 0; z-index: 500;
-      background: rgba(10, 11, 15, 0.82);
-      display: none; align-items: center; justify-content: center;
-      padding: 1.5rem;
-    }
-    #modal-overlay.open { display: flex; }
-    #modal-box {
-      background: var(--dark-card);
-      border: 1px solid rgba(245,200,66,0.3);
-      border-radius: 14px;
-      padding: 2.25rem 2rem;
-      max-width: 420px; width: 100%;
-      text-align: center;
-      position: relative;
-    }
-    #modal-close {
-      position: absolute; top: 1rem; right: 1.1rem;
-      background: none; border: none; color: var(--text-muted);
-      font-size: 1.1rem; cursor: pointer; line-height: 1;
-      font-family: 'DM Mono', monospace;
-    }
-    #modal-close:hover { color: var(--text); }
-    .modal-tag {
-      font-family: 'DM Mono', monospace; font-size: 0.58rem;
-      letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--gold); background: rgba(245,200,66,0.08);
-      border: 1px solid rgba(245,200,66,0.2);
-      padding: 0.3rem 0.8rem; border-radius: 100px;
-      display: inline-block; margin-bottom: 1.25rem;
-    }
-    .modal-headline {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.5rem; font-weight: 400; line-height: 1.3;
-      margin-bottom: 0.6rem; color: var(--text);
-    }
-    .modal-headline em { font-style: italic; color: var(--gold); }
-    .modal-sub {
-      font-size: 0.87rem; color: var(--text-muted);
-      line-height: 1.65; margin-bottom: 1.75rem;
-    }
-    .modal-code-wrap {
-      background: var(--dark-mid);
-      border: 1px dashed rgba(245,200,66,0.35);
-      border-radius: 8px; padding: 0.85rem 1.25rem;
-      margin-bottom: 1.5rem;
-      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-    }
-    .modal-code {
-      font-family: 'DM Mono', monospace;
-      font-size: 1.3rem; letter-spacing: 0.15em;
-      color: var(--gold); font-weight: 400;
-    }
-    .modal-copy-btn {
-      font-family: 'DM Mono', monospace; font-size: 0.6rem;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      background: none; border: 1px solid var(--border);
-      color: var(--text-muted); padding: 0.35rem 0.7rem;
-      border-radius: 4px; cursor: pointer; transition: all 0.2s; white-space: nowrap;
-    }
-    .modal-copy-btn:hover { border-color: var(--gold); color: var(--gold); }
-    .modal-copy-btn.copied { border-color: var(--green); color: var(--green); }
-    .modal-saving {
-      font-size: 0.78rem; color: var(--text-muted); margin-bottom: 1.5rem;
-    }
-    .modal-saving strong { color: var(--green); }
-    .modal-cta {
-      display: block; width: 100%;
-      background: var(--gold); color: var(--dark); border: none;
-      padding: 0.9rem; border-radius: 6px;
-      font-family: 'DM Mono', monospace; font-size: 0.7rem;
-      letter-spacing: 0.15em; text-transform: uppercase;
-      cursor: pointer; text-decoration: none;
-      transition: background 0.2s; font-weight: 500;
-    }
-    .modal-cta:hover { background: #fff; }
-    .modal-skip {
-      display: block; margin-top: 1rem;
-      font-family: 'DM Mono', monospace; font-size: 0.58rem;
-      letter-spacing: 0.08em; text-transform: uppercase;
-      color: var(--text-muted); cursor: pointer;
-      background: none; border: none;
-    }
-    .modal-skip:hover { color: var(--text); }
   </style>
   <!-- Google Analytics 4 -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-P9C0PBTHXB"></script>
@@ -541,23 +456,7 @@
   </div>
 </div>
 
-<!-- DISCOUNT MODAL -->
-<div id="modal-overlay" role="dialog" aria-modal="true" aria-label="First Flight discount">
-  <div id="modal-box">
-    <button id="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
-    <div class="modal-tag">✦ quiz completion discount</div>
-    <h2 class="modal-headline">Half off your<br/><em>First Flight</em></h2>
-    <p class="modal-sub" id="modal-sub-copy">Because you showed up and did the work. Use this code at checkout on Calendly — <strong style="color:var(--text)">$149</strong> for the full 2-hour session (normally $299).</p>
-    <div class="modal-code-wrap">
-      <span class="modal-code" id="modal-code-display">IMREADY</span>
-      <button class="modal-copy-btn" id="copy-btn" onclick="copyCode()">Copy code</button>
-    </div>
-    <p class="modal-saving" id="modal-saving-copy">You save <strong>$150</strong> with this quiz offer.</p>
-    <a href="https://calendly.com/lilbirdlifecoaching/first-flight-session" target="_blank" class="modal-cta" onclick="closeModal()">Book now with code →</a>
-    <button class="modal-skip" onclick="closeModal()">I'll book without the discount</button>
-  </div>
-</div>
-
+<script src="first-flight-booking.js"></script>
 <script>
 
 // ── CONFIG ────────────────────────────────────────────────────────────────────
@@ -993,62 +892,17 @@ function retake() {
   document.getElementById('q-count').style.display = 'none';
 }
 
-function syncQuizModalPricing() {
-  var list = FIRST_FLIGHT_LIST_USD;
-  var sale = FIRST_FLIGHT_QUIZ_PRICE_USD;
-  var save = list - sale;
-  var sub = document.getElementById('modal-sub-copy');
-  if (sub) {
-    sub.innerHTML = 'Because you showed up and did the work. Use <strong style="color:var(--text)">' + FIRST_FLIGHT_COUPON_CODE + '</strong> at checkout on Calendly — <strong style="color:var(--text)">$' + sale + '</strong> for the full 2-hour session (list price $' + list + ').';
-  }
-  var saving = document.getElementById('modal-saving-copy');
-  if (saving) {
-    saving.innerHTML = 'You save <strong style="color:var(--green)">$' + save + '</strong> with this quiz offer.';
-  }
-  var codeDisp = document.getElementById('modal-code-display');
-  if (codeDisp) codeDisp.textContent = FIRST_FLIGHT_COUPON_CODE;
-}
-
-// ── MODAL ─────────────────────────────────────────────────────────────────────
 function openModal() {
-  syncQuizModalPricing();
-  document.getElementById('modal-overlay').classList.add('open');
-  document.getElementById('copy-btn').textContent = 'Copy code';
-  document.getElementById('copy-btn').classList.remove('copied');
+  if (window.LbFirstFlight) window.LbFirstFlight.openModal({ context: 'quiz' });
 }
 function closeModal() {
-  document.getElementById('modal-overlay').classList.remove('open');
+  if (window.LbFirstFlight) window.LbFirstFlight.closeModal();
 }
 function copyCode() {
-  var code = FIRST_FLIGHT_COUPON_CODE;
-  navigator.clipboard.writeText(code).then(function() {
-    var btn = document.getElementById('copy-btn');
-    btn.textContent = 'Copied!';
-    btn.classList.add('copied');
-  }).catch(function() {
-    // fallback for older browsers
-    var ta = document.createElement('textarea');
-    ta.value = code;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    var btn = document.getElementById('copy-btn');
-    btn.textContent = 'Copied!';
-    btn.classList.add('copied');
-  });
+  if (window.LbFirstFlight) window.LbFirstFlight.copyCode();
 }
-// Close modal on overlay click
-document.addEventListener('click', function(e) {
-  if (e.target === document.getElementById('modal-overlay')) closeModal();
-});
-// Close on Escape
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') closeModal();
-});
 
 document.addEventListener('DOMContentLoaded', function() {
-  syncQuizModalPricing();
   var btn = document.getElementById('btn-start');
   if (btn) btn.addEventListener('click', startQuiz);
 });
