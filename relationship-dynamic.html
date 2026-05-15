@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<!-- lil' bird Relationship Dynamic — embeddable standalone (uses /partner-dynamic on lilbird-assessment worker) -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relationship Dynamic · lil' bird</title>
+<meta name="description" content="Understand how your wiring meets someone else's — and how to work together better.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #F5C842;
+    --gold-dim: #c9a130;
+    --gold-faint: rgba(245,200,66,0.08);
+    --dark: #1e2028;
+    --dark-mid: #252830;
+    --dark-card: #2a2d38;
+    --dark-border: rgba(245,200,66,0.18);
+    --text-main: #f0ead8;
+    --text-muted: #a09880;
+    --ember: #e8734a;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--dark);
+    color: var(--text-main);
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+  }
+  body.embed { min-height: auto; }
+  body.embed .site-nav,
+  body.embed .site-footer { display: none; }
+  body.embed .page { padding-top: 1.25rem; }
+
+  .site-nav {
+    position: relative;
+    z-index: 2;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(245,200,66,0.08);
+  }
+  .nav-brand {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--gold);
+    text-decoration: none;
+  }
+  .nav-link {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    text-decoration: none;
+    border: 1px solid var(--dark-border);
+    border-radius: 6px;
+    padding: 0.4rem 0.75rem;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .nav-link:hover { color: var(--gold); border-color: rgba(245,200,66,0.35); }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 3rem;
+  }
+
+  .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .eyebrow::before { content: ''; width: 16px; height: 1px; background: var(--gold-dim); }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.75rem, 5vw, 2.35rem);
+    font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: 0.75rem;
+  }
+  h1 em { font-style: italic; color: var(--gold); }
+
+  .intro {
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    margin-bottom: 2rem;
+    line-height: 1.75;
+  }
+
+  .card {
+    background: var(--dark-mid);
+    border: 1px solid rgba(245,200,66,0.12);
+    border-radius: 12px;
+    padding: 1.5rem 1.5rem 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    color: var(--text-main);
+    margin-bottom: 0.35rem;
+  }
+  .card-hint {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 1.1rem;
+    line-height: 1.6;
+  }
+
+  .field { margin-bottom: 1rem; }
+  .field:last-child { margin-bottom: 0; }
+  .field-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 0.4rem;
+    display: block;
+  }
+  .field input,
+  .field select,
+  .field textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(245,200,66,0.15);
+    border-radius: 8px;
+    color: var(--text-main);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    padding: 0.65rem 1rem;
+    transition: border-color 0.2s;
+  }
+  .field textarea { resize: vertical; min-height: 72px; line-height: 1.55; }
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus { outline: none; border-color: rgba(245,200,66,0.4); }
+  .field input::placeholder,
+  .field textarea::placeholder { color: rgba(240,234,216,0.28); }
+  .field select option { background: var(--dark-card); }
+
+  .nest-loaded {
+    display: none;
+    background: var(--gold-faint);
+    border: 1px solid var(--dark-border);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    margin-bottom: 1rem;
+  }
+  .nest-loaded.visible { display: block; }
+  .nest-loaded-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 0.35rem;
+  }
+  .nest-loaded-name {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--gold);
+    margin-bottom: 0.25rem;
+  }
+  .nest-loaded-tags {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+  .nest-change {
+    margin-top: 0.65rem;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .nest-change:hover { color: var(--gold); }
+
+  #manual-you-panel { display: block; }
+  #manual-you-panel.hidden { display: none; }
+
+  .btn-row { margin-top: 1.5rem; }
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    background: transparent;
+    border: 1px solid rgba(245,200,66,0.35);
+    color: var(--gold);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.75rem 1.35rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: var(--gold-faint);
+    border-color: var(--gold);
+  }
+  .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .dynamic-result {
+    display: none;
+    background: var(--dark-card);
+    border: 1px solid var(--dark-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    animation: fadeUp 0.35s ease both;
+  }
+  .dynamic-result.visible { display: block; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .dynamic-result h2 {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.2rem;
+    color: var(--gold);
+    margin-bottom: 1rem;
+    font-weight: 400;
+  }
+  .dynamic-result p {
+    font-size: 0.92rem;
+    color: var(--text-main);
+    line-height: 1.75;
+    margin-bottom: 0.9rem;
+  }
+  .dynamic-result p:last-child { margin-bottom: 0; }
+  .result-label {
+    color: var(--gold-dim);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.35rem;
+  }
+  .result-share {
+    font-style: italic;
+    color: var(--gold-dim);
+    font-size: 0.88rem;
+    margin-top: 0.5rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(245,200,66,0.1);
+  }
+  .error-msg {
+    color: var(--ember);
+    font-size: 0.88rem;
+    margin-top: 1rem;
+  }
+
+  .site-footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+  .site-footer a { color: var(--gold-dim); text-decoration: none; }
+  .site-footer a:hover { color: var(--gold); }
+
+  .loading-pill {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-top: 1rem;
+  }
+  .loading-pill.visible { display: inline-flex; }
+  .loading-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--gold);
+    animation: pulse 1s ease infinite;
+  }
+  .loading-dot:nth-child(2) { animation-delay: 0.15s; }
+  .loading-dot:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.25; transform: scale(0.85); }
+    50% { opacity: 1; transform: scale(1); }
+  }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a class="nav-brand" href="https://lilbird.life" target="_blank" rel="noopener">lil' bird</a>
+  <a class="nav-link" href="https://lilbird.life/deep-profile.html" target="_blank" rel="noopener">Inner Compass →</a>
+</nav>
+
+<main class="page">
+  <p class="eyebrow">relationship dynamic</p>
+  <h1>How do you work with <em>someone you know?</em></h1>
+  <p class="intro" id="intro-copy">
+    Put in what you know about another person — a colleague, collaborator, manager, or friend — and we'll read the dynamic between your wiring and theirs.
+  </p>
+
+  <!-- YOUR PROFILE -->
+  <section class="card" id="you-section">
+    <h2 class="card-title">About you</h2>
+    <p class="card-hint" id="you-hint">If you've done the Inner Compass, we'll use your Nest read. Otherwise, tell us your types below.</p>
+
+    <div class="nest-loaded" id="nest-loaded">
+      <p class="nest-loaded-label">Loaded from your Nest</p>
+      <p class="nest-loaded-name" id="nest-archetype">—</p>
+      <p class="nest-loaded-tags" id="nest-tags"></p>
+      <button type="button" class="nest-change" id="nest-change-btn">Use a different profile instead</button>
+    </div>
+
+    <div id="manual-you-panel">
+      <div class="field" id="nest-id-field">
+        <label class="field-label" for="nest-id-input">Nest link or ID <span style="opacity:0.6;font-weight:400;">(optional)</span></label>
+        <input type="text" id="nest-id-input" placeholder="e.g. nest-m123abc or paste your Nest URL">
+      </div>
+      <div class="field">
+        <label class="field-label" for="user-types">Your personality types (if you know them)</label>
+        <input type="text" id="user-types" placeholder="e.g. ENFP, Enneagram 7, Connector — anything you know">
+      </div>
+      <div class="field">
+        <label class="field-label" for="user-description">Describe how you tend to work</label>
+        <textarea id="user-description" placeholder="e.g. big-picture, moves fast, hates micromanagement, needs clarity before committing..."></textarea>
+      </div>
+    </div>
+  </section>
+
+  <!-- THEM -->
+  <section class="card">
+    <h2 class="card-title">About them</h2>
+    <p class="card-hint">You don't need a full profile — a few honest details is enough.</p>
+
+    <div class="field">
+      <label class="field-label" for="partner-relationship">Who is this person to you?</label>
+      <select id="partner-relationship">
+        <option value="colleague">Colleague or collaborator</option>
+        <option value="manager">Manager or leader</option>
+        <option value="partner">Romantic partner</option>
+        <option value="friend">Close friend</option>
+        <option value="family">Family member</option>
+      </select>
+    </div>
+    <div class="field">
+      <label class="field-label" for="partner-types">Their personality types (if you know them)</label>
+      <input type="text" id="partner-types" placeholder="e.g. INFJ, Enneagram 9, Nurturer — anything you know">
+    </div>
+    <div class="field">
+      <label class="field-label" for="partner-description">Describe them in a few words</label>
+      <textarea id="partner-description" placeholder="e.g. very calm, hates conflict, always thinking about others..."></textarea>
+    </div>
+  </section>
+
+  <div class="btn-row">
+    <button type="button" class="btn-primary" id="generate-btn">See the dynamic →</button>
+    <div class="loading-pill" id="loading-pill" aria-live="polite">
+      <span class="loading-dot"></span>
+      <span class="loading-dot"></span>
+      <span class="loading-dot"></span>
+      Reading the dynamic
+    </div>
+  </div>
+
+  <div class="dynamic-result" id="dynamic-result" role="region" aria-live="polite"></div>
+  <p class="error-msg" id="error-msg" style="display:none;"></p>
+</main>
+
+<footer class="site-footer">
+  <p>Powered by <a href="https://lilbird.life" target="_blank" rel="noopener">lil' bird</a> · <a href="https://lilbird.life/deep-profile.html" target="_blank" rel="noopener">Take the Inner Compass</a></p>
+</footer>
+
+<script>
+(function () {
+  const WORKER_URL = 'https://lilbird-assessment.cwwq46sn7m.workers.dev';
+  const params = new URLSearchParams(window.location.search);
+  const isEmbed = params.get('embed') === '1' || params.get('embed') === 'true';
+  if (isEmbed) document.body.classList.add('embed');
+
+  let userProfile = null;
+  let nestId = null;
+  let useManualProfile = true;
+
+  const nestLoadedEl = document.getElementById('nest-loaded');
+  const manualPanel = document.getElementById('manual-you-panel');
+  const nestIdField = document.getElementById('nest-id-field');
+  const nestIdInput = document.getElementById('nest-id-input');
+  const generateBtn = document.getElementById('generate-btn');
+  const loadingPill = document.getElementById('loading-pill');
+  const resultEl = document.getElementById('dynamic-result');
+  const errorEl = document.getElementById('error-msg');
+
+  function parseNestId(raw) {
+    if (!raw) return null;
+    const s = raw.trim();
+    if (!s) return null;
+    try {
+      const u = new URL(s);
+      const fromQuery = u.searchParams.get('nest');
+      if (fromQuery) return fromQuery;
+    } catch (_) {}
+    const m = s.match(/nest-[a-z0-9-]+/i);
+    return m ? m[0] : (s.startsWith('nest-') ? s : null);
+  }
+
+  function showNestProfile(profile) {
+    userProfile = profile;
+    useManualProfile = false;
+    nestLoadedEl.classList.add('visible');
+    manualPanel.classList.add('hidden');
+    nestIdField.style.display = 'none';
+
+    const name = profile.likelyCoreArchetypePlain || profile.archetypePlain || profile.likelyCoreArchetype || profile.archetype || 'Your profile';
+    document.getElementById('nest-archetype').textContent = name;
+
+    const tags = [
+      profile.likelyCoreMbti || profile.mbti,
+      profile.likelyCoreEnneagram || profile.enneagram,
+      profile.likelyCoreAttachment || profile.attachment
+    ].filter(Boolean).join(' · ');
+    document.getElementById('nest-tags').textContent = tags || 'Inner Compass read loaded';
+  }
+
+  function showManualPanel() {
+    useManualProfile = true;
+    userProfile = null;
+    nestLoadedEl.classList.remove('visible');
+    manualPanel.classList.remove('hidden');
+    nestIdField.style.display = '';
+  }
+
+  function buildManualUserProfile() {
+    const types = document.getElementById('user-types').value.trim();
+    const desc = document.getElementById('user-description').value.trim();
+    if (!types && !desc) return null;
+    return {
+      likelyCoreArchetype: desc || 'Self-described',
+      likelyCoreArchetypePlain: desc || 'Your working style',
+      likelyCoreArchetypeSub: types,
+      likelyCoreMbti: types,
+      likelyCoreEnneagram: types,
+      likelyCoreAttachment: '',
+      likelyCoreFiveVoicesNod: types,
+      archetype: desc,
+      archetypePlain: desc || 'You',
+      mbti: types,
+      enneagram: types
+    };
+  }
+
+  async function loadNest(id) {
+    if (!id) return false;
+    try {
+      const r = await fetch(WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(id));
+      if (!r.ok) return false;
+      const data = await r.json();
+      if (!data.profile) return false;
+      nestId = id;
+      showNestProfile(data.profile);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function renderDynamic(dynamic) {
+    resultEl.innerHTML =
+      '<h2>' + escapeHtml(dynamic.pairingTitle || 'Your dynamic') + '</h2>' +
+      '<p>' + escapeHtml(dynamic.dynamicSummary || '') + '</p>' +
+      '<p><span class="result-label">What they bring to you</span>' + escapeHtml(dynamic.theyBringToYou || '') + '</p>' +
+      '<p><span class="result-label">What you bring to them</span>' + escapeHtml(dynamic.youBringToThem || '') + '</p>' +
+      '<p><span class="result-label">Watch out for</span>' + escapeHtml(dynamic.watchOutFor || '') + '</p>' +
+      '<p><span class="result-label">The invitation</span>' + escapeHtml(dynamic.growthInvitation || '') + '</p>' +
+      (dynamic.promptToShare ? '<p class="result-share">' + escapeHtml(dynamic.promptToShare) + '</p>' : '');
+    resultEl.classList.add('visible');
+    resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    notifyResize();
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function setLoading(on) {
+    generateBtn.disabled = on;
+    loadingPill.classList.toggle('visible', on);
+    if (on) {
+      generateBtn.textContent = 'Reading…';
+      errorEl.style.display = 'none';
+    } else {
+      generateBtn.textContent = 'See the dynamic →';
+    }
+  }
+
+  function showError(msg) {
+    errorEl.textContent = msg;
+    errorEl.style.display = 'block';
+    resultEl.classList.remove('visible');
+  }
+
+  async function generateDynamic() {
+    let profile = userProfile;
+    if (useManualProfile) {
+      profile = buildManualUserProfile();
+      if (!profile) {
+        showError('Tell us a little about yourself first — your types or how you tend to work.');
+        return;
+      }
+    }
+    if (!profile) {
+      showError('Load your Nest profile or enter your types above.');
+      return;
+    }
+
+    const rel = document.getElementById('partner-relationship').value;
+    const types = document.getElementById('partner-types').value.trim();
+    const desc = document.getElementById('partner-description').value.trim();
+
+    if (!types && !desc) {
+      showError('Tell us a little about the other person — even just their Enneagram type or a brief description.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const r = await fetch(WORKER_URL + '/partner-dynamic', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userProfile: profile,
+          partnerInput: { relationship: rel, types, description: desc }
+        })
+      });
+      if (!r.ok) throw new Error('request failed');
+      const dynamic = await r.json();
+      if (dynamic.error) throw new Error(dynamic.error);
+      renderDynamic(dynamic);
+    } catch (_) {
+      showError('Something went wrong. Try again in a moment.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function notifyResize() {
+    if (window.parent === window) return;
+    try {
+      window.parent.postMessage({
+        type: 'lilbird-embed-resize',
+        height: Math.max(document.documentElement.scrollHeight, document.body.scrollHeight)
+      }, '*');
+    } catch (_) {}
+  }
+
+  document.getElementById('nest-change-btn').addEventListener('click', showManualPanel);
+  generateBtn.addEventListener('click', generateDynamic);
+
+  nestIdInput.addEventListener('change', async function () {
+    const id = parseNestId(nestIdInput.value);
+    if (!id) return;
+    const ok = await loadNest(id);
+    if (!ok) showError('Could not find that Nest. Check the link or enter your types manually.');
+    else errorEl.style.display = 'none';
+  });
+
+  // URL: ?nest=… & ?relationship=colleague & ?embed=1
+  const relParam = params.get('relationship');
+  if (relParam) {
+    const sel = document.getElementById('partner-relationship');
+    for (let i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value === relParam) { sel.selectedIndex = i; break; }
+    }
+  }
+
+  const intro = document.getElementById('intro-copy');
+  if (relParam === 'colleague' || relParam === 'manager') {
+    intro.textContent = "Put in what you know about a colleague or collaborator — types, habits, friction points — and we'll read how your wiring meets theirs at work.";
+  }
+
+  (async function init() {
+    const fromUrl = params.get('nest');
+    if (fromUrl) {
+      nestIdInput.value = fromUrl;
+      const ok = await loadNest(fromUrl);
+      if (!ok) showError('Nest not found — enter your types manually below.');
+    }
+    notifyResize();
+    window.addEventListener('resize', notifyResize);
+    if (typeof ResizeObserver !== 'undefined') {
+      new ResizeObserver(notifyResize).observe(document.body);
+    }
+  })();
+})();
+</script>
+<!--
+EMBED ON ANOTHER SITE
+
+Option A — iframe (simplest):
+
+<iframe
+  src="https://lilbird.life/relationship-dynamic.html?embed=1&relationship=colleague"
+  title="Relationship dynamic — lil' bird"
+  style="width:100%;min-height:720px;border:none;border-radius:12px;"
+  allow="clipboard-write"
+></iframe>
+
+Option B — pass someone's Nest ID so their Inner Compass read loads automatically:
+
+<iframe
+  src="https://lilbird.life/relationship-dynamic.html?embed=1&nest=nest-XXXXX"
+  ...
+></iframe>
+
+Optional query params:
+  embed=1          — compact chrome for iframe
+  nest=nest-…      — load user profile from Inner Compass Nest
+  relationship=    — colleague | manager | partner | friend | family
+-->
+</body>
+</html>
