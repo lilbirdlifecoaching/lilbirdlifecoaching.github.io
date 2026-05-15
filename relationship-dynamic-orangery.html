@@ -408,20 +408,8 @@
 
   <section class="card" id="you-section">
     <h2 class="card-title" id="you-title">Your wiring</h2>
-    <p class="card-hint" id="you-hint">Done the Inner Compass with lil' bird? Paste your Nest link and we'll load your profile. Otherwise, describe how you lead and work below.</p>
+    <p class="card-hint" id="you-hint">Share your types, frameworks, or a short read on how you tend to lead and work — honesty beats completeness.</p>
 
-    <div class="profile-loaded" id="profile-loaded">
-      <p class="profile-loaded-label">Profile loaded</p>
-      <p class="profile-loaded-name" id="profile-archetype">—</p>
-      <p class="profile-loaded-tags" id="profile-tags"></p>
-      <button type="button" class="profile-change" id="profile-change-btn">Enter details manually instead</button>
-    </div>
-
-    <div id="manual-you-panel">
-      <div class="field" id="nest-id-field">
-        <label class="field-label" for="nest-id-input">Inner Compass Nest link <span style="font-weight:400;text-transform:none;letter-spacing:0;opacity:0.75;">(optional)</span></label>
-        <input type="text" id="nest-id-input" placeholder="Paste your Nest URL or nest ID from lilbird.life">
-      </div>
       <div class="field">
         <label class="field-label" for="user-types">Your types & frameworks</label>
         <input type="text" id="user-types" placeholder="e.g. ENTJ, Enneagram 3, Pioneer — whatever you know">
@@ -430,7 +418,6 @@
         <label class="field-label" for="user-description">How you tend to show up at work</label>
         <textarea id="user-description" placeholder="e.g. moves fast, wants autonomy, direct communicator, struggles when priorities shift without context…"></textarea>
       </div>
-    </div>
   </section>
 
   <section class="card">
@@ -492,7 +479,6 @@
     errors: {
       you: 'Start with a little about your wiring — types, or how you tend to show up at work.',
       them: 'Add something about the other person — even a short description of how they operate.',
-      nest: 'We couldn\'t find that Nest link. Check the URL or enter your details manually.',
       generic: 'Something went wrong on our end. Give it another try in a moment.'
     }
   };
@@ -502,58 +488,12 @@
     document.body.classList.add('embed');
   }
 
-  let userProfile = null;
-  let useManualProfile = true;
-
-  const profileLoadedEl = document.getElementById('profile-loaded');
-  const manualPanel = document.getElementById('manual-you-panel');
-  const nestIdField = document.getElementById('nest-id-field');
-  const nestIdInput = document.getElementById('nest-id-input');
   const generateBtn = document.getElementById('generate-btn');
   const loadingPill = document.getElementById('loading-pill');
   const resultEl = document.getElementById('dynamic-result');
   const errorEl = document.getElementById('error-msg');
 
-  function parseNestId(raw) {
-    if (!raw) return null;
-    const s = raw.trim();
-    if (!s) return null;
-    try {
-      const u = new URL(s);
-      const fromQuery = u.searchParams.get('nest');
-      if (fromQuery) return fromQuery;
-    } catch (_) {}
-    const m = s.match(/nest-[a-z0-9-]+/i);
-    return m ? m[0] : (s.startsWith('nest-') ? s : null);
-  }
-
-  function showNestProfile(profile) {
-    userProfile = profile;
-    useManualProfile = false;
-    profileLoadedEl.classList.add('visible');
-    manualPanel.classList.add('hidden');
-    nestIdField.style.display = 'none';
-
-    const name = profile.likelyCoreArchetypePlain || profile.archetypePlain || profile.likelyCoreArchetype || profile.archetype || 'Your profile';
-    document.getElementById('profile-archetype').textContent = name;
-
-    const tags = [
-      profile.likelyCoreMbti || profile.mbti,
-      profile.likelyCoreEnneagram || profile.enneagram,
-      profile.likelyCoreAttachment || profile.attachment
-    ].filter(Boolean).join(' · ');
-    document.getElementById('profile-tags').textContent = tags || 'Inner Compass profile loaded';
-  }
-
-  function showManualPanel() {
-    useManualProfile = true;
-    userProfile = null;
-    profileLoadedEl.classList.remove('visible');
-    manualPanel.classList.remove('hidden');
-    nestIdField.style.display = '';
-  }
-
-  function buildManualUserProfile() {
+  function buildUserProfile() {
     const types = document.getElementById('user-types').value.trim();
     const desc = document.getElementById('user-description').value.trim();
     if (!types && !desc) return null;
@@ -570,20 +510,6 @@
       mbti: types,
       enneagram: types
     };
-  }
-
-  async function loadNest(id) {
-    if (!id) return false;
-    try {
-      const r = await fetch(WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(id));
-      if (!r.ok) return false;
-      const data = await r.json();
-      if (!data.profile) return false;
-      showNestProfile(data.profile);
-      return true;
-    } catch (_) {
-      return false;
-    }
   }
 
   function renderDynamic(dynamic) {
@@ -623,14 +549,7 @@
   }
 
   async function generateDynamic() {
-    let profile = userProfile;
-    if (useManualProfile) {
-      profile = buildManualUserProfile();
-      if (!profile) {
-        showError(COPY.errors.you);
-        return;
-      }
-    }
+    const profile = buildUserProfile();
     if (!profile) {
       showError(COPY.errors.you);
       return;
@@ -681,16 +600,7 @@
     } catch (_) {}
   }
 
-  document.getElementById('profile-change-btn').addEventListener('click', showManualPanel);
   generateBtn.addEventListener('click', generateDynamic);
-
-  nestIdInput.addEventListener('change', async function () {
-    const id = parseNestId(nestIdInput.value);
-    if (!id) return;
-    const ok = await loadNest(id);
-    if (!ok) showError(COPY.errors.nest);
-    else errorEl.style.display = 'none';
-  });
 
   const relParam = params.get('relationship');
   if (relParam === 'manager') {
@@ -703,13 +613,7 @@
     }
   }
 
-  (async function init() {
-    const fromUrl = params.get('nest');
-    if (fromUrl) {
-      nestIdInput.value = fromUrl;
-      const ok = await loadNest(fromUrl);
-      if (!ok) showError(COPY.errors.nest);
-    }
+  (function init() {
     notifyResize();
     window.addEventListener('resize', notifyResize);
     if (typeof ResizeObserver !== 'undefined') {
