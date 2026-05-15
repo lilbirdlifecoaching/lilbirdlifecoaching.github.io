@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<!-- Orangery Leadership Solutions — Team Dynamic tool (embed on orangery.solutions via iframe) -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team Dynamic · Orangery Leadership Solutions</title>
+<meta name="description" content="See how your wiring meets a colleague's — and how to work together with more clarity and less friction.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,400;0,600;0,700;1,400&family=Poppins:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+  /* Pulled from orangery.solutions Squarespace palette */
+    --cream: hsl(60, 9%, 98%);
+    --cream-mid: hsl(60, 6%, 94%);
+    --orange: hsl(22, 74%, 55%);
+    --orange-deep: hsl(22, 74%, 46%);
+    --orange-faint: hsla(22, 74%, 55%, 0.1);
+    --olive: hsl(70, 15%, 47%);
+    --olive-faint: hsla(70, 15%, 47%, 0.12);
+    --peach: hsl(34, 76%, 80%);
+    --ink: hsl(0, 0%, 12%);
+    --ink-muted: hsl(0, 0%, 40%);
+    --ink-faint: hsla(0, 0%, 12%, 0.45);
+    --border: hsla(22, 40%, 55%, 0.22);
+    --radius: 999px;
+    --radius-card: 16px;
+    --font-head: 'Urbanist', system-ui, sans-serif;
+    --font-body: 'Poppins', system-ui, sans-serif;
+    --shadow-card: 0 2px 24px hsla(22, 30%, 30%, 0.06);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-weight: 300;
+    font-size: 0.95rem;
+    line-height: 1.75;
+    min-height: 100vh;
+  }
+
+  body.embed { min-height: auto; }
+  body.embed .site-nav,
+  body.embed .site-footer,
+  body.embed .accent-bar { display: none; }
+  body.embed .page { padding-top: 1rem; }
+
+  .accent-bar {
+    height: 5px;
+    background: linear-gradient(90deg, var(--orange) 0%, var(--peach) 45%, var(--olive) 100%);
+  }
+
+  .site-nav {
+    position: relative;
+    z-index: 2;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--cream);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    height: 40px;
+    width: auto;
+    display: block;
+  }
+  .nav-cta {
+    font-family: var(--font-head);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    border: 1.5px solid var(--ink);
+    border-radius: var(--radius);
+    padding: 0.5rem 1rem;
+    transition: background 0.2s, color 0.2s;
+  }
+  .nav-cta:hover {
+    background: var(--orange);
+    border-color: var(--orange);
+    color: #fff;
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 2rem 1.35rem 2.5rem;
+  }
+
+  .eyebrow {
+    font-family: var(--font-head);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 0.65rem;
+  }
+
+  h1 {
+    font-family: var(--font-head);
+    font-size: clamp(1.85rem, 5vw, 2.5rem);
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 0.85rem;
+    color: var(--ink);
+  }
+  h1 em {
+    font-style: normal;
+    color: var(--orange);
+  }
+
+  .intro {
+    color: var(--ink-muted);
+    font-size: 0.95rem;
+    margin-bottom: 1.75rem;
+    line-height: 1.8;
+    max-width: 36em;
+  }
+
+  .card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    padding: 1.5rem 1.4rem 1.25rem;
+    margin-bottom: 1.15rem;
+    box-shadow: var(--shadow-card);
+  }
+  .card-title {
+    font-family: var(--font-head);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 0.3rem;
+  }
+  .card-hint {
+    font-size: 0.86rem;
+    color: var(--ink-muted);
+    margin-bottom: 1.1rem;
+    line-height: 1.65;
+  }
+
+  .field { margin-bottom: 1rem; }
+  .field:last-child { margin-bottom: 0; }
+  .field-label {
+    font-family: var(--font-head);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--olive);
+    margin-bottom: 0.4rem;
+    display: block;
+  }
+  .field input,
+  .field select,
+  .field textarea {
+    width: 100%;
+    background: var(--cream);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 400;
+    padding: 0.7rem 1.1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .field textarea {
+    border-radius: 14px;
+    resize: vertical;
+    min-height: 76px;
+    line-height: 1.6;
+  }
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus {
+    outline: none;
+    border-color: var(--orange);
+    box-shadow: 0 0 0 3px var(--orange-faint);
+  }
+  .field input::placeholder,
+  .field textarea::placeholder { color: var(--ink-faint); }
+  .field select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23666' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+  }
+  .field select option { background: #fff; color: var(--ink); }
+
+  .profile-loaded {
+    display: none;
+    background: var(--orange-faint);
+    border: 1.5px solid hsla(22, 74%, 55%, 0.25);
+    border-radius: 14px;
+    padding: 1rem 1.15rem;
+    margin-bottom: 1rem;
+  }
+  .profile-loaded.visible { display: block; }
+  .profile-loaded-label {
+    font-family: var(--font-head);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--orange-deep);
+    margin-bottom: 0.35rem;
+  }
+  .profile-loaded-name {
+    font-family: var(--font-head);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 0.2rem;
+  }
+  .profile-loaded-tags {
+    font-size: 0.82rem;
+    color: var(--ink-muted);
+    line-height: 1.5;
+  }
+  .profile-change {
+    margin-top: 0.6rem;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: var(--font-head);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--orange);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .profile-change:hover { color: var(--orange-deep); }
+
+  #manual-you-panel.hidden { display: none; }
+
+  .btn-row {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+  }
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--orange);
+    border: none;
+    color: #fff;
+    font-family: var(--font-head);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.85rem 1.75rem;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    box-shadow: 0 4px 14px hsla(22, 74%, 45%, 0.25);
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: var(--orange-deep);
+    transform: translateY(-1px);
+  }
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .loading-pill {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-head);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--olive);
+  }
+  .loading-pill.visible { display: inline-flex; }
+  .loading-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--orange);
+    animation: pulse 1s ease infinite;
+  }
+  .loading-dot:nth-child(2) { animation-delay: 0.15s; }
+  .loading-dot:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.3; transform: scale(0.85); }
+    50% { opacity: 1; transform: scale(1); }
+  }
+
+  .dynamic-result {
+    display: none;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--orange);
+    border-radius: var(--radius-card);
+    padding: 1.5rem 1.4rem;
+    margin-top: 1.5rem;
+    box-shadow: var(--shadow-card);
+    animation: fadeUp 0.35s ease both;
+  }
+  .dynamic-result.visible { display: block; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .dynamic-result h2 {
+    font-family: var(--font-head);
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--orange-deep);
+    margin-bottom: 1rem;
+    line-height: 1.25;
+  }
+  .dynamic-result p {
+    font-size: 0.92rem;
+    color: var(--ink);
+    line-height: 1.8;
+    margin-bottom: 0.95rem;
+  }
+  .dynamic-result p:last-child { margin-bottom: 0; }
+  .result-label {
+    color: var(--olive);
+    font-family: var(--font-head);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.35rem;
+  }
+  .result-share {
+    font-style: italic;
+    color: var(--ink-muted);
+    font-size: 0.88rem;
+    margin-top: 0.25rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .error-msg {
+    color: hsl(0, 65%, 45%);
+    font-size: 0.88rem;
+    margin-top: 1rem;
+  }
+
+  .site-footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+    border-top: 1px solid var(--border);
+    background: var(--cream-mid);
+  }
+  .site-footer a {
+    color: var(--orange);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .site-footer a:hover { text-decoration: underline; }
+  .footer-powered {
+    font-size: 0.72rem;
+    opacity: 0.75;
+    margin-top: 0.35rem;
+  }
+</style>
+</head>
+<body>
+
+<div class="accent-bar" aria-hidden="true"></div>
+
+<nav class="site-nav">
+  <a href="https://www.orangery.solutions" target="_blank" rel="noopener">
+    <img class="nav-logo" src="https://images.squarespace-cdn.com/content/v1/61771991617ef211f58fd8ae/fc8180ef-0cbc-4d4c-ad56-2b13c32f71c3/Orangery+solutions+logo.png" alt="Orangery Leadership Solutions" width="160" height="40">
+  </a>
+  <a class="nav-cta" href="https://calendly.com/lukehaythorpe-orangery/30min" target="_blank" rel="noopener">Book a conversation</a>
+</nav>
+
+<main class="page">
+  <p class="eyebrow" id="eyebrow-text">Team dynamics</p>
+  <h1 id="headline">How does your wiring meet <em>theirs?</em></h1>
+  <p class="intro" id="intro-copy">
+    Frustrated by workplace dynamics? A few honest details about you and someone you work with — types, habits, friction points — is enough to surface where collaboration clicks and where it strains.
+  </p>
+
+  <section class="card" id="you-section">
+    <h2 class="card-title" id="you-title">Your wiring</h2>
+    <p class="card-hint" id="you-hint">Done the Inner Compass with lil' bird? Paste your Nest link and we'll load your profile. Otherwise, describe how you lead and work below.</p>
+
+    <div class="profile-loaded" id="profile-loaded">
+      <p class="profile-loaded-label">Profile loaded</p>
+      <p class="profile-loaded-name" id="profile-archetype">—</p>
+      <p class="profile-loaded-tags" id="profile-tags"></p>
+      <button type="button" class="profile-change" id="profile-change-btn">Enter details manually instead</button>
+    </div>
+
+    <div id="manual-you-panel">
+      <div class="field" id="nest-id-field">
+        <label class="field-label" for="nest-id-input">Inner Compass Nest link <span style="font-weight:400;text-transform:none;letter-spacing:0;opacity:0.75;">(optional)</span></label>
+        <input type="text" id="nest-id-input" placeholder="Paste your Nest URL or nest ID from lilbird.life">
+      </div>
+      <div class="field">
+        <label class="field-label" for="user-types">Your types & frameworks</label>
+        <input type="text" id="user-types" placeholder="e.g. ENTJ, Enneagram 3, Pioneer — whatever you know">
+      </div>
+      <div class="field">
+        <label class="field-label" for="user-description">How you tend to show up at work</label>
+        <textarea id="user-description" placeholder="e.g. moves fast, wants autonomy, direct communicator, struggles when priorities shift without context…"></textarea>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 class="card-title" id="them-title">Their wiring</h2>
+    <p class="card-hint" id="them-hint">You don't need their full assessment — a rough read on how they operate is enough to start.</p>
+
+    <div class="field">
+      <label class="field-label" for="partner-relationship">Relationship at work</label>
+      <select id="partner-relationship">
+        <option value="colleague">Colleague or peer</option>
+        <option value="manager">Manager or leader</option>
+        <option value="colleague">Direct report</option>
+        <option value="colleague">Cross-functional partner</option>
+        <option value="friend">Trusted collaborator outside your team</option>
+      </select>
+    </div>
+    <div class="field">
+      <label class="field-label" for="partner-types">Their types & frameworks</label>
+      <input type="text" id="partner-types" placeholder="e.g. INFJ, Enneagram 9, Steady voice — anything you know">
+    </div>
+    <div class="field">
+      <label class="field-label" for="partner-description">How they tend to show up</label>
+      <textarea id="partner-description" placeholder="e.g. thoughtful, avoids conflict, needs time to process, strong on relationships but slow to decide…"></textarea>
+    </div>
+  </section>
+
+  <div class="btn-row">
+    <button type="button" class="btn-primary" id="generate-btn">Read the dynamic</button>
+    <div class="loading-pill" id="loading-pill" aria-live="polite">
+      <span class="loading-dot"></span>
+      <span class="loading-dot"></span>
+      <span class="loading-dot"></span>
+      <span id="loading-text">Reading your dynamic</span>
+    </div>
+  </div>
+
+  <div class="dynamic-result" id="dynamic-result" role="region" aria-live="polite"></div>
+  <p class="error-msg" id="error-msg" style="display:none;"></p>
+</main>
+
+<footer class="site-footer">
+  <p><a href="https://www.orangery.solutions" target="_blank" rel="noopener">Orangery Leadership Solutions</a> · <a href="https://calendly.com/lukehaythorpe-orangery/30min" target="_blank" rel="noopener">Take the first step</a></p>
+  <p class="footer-powered">Assessment engine by <a href="https://lilbird.life/deep-profile.html" target="_blank" rel="noopener">lil' bird Inner Compass</a></p>
+</footer>
+
+<script>
+(function () {
+  const WORKER_URL = 'https://lilbird-assessment.cwwq46sn7m.workers.dev';
+  const COPY = {
+    btnIdle: 'Read the dynamic',
+    btnLoading: 'Reading…',
+    loadingText: 'Reading your dynamic',
+    labels: {
+      theyBring: 'What they bring to the table for you',
+      youBring: 'What you bring to the table for them',
+      watchOut: 'Where friction tends to show up',
+      invitation: 'The growth edge for both of you'
+    },
+    errors: {
+      you: 'Start with a little about your wiring — types, or how you tend to show up at work.',
+      them: 'Add something about the other person — even a short description of how they operate.',
+      nest: 'We couldn\'t find that Nest link. Check the URL or enter your details manually.',
+      generic: 'Something went wrong on our end. Give it another try in a moment.'
+    }
+  };
+
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('embed') === '1' || params.get('embed') === 'true') {
+    document.body.classList.add('embed');
+  }
+
+  let userProfile = null;
+  let useManualProfile = true;
+
+  const profileLoadedEl = document.getElementById('profile-loaded');
+  const manualPanel = document.getElementById('manual-you-panel');
+  const nestIdField = document.getElementById('nest-id-field');
+  const nestIdInput = document.getElementById('nest-id-input');
+  const generateBtn = document.getElementById('generate-btn');
+  const loadingPill = document.getElementById('loading-pill');
+  const resultEl = document.getElementById('dynamic-result');
+  const errorEl = document.getElementById('error-msg');
+
+  function parseNestId(raw) {
+    if (!raw) return null;
+    const s = raw.trim();
+    if (!s) return null;
+    try {
+      const u = new URL(s);
+      const fromQuery = u.searchParams.get('nest');
+      if (fromQuery) return fromQuery;
+    } catch (_) {}
+    const m = s.match(/nest-[a-z0-9-]+/i);
+    return m ? m[0] : (s.startsWith('nest-') ? s : null);
+  }
+
+  function showNestProfile(profile) {
+    userProfile = profile;
+    useManualProfile = false;
+    profileLoadedEl.classList.add('visible');
+    manualPanel.classList.add('hidden');
+    nestIdField.style.display = 'none';
+
+    const name = profile.likelyCoreArchetypePlain || profile.archetypePlain || profile.likelyCoreArchetype || profile.archetype || 'Your profile';
+    document.getElementById('profile-archetype').textContent = name;
+
+    const tags = [
+      profile.likelyCoreMbti || profile.mbti,
+      profile.likelyCoreEnneagram || profile.enneagram,
+      profile.likelyCoreAttachment || profile.attachment
+    ].filter(Boolean).join(' · ');
+    document.getElementById('profile-tags').textContent = tags || 'Inner Compass profile loaded';
+  }
+
+  function showManualPanel() {
+    useManualProfile = true;
+    userProfile = null;
+    profileLoadedEl.classList.remove('visible');
+    manualPanel.classList.remove('hidden');
+    nestIdField.style.display = '';
+  }
+
+  function buildManualUserProfile() {
+    const types = document.getElementById('user-types').value.trim();
+    const desc = document.getElementById('user-description').value.trim();
+    if (!types && !desc) return null;
+    return {
+      likelyCoreArchetype: desc || 'Self-described',
+      likelyCoreArchetypePlain: desc || 'Your leadership style',
+      likelyCoreArchetypeSub: types,
+      likelyCoreMbti: types,
+      likelyCoreEnneagram: types,
+      likelyCoreAttachment: '',
+      likelyCoreFiveVoicesNod: types,
+      archetype: desc,
+      archetypePlain: desc || 'You',
+      mbti: types,
+      enneagram: types
+    };
+  }
+
+  async function loadNest(id) {
+    if (!id) return false;
+    try {
+      const r = await fetch(WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(id));
+      if (!r.ok) return false;
+      const data = await r.json();
+      if (!data.profile) return false;
+      showNestProfile(data.profile);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function renderDynamic(dynamic) {
+    const L = COPY.labels;
+    resultEl.innerHTML =
+      '<h2>' + escapeHtml(dynamic.pairingTitle || 'Your team dynamic') + '</h2>' +
+      '<p>' + escapeHtml(dynamic.dynamicSummary || '') + '</p>' +
+      '<p><span class="result-label">' + L.theyBring + '</span>' + escapeHtml(dynamic.theyBringToYou || '') + '</p>' +
+      '<p><span class="result-label">' + L.youBring + '</span>' + escapeHtml(dynamic.youBringToThem || '') + '</p>' +
+      '<p><span class="result-label">' + L.watchOut + '</span>' + escapeHtml(dynamic.watchOutFor || '') + '</p>' +
+      '<p><span class="result-label">' + L.invitation + '</span>' + escapeHtml(dynamic.growthInvitation || '') + '</p>' +
+      (dynamic.promptToShare ? '<p class="result-share">' + escapeHtml(dynamic.promptToShare) + '</p>' : '');
+    resultEl.classList.add('visible');
+    resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    notifyResize();
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function setLoading(on) {
+    generateBtn.disabled = on;
+    loadingPill.classList.toggle('visible', on);
+    generateBtn.textContent = on ? COPY.btnLoading : COPY.btnIdle;
+    if (on) errorEl.style.display = 'none';
+  }
+
+  function showError(msg) {
+    errorEl.textContent = msg;
+    errorEl.style.display = 'block';
+    resultEl.classList.remove('visible');
+  }
+
+  async function generateDynamic() {
+    let profile = userProfile;
+    if (useManualProfile) {
+      profile = buildManualUserProfile();
+      if (!profile) {
+        showError(COPY.errors.you);
+        return;
+      }
+    }
+    if (!profile) {
+      showError(COPY.errors.you);
+      return;
+    }
+
+    const rel = document.getElementById('partner-relationship').value;
+    const types = document.getElementById('partner-types').value.trim();
+    const desc = document.getElementById('partner-description').value.trim();
+
+    if (!types && !desc) {
+      showError(COPY.errors.them);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const r = await fetch(WORKER_URL + '/partner-dynamic', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userProfile: profile,
+          partnerInput: {
+            relationship: rel,
+            types,
+            description: desc,
+            brand: 'orangery'
+          }
+        })
+      });
+      if (!r.ok) throw new Error('request failed');
+      const dynamic = await r.json();
+      if (dynamic.error) throw new Error(dynamic.error);
+      renderDynamic(dynamic);
+    } catch (_) {
+      showError(COPY.errors.generic);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function notifyResize() {
+    if (window.parent === window) return;
+    try {
+      window.parent.postMessage({
+        type: 'lilbird-embed-resize',
+        height: Math.max(document.documentElement.scrollHeight, document.body.scrollHeight)
+      }, '*');
+    } catch (_) {}
+  }
+
+  document.getElementById('profile-change-btn').addEventListener('click', showManualPanel);
+  generateBtn.addEventListener('click', generateDynamic);
+
+  nestIdInput.addEventListener('change', async function () {
+    const id = parseNestId(nestIdInput.value);
+    if (!id) return;
+    const ok = await loadNest(id);
+    if (!ok) showError(COPY.errors.nest);
+    else errorEl.style.display = 'none';
+  });
+
+  const relParam = params.get('relationship');
+  if (relParam === 'manager') {
+    document.getElementById('headline').innerHTML = 'How does your wiring meet <em>your leader\'s?</em>';
+    document.getElementById('intro-copy').textContent =
+      'Leading up has its own friction. Share what you know about how you operate and how your manager tends to move — we\'ll read the dynamic and where alignment can grow.';
+    const sel = document.getElementById('partner-relationship');
+    for (let i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value === 'manager') { sel.selectedIndex = i; break; }
+    }
+  }
+
+  (async function init() {
+    const fromUrl = params.get('nest');
+    if (fromUrl) {
+      nestIdInput.value = fromUrl;
+      const ok = await loadNest(fromUrl);
+      if (!ok) showError(COPY.errors.nest);
+    }
+    notifyResize();
+    window.addEventListener('resize', notifyResize);
+    if (typeof ResizeObserver !== 'undefined') {
+      new ResizeObserver(notifyResize).observe(document.body);
+    }
+  })();
+})();
+</script>
+<!--
+SQUARESPACE EMBED (orangery.solutions)
+
+<div id="orangery-dynamic-embed" style="width:100%;max-width:720px;margin:0 auto;">
+  <iframe
+    id="orangery-dynamic-frame"
+    src="https://lilbird.life/relationship-dynamic-orangery.html?embed=1"
+    title="Team dynamic — Orangery Leadership Solutions"
+    style="width:100%;min-height:720px;border:none;display:block;background:#faf9f6;"
+    loading="lazy"
+  ></iframe>
+</div>
+<script>
+(function () {
+  var f = document.getElementById('orangery-dynamic-frame');
+  if (!f) return;
+  window.addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'lilbird-embed-resize') return;
+    f.style.height = Math.max(560, e.data.height) + 'px';
+  });
+})();
+</script>
+-->
+</body>
+</html>
