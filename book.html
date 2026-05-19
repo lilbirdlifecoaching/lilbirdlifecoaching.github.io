@@ -402,7 +402,7 @@
           <p class="opt-tag">flexible · recurring or once-off</p>
           <p class="opt-desc">Some people need a regular thinking partner. Some just need one good conversation right now. Monthly coaching works both ways — a standing session to keep you moving, or a one-off when something specific needs working through. No pressure to commit to more than you need.</p>
         </div>
-        <div class="session-option" data-url="https://calendly.com/lilbirdlifecoaching/30min" onclick="switchCalendly(this)">
+        <div class="session-option" id="discovery" data-url="https://calendly.com/lilbirdlifecoaching/30min" onclick="switchCalendly(this)">
           <p class="opt-name">Discovery Call</p>
           <p class="opt-tag">free · 30 minutes · no hard sell</p>
           <p class="opt-desc">Not sure if this is for you? That's exactly what this call is for. We'll spend 30 minutes getting honest about where you are and whether we're the right fit. No script, no pitch. If we're not the right match, we'll tell you. Our bias is always you.</p>
@@ -449,6 +449,7 @@
       <a href="format.html">How It Works</a>
       <a href="index.html">Home</a>
       <a href="mailto:hello@lilbird.life" id="footer-feedback-link" title="Broken link, typo, bug, or idea">Site feedback</a>
+      <a href="privacy.html">Privacy</a>
     </div>
     <span class="footer-note">part of the Orangery Solutions ecosystem</span>
   </footer>
@@ -520,7 +521,32 @@
       setTimeout(() => document.getElementById('cal-loading').classList.add('hidden'), 4000);
     }
 
-    setTimeout(showFirstFlightOffer, 600);
+    const SESSION_DEEP_LINKS = {
+      discovery: 'https://calendly.com/lilbirdlifecoaching/30min',
+      intensive: 'https://calendly.com/lilbirdlifecoaching/packages/141b4b4c-dca7-46e5-9314-a8fc55f4320f',
+      coaching: 'https://calendly.com/lilbirdlifecoaching/coaching',
+      monthly: 'https://calendly.com/lilbirdlifecoaching/coaching',
+    };
+
+    function sessionOptionFromDeepLink() {
+      const hash = (location.hash || '').replace(/^#/, '').toLowerCase();
+      const params = new URLSearchParams(location.search);
+      const key = (params.get('session') || hash || '').toLowerCase();
+      const url = SESSION_DEEP_LINKS[key];
+      if (!url) return null;
+      return document.querySelector('.session-option[data-url="' + url + '"]');
+    }
+
+    function initBookPageFromDeepLink() {
+      const option = sessionOptionFromDeepLink();
+      if (option) {
+        switchCalendly(option);
+        return;
+      }
+      setTimeout(showFirstFlightOffer, 600);
+    }
+
+    initBookPageFromDeepLink();
 
     (function () {
       const a = document.getElementById('footer-feedback-link');
