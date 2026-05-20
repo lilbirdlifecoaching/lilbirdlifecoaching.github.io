@@ -2434,7 +2434,7 @@
 </div>
 
 <footer class="page-footer">
-  <p>lil' bird life coaching · <a href="index.html">lilbird.life</a> · <a href="mailto:hello@lilbird.life">hello@lilbird.life</a> · <a href="mailto:hello@lilbird.life" id="footer-feedback-link">Site feedback</a></p>
+  <p>lil' bird life coaching · <a href="index.html">lilbird.life</a> · <a href="mailto:hello@lilbird.life">hello@lilbird.life</a> · <a href="privacy.html">Privacy</a> · <a href="mailto:hello@lilbird.life" id="footer-feedback-link">Site feedback</a></p>
 </footer>
 
 <script>
@@ -2515,7 +2515,7 @@ async function _postCourseLink(nestIdToLink){
 }
 const STRIPE_PK      = 'pk_live_51QSMYQGAu36WZ7DdlsoNqzwPnsf4HUoOj6F1NZAeGnnH1TPjDEdEQudXIGgTLaUq079aQMI1W2MS6UpMItmTjgxy00HbouBx2g';
 const SHEETS_URL     = 'https://script.google.com/macros/s/AKfycbwPoMHcmTKO8JiDt8VS4fVsvGKqw-CQGLktQKImKeUPsfqX7WhH1IJCsG2M2fF7lyL6/exec';
-const BEEHIIV_PUB_ID = '53a4cafc-9b30-41d5-bd5e-4dc0026b4308';
+const BEEHIIV_PUB_ID = 'pub_53a4cafc-9b30-41d5-bd5e-4dc0026b4308';
 // RESEND_API_KEY is stored as a Cloudflare Worker env var (never in frontend code)
 
 // ═══════════════════════════════════════
@@ -3150,9 +3150,9 @@ async function submitEmail(){
   // Store for pay screen — no second ask needed
   userEmail = email;
 
-  // Subscribe via worker (avoids CORS)
+  // Subscribe via worker (avoids CORS; Beehiiv API key lives on worker only)
   try{
-    await fetch(`${WORKER_URL}/subscribe-email`, {
+    const subRes = await fetch(`${WORKER_URL}/subscribe-email`, {
       method: 'POST', headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
         email,
@@ -3169,7 +3169,13 @@ async function submitEmail(){
         ]
       })
     });
-  }catch(e){ console.warn('Beehiiv error (silent):',e); }
+    const subJson = await subRes.json().catch(() => ({}));
+    if(subRes.ok && subJson.success){
+      console.info('Beehiiv: subscribed', email);
+    }else{
+      console.warn('Beehiiv subscribe did not succeed:', subRes.status, subJson);
+    }
+  }catch(e){ console.warn('Beehiiv request failed:', e); }
 
   // Hide gate, reveal snapshot content
   const gate    = document.getElementById('email-gate');
