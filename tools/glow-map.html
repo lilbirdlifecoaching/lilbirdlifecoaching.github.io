@@ -1,25 +1,25 @@
 <!DOCTYPE html>
-<!-- lil' bird · Glow Map — public lead-gen pilot (deploy to https://lilbird.life/tools/glow-map.html) -->
+<!-- lil' bird · Glow Map · public lead-gen pilot (deploy to https://lilbird.life/tools/glow-map.html) -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Free Glow Map tool from lil' bird coaching. Score five areas of your life and see where your energy is flowing — and where it's dim." />
+  <meta name="description" content="Free Glow Map tool from lil' bird coaching. Score five areas of your life and see where your energy is flowing and where it's dim." />
   <meta name="keywords" content="life balance tool, glow map, life coaching exercise, lil bird coaching, Luke Haythorpe, self assessment" />
   <meta name="author" content="Luke Haythorpe" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://lilbird.life/tools/glow-map.html" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://lilbird.life/tools/glow-map.html" />
-  <meta property="og:title" content="Glow Map — free life coaching tool · lil' bird" />
-  <meta property="og:description" content="Score five areas of your life from 1–10. See where your energy is glowing — and where it needs attention. Free, no account." />
+  <meta property="og:title" content="Glow Map · free life coaching tool · lil' bird" />
+  <meta property="og:description" content="Score five areas of your life from 1–10. See where your energy is glowing and where it needs attention. Free, no account." />
   <meta property="og:image" content="https://lilbird.life/bird-logo.png" />
   <meta property="og:site_name" content="lil' bird coaching" />
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Glow Map — free life coaching tool · lil' bird" />
-  <meta name="twitter:description" content="Score five areas of your life from 1–10. See where your energy is glowing — and where it needs attention." />
+  <meta name="twitter:title" content="Glow Map · free life coaching tool · lil' bird" />
+  <meta name="twitter:description" content="Score five areas of your life from 1–10. See where your energy is glowing and where it needs attention." />
   <meta name="twitter:image" content="https://lilbird.life/bird-logo.png" />
-  <title>Glow Map — free coaching tool · lil' bird</title>
+  <title>Glow Map · free coaching tool · lil' bird</title>
   <link rel="icon" type="image/png" href="../bird-logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -334,6 +334,73 @@
     .score-pill.dim { border-color: rgba(232,115,74,0.35); color: #e8a07a; }
     .score-pill.bright { border-color: var(--glow-border); color: var(--glow); }
 
+    .action-card {
+      background: var(--dark-card);
+      border: 1px solid rgba(232,115,74,0.28);
+      border-radius: 18px;
+      padding: 1.35rem 1.35rem 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .action-card-kicker {
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #e8a07a;
+      margin-bottom: 0.65rem;
+    }
+    .action-card h2 {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-style: italic;
+      font-weight: 400;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+    .action-block {
+      padding-top: 1rem;
+      margin-top: 1rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .action-block:first-of-type {
+      padding-top: 0;
+      margin-top: 0;
+      border-top: none;
+    }
+    .action-area-label {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: #e8a07a;
+      margin-bottom: 0.85rem;
+    }
+    .action-label {
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+    .action-question {
+      font-size: 0.92rem;
+      line-height: 1.65;
+      color: var(--text);
+      margin-bottom: 0.85rem;
+    }
+    .action-step {
+      font-size: 0.88rem;
+      line-height: 1.7;
+      color: var(--text-dim);
+      padding-left: 0.85rem;
+      border-left: 2px solid rgba(232,115,74,0.45);
+    }
+    .action-tie-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 1rem;
+      line-height: 1.5;
+    }
+
     .cta-section { margin-top: 2rem; }
     .cta-section > p {
       font-family: var(--font-mono);
@@ -411,7 +478,7 @@
     <p class="eyebrow">From the lil' bird curriculum</p>
     <h1>Where is your life <em>glowing</em>?</h1>
     <p class="lead">
-      The Glow Map is one exercise from our coaching work — a quick, honest snapshot of five areas that shape how you feel day to day. Score each from 1–10 and watch the shape emerge. No account, no email gate — just you and the map.
+      The Glow Map is one exercise from our coaching work: a quick snapshot of five areas that shape how you feel day to day. Score each from 1–10 and watch the shape emerge. No account, no email gate. Just you and the map.
     </p>
     <div class="pill-row">
       <span class="pill">~5 minutes</span>
@@ -420,11 +487,11 @@
     </div>
     <ol class="how-list">
       <li><span class="how-num">01</span><span>Move the sliders for Connections, Spaces, Passion &amp; Purpose, Resources, and Energy &amp; Wellbeing.</span></li>
-      <li><span class="how-num">02</span><span>Watch your Glow Map update live — the dips and peaks are the point.</span></li>
-      <li><span class="how-num">03</span><span>See a short read on what your shape might be saying — and what to do if you want to go deeper.</span></li>
+      <li><span class="how-num">02</span><span>Watch your Glow Map update live. The dips and peaks are the point.</span></li>
+      <li><span class="how-num">03</span><span>See a short read on your map, plus one practical question and a small action step aimed at your lowest score.</span></li>
     </ol>
     <button type="button" class="btn btn-primary" id="btn-start">Start your Glow Map →</button>
-    <p class="note-small">This is one tool from Life Change Sessions. The full journey — guided sessions, AI coach, and the rest of the toolkit — lives in the <a href="https://lilbird.life/solo/" style="color:var(--glow);text-decoration:none;">Solo course</a> or in-person through the <a href="../book.html#intensive" style="color:var(--glow);text-decoration:none;">Life Change Intensive</a>.</p>
+    <p class="note-small">This is one tool from Life Change Sessions. The full journey (guided sessions, AI coach, and the rest of the toolkit) lives in the <a href="https://lilbird.life/solo/" style="color:var(--glow);text-decoration:none;">Solo course</a> or in-person through the <a href="../book.html#intensive" style="color:var(--glow);text-decoration:none;">Life Change Intensive</a>.</p>
   </div>
 </section>
 
@@ -434,7 +501,7 @@
     <div class="tool-head">
       <p class="eyebrow">Your map</p>
       <h2>Glow Map</h2>
-      <p>Be honest, not aspirational. You're scoring <em>right now</em> — not where you wish you were.</p>
+      <p>Score what's true right now, not where you wish you were.</p>
     </div>
     <div class="chart-wrap">
       <svg id="glow-svg" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Glow Map radar chart"></svg>
@@ -454,14 +521,21 @@
     <h1 style="font-size:clamp(1.75rem,5vw,2.25rem);margin-bottom:1.25rem;">Here's what your map is saying</h1>
 
     <div class="done-card" id="insight-card">
-      <h2 id="insight-headline">—</h2>
-      <p id="insight-body">—</p>
+      <h2 id="insight-headline">…</h2>
+      <p id="insight-body">…</p>
       <div class="score-pills" id="score-pills"></div>
+    </div>
+
+    <div class="action-card" id="action-card" hidden>
+      <p class="action-card-kicker">One step from here</p>
+      <h2 id="action-card-title">Start where it's dimmest</h2>
+      <div id="action-blocks"></div>
+      <p class="action-tie-note" id="action-tie-note" hidden></p>
     </div>
 
     <div class="done-card">
       <p style="font-size:0.88rem;line-height:1.75;color:var(--text-dim);">
-        One exercise can't carry the whole story — but it can name what matters. If something here landed, you don't have to figure out the next chapter alone.
+        One exercise can't carry the whole story, but it can name what matters. If something here landed, you don't have to figure out the next chapter alone.
       </p>
     </div>
 
@@ -471,18 +545,18 @@
         <div class="cta-card featured">
           <h3>First Flight</h3>
           <p>One 2-hour session with Luke. Map your story, name the real issue, leave with a next brave step. Lowest barrier to see if coaching fits.</p>
-          <p class="code">Code <strong>IMREADY</strong> — 25% off</p>
+          <p class="code">Code <strong>IMREADY</strong> · 25% off</p>
           <a href="https://calendly.com/lilbirdlifecoaching/first-flight-session" class="btn btn-gold" target="_blank" rel="noopener">Book a First Flight →</a>
         </div>
         <div class="cta-card">
           <h3>Life Change Sessions: Solo</h3>
-          <p>The full self-guided course — same curriculum spine, your pace. AI coach, session tools, and the arc this Glow Map sits inside.</p>
-          <p class="code">Code <strong>SOLO50</strong> — 50% off</p>
+          <p>The full self-guided course: same curriculum spine, your pace. AI coach, session tools, and the arc this Glow Map sits inside.</p>
+          <p class="code">Code <strong>SOLO50</strong> · 50% off</p>
           <a href="https://lilbird.life/solo/" class="btn btn-outline" target="_blank" rel="noopener">Explore Solo →</a>
         </div>
         <div class="cta-card">
           <h3>Life Change Intensive</h3>
-          <p>The full in-person journey with Luke — story, vision, identity, transitions, rhythms, relationships. For when you're ready to go all the way in the room.</p>
+          <p>The full in-person journey with Luke: story, vision, identity, transitions, rhythms, relationships. For when you're ready to go all the way in the room.</p>
           <a href="../book.html#intensive" class="btn btn-outline">Learn about the Intensive →</a>
         </div>
       </div>
@@ -507,9 +581,33 @@
     { key: 'connections',  label: 'Connections',       desc: 'How alive and nourishing are your relationships right now?',            color: '#c4956a' },
     { key: 'spaces',       label: 'Spaces',            desc: 'Does your physical environment support the life you want to live?',      color: '#7eb8c9' },
     { key: 'purpose',      label: 'Passion & Purpose', desc: 'How much of your time is spent on things that genuinely matter to you?', color: '#F5C842' },
-    { key: 'resources',    label: 'Resources',         desc: 'Do you have enough — time, money, energy — to live without constant strain?', color: '#9dbf8a' },
+    { key: 'resources',    label: 'Resources',         desc: 'Do you have enough time, money, and energy to live without constant strain?', color: '#9dbf8a' },
     { key: 'wellbeing',    label: 'Energy & Wellbeing',desc: 'How well are you sleeping, moving, resting, and caring for yourself?',   color: '#a89060' },
   ];
+
+  /** Practical prompt per axis when that area is the lowest score */
+  const ACTION_BY_AXIS = {
+    connections: {
+      question: 'Who is one person you could be more direct with this week, without trying to fix the whole relationship?',
+      step: 'Send one message or make one call to someone who matters to you. Keep it short. Say one thing that is actually true.'
+    },
+    spaces: {
+      question: 'What is one change to your physical environment that would make tomorrow feel even 10% easier to be in?',
+      step: 'Reclaim one small thing today: clear one surface, open a window, or dedicate one corner to something you actually want to do there.'
+    },
+    purpose: {
+      question: 'If you looked at last week\'s calendar, how much of it would you choose again? What is that telling you?',
+      step: 'Block 30 minutes this week for one thing that genuinely matters to you. Treat it like a meeting with someone you respect.'
+    },
+    resources: {
+      question: 'Where are you paying a cost you never consciously agreed to, in time, money, or energy?',
+      step: 'Name one drain you could reduce or pause for seven days. Write it down or tell one person so it stops being background noise.'
+    },
+    wellbeing: {
+      question: 'What does your body need that you\'ve been putting off? Not someday. This week.',
+      step: 'Pick one non-negotiable for the next seven days: one earlier night, one walk without your phone, or one meal eaten sitting down.'
+    }
+  };
 
   let scores = { connections: 5, spaces: 5, purpose: 5, resources: 5, wellbeing: 5 };
 
@@ -650,21 +748,21 @@
     const dimLabels = dimmest.map(function (a) { return a.label; }).join(' and ');
     const brightLabels = brightest.map(function (a) { return a.label; }).join(' and ');
 
-    let headline = 'A mixed map — worth paying attention to';
+    let headline = 'A mixed map, worth paying attention to';
     let body = '';
 
     if (avg <= 4) {
       headline = 'A lot is running dim right now';
-      body = 'Most of your map is sitting low. That usually means strain isn\'t isolated to one corner of life — it\'s the whole system asking for air. Naming ' + dimLabels + ' as the lowest isn\'t failure; it\'s data.';
+      body = 'Most of your map is sitting low. That usually means strain is not isolated to one corner of life. The whole system is under pressure. Naming ' + dimLabels + ' as the lowest is not failure. It is data.';
     } else if (avg >= 7.5) {
       headline = 'Strong light across the board';
-      body = 'You\'re scoring high in most areas. The work now is often maintenance and honesty — not letting the bright spots hide a quiet dip. Even high maps have edges; yours shows ' + dimLabels + ' as the relative low.';
+      body = 'You\'re scoring high in most areas. The work now is often maintenance: do not let the bright spots hide a quiet dip. Even high maps have edges. Yours shows ' + dimLabels + ' as the relative low.';
     } else if (brightest[0].score - dimmest[0].score >= 4) {
       headline = 'Big gap between glow and dim';
-      body = brightLabels + ' is carrying real energy for you (' + brightest[0].score + '/10), while ' + dimLabels + ' is lagging (' + dimmest[0].score + '/10). That kind of split often shows up as "fine on paper, heavy in real life." The gap is the conversation.';
+      body = brightLabels + ' is carrying real energy for you (' + brightest[0].score + '/10), while ' + dimLabels + ' is lagging (' + dimmest[0].score + '/10). That kind of split often shows up as fine on paper and heavy in real life. The gap is the conversation.';
     } else {
       headline = 'Uneven but not collapsed';
-      body = dimLabels + ' is where the map dips first (' + dimmest[0].score + '/10). ' + brightLabels + ' is your steadiest light (' + brightest[0].score + '/10). You don\'t need to fix everything at once — but the dim edge is usually where change wants to start.';
+      body = dimLabels + ' is where the map dips first (' + dimmest[0].score + '/10). ' + brightLabels + ' is your steadiest area (' + brightest[0].score + '/10). You do not need to fix everything at once. The dim edge is usually where change wants to start.';
     }
 
     document.getElementById('insight-headline').textContent = headline;
@@ -677,6 +775,55 @@
       span.className = 'score-pill' + (i === 0 ? ' dim' : i === ranked.length - 1 ? ' bright' : '');
       span.textContent = a.label + ' · ' + a.score;
       pills.appendChild(span);
+    });
+
+    buildActionSteps(dimmest);
+  }
+
+  function buildActionSteps(dimmest) {
+    const card = document.getElementById('action-card');
+    const blocks = document.getElementById('action-blocks');
+    const tieNote = document.getElementById('action-tie-note');
+    const title = document.getElementById('action-card-title');
+
+    blocks.innerHTML = '';
+    tieNote.hidden = true;
+
+    if (!dimmest.length) {
+      card.hidden = true;
+      return;
+    }
+
+    card.hidden = false;
+
+    if (dimmest.length === 1) {
+      title.textContent = 'Start with ' + dimmest[0].label;
+    } else {
+      title.textContent = 'A step for each dim spot';
+      tieNote.textContent = 'You tied on the low end. Pick the one that stings most, or do one small action in each.';
+      tieNote.hidden = false;
+    }
+
+    dimmest.forEach(function (area, idx) {
+      const prompt = ACTION_BY_AXIS[area.key];
+      if (!prompt) return;
+
+      const block = document.createElement('div');
+      block.className = 'action-block';
+
+      var labelHtml = '';
+      if (dimmest.length > 1) {
+        labelHtml = '<p class="action-area-label">' + area.label + ' · ' + area.score + '/10</p>';
+      }
+
+      block.innerHTML =
+        labelHtml +
+        '<p class="action-label">Ask yourself</p>' +
+        '<p class="action-question">' + prompt.question + '</p>' +
+        '<p class="action-label">Try this week</p>' +
+        '<p class="action-step">' + prompt.step + '</p>';
+
+      blocks.appendChild(block);
     });
   }
 
