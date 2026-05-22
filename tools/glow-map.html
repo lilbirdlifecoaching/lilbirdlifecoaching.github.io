@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<!-- lil' bird · Glow Map — public lead-gen pilot (deploy to https://lilbird.life/tools/glow-map.html) -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Free Glow Map tool from lil' bird coaching. Score five areas of your life and see where your energy is flowing — and where it's dim." />
+  <meta name="keywords" content="life balance tool, glow map, life coaching exercise, lil bird coaching, Luke Haythorpe, self assessment" />
+  <meta name="author" content="Luke Haythorpe" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://lilbird.life/tools/glow-map.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://lilbird.life/tools/glow-map.html" />
+  <meta property="og:title" content="Glow Map — free life coaching tool · lil' bird" />
+  <meta property="og:description" content="Score five areas of your life from 1–10. See where your energy is glowing — and where it needs attention. Free, no account." />
+  <meta property="og:image" content="https://lilbird.life/bird-logo.png" />
+  <meta property="og:site_name" content="lil' bird coaching" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Glow Map — free life coaching tool · lil' bird" />
+  <meta name="twitter:description" content="Score five areas of your life from 1–10. See where your energy is glowing — and where it needs attention." />
+  <meta name="twitter:image" content="https://lilbird.life/bird-logo.png" />
+  <title>Glow Map — free coaching tool · lil' bird</title>
+  <link rel="icon" type="image/png" href="../bird-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --dark: #1e2028;
+      --dark-mid: #252830;
+      --dark-card: #2a2d38;
+      --gold: #F5C842;
+      --gold-dim: #c9a130;
+      --glow: #7eb8c9;
+      --glow-dim: rgba(126,184,201,0.12);
+      --glow-border: rgba(126,184,201,0.25);
+      --text: #f0ece4;
+      --text-dim: rgba(240,236,228,0.58);
+      --text-muted: rgba(240,236,228,0.3);
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body: 'DM Sans', system-ui, sans-serif;
+      --font-mono: 'DM Mono', monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--dark);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-weight: 300;
+      min-height: 100vh;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.5;
+    }
+
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 1.1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 50;
+      background: linear-gradient(to bottom, rgba(30,32,40,0.96), rgba(30,32,40,0.4), transparent);
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      text-decoration: none;
+      color: var(--gold);
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 1rem;
+    }
+    .nav-logo img { width: 28px; height: 28px; border-radius: 6px; object-fit: cover; }
+    .nav-tag {
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .screen { display: none; position: relative; z-index: 1; }
+    .screen.active { display: block; }
+
+    .wrap {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 5.5rem 1.25rem 4rem;
+    }
+
+    /* ── INTRO ── */
+    #screen-intro { min-height: 100vh; }
+    #screen-intro .wrap {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: calc(100vh - 2rem);
+      padding-bottom: 3rem;
+    }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--glow);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .eyebrow::before { content: ''; width: 16px; height: 1px; background: var(--glow); }
+    h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 6vw, 2.75rem);
+      font-weight: 400;
+      font-style: italic;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+    }
+    .lead {
+      color: var(--text-dim);
+      font-size: 1rem;
+      line-height: 1.8;
+      margin-bottom: 1.5rem;
+      max-width: 36rem;
+    }
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+    }
+    .pill {
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.7rem;
+      border-radius: 100px;
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--text-muted);
+    }
+    .how-list {
+      list-style: none;
+      margin-bottom: 2.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+    .how-list li {
+      display: flex;
+      gap: 0.85rem;
+      align-items: flex-start;
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      line-height: 1.55;
+    }
+    .how-num {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      color: var(--glow);
+      min-width: 1.5rem;
+      padding-top: 0.15rem;
+    }
+    .note-small {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 1.25rem;
+      line-height: 1.5;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: 8px;
+      padding: 0.9rem 1.6rem;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.2s, background 0.2s, border-color 0.2s;
+    }
+    .btn-primary {
+      background: var(--glow);
+      color: var(--dark);
+      font-weight: 500;
+    }
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-gold {
+      background: var(--gold);
+      color: var(--dark);
+      font-weight: 500;
+    }
+    .btn-gold:hover { opacity: 0.88; }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--glow-border);
+      color: var(--glow);
+    }
+    .btn-outline:hover { background: var(--glow-dim); }
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--text-muted);
+    }
+    .btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+    /* ── TOOL ── */
+    .tool-head { margin-bottom: 1.5rem; }
+    .tool-head h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      font-style: italic;
+      font-weight: 400;
+      margin-bottom: 0.5rem;
+    }
+    .tool-head p { color: var(--text-dim); font-size: 0.88rem; line-height: 1.7; }
+    .chart-wrap {
+      background: var(--dark-card);
+      border: 1px solid var(--glow-border);
+      border-radius: 20px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: center;
+    }
+    #glow-svg { width: 100%; max-width: 320px; }
+    .sliders { display: flex; flex-direction: column; gap: 1.25rem; margin-bottom: 2rem; }
+    .slider-row {
+      background: var(--dark-card);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 1rem 1.25rem;
+    }
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+    .slider-name { font-size: 0.88rem; font-weight: 500; }
+    .slider-value {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      color: var(--glow);
+      min-width: 24px;
+      text-align: right;
+    }
+    .slider-desc { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.75rem; line-height: 1.5; }
+    input[type=range] {
+      width: 100%;
+      height: 6px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: rgba(255,255,255,0.08);
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--glow);
+      cursor: pointer;
+      border: 3px solid var(--dark-card);
+      box-shadow: 0 0 0 1px var(--glow);
+    }
+    input[type=range]::-moz-range-thumb {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--glow);
+      cursor: pointer;
+      border: 3px solid var(--dark-card);
+    }
+    .tool-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    /* ── DONE ── */
+    .done-card {
+      background: var(--dark-card);
+      border: 1px solid var(--glow-border);
+      border-radius: 18px;
+      padding: 1.5rem 1.35rem;
+      margin-bottom: 1.5rem;
+    }
+    .done-card h2 {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-style: italic;
+      font-weight: 400;
+      margin-bottom: 0.75rem;
+    }
+    .done-card p { color: var(--text-dim); font-size: 0.9rem; line-height: 1.75; }
+    .score-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin: 1rem 0 0.5rem;
+    }
+    .score-pill {
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.65rem;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .score-pill.dim { border-color: rgba(232,115,74,0.35); color: #e8a07a; }
+    .score-pill.bright { border-color: var(--glow-border); color: var(--glow); }
+
+    .cta-section { margin-top: 2rem; }
+    .cta-section > p {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+      margin-bottom: 1rem;
+    }
+    .cta-grid { display: flex; flex-direction: column; gap: 0.85rem; }
+    .cta-card {
+      background: var(--dark-card);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 1.15rem 1.25rem;
+      display: grid;
+      gap: 0.5rem;
+    }
+    .cta-card.featured { border-color: rgba(245,200,66,0.25); }
+    .cta-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-style: italic;
+      font-weight: 400;
+    }
+    .cta-card p { font-size: 0.82rem; color: var(--text-dim); line-height: 1.6; }
+    .cta-card .code {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--gold);
+      letter-spacing: 0.08em;
+    }
+    .cta-card .btn { width: 100%; margin-top: 0.25rem; }
+    .done-footer {
+      margin-top: 2.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .site-footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 2rem 1.25rem 2.5rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    .site-footer a { color: var(--gold-dim); text-decoration: none; }
+    .site-footer a:hover { color: var(--gold); }
+
+    @media (max-width: 480px) {
+      .nav { padding: 1rem; }
+      .wrap { padding-top: 4.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Site">
+  <a class="nav-logo" href="../index.html">
+    <img src="../bird-logo.png" alt="" width="28" height="28" />
+    <span>lil' bird</span>
+  </a>
+  <span class="nav-tag">Free tool</span>
+</nav>
+
+<!-- INTRO -->
+<section class="screen active" id="screen-intro" aria-label="Introduction">
+  <div class="wrap">
+    <p class="eyebrow">From the lil' bird curriculum</p>
+    <h1>Where is your life <em>glowing</em>?</h1>
+    <p class="lead">
+      The Glow Map is one exercise from our coaching work — a quick, honest snapshot of five areas that shape how you feel day to day. Score each from 1–10 and watch the shape emerge. No account, no email gate — just you and the map.
+    </p>
+    <div class="pill-row">
+      <span class="pill">~5 minutes</span>
+      <span class="pill">Saves in your browser</span>
+      <span class="pill">Free</span>
+    </div>
+    <ol class="how-list">
+      <li><span class="how-num">01</span><span>Move the sliders for Connections, Spaces, Passion &amp; Purpose, Resources, and Energy &amp; Wellbeing.</span></li>
+      <li><span class="how-num">02</span><span>Watch your Glow Map update live — the dips and peaks are the point.</span></li>
+      <li><span class="how-num">03</span><span>See a short read on what your shape might be saying — and what to do if you want to go deeper.</span></li>
+    </ol>
+    <button type="button" class="btn btn-primary" id="btn-start">Start your Glow Map →</button>
+    <p class="note-small">This is one tool from Life Change Sessions. The full journey — guided sessions, AI coach, and the rest of the toolkit — lives in the <a href="https://lilbird.life/solo/" style="color:var(--glow);text-decoration:none;">Solo course</a> or in-person through the <a href="../book.html#intensive" style="color:var(--glow);text-decoration:none;">Life Change Intensive</a>.</p>
+  </div>
+</section>
+
+<!-- TOOL -->
+<section class="screen" id="screen-tool" aria-label="Glow Map tool">
+  <div class="wrap">
+    <div class="tool-head">
+      <p class="eyebrow">Your map</p>
+      <h2>Glow Map</h2>
+      <p>Be honest, not aspirational. You're scoring <em>right now</em> — not where you wish you were.</p>
+    </div>
+    <div class="chart-wrap">
+      <svg id="glow-svg" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Glow Map radar chart"></svg>
+    </div>
+    <div class="sliders" id="sliders"></div>
+    <div class="tool-actions">
+      <button type="button" class="btn btn-primary" id="btn-finish">See my read →</button>
+      <button type="button" class="btn btn-ghost" id="btn-intro-back">← Back</button>
+    </div>
+  </div>
+</section>
+
+<!-- DONE -->
+<section class="screen" id="screen-done" aria-label="Your read and next steps">
+  <div class="wrap">
+    <p class="eyebrow">Your read</p>
+    <h1 style="font-size:clamp(1.75rem,5vw,2.25rem);margin-bottom:1.25rem;">Here's what your map is saying</h1>
+
+    <div class="done-card" id="insight-card">
+      <h2 id="insight-headline">—</h2>
+      <p id="insight-body">—</p>
+      <div class="score-pills" id="score-pills"></div>
+    </div>
+
+    <div class="done-card">
+      <p style="font-size:0.88rem;line-height:1.75;color:var(--text-dim);">
+        One exercise can't carry the whole story — but it can name what matters. If something here landed, you don't have to figure out the next chapter alone.
+      </p>
+    </div>
+
+    <div class="cta-section">
+      <p>Want to go further?</p>
+      <div class="cta-grid">
+        <div class="cta-card featured">
+          <h3>First Flight</h3>
+          <p>One 2-hour session with Luke. Map your story, name the real issue, leave with a next brave step. Lowest barrier to see if coaching fits.</p>
+          <p class="code">Code <strong>IMREADY</strong> — 25% off</p>
+          <a href="https://calendly.com/lilbirdlifecoaching/first-flight-session" class="btn btn-gold" target="_blank" rel="noopener">Book a First Flight →</a>
+        </div>
+        <div class="cta-card">
+          <h3>Life Change Sessions: Solo</h3>
+          <p>The full self-guided course — same curriculum spine, your pace. AI coach, session tools, and the arc this Glow Map sits inside.</p>
+          <p class="code">Code <strong>SOLO50</strong> — 50% off</p>
+          <a href="https://lilbird.life/solo/" class="btn btn-outline" target="_blank" rel="noopener">Explore Solo →</a>
+        </div>
+        <div class="cta-card">
+          <h3>Life Change Intensive</h3>
+          <p>The full in-person journey with Luke — story, vision, identity, transitions, rhythms, relationships. For when you're ready to go all the way in the room.</p>
+          <a href="../book.html#intensive" class="btn btn-outline">Learn about the Intensive →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="done-footer">
+      <button type="button" class="btn btn-ghost" id="btn-redo">Start over</button>
+      <a href="../index.html" class="btn btn-ghost">Back to lilbird.life</a>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <p>lil' bird life coaching · <a href="../index.html">lilbird.life</a> · <a href="mailto:hello@lilbird.life">hello@lilbird.life</a> · <a href="../privacy.html">Privacy</a></p>
+</footer>
+
+<script>
+(function () {
+  const STORAGE_KEY = 'lilbird-glow-map-lead-v1';
+
+  const AXES = [
+    { key: 'connections',  label: 'Connections',       desc: 'How alive and nourishing are your relationships right now?',            color: '#c4956a' },
+    { key: 'spaces',       label: 'Spaces',            desc: 'Does your physical environment support the life you want to live?',      color: '#7eb8c9' },
+    { key: 'purpose',      label: 'Passion & Purpose', desc: 'How much of your time is spent on things that genuinely matter to you?', color: '#F5C842' },
+    { key: 'resources',    label: 'Resources',         desc: 'Do you have enough — time, money, energy — to live without constant strain?', color: '#9dbf8a' },
+    { key: 'wellbeing',    label: 'Energy & Wellbeing',desc: 'How well are you sleeping, moving, resting, and caring for yourself?',   color: '#a89060' },
+  ];
+
+  let scores = { connections: 5, spaces: 5, purpose: 5, resources: 5, wellbeing: 5 };
+
+  const screens = {
+    intro: document.getElementById('screen-intro'),
+    tool: document.getElementById('screen-tool'),
+    done: document.getElementById('screen-done'),
+  };
+
+  function showScreen(name) {
+    Object.values(screens).forEach(function (el) { el.classList.remove('active'); });
+    screens[name].classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function loadSaved() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      if (data && data.scores) scores = Object.assign({}, scores, data.scores);
+    } catch (e) {}
+  }
+
+  function saveLocal() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ scores: scores, savedAt: new Date().toISOString() }));
+    } catch (e) {}
+  }
+
+  function drawChart() {
+    const svg = document.getElementById('glow-svg');
+    svg.innerHTML = '';
+    const cx = 150, cy = 150, r = 110, n = AXES.length;
+
+    [0.25, 0.5, 0.75, 1].forEach(function (pct) {
+      const ring = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      ring.setAttribute('cx', cx);
+      ring.setAttribute('cy', cy);
+      ring.setAttribute('r', r * pct);
+      ring.setAttribute('fill', 'none');
+      ring.setAttribute('stroke', 'rgba(255,255,255,0.06)');
+      ring.setAttribute('stroke-width', '1');
+      svg.appendChild(ring);
+    });
+
+    AXES.forEach(function (axis, i) {
+      const angle = (i / n) * Math.PI * 2 - Math.PI / 2;
+      const x2 = cx + r * Math.cos(angle);
+      const y2 = cy + r * Math.sin(angle);
+      const lx = cx + (r + 20) * Math.cos(angle);
+      const ly = cy + (r + 20) * Math.sin(angle);
+
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', cx);
+      line.setAttribute('y1', cy);
+      line.setAttribute('x2', x2);
+      line.setAttribute('y2', y2);
+      line.setAttribute('stroke', 'rgba(255,255,255,0.08)');
+      line.setAttribute('stroke-width', '1');
+      svg.appendChild(line);
+
+      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      label.setAttribute('x', lx);
+      label.setAttribute('y', ly);
+      label.setAttribute('text-anchor', 'middle');
+      label.setAttribute('dominant-baseline', 'middle');
+      label.setAttribute('fill', axis.color);
+      label.setAttribute('font-size', '9');
+      label.setAttribute('font-family', 'DM Mono, monospace');
+      label.textContent = axis.label;
+      svg.appendChild(label);
+    });
+
+    const points = AXES.map(function (axis, i) {
+      const angle = (i / n) * Math.PI * 2 - Math.PI / 2;
+      const val = (scores[axis.key] || 1) / 10;
+      return [cx + r * val * Math.cos(angle), cy + r * val * Math.sin(angle)];
+    });
+
+    const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    poly.setAttribute('points', points.map(function (p) { return p.join(','); }).join(' '));
+    poly.setAttribute('fill', 'rgba(126,184,201,0.18)');
+    poly.setAttribute('stroke', '#7eb8c9');
+    poly.setAttribute('stroke-width', '2');
+    poly.setAttribute('stroke-linejoin', 'round');
+    svg.appendChild(poly);
+
+    points.forEach(function (p, i) {
+      const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      dot.setAttribute('cx', p[0]);
+      dot.setAttribute('cy', p[1]);
+      dot.setAttribute('r', 5);
+      dot.setAttribute('fill', AXES[i].color);
+      dot.setAttribute('stroke', '#1e2028');
+      dot.setAttribute('stroke-width', '2');
+      svg.appendChild(dot);
+    });
+  }
+
+  function buildSliders() {
+    const container = document.getElementById('sliders');
+    container.innerHTML = '';
+    AXES.forEach(function (axis) {
+      const row = document.createElement('div');
+      row.className = 'slider-row';
+      row.innerHTML =
+        '<div class="slider-header">' +
+          '<span class="slider-name" style="color:' + axis.color + '">' + axis.label + '</span>' +
+          '<span class="slider-value" id="val-' + axis.key + '" style="color:' + axis.color + '">' + scores[axis.key] + '</span>' +
+        '</div>' +
+        '<div class="slider-desc">' + axis.desc + '</div>' +
+        '<input type="range" min="1" max="10" value="' + scores[axis.key] + '" data-key="' + axis.key + '" aria-label="' + axis.label + '" />';
+      container.appendChild(row);
+
+      row.querySelector('input').addEventListener('input', function (e) {
+        const key = e.target.dataset.key;
+        scores[key] = parseInt(e.target.value, 10);
+        document.getElementById('val-' + key).textContent = scores[key];
+        drawChart();
+        saveLocal();
+      });
+    });
+  }
+
+  function rankedAxes() {
+    return AXES.map(function (a) {
+      return { label: a.label, key: a.key, score: scores[a.key] || 1 };
+    }).sort(function (a, b) { return a.score - b.score; });
+  }
+
+  function buildInsight() {
+    const ranked = rankedAxes();
+    const dimmest = ranked.filter(function (a) { return a.score === ranked[0].score; });
+    const brightest = ranked.filter(function (a) { return a.score === ranked[ranked.length - 1].score; });
+    const avg = ranked.reduce(function (s, a) { return s + a.score; }, 0) / ranked.length;
+
+    const dimLabels = dimmest.map(function (a) { return a.label; }).join(' and ');
+    const brightLabels = brightest.map(function (a) { return a.label; }).join(' and ');
+
+    let headline = 'A mixed map — worth paying attention to';
+    let body = '';
+
+    if (avg <= 4) {
+      headline = 'A lot is running dim right now';
+      body = 'Most of your map is sitting low. That usually means strain isn\'t isolated to one corner of life — it\'s the whole system asking for air. Naming ' + dimLabels + ' as the lowest isn\'t failure; it\'s data.';
+    } else if (avg >= 7.5) {
+      headline = 'Strong light across the board';
+      body = 'You\'re scoring high in most areas. The work now is often maintenance and honesty — not letting the bright spots hide a quiet dip. Even high maps have edges; yours shows ' + dimLabels + ' as the relative low.';
+    } else if (brightest[0].score - dimmest[0].score >= 4) {
+      headline = 'Big gap between glow and dim';
+      body = brightLabels + ' is carrying real energy for you (' + brightest[0].score + '/10), while ' + dimLabels + ' is lagging (' + dimmest[0].score + '/10). That kind of split often shows up as "fine on paper, heavy in real life." The gap is the conversation.';
+    } else {
+      headline = 'Uneven but not collapsed';
+      body = dimLabels + ' is where the map dips first (' + dimmest[0].score + '/10). ' + brightLabels + ' is your steadiest light (' + brightest[0].score + '/10). You don\'t need to fix everything at once — but the dim edge is usually where change wants to start.';
+    }
+
+    document.getElementById('insight-headline').textContent = headline;
+    document.getElementById('insight-body').textContent = body;
+
+    const pills = document.getElementById('score-pills');
+    pills.innerHTML = '';
+    ranked.forEach(function (a, i) {
+      const span = document.createElement('span');
+      span.className = 'score-pill' + (i === 0 ? ' dim' : i === ranked.length - 1 ? ' bright' : '');
+      span.textContent = a.label + ' · ' + a.score;
+      pills.appendChild(span);
+    });
+  }
+
+  document.getElementById('btn-start').addEventListener('click', function () {
+    showScreen('tool');
+  });
+  document.getElementById('btn-intro-back').addEventListener('click', function () {
+    showScreen('intro');
+  });
+  document.getElementById('btn-finish').addEventListener('click', function () {
+    saveLocal();
+    buildInsight();
+    showScreen('done');
+  });
+  document.getElementById('btn-redo').addEventListener('click', function () {
+    scores = { connections: 5, spaces: 5, purpose: 5, resources: 5, wellbeing: 5 };
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    buildSliders();
+    drawChart();
+    showScreen('tool');
+  });
+
+  // Deep-link: ?start=1 skips intro (handy for returning visitors)
+  loadSaved();
+  buildSliders();
+  drawChart();
+  if (new URLSearchParams(window.location.search).get('start') === '1') {
+    showScreen('tool');
+  }
+})();
+</script>
+</body>
+</html>
