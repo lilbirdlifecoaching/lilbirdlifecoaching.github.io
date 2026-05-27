@@ -8,9 +8,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
-  <link rel="stylesheet" href="./nest-styles.css" />
+  <link rel="stylesheet" href="./nest-styles.css?v=2" />
 </head>
-<body>
+<body class="nest-page">
   <div id="view-auth" class="view active">
     <main class="auth-wrap">
       <div class="auth-card">
@@ -51,14 +51,17 @@
 
   <div id="view-dashboard" class="view">
     <nav class="top-nav">
-      <div class="wordmark">lil' bird</div>
+      <a class="wordmark" href="/">lil' bird</a>
       <div class="nav-user">
-        <span id="nav-user-name"></span>
-        <span class="avatar"><i class="ti ti-user"></i></span>
+        <span id="nav-user-name" class="nav-user-name"></span>
+        <span class="avatar" aria-hidden="true"><i class="ti ti-user"></i></span>
+        <button id="btn-logout" class="btn btn-outline btn-logout" type="button">Log out</button>
       </div>
     </nav>
 
     <main class="dash-wrap">
+      <p id="dash-error" class="dash-error hidden" role="alert"></p>
+      <div id="dash-loading" class="dash-loading hidden">Loading your Nest…</div>
       <section class="tabs-row">
         <button id="tab-products" class="dash-tab active" type="button"><i class="ti ti-layout-grid"></i> My products</button>
         <button id="tab-profile" class="dash-tab" type="button">
@@ -73,7 +76,7 @@
         <ul id="next-steps-list" class="steps-list"></ul>
       </section>
 
-      <div class="dash-grid">
+      <div id="dash-grid" class="dash-grid">
         <section class="main-col">
           <div id="pane-products" class="tab-pane active"></div>
           <div id="pane-profile" class="tab-pane"></div>
@@ -114,6 +117,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="./nest-client.js"></script>
+  <script src="./nest-client.js?v=2"></script>
 </body>
 </html>

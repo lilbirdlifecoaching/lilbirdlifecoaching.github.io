@@ -106,8 +106,25 @@
     }
   }
 
+  function setDashError(message) {
+    const el = document.getElementById('dash-error');
+    if (!message) {
+      el.textContent = '';
+      el.classList.add('hidden');
+      return;
+    }
+    el.textContent = message;
+    el.classList.remove('hidden');
+  }
+
+  function setDashLoading(isLoading) {
+    document.getElementById('dash-loading').classList.toggle('hidden', !isLoading);
+  }
+
   async function hydrateDashboard() {
     const uid = currentUser.id;
+    setDashError('');
+    setDashLoading(true);
 
     const [entRes, courseRes, progressRes, linkRes] = await Promise.all([
       sb.from('user_entitlements').select('product,active').eq('user_id', uid).eq('active', true),
@@ -115,6 +132,14 @@
       sb.from('session_progress').select('*').eq('user_id', uid).order('session_number'),
       sb.from('deep_profile_links').select('nest_id').eq('user_id', uid).maybeSingle()
     ]);
+
+    setDashLoading(false);
+
+    if (entRes.error) {
+      setDashError(
+        'Could not load your product access yet. If this is your first setup, confirm the user_entitlements table exists in Supabase.'
+      );
+    }
 
     entitlements = new Set((entRes.data || []).map((r) => r.product));
     courseProfile = courseRes.data || null;
@@ -347,9 +372,24 @@
   // tabs
   function setTab(name) {
     document.querySelectorAll('.dash-tab').forEach((el) => el.classList.remove('active'));
-    document.querySelectorAll('.tab-pane').forEach((el) => el.classList.remove('active'));
+    document.querySelectorAll('#view-dashboard .tab-pane').forEach((el) => el.classList.remove('active'));
     document.getElementById(`tab-${name}`).classList.add('active');
     document.getElementById(`pane-${name}`).classList.add('active');
+    document.getElementById('dash-grid').classList.toggle('is-ask-tab', name === 'ask');
+  }
+
+  function resetDashboardUi() {
+    setTab('products');
+    setDashError('');
+    setDashLoading(false);
+    chatMsgs = [];
+    const chatWrap = document.getElementById('chat-messages');
+    if (chatWrap) chatWrap.innerHTML = '';
+    document.getElementById('pane-products').innerHTML = '';
+    document.getElementById('pane-profile').innerHTML = '';
+    document.getElementById('sidebar-context-card').innerHTML = '';
+    document.getElementById('next-steps-list').innerHTML = '';
+    document.getElementById('nav-user-name').textContent = '';
   }
   document.getElementById('tab-products').addEventListener('click', () => setTab('products'));
   document.getElementById('tab-profile').addEventListener('click', () => setTab('profile'));
@@ -403,15 +443,26 @@
     }
   }
 
+  document.getElementById('btn-logout').addEventListener('click', async () => {
+    const btn = document.getElementById('btn-logout');
+    btn.disabled = true;
+    btn.textContent = 'Logging out…';
+    await sb.auth.signOut();
+    btn.disabled = false;
+    btn.textContent = 'Log out';
+  });
+
   async function showDashboard(session) {
     currentUser = session.user;
     document.getElementById('view-auth').classList.remove('active');
     document.getElementById('view-dashboard').classList.add('active');
+    setTab('products');
     await hydrateDashboard();
   }
 
   function showAuth() {
     currentUser = null;
+    resetDashboardUi();
     document.getElementById('view-dashboard').classList.remove('active');
     document.getElementById('view-auth').classList.add('active');
   }
