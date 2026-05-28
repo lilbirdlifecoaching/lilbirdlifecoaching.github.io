@@ -26,26 +26,24 @@
   let chatMsgs = [];
   let suppressDashboard = false;
 
-  const HELLO_EMAIL = 'hello@lilbird.life';
-  const HELLO_AUTH_USER_ID = '4ac3081b-0b78-4786-8b01-586259415a5c';
-
   function clearAllSupabaseAuthStorage() {
-    const keys = [];
+    const shouldRemove = (key) =>
+      key.includes('lilbird') ||
+      key.includes('supabase') ||
+      key.startsWith('sb-') ||
+      key.includes('mebqqzbuwkogdxvnihrq');
+
     try {
-      for (let i = 0; i < localStorage.length; i++) {
+      for (let i = localStorage.length - 1; i >= 0; i--) {
         const key = localStorage.key(i);
-        if (!key) continue;
-        if (
-          key === 'lilbird-nest-auth' ||
-          key === 'lilbird-solo-auth' ||
-          key.startsWith('sb-mebqqzbuwkogdxvnihrq-auth-token')
-        ) {
-          keys.push(key);
-        }
+        if (key && shouldRemove(key)) localStorage.removeItem(key);
       }
-      keys.forEach((key) => localStorage.removeItem(key));
+      for (let i = sessionStorage.length - 1; i >= 0; i--) {
+        const key = sessionStorage.key(i);
+        if (key && shouldRemove(key)) sessionStorage.removeItem(key);
+      }
     } catch (e) {
-      console.warn('Nest localStorage clear:', e);
+      console.warn('Nest storage clear:', e);
     }
   }
 
@@ -71,17 +69,11 @@
       ' entitlement(s) loaded for this id';
 
     el.classList.remove('warn');
-    if (email === HELLO_EMAIL && id !== HELLO_AUTH_USER_ID) {
+    if (entitlementCount === 0) {
       el.classList.add('warn');
       text +=
-        ' · MISMATCH: hello@lilbird.life should be user ' +
-        HELLO_AUTH_USER_ID +
-        '. You are on a stale test session (' +
-        id +
-        '). Click Log out, then log in again.';
-    } else if (entitlementCount === 0) {
-      el.classList.add('warn');
-      text += ' · No entitlements found for this user id in Supabase.';
+        ' · No entitlements for this user id. In Supabase, grant rows in user_entitlements where user_id = ' +
+        id;
     }
 
     el.textContent = text;
@@ -137,7 +129,12 @@
     const email = document.getElementById('login-email').value.trim().toLowerCase();
     const password = document.getElementById('login-password').value;
 
-    // Prevent stale cached sessions (e.g. old b987 test user) from surviving login.
+    clearAllSupabaseAuthStorage();
+    try {
+      await sb.auth.signOut({ scope: 'global' });
+    } catch (e) {
+      /* ignore */
+    }
     clearAllSupabaseAuthStorage();
 
     const { data, error } = await sb.auth.signInWithPassword({ email, password });
@@ -153,7 +150,9 @@
       return;
     }
 
-    loginError.textContent = '';
+    loginError.textContent =
+      'Logged in as ' + signedInEmail + ' · Supabase user id: ' + data.user.id;
+    loginError.style.color = '#9dbf8a';
   });
 
   document.getElementById('btn-forgot').addEventListener('click', async () => {
