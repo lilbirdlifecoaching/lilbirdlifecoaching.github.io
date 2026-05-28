@@ -88,8 +88,10 @@
   .nav-logo { display: flex; align-items: center; gap: 0.65rem; text-decoration: none; }
   .nav-bird { width: 36px; height: 36px; border-radius: 8px; }
   .nav-wordmark { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.1rem; color: var(--gold); }
+  .nav-actions { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; justify-content: flex-end; }
   .nav-back { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold-dim); text-decoration: none; transition: color 0.2s; }
   .nav-back:hover { color: var(--gold); }
+  .nav-back-nest { color: var(--gold); border: 1px solid rgba(245,200,66,0.25); border-radius: 100px; padding: 0.35rem 0.75rem; }
 
   .progress-bar-wrap { position: fixed; top: 0; left: 0; right: 0; z-index: 200; background: rgba(30,32,40,0.92); }
   .progress-bar-fill { height: 3px; background: linear-gradient(to right, var(--gold), var(--ember)); transition: width 0.6s ease; }
@@ -1721,7 +1723,10 @@
     <img src="bird-logo.png" alt="lil' bird" class="nav-bird">
     <span class="nav-wordmark">lil' bird</span>
   </a>
-  <a href="index.html" class="nav-back">← back to home</a>
+  <div class="nav-actions">
+    <a href="/nest/" class="nav-back nav-back-nest" id="nav-back-nest" hidden>← back to your Nest</a>
+    <a href="https://lilbird.life/" class="nav-back">← back to home</a>
+  </div>
 </nav>
 
 <div class="progress-bar-wrap">
@@ -2133,7 +2138,7 @@
       <p class="offer-codes-title">🎁 your discount codes — save these</p>
       <div class="offer-item">
         <span class="offer-code">IMREADY</span>
-        <p class="offer-desc">25% off your first <a href="https://calendly.com/lilbirdlifecoaching/first-flight-session" target="_blank">First Flight coaching session →</a></p>
+        <p class="offer-desc">Fixed price $149 for your first <a href="https://calendly.com/lilbirdlifecoaching/first-flight-session" target="_blank">First Flight coaching session →</a></p>
       </div>
       <div class="offer-item">
         <span class="offer-code">SOLO50</span>
@@ -2401,7 +2406,7 @@
           <p class="sidebar-card-eyebrow" style="color:var(--ember);">ready to go deeper?</p>
           <h3 class="sidebar-card-title">Book a First Flight</h3>
           <p class="sidebar-card-body">A one-to-one session with Luke that takes everything in your read and turns it into a real conversation — and a real next step.</p>
-          <p class="sidebar-code">Use code <strong>IMREADY</strong> for 25% off</p>
+          <p class="sidebar-code">Use code <strong>IMREADY</strong> for a fixed price of $149</p>
           <a href="https://calendly.com/lilbirdlifecoaching/first-flight-session" target="_blank" class="btn btn-gold" style="width:100%;justify-content:center;margin-top:1rem;">Book now →</a>
         </div>
 
@@ -2437,6 +2442,16 @@
   <p>lil' bird life coaching · <a href="index.html">lilbird.life</a> · <a href="mailto:hello@lilbird.life">hello@lilbird.life</a> · <a href="privacy.html">Privacy</a> · <a href="mailto:hello@lilbird.life" id="footer-feedback-link">Site feedback</a></p>
 </footer>
 
+<script src="/lilbird-auth-bridge.js"></script>
+<script>
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('from') === 'nest' || document.referrer.indexOf('/nest') !== -1) {
+    var nestLink = document.getElementById('nav-back-nest');
+    if (nestLink) nestLink.hidden = false;
+  }
+})();
+</script>
 <script>
 (function () {
   const a = document.getElementById('footer-feedback-link');
@@ -2729,7 +2744,7 @@ async function processPayment(){
   try{
     // Handle 100% promo — skip Stripe entirely
     if(promoApplied && promoDiscount >= 1.0){
-      if(SHEETS_URL && profileData) logToSheet(profileData, 0, collectResponses(), 'promo');
+      if(SHEETS_URL && profileData) logToSheet({ event: 'promo_unlock', email: emailVal, paid: 'yes', amount: 0, promoCode: 'promo' });
       try{
         // Store profile in KV first so Nest link works
         await fetch(`${WORKER_URL}/store-profile`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nestId,profile:profileData,canvasScores,canvasHistory:[],assessmentMode: assessmentPath === 'know' ? 'know-type' : 'full',peakPlunge: peakPlungeData,pairTheseLog})});
@@ -2759,8 +2774,7 @@ async function processPayment(){
     if(error) throw new Error(error.message);
     if(paymentIntent.status!=='succeeded') throw new Error('Payment did not complete. Please try again.');
 
-    // Log to Sheet
-    if(SHEETS_URL && profileData) logToSheet(profileData,selectedAmount,collectResponses());
+    if(SHEETS_URL && profileData) logToSheet({ event: 'paid', email: emailVal, paid: 'yes', amount: selectedAmount });
 
     // Send profile email + mark as paid in KV
     try{
@@ -3075,9 +3089,6 @@ async function runAnalysis(){
     renderCanvasResults(canvasScores, '');
   }
 
-  // Log completion to Sheet immediately — amount 0 means they completed but haven't paid yet
-  if(SHEETS_URL && profileData) logToSheet(profileData, 0, collectResponses());
-
   goTo('screen-snapshot');
 }
 
@@ -3176,6 +3187,9 @@ async function submitEmail(){
       console.warn('Beehiiv subscribe did not succeed:', subRes.status, subJson);
     }
   }catch(e){ console.warn('Beehiiv request failed:', e); }
+
+  // Registry row for nest recovery (email + nestId only — no assessment answers)
+  logToSheet({ event: 'email_captured', email });
 
   // Hide gate, reveal snapshot content
   const gate    = document.getElementById('email-gate');
@@ -3803,31 +3817,53 @@ function setSection(id,content){
 }
 
 // ═══════════════════════════════════════
-// SHEETS LOGGING
+// SHEETS LOGGING — nest recovery registry (privacy-minimal)
+// Records: email, nestId, nest link, Life Canvas scores, payment status, type summary.
+// Does NOT log chat answers, canvas free-text, or full response payloads.
 // ═══════════════════════════════════════
-function logToSheet(profile,amount,responses,promoCode=''){
+function logToSheet(opts){
   if(!SHEETS_URL) return;
+  opts = opts || {};
+  const emailVal = (opts.email || userEmail || '').trim();
+  const id = opts.nestId || nestId || '';
   const codeEl = document.getElementById('promo-code');
-  const usedCode = promoCode || (codeEl ? codeEl.value.trim().toUpperCase() : '');
-  fetch(SHEETS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({
-    nestId,
-    timestamp:new Date().toISOString(),
-    archetype:profile.archetype||'',
-    mbti:profile.mbti||'',
-    enneagram:profile.enneagram||'',
-    likelyCoreMbti:profile.likelyCoreMbti||'',
-    likelyCoreEnneagram:profile.likelyCoreEnneagram||'',
-    attachment:profile.attachment||'',
-    amount:amount||0,
-    paid: amount > 0 || promoCode ? 'yes' : 'no',
-    promoCode: usedCode,
-    canvasWhy:   responses?.canvasScores?.why   || '',
-    canvasWho:   responses?.canvasScores?.who   || '',
-    canvasWhere: responses?.canvasScores?.where || '',
-    canvasWhat:  responses?.canvasScores?.what  || '',
-    canvasHow:   responses?.canvasScores?.how   || '',
-    answers:responses?JSON.stringify(responses):''
-  })}).catch(()=>{});
+  const usedCode = opts.promoCode || (codeEl ? codeEl.value.trim().toUpperCase() : '');
+  const amt = typeof opts.amount === 'number' ? opts.amount : 0;
+  const paidFlag = opts.paid || (amt > 0 || usedCode ? 'yes' : 'no');
+  const p = profileData || {};
+  const cs = opts.canvasScores || canvasScores || {};
+  const canvasDims = ['why', 'who', 'where', 'what', 'how'];
+  const canvasVals = canvasDims.map((k) => (typeof cs[k] === 'number' ? cs[k] : parseInt(cs[k], 10))).filter((n) => !Number.isNaN(n));
+  const canvasOverall = canvasVals.length
+    ? Math.round(canvasVals.reduce((s, n) => s + n, 0) / canvasVals.length)
+    : '';
+
+  fetch(SHEETS_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      nestId: id,
+      email: emailVal,
+      nestLink: id ? `https://lilbird.life/deep-profile.html?nest=${id}` : '',
+      timestamp: new Date().toISOString(),
+      event: opts.event || 'log',
+      paid: paidFlag,
+      amount: amt,
+      promoCode: usedCode,
+      canvasWhy: cs.why ?? '',
+      canvasWho: cs.who ?? '',
+      canvasWhere: cs.where ?? '',
+      canvasWhat: cs.what ?? '',
+      canvasHow: cs.how ?? '',
+      canvasOverall: canvasOverall,
+      archetype: p.archetypePlain || p.archetype || '',
+      mbti: p.mbti || '',
+      enneagram: p.enneagram || '',
+      likelyCoreMbti: p.likelyCoreMbti || '',
+      likelyCoreEnneagram: p.likelyCoreEnneagram || '',
+    }),
+  }).catch(() => {});
 }
 
 // ═══════════════════════════════════════
