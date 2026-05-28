@@ -373,9 +373,12 @@
   function setTab(name) {
     document.querySelectorAll('.dash-tab').forEach((el) => el.classList.remove('active'));
     document.querySelectorAll('#view-dashboard .tab-pane').forEach((el) => el.classList.remove('active'));
-    document.getElementById(`tab-${name}`).classList.add('active');
-    document.getElementById(`pane-${name}`).classList.add('active');
-    document.getElementById('dash-grid').classList.toggle('is-ask-tab', name === 'ask');
+    const tab = document.getElementById(`tab-${name}`);
+    const pane = document.getElementById(`pane-${name}`);
+    if (tab) tab.classList.add('active');
+    if (pane) pane.classList.add('active');
+    const dashGrid = document.getElementById('dash-grid');
+    if (dashGrid) dashGrid.classList.toggle('is-ask-tab', name === 'ask');
   }
 
   function resetDashboardUi() {
@@ -391,10 +394,14 @@
     document.getElementById('next-steps-list').innerHTML = '';
     document.getElementById('nav-user-name').textContent = '';
   }
-  document.getElementById('tab-products').addEventListener('click', () => setTab('products'));
-  document.getElementById('tab-profile').addEventListener('click', () => setTab('profile'));
-  document.getElementById('tab-ask').addEventListener('click', () => setTab('ask'));
-  document.getElementById('btn-open-ask').addEventListener('click', () => setTab('ask'));
+  const tabProducts = document.getElementById('tab-products');
+  const tabProfile = document.getElementById('tab-profile');
+  const tabAsk = document.getElementById('tab-ask');
+  const btnOpenAsk = document.getElementById('btn-open-ask');
+  if (tabProducts) tabProducts.addEventListener('click', () => setTab('products'));
+  if (tabProfile) tabProfile.addEventListener('click', () => setTab('profile'));
+  if (tabAsk) tabAsk.addEventListener('click', () => setTab('ask'));
+  if (btnOpenAsk) btnOpenAsk.addEventListener('click', () => setTab('ask'));
 
   // chat
   function renderChatMsg(role, content) {
@@ -411,15 +418,19 @@
     chatMsgs.push({ role: 'assistant', content: greet });
     renderChatMsg('assistant', greet);
   }
-  document.getElementById('tab-ask').addEventListener('click', bootChat);
-  document.getElementById('btn-open-ask').addEventListener('click', bootChat);
-  document.getElementById('chat-send').addEventListener('click', sendChat);
-  document.getElementById('chat-input').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendChat();
-    }
-  });
+  if (tabAsk) tabAsk.addEventListener('click', bootChat);
+  if (btnOpenAsk) btnOpenAsk.addEventListener('click', bootChat);
+  const chatSend = document.getElementById('chat-send');
+  const chatInput = document.getElementById('chat-input');
+  if (chatSend) chatSend.addEventListener('click', sendChat);
+  if (chatInput) {
+    chatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendChat();
+      }
+    });
+  }
 
   async function sendChat() {
     const input = document.getElementById('chat-input');
@@ -443,14 +454,16 @@
     }
   }
 
-  document.getElementById('btn-logout').addEventListener('click', async () => {
-    const btn = document.getElementById('btn-logout');
-    btn.disabled = true;
-    btn.textContent = 'Logging out…';
-    await sb.auth.signOut();
-    btn.disabled = false;
-    btn.textContent = 'Log out';
-  });
+  const btnLogout = document.getElementById('btn-logout');
+  if (btnLogout) {
+    btnLogout.addEventListener('click', async () => {
+      btnLogout.disabled = true;
+      btnLogout.textContent = 'Logging out...';
+      await sb.auth.signOut();
+      btnLogout.disabled = false;
+      btnLogout.textContent = 'Log out';
+    });
+  }
 
   async function showDashboard(session) {
     currentUser = session.user;
