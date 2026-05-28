@@ -126,33 +126,40 @@
   formLogin.addEventListener('submit', async (e) => {
     e.preventDefault();
     loginError.textContent = '';
+    loginError.style.color = '';
+    const btnLogin = document.getElementById('btn-login');
     const email = document.getElementById('login-email').value.trim().toLowerCase();
     const password = document.getElementById('login-password').value;
 
-    clearAllSupabaseAuthStorage();
-    try {
-      await sb.auth.signOut({ scope: 'global' });
-    } catch (e) {
-      /* ignore */
+    if (btnLogin) {
+      btnLogin.disabled = true;
+      btnLogin.textContent = 'Logging in...';
     }
-    clearAllSupabaseAuthStorage();
 
     const { data, error } = await sb.auth.signInWithPassword({ email, password });
+
+    if (btnLogin) {
+      btnLogin.disabled = false;
+      btnLogin.textContent = 'Log in →';
+    }
+
     if (error) {
       loginError.textContent = error.message || 'Could not log in.';
       return;
     }
 
-    const signedInEmail = (data.user?.email || '').toLowerCase();
-    if (!data.user || signedInEmail !== email) {
-      loginError.textContent = 'Login did not match the email entered. Please try again.';
-      await forceLogout();
+    if (!data.session?.user) {
+      loginError.textContent =
+        'Account needs email confirmation before login. Check your inbox, then try again.';
       return;
     }
 
-    loginError.textContent =
-      'Logged in as ' + signedInEmail + ' · Supabase user id: ' + data.user.id;
-    loginError.style.color = '#9dbf8a';
+    try {
+      await showDashboard(data.session.user);
+    } catch (err) {
+      console.error('Nest showDashboard after login:', err);
+      loginError.textContent = 'Logged in, but dashboard failed to load. Please refresh once.';
+    }
   });
 
   document.getElementById('btn-forgot').addEventListener('click', async () => {
@@ -569,12 +576,16 @@
     }
   }
 
-  async function showDashboard() {
+  async function showDashboard(preloadedUser) {
     if (suppressDashboard) return;
 
-    const { user, error } = await getVerifiedUser();
-    if (error || !user) {
-      await forceLogout();
+    let user = preloadedUser || null;
+    if (!user) {
+      const { data: sessionData } = await sb.auth.getSession();
+      user = sessionData.session?.user || null;
+    }
+    if (!user) {
+      showAuth();
       return;
     }
 
