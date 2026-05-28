@@ -24,6 +24,41 @@
   let deepProfile = null;
   let deepNestId = null;
   let chatMsgs = [];
+  let suppressDashboard = false;
+
+  function clearNestSessionStorage() {
+    try {
+      localStorage.removeItem('lilbird-nest-auth');
+    } catch (e) {
+      console.warn('Nest localStorage clear:', e);
+    }
+  }
+
+  function resetLogoutButton() {
+    const btnLogout = document.getElementById('btn-logout');
+    if (!btnLogout) return;
+    btnLogout.disabled = false;
+    btnLogout.textContent = 'Log out';
+  }
+
+  function showAuthViewNow() {
+    currentUser = null;
+    const dash = document.getElementById('view-dashboard');
+    const auth = document.getElementById('view-auth');
+    const loading = document.getElementById('dash-loading');
+    if (dash) dash.classList.remove('active');
+    if (auth) auth.classList.add('active');
+    if (loading) loading.classList.add('hidden');
+    resetLogoutButton();
+  }
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const wantsLogout = urlParams.get('logout') === '1';
+  if (wantsLogout) {
+    suppressDashboard = true;
+    clearNestSessionStorage();
+    showAuthViewNow();
+  }
 
   // auth tabs
   const tabLogin = document.getElementById('tab-login');
@@ -126,47 +161,51 @@
     setDashError('');
     setDashLoading(true);
 
-    const [entRes, courseRes, progressRes, linkRes] = await Promise.all([
-      sb.from('user_entitlements').select('product,active').eq('user_id', uid).eq('active', true),
-      sb.from('course_users').select('*').eq('id', uid).maybeSingle(),
-      sb.from('session_progress').select('*').eq('user_id', uid).order('session_number'),
-      sb.from('deep_profile_links').select('nest_id').eq('user_id', uid).maybeSingle()
-    ]);
+    try {
+      const [entRes, courseRes, progressRes, linkRes] = await Promise.all([
+        sb.from('user_entitlements').select('product,active').eq('user_id', uid).eq('active', true),
+        sb.from('course_users').select('*').eq('id', uid).maybeSingle(),
+        sb.from('session_progress').select('*').eq('user_id', uid).order('session_number'),
+        sb.from('deep_profile_links').select('nest_id').eq('user_id', uid).maybeSingle()
+      ]);
 
-    setDashLoading(false);
-
-    if (entRes.error) {
-      setDashError(
-        'Could not load your product access yet. If this is your first setup, confirm the user_entitlements table exists in Supabase.'
-      );
-    }
-
-    entitlements = new Set((entRes.data || []).map((r) => r.product));
-    courseProfile = courseRes.data || null;
-    sessionProgress = progressRes.data || [];
-    deepNestId = linkRes.data?.nest_id || null;
-    deepProfile = null;
-
-    if (deepNestId) {
-      try {
-        const res = await fetch(ASSESSMENT_WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(deepNestId));
-        if (res.ok) {
-          const payload = await res.json();
-          deepProfile = payload?.profile || null;
-        }
-      } catch (e) {
-        console.error('Could not load deep profile:', e);
+      if (entRes.error) {
+        const detail = entRes.error.message || entRes.error.code || 'unknown error';
+        setDashError(
+          'Could not load your product access (' + detail + '). In Supabase, confirm user_entitlements exists and RLS select policy allows authenticated users.'
+        );
+        console.error('user_entitlements query failed:', entRes.error);
       }
+
+      entitlements = new Set((entRes.data || []).map((r) => r.product));
+      courseProfile = courseRes.data || null;
+      sessionProgress = progressRes.data || [];
+      deepNestId = linkRes.data?.nest_id || null;
+      deepProfile = null;
+
+      if (deepNestId) {
+        try {
+          const res = await fetch(ASSESSMENT_WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(deepNestId));
+          if (res.ok) {
+            const payload = await res.json();
+            deepProfile = payload?.profile || null;
+          }
+        } catch (e) {
+          console.error('Could not load deep profile:', e);
+        }
+      }
+
+      document.getElementById('nav-user-name').textContent =
+        courseProfile?.full_name || currentUser.user_metadata?.full_name || currentUser.email;
+
+      document.getElementById('profile-dot').classList.toggle('hidden', !deepProfile);
+      renderNextSteps();
+      renderProducts();
+      renderProfile();
+      renderSidebar();
+    } finally {
+      setDashLoading(false);
     }
-
-    document.getElementById('nav-user-name').textContent =
-      courseProfile?.full_name || currentUser.user_metadata?.full_name || currentUser.email;
-
-    document.getElementById('profile-dot').classList.toggle('hidden', !deepProfile);
-    renderNextSteps();
-    renderProducts();
-    renderProfile();
-    renderSidebar();
   }
 
   function renderNextSteps() {
@@ -454,18 +493,8 @@
     }
   }
 
-  const btnLogout = document.getElementById('btn-logout');
-  if (btnLogout) {
-    btnLogout.addEventListener('click', async () => {
-      btnLogout.disabled = true;
-      btnLogout.textContent = 'Logging out...';
-      await sb.auth.signOut();
-      btnLogout.disabled = false;
-      btnLogout.textContent = 'Log out';
-    });
-  }
-
   async function showDashboard(session) {
+    if (suppressDashboard) return;
     currentUser = session.user;
     document.getElementById('view-auth').classList.remove('active');
     document.getElementById('view-dashboard').classList.add('active');
@@ -476,18 +505,73 @@
   function showAuth() {
     currentUser = null;
     resetDashboardUi();
-    document.getElementById('view-dashboard').classList.remove('active');
-    document.getElementById('view-auth').classList.add('active');
+    showAuthViewNow();
+  }
+
+  async function forceLogout() {
+    suppressDashboard = true;
+    clearNestSessionStorage();
+    showAuthViewNow();
+    resetDashboardUi();
+    try {
+      await sb.auth.signOut({ scope: 'local' });
+    } catch (e) {
+      console.warn('Nest signOut:', e);
+    }
+    suppressDashboard = false;
+    showAuth();
+  }
+
+  const btnLogout = document.getElementById('btn-logout');
+  if (btnLogout) {
+    btnLogout.addEventListener('click', async () => {
+      btnLogout.disabled = true;
+      btnLogout.textContent = 'Logging out...';
+      try {
+        await forceLogout();
+      } finally {
+        resetLogoutButton();
+      }
+    });
   }
 
   sb.auth.onAuthStateChange(async (_evt, session) => {
+    if (suppressDashboard) {
+      if (!session?.user) suppressDashboard = false;
+      return;
+    }
     if (session?.user) await showDashboard(session);
     else showAuth();
   });
 
   (async function init() {
+    if (wantsLogout) {
+      try {
+        await sb.auth.signOut({ scope: 'local' });
+      } catch (e) {
+        console.warn('Nest signOut:', e);
+      }
+      clearNestSessionStorage();
+      showAuthViewNow();
+      suppressDashboard = false;
+      try {
+        window.history.replaceState({}, '', window.location.pathname);
+      } catch (e) {}
+      return;
+    }
+
     const { data } = await sb.auth.getSession();
-    if (data.session?.user) await showDashboard(data.session);
-    else showAuth();
+    if (!data.session?.user) {
+      showAuth();
+      return;
+    }
+
+    const { data: userData, error: userError } = await sb.auth.getUser();
+    if (userError || !userData.user) {
+      await forceLogout();
+      return;
+    }
+
+    await showDashboard({ user: userData.user, ...data.session });
   })();
 })();
