@@ -26,12 +26,66 @@
   let chatMsgs = [];
   let suppressDashboard = false;
 
-  function clearNestSessionStorage() {
+  const HELLO_EMAIL = 'hello@lilbird.life';
+  const HELLO_AUTH_USER_ID = '4ac3081b-0b78-4786-8b01-586259415a5c';
+
+  function clearAllSupabaseAuthStorage() {
+    const keys = [];
     try {
-      localStorage.removeItem('lilbird-nest-auth');
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key) continue;
+        if (
+          key === 'lilbird-nest-auth' ||
+          key === 'lilbird-solo-auth' ||
+          key.startsWith('sb-mebqqzbuwkogdxvnihrq-auth-token')
+        ) {
+          keys.push(key);
+        }
+      }
+      keys.forEach((key) => localStorage.removeItem(key));
     } catch (e) {
       console.warn('Nest localStorage clear:', e);
     }
+  }
+
+  async function getVerifiedUser() {
+    const { data, error } = await sb.auth.getUser();
+    if (error || !data.user) return { user: null, error };
+    return { user: data.user, error: null };
+  }
+
+  function showSessionInfo(user, entitlementCount) {
+    const el = document.getElementById('dash-session-info');
+    if (!el || !user) return;
+
+    const email = (user.email || '').toLowerCase();
+    const id = user.id || '';
+    let text =
+      'Signed in as ' +
+      (user.email || '(no email)') +
+      ' · user id ' +
+      id +
+      ' · ' +
+      entitlementCount +
+      ' entitlement(s) loaded for this id';
+
+    el.classList.remove('warn');
+    if (email === HELLO_EMAIL && id !== HELLO_AUTH_USER_ID) {
+      el.classList.add('warn');
+      text +=
+        ' · MISMATCH: hello@lilbird.life should be user ' +
+        HELLO_AUTH_USER_ID +
+        '. You are on a stale test session (' +
+        id +
+        '). Click Log out, then log in again.';
+    } else if (entitlementCount === 0) {
+      el.classList.add('warn');
+      text += ' · No entitlements found for this user id in Supabase.';
+    }
+
+    el.textContent = text;
+    el.classList.remove('hidden');
   }
 
   function resetLogoutButton() {
@@ -56,7 +110,7 @@
   const wantsLogout = urlParams.get('logout') === '1';
   if (wantsLogout) {
     suppressDashboard = true;
-    clearNestSessionStorage();
+    clearAllSupabaseAuthStorage();
     showAuthViewNow();
   }
 
@@ -80,10 +134,26 @@
   formLogin.addEventListener('submit', async (e) => {
     e.preventDefault();
     loginError.textContent = '';
-    const email = document.getElementById('login-email').value.trim();
+    const email = document.getElementById('login-email').value.trim().toLowerCase();
     const password = document.getElementById('login-password').value;
-    const { error } = await sb.auth.signInWithPassword({ email, password });
-    if (error) loginError.textContent = error.message || 'Could not log in.';
+
+    // Prevent stale cached sessions (e.g. old b987 test user) from surviving login.
+    clearAllSupabaseAuthStorage();
+
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) {
+      loginError.textContent = error.message || 'Could not log in.';
+      return;
+    }
+
+    const signedInEmail = (data.user?.email || '').toLowerCase();
+    if (!data.user || signedInEmail !== email) {
+      loginError.textContent = 'Login did not match the email entered. Please try again.';
+      await forceLogout();
+      return;
+    }
+
+    loginError.textContent = '';
   });
 
   document.getElementById('btn-forgot').addEventListener('click', async () => {
@@ -203,6 +273,7 @@
       renderProducts();
       renderProfile();
       renderSidebar();
+      showSessionInfo(currentUser, entitlements.size);
     } finally {
       setDashLoading(false);
     }
@@ -432,6 +503,12 @@
     document.getElementById('sidebar-context-card').innerHTML = '';
     document.getElementById('next-steps-list').innerHTML = '';
     document.getElementById('nav-user-name').textContent = '';
+    const sess = document.getElementById('dash-session-info');
+    if (sess) {
+      sess.textContent = '';
+      sess.classList.add('hidden');
+      sess.classList.remove('warn');
+    }
   }
   const tabProducts = document.getElementById('tab-products');
   const tabProfile = document.getElementById('tab-profile');
@@ -493,9 +570,16 @@
     }
   }
 
-  async function showDashboard(session) {
+  async function showDashboard() {
     if (suppressDashboard) return;
-    currentUser = session.user;
+
+    const { user, error } = await getVerifiedUser();
+    if (error || !user) {
+      await forceLogout();
+      return;
+    }
+
+    currentUser = user;
     document.getElementById('view-auth').classList.remove('active');
     document.getElementById('view-dashboard').classList.add('active');
     setTab('products');
@@ -510,7 +594,7 @@
 
   async function forceLogout() {
     suppressDashboard = true;
-    clearNestSessionStorage();
+    clearAllSupabaseAuthStorage();
     showAuthViewNow();
     resetDashboardUi();
     try {
@@ -518,6 +602,7 @@
     } catch (e) {
       console.warn('Nest signOut:', e);
     }
+    clearAllSupabaseAuthStorage();
     suppressDashboard = false;
     showAuth();
   }
@@ -540,7 +625,7 @@
       if (!session?.user) suppressDashboard = false;
       return;
     }
-    if (session?.user) await showDashboard(session);
+    if (session?.user) await showDashboard();
     else showAuth();
   });
 
@@ -551,7 +636,7 @@
       } catch (e) {
         console.warn('Nest signOut:', e);
       }
-      clearNestSessionStorage();
+      clearAllSupabaseAuthStorage();
       showAuthViewNow();
       suppressDashboard = false;
       try {
@@ -566,12 +651,6 @@
       return;
     }
 
-    const { data: userData, error: userError } = await sb.auth.getUser();
-    if (userError || !userData.user) {
-      await forceLogout();
-      return;
-    }
-
-    await showDashboard({ user: userData.user, ...data.session });
+    await showDashboard();
   })();
 })();
