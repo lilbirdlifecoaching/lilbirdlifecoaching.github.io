@@ -239,6 +239,10 @@ body.nest-page { line-height: 1.5; }
   padding: 0.18rem 0.52rem;
   margin-bottom: 0.5rem;
 }
+.status-badge.pending {
+  border-color: rgba(245,200,66,0.35);
+  color: var(--gold-dim);
+}
 .locked {
   background: var(--dark-mid);
   border: 1px solid rgba(245,200,66,0.07);

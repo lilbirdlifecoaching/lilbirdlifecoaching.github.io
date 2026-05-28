@@ -8,9 +8,10 @@
   const NEST_WELCOME_EMAIL_ENDPOINT = '';
 
   const { createClient } = supabase;
+  const AUTH_STORAGE_KEY = 'lilbird-solo-auth';
   const sb = createClient(SUPABASE_URL, SUPABASE_ANON, {
     auth: {
-      storageKey: 'lilbird-nest-auth',
+      storageKey: AUTH_STORAGE_KEY,
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: false
@@ -25,6 +26,15 @@
   let deepNestId = null;
   let chatMsgs = [];
   let suppressDashboard = false;
+
+  let loginInFlight = false;
+
+  function resetLoginButton() {
+    const btnLogin = document.getElementById('btn-login');
+    if (!btnLogin) return;
+    btnLogin.disabled = false;
+    btnLogin.textContent = 'Log in →';
+  }
 
   function clearAllSupabaseAuthStorage() {
     const shouldRemove = (key) =>
@@ -127,38 +137,37 @@
     e.preventDefault();
     loginError.textContent = '';
     loginError.style.color = '';
-    const btnLogin = document.getElementById('btn-login');
     const email = document.getElementById('login-email').value.trim().toLowerCase();
     const password = document.getElementById('login-password').value;
 
+    loginInFlight = true;
+    const btnLogin = document.getElementById('btn-login');
     if (btnLogin) {
       btnLogin.disabled = true;
       btnLogin.textContent = 'Logging in...';
     }
 
-    const { data, error } = await sb.auth.signInWithPassword({ email, password });
-
-    if (btnLogin) {
-      btnLogin.disabled = false;
-      btnLogin.textContent = 'Log in →';
-    }
-
-    if (error) {
-      loginError.textContent = error.message || 'Could not log in.';
-      return;
-    }
-
-    if (!data.session?.user) {
-      loginError.textContent =
-        'Account needs email confirmation before login. Check your inbox, then try again.';
-      return;
-    }
-
     try {
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        loginError.textContent = error.message || 'Could not log in.';
+        return;
+      }
+
+      if (!data.session?.user) {
+        loginError.textContent =
+          'Account needs email confirmation before login. Check your inbox, then try again.';
+        return;
+      }
+
       await showDashboard(data.session.user);
     } catch (err) {
-      console.error('Nest showDashboard after login:', err);
-      loginError.textContent = 'Logged in, but dashboard failed to load. Please refresh once.';
+      console.error('Nest login:', err);
+      loginError.textContent = 'Something went wrong. Please try again.';
+    } finally {
+      loginInFlight = false;
+      resetLoginButton();
     }
   });
 
@@ -274,7 +283,7 @@
       document.getElementById('nav-user-name').textContent =
         courseProfile?.full_name || currentUser.user_metadata?.full_name || currentUser.email;
 
-      document.getElementById('profile-dot').classList.toggle('hidden', !deepProfile);
+      document.getElementById('profile-dot').classList.toggle('hidden', !hasInnerCompassComplete());
       renderNextSteps();
       renderProducts();
       renderProfile();
@@ -288,19 +297,42 @@
   function renderNextSteps() {
     const steps = [];
     const hasInner = entitlements.has('inner_compass');
+    const innerDone = hasInnerCompassComplete();
     const hasSolo = entitlements.has('solo_course');
     const hasFirstFlight = entitlements.has('first_flight');
     const hasIntensive = entitlements.has('life_change_intensive');
 
-    steps.push({ done: hasInner, text: hasInner ? 'Inner Compass unlocked' : 'Take your Inner Compass assessment' });
+    steps.push({
+      done: innerDone,
+      text: innerDone
+        ? 'Inner Compass completed'
+        : hasInner
+          ? 'Take your Inner Compass assessment'
+          : 'Unlock Inner Compass in your Nest'
+    });
     steps.push({ done: hasSolo || hasFirstFlight || hasIntensive, text: 'Your Nest account is active' });
     steps.push({ done: hasSolo || hasIntensive || hasFirstFlight, text: hasSolo ? 'Continue your Solo journey' : 'Unlock your next product in the Nest' });
-    steps.push({ done: !!deepProfile, text: !!deepProfile ? 'Profile result loaded in My profile' : 'Review your profile in My profile once ready' });
+    steps.push({
+      done: innerDone,
+      text: innerDone ? 'Profile ready in My profile' : 'Complete Inner Compass to fill My profile'
+    });
 
     const ul = document.getElementById('next-steps-list');
     ul.innerHTML = steps
       .map((s) => `<li class="${s.done ? 'done' : ''}">${s.done ? '✓' : '○'} ${escapeHtml(s.text)}</li>`)
       .join('');
+  }
+
+  function hasInnerCompassComplete() {
+    return !!(deepNestId && deepProfile);
+  }
+
+  function innerCompassHref() {
+    const base = '/deep-profile.html?from=nest';
+    if (hasInnerCompassComplete()) {
+      return base + '&nest=' + encodeURIComponent(deepNestId);
+    }
+    return base;
   }
 
   function progressSummary() {
@@ -316,16 +348,29 @@
     const unlocked = entitlements.has(key);
     if (key === 'inner_compass') {
       if (unlocked) {
-        const arch = deepProfile?.archetypePlain || deepProfile?.archetype || 'Inner Compass ready';
-        const mbti = deepProfile?.mbti || deepProfile?.likelyCoreMbti || 'MBTI pending';
-        const enne = deepProfile?.enneagram || deepProfile?.likelyCoreEnneagram || 'Enneagram pending';
+        const done = hasInnerCompassComplete();
+        if (done) {
+          const arch = deepProfile.archetypePlain || deepProfile.archetype || 'Your read';
+          const mbti = deepProfile.mbti || deepProfile.likelyCoreMbti || '';
+          const enne = deepProfile.enneagram || deepProfile.likelyCoreEnneagram || '';
+          const tags = [arch, mbti, enne].filter(Boolean).map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join('');
+          return `
+          <article class="product-card">
+            <p class="eyebrow">assessment</p>
+            <h3>Inner Compass read</h3>
+            <span class="status-badge">complete</span>
+            <div class="tag-row">${tags}</div>
+            <p>Your foundational wiring read is ready to revisit.</p>
+            <div class="btn-row"><a class="btn btn-gold" href="${innerCompassHref()}">View full read →</a></div>
+          </article>`;
+        }
         return `
           <article class="product-card">
             <p class="eyebrow">assessment</p>
             <h3>Inner Compass read</h3>
-            <div class="tag-row"><span class="tag">${escapeHtml(arch)}</span><span class="tag">${escapeHtml(mbti)}</span><span class="tag">${escapeHtml(enne)}</span></div>
-            <p>Your foundational wiring read is available.</p>
-            <div class="btn-row"><a class="btn btn-gold" href="/deep-profile.html${deepNestId ? `?nest=${encodeURIComponent(deepNestId)}` : ''}">View full read →</a></div>
+            <span class="status-badge pending">ready to begin</span>
+            <p>You have access. Take the assessment to generate your personal read.</p>
+            <div class="btn-row"><a class="btn btn-gold" href="${innerCompassHref()}">Take the Inner Compass →</a></div>
           </article>`;
       }
       return `
@@ -334,7 +379,7 @@
           <p class="eyebrow">assessment</p>
           <h3>Inner Compass read</h3>
           <p>Understand your wiring. The foundation everything else builds on.</p>
-          <div class="btn-row"><a class="btn btn-ember" href="/deep-profile.html">Take the Inner Compass →</a></div>
+          <div class="btn-row"><a class="btn btn-ember" href="/deep-profile.html?from=nest">Take the Inner Compass →</a></div>
         </article>`;
     }
 
@@ -425,7 +470,7 @@
 
   function renderProfile() {
     const pane = document.getElementById('pane-profile');
-    if (entitlements.has('inner_compass') && deepProfile) {
+    if (entitlements.has('inner_compass') && hasInnerCompassComplete()) {
       pane.innerHTML = `
         <article class="product-card">
           <p class="eyebrow">my profile</p>
@@ -436,7 +481,16 @@
             <span class="tag">${escapeHtml(deepProfile.attachment || deepProfile.likelyCoreAttachment || 'Attachment')}</span>
           </div>
           <p>Your profile is loaded and ready to revisit.</p>
-          <div class="btn-row"><a class="btn btn-gold" href="/deep-profile.html${deepNestId ? `?nest=${encodeURIComponent(deepNestId)}` : ''}">Open Inner Compass result →</a></div>
+          <div class="btn-row"><a class="btn btn-gold" href="${innerCompassHref()}">Open Inner Compass result →</a></div>
+        </article>`;
+    } else if (entitlements.has('inner_compass')) {
+      pane.innerHTML = `
+        <article class="product-card">
+          <p class="eyebrow">my profile</p>
+          <h3>Inner Compass profile</h3>
+          <span class="status-badge pending">not started</span>
+          <p>You have access. Complete the Inner Compass and your profile will appear here.</p>
+          <div class="btn-row"><a class="btn btn-gold" href="${innerCompassHref()}">Take the Inner Compass →</a></div>
         </article>`;
     } else {
       pane.innerHTML = `
@@ -445,7 +499,7 @@
           <p class="eyebrow">my profile</p>
           <h3>Inner Compass profile</h3>
           <p>Take your Inner Compass read first. Your profile will appear here once unlocked.</p>
-          <div class="btn-row"><a class="btn btn-ember" href="/deep-profile.html">Take the Inner Compass →</a></div>
+          <div class="btn-row"><a class="btn btn-ember" href="/deep-profile.html?from=nest">Take the Inner Compass →</a></div>
         </article>`;
     }
   }
@@ -600,6 +654,7 @@
     currentUser = null;
     resetDashboardUi();
     showAuthViewNow();
+    resetLoginButton();
   }
 
   async function forceLogout() {
@@ -631,7 +686,7 @@
   }
 
   sb.auth.onAuthStateChange(async (_evt, session) => {
-    if (suppressDashboard) {
+    if (suppressDashboard || loginInFlight) {
       if (!session?.user) suppressDashboard = false;
       return;
     }
