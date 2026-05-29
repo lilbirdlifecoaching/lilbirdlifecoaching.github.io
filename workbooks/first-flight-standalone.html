@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>First Flight · lil' bird life coaching</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --dark: #1c1f26;
+    --darker: #161820;
+    --gold: #c9973a;
+    --gold-light: #e8b84b;
+    --cream: #f5f0e8;
+    --cream-dark: #ede6d8;
+    --text-on-dark: #d4cfc8;
+    --muted: #6b6760;
+    --border: rgba(201,151,58,0.25);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--dark);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--darker);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 28px;
+    height: 52px;
+    gap: 0;
+  }
+  .topbar-brand {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: var(--gold);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .topbar-sep {
+    width: 1px;
+    height: 24px;
+    background: rgba(255,255,255,0.08);
+    margin: 0 20px;
+  }
+  .topbar-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: rgba(212,207,200,0.5);
+    white-space: nowrap;
+    text-transform: uppercase;
+  }
+  .topbar-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .topbar-nest {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+    padding: 7px 12px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+  }
+  .topbar-nest:hover { color: var(--gold-light); }
+  .btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 7px 16px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-on-dark);
+  }
+  .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+  .btn-primary {
+    background: var(--gold);
+    border: 1px solid var(--gold);
+    color: var(--dark);
+    font-weight: 500;
+  }
+  .btn-primary:hover { background: var(--gold-light); }
+
+  /* ── COVER ── */
+  .cover {
+    background: var(--dark);
+    padding: 80px 48px 72px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -120px; right: -120px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(201,151,58,0.07) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: 40%;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(201,151,58,0.04) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cover-inner { max-width: 700px; position: relative; }
+  .cover-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 36px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .cover-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 24px; height: 24px;
+    background: var(--gold);
+    flex-shrink: 0;
+  }
+  .cover-session-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: rgba(201,151,58,0.55);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  h1.cover-h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(52px, 9vw, 88px);
+    font-weight: 400;
+    color: var(--cream);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .cover-sub {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(22px, 4vw, 32px);
+    color: var(--gold);
+    margin-bottom: 28px;
+    line-height: 1.2;
+  }
+  .cover-quote {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: rgba(212,207,200,0.5);
+    border-left: 2px solid var(--border);
+    padding-left: 20px;
+    max-width: 480px;
+    margin-bottom: 56px;
+    line-height: 1.7;
+  }
+  .cover-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px 32px;
+  }
+  @media (max-width: 560px) { .cover-fields { grid-template-columns: 1fr; } }
+  .cover-field label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .cover-field input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    padding: 8px 0;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .cover-field input:focus { border-color: var(--gold); }
+  .cover-field input::placeholder { color: rgba(255,255,255,0.18); }
+
+  /* ── SECTION DIVIDER ── */
+  .section-divider {
+    background: var(--dark);
+    padding: 40px 48px 32px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+  .section-divider-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .section-divider-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--cream);
+  }
+  .section-divider-title em { font-style: italic; color: var(--gold); }
+
+  /* ── CONTENT ── */
+  .content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 28px 80px;
+  }
+
+  /* ── QUARTER CARD ── */
+  .quarter {
+    background: white;
+    border: 1px solid var(--cream-dark);
+    border-radius: 2px;
+    padding: 36px 40px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  @media (max-width: 560px) { .quarter { padding: 24px 20px; } }
+  .q-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 4px;
+  }
+  .q-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--dark);
+    margin-bottom: 4px;
+  }
+  .q-intro {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--cream-dark);
+    line-height: 1.6;
+  }
+
+  /* ── FIELD ── */
+  .field { margin-bottom: 26px; }
+  .field:last-child { margin-bottom: 0; }
+  .field-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--dark);
+    margin-bottom: 10px;
+    display: block;
+    line-height: 1.5;
+  }
+  textarea {
+    width: 100%;
+    min-height: 108px;
+    background: var(--cream);
+    border: 1px solid var(--cream-dark);
+    border-radius: 2px;
+    padding: 14px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--dark);
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  textarea:focus { border-color: var(--gold); background: white; }
+  textarea::placeholder { color: rgba(28,31,38,0.28); font-style: italic; }
+  textarea.short { min-height: 68px; }
+  textarea.tall  { min-height: 160px; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 560px) { .two-col { grid-template-columns: 1fr; } }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+  /* ── NOTE BOX ── */
+  .note-box {
+    background: #fdf8ee;
+    border-left: 3px solid var(--gold);
+    padding: 16px 20px;
+    border-radius: 0 2px 2px 0;
+    margin: 20px 0;
+  }
+  .note-box p {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--dark);
+    opacity: 0.75;
+  }
+
+  /* ── STEP BOXES ── */
+  .step-boxes { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  @media (max-width: 560px) { .step-boxes { grid-template-columns: 1fr; } }
+  .step-box {
+    background: var(--cream);
+    border: 1px solid var(--cream-dark);
+    border-radius: 2px;
+    padding: 20px;
+  }
+  .step-box-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .step-box-title { font-size: 13px; font-weight: 500; color: var(--dark); margin-bottom: 10px; }
+  .step-box textarea { min-height: 90px; background: white; }
+
+  /* ── COMMITMENT ── */
+  .commitment {
+    background: var(--dark);
+    color: var(--cream);
+    padding: 40px 44px;
+    border-radius: 2px;
+    margin-top: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .commitment::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 280px; height: 280px;
+    background: radial-gradient(circle, rgba(201,151,58,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .commitment-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .commitment-prompt {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--cream);
+    margin-bottom: 20px;
+    font-style: italic;
+    line-height: 1.4;
+  }
+  .commitment textarea {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--cream);
+    min-height: 90px;
+    margin-bottom: 24px;
+  }
+  .commitment textarea:focus { background: rgba(255,255,255,0.1); border-color: var(--gold); }
+  .commitment textarea::placeholder { color: rgba(255,255,255,0.22); }
+  .sig-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 400px) { .sig-row { grid-template-columns: 1fr; } }
+  .sig-field label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.16em;
+    color: rgba(201,151,58,0.65);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .sig-field input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    color: var(--cream);
+    padding: 8px 0;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .sig-field input:focus { border-color: var(--gold); }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--darker);
+    padding: 32px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .footer-brand {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+  }
+  .footer-note {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.2);
+  }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--dark);
+    color: var(--cream);
+    padding: 12px 20px;
+    border-radius: 4px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s;
+    pointer-events: none;
+    z-index: 999;
+    border-left: 3px solid var(--gold);
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* ── PRINT ── */
+  @media print {
+    .topbar, .footer { display: none; }
+    .quarter { break-inside: avoid; box-shadow: none; }
+    .commitment { break-inside: avoid; }
+    .cover { padding: 48px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <span class="topbar-brand">lil' bird</span>
+  <div class="topbar-sep"></div>
+  <span class="topbar-title">First Flight · Standalone Session</span>
+  <div class="topbar-actions">
+    <a href="/nest/" class="topbar-nest" id="topbar-back-nest" hidden>← Nest</a>
+    <button class="btn btn-ghost" onclick="saveData()">Save</button>
+    <button class="btn btn-primary" onclick="window.print()">Export PDF</button>
+  </div>
+</header>
+
+<!-- ══════════ COVER ══════════ -->
+<div class="cover">
+  <div class="cover-inner">
+    <div class="cover-eyebrow"><span></span>lil' bird life coaching</div>
+    <div class="cover-session-tag">Session Zero</div>
+    <h1 class="cover-h1">First Flight.</h1>
+    <div class="cover-sub">Vision, Gap &amp; First Step.</div>
+    <p class="cover-quote">"You don't need to have it all figured out — you just need a next step that feels true."</p>
+    <div class="cover-fields">
+      <div class="cover-field">
+        <label>This workbook belongs to</label>
+        <input type="text" id="cover-name" placeholder="Your name" oninput="autosave()">
+      </div>
+      <div class="cover-field">
+        <label>Coach</label>
+        <input type="text" id="cover-coach" placeholder="Coach name" oninput="autosave()">
+      </div>
+      <div class="cover-field">
+        <label>Session Date</label>
+        <input type="date" id="cover-date" oninput="autosave()">
+      </div>
+      <div class="cover-field">
+        <label>Location / Format</label>
+        <input type="text" id="cover-location" placeholder="e.g. In person · Online" oninput="autosave()">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ Q1 ══════════ -->
+<div class="section-divider">
+  <div class="section-divider-label">Quarter One</div>
+  <div class="section-divider-title">Where are you <em>right now?</em></div>
+</div>
+
+<div class="content">
+  <div class="quarter">
+    <div class="q-label">Quarter One · Starting Point</div>
+    <div class="q-title">Where are you right now?</div>
+    <p class="q-intro">Before we look forward, let's be honest about where you actually are. No spin — just what's true.</p>
+
+    <div class="field">
+      <span class="field-label">What's feeling most alive right now — and what's most stuck?</span>
+      <textarea id="q1-alive" placeholder="Alive: ...&#10;&#10;Stuck: ..." oninput="autosave()"></textarea>
+    </div>
+    <div class="field">
+      <span class="field-label">What do you keep coming back to? The thought that won't leave you alone.</span>
+      <textarea id="q1-thought" placeholder="That persistent thought you can't shake..." oninput="autosave()"></textarea>
+    </div>
+    <div class="field">
+      <span class="field-label">What are you most tired of carrying?</span>
+      <textarea id="q1-tired" placeholder="Name it honestly..." oninput="autosave()"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ Q2 ══════════ -->
+<div class="section-divider">
+  <div class="section-divider-label">Quarter Two</div>
+  <div class="section-divider-title">Where do you <em>want to go?</em></div>
+</div>
+
+<div class="content">
+  <div class="quarter">
+    <div class="q-label">Quarter Two · Vision</div>
+    <div class="q-title">Where do you want to go?</div>
+    <p class="q-intro">Forget practical for a moment. If this next season went the way you'd hope — what would that look like?</p>
+
+    <div class="field">
+      <span class="field-label">What does a life that feels like yours actually look like?</span>
+      <textarea id="q2-life" placeholder="Describe it without editing yourself..." oninput="autosave()"></textarea>
+    </div>
+    <div class="field">
+      <span class="field-label">If you looked back five years from now, what would you want to say happened?</span>
+      <textarea id="q2-five-years" placeholder="Five years forward — what did you build, become, let go of?" oninput="autosave()"></textarea>
+    </div>
+
+    <div class="note-box">
+      <p>We don't always need a 180. Sometimes a 2 degree shift is enough.</p>
+    </div>
+
+    <div class="field">
+      <span class="field-label">What would a small but meaningful shift feel like — and look like?</span>
+      <textarea id="q2-shift" class="short" placeholder="The 2 degree turn that changes everything over time..." oninput="autosave()"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ Q3 ══════════ -->
+<div class="section-divider">
+  <div class="section-divider-label">Quarter Three</div>
+  <div class="section-divider-title">What's <em>in the way?</em></div>
+</div>
+
+<div class="content">
+  <div class="quarter">
+    <div class="q-label">Quarter Three · The Gap</div>
+    <div class="q-title">What's in the way?</div>
+    <p class="q-intro">There's a gap between where you are and where you want to be. Let's name what's in it — honestly.</p>
+
+    <div class="field">
+      <span class="field-label">What's the real reason you haven't moved on this yet?</span>
+      <textarea id="q3-real-reason" placeholder="Not the polished answer — the honest one..." oninput="autosave()"></textarea>
+    </div>
+    <div class="field">
+      <span class="field-label">What are you protecting by staying where you are?</span>
+      <textarea id="q3-protecting" placeholder="What's the payoff of staying put? Safety, identity, approval...?" oninput="autosave()"></textarea>
+    </div>
+    <div class="field">
+      <span class="field-label">Use this space — draw, map, connect the dots. (Or write freely about what the gap looks like.)</span>
+      <textarea id="q3-map" class="tall" placeholder="Sketch it out in words... What does the gap between here and there actually contain?" oninput="autosave()"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ Q4 ══════════ -->
+<div class="section-divider">
+  <div class="section-divider-label">Quarter Four</div>
+  <div class="section-divider-title">The <em>first step.</em></div>
+</div>
+
+<div class="content">
+  <div class="quarter">
+    <div class="q-label">Quarter Four · First Step</div>
+    <div class="q-title">The first step.</div>
+    <p class="q-intro">Not a plan. One honest next step that belongs to you.</p>
+
+    <div class="step-boxes">
+      <div class="step-box">
+        <div class="step-box-label">Short-term</div>
+        <div class="step-box-title">Next 90 days</div>
+        <textarea id="q4-90days" placeholder="What's possible in the next 90 days?" oninput="autosave()"></textarea>
+      </div>
+      <div class="step-box">
+        <div class="step-box-label">Long-term</div>
+        <div class="step-box-title">The bigger picture</div>
+        <textarea id="q4-longterm" placeholder="The horizon you're actually aiming for..." oninput="autosave()"></textarea>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">What's the smallest real step you could take this week?</span>
+      <textarea id="q4-this-week" class="short" placeholder="One honest, specific, doable step..." oninput="autosave()"></textarea>
+    </div>
+
+    <div class="note-box">
+      <p>"It can all change with one moment. This might be one of them."</p>
+    </div>
+
+    <hr class="divider">
+
+    <div class="field">
+      <span class="field-label">The most honest thing I uncovered today:</span>
+      <textarea id="q4-honest" class="short" placeholder="Don't overthink it — what's the real thing?" oninput="autosave()"></textarea>
+    </div>
+  </div>
+
+  <!-- COMMITMENT -->
+  <div class="commitment">
+    <div class="commitment-label">My Commitment · First Flight</div>
+    <p class="commitment-prompt">The one thing I am taking from today and doing this week:</p>
+    <textarea id="commitment-text" placeholder="Be specific. Be honest. Mean it." oninput="autosave()"></textarea>
+    <div class="sig-row">
+      <div class="sig-field">
+        <label>Signature</label>
+        <input type="text" id="commitment-sig" placeholder="Sign your name" oninput="autosave()">
+      </div>
+      <div class="sig-field">
+        <label>Date</label>
+        <input type="date" id="commitment-date" oninput="autosave()">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <span class="footer-brand">lilbird.life</span>
+  <span class="footer-note">Roots &amp; Wings · First Flight · Standalone Session</span>
+</footer>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  const STORE_KEY = 'ff-standalone';
+
+  function autosave() {
+    const data = {};
+    document.querySelectorAll('textarea, input[type="text"], input[type="date"]').forEach(el => {
+      if (el.id) data[el.id] = el.value;
+    });
+    localStorage.setItem(STORE_KEY, JSON.stringify(data));
+  }
+
+  function saveData() {
+    autosave();
+    const t = document.getElementById('toast');
+    t.textContent = 'Saved ✓';
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  function loadData() {
+    const data = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
+    Object.entries(data).forEach(([id, val]) => {
+      const el = document.getElementById(id);
+      if (el) el.value = val;
+    });
+  }
+
+  loadData();
+
+  (function () {
+    var p = new URLSearchParams(window.location.search);
+    if (p.get('from') === 'nest' || document.referrer.indexOf('/nest') !== -1) {
+      var el = document.getElementById('topbar-back-nest');
+      if (el) el.hidden = false;
+    }
+  })();
+
+  // Autosave on any input not already wired
+  document.querySelectorAll('textarea, input').forEach(el => {
+    el.addEventListener('input', autosave);
+    el.addEventListener('change', autosave);
+  });
+</script>
+<script src="/lilbird-auth-bridge.js"></script>
+</body>
+</html>
