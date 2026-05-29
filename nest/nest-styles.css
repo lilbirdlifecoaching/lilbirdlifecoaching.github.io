@@ -118,7 +118,11 @@ body.nest-page { line-height: 1.5; }
   display: grid; place-items: center;
   background: var(--dark-card);
   border: 1px solid var(--dark-border);
+  padding: 0;
+  color: var(--text-muted);
+  cursor: pointer;
 }
+.avatar:hover { color: var(--gold); border-color: rgba(245, 200, 66, 0.35); }
 
 .dash-wrap { max-width: 1100px; margin: 0 auto; padding: 1.2rem; }
 .dash-error {

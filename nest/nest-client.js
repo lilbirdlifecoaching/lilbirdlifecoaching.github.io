@@ -15,7 +15,7 @@
       storageKey: AUTH_STORAGE_KEY,
       autoRefreshToken: true,
       persistSession: true,
-      detectSessionInUrl: true
+      detectSessionInUrl: false
     }
   });
 
@@ -27,8 +27,8 @@
   let deepNestId = null;
   let chatMsgs = [];
   let suppressDashboard = false;
+  let dashboardHydrateToken = 0;
 
-  let loginInFlight = false;
   let signupInFlight = false;
 
   function resetLoginButton() {
@@ -107,11 +107,6 @@
 
   const urlParams = new URLSearchParams(window.location.search);
   const wantsLogout = urlParams.get('logout') === '1';
-  if (wantsLogout) {
-    suppressDashboard = true;
-    clearAllSupabaseAuthStorage();
-    showAuthViewNow();
-  }
 
   // auth tabs
   const tabLogin = document.getElementById('tab-login');
@@ -145,7 +140,6 @@
     const email = document.getElementById('login-email').value.trim().toLowerCase();
     const password = document.getElementById('login-password').value;
 
-    loginInFlight = true;
     const btnLogin = document.getElementById('btn-login');
     if (btnLogin) {
       btnLogin.disabled = true;
@@ -171,7 +165,6 @@
       console.error('Nest login:', err);
       loginError.textContent = 'Something went wrong. Please try again.';
     } finally {
-      loginInFlight = false;
       resetLoginButton();
     }
   });
@@ -389,7 +382,10 @@
   }
 
   async function hydrateDashboard() {
+    if (!currentUser?.id) return;
+
     const uid = currentUser.id;
+    const token = ++dashboardHydrateToken;
     setDashError('');
     setDashLoading(true);
 
@@ -435,8 +431,13 @@
       renderProducts();
       renderProfile();
       renderSidebar();
+    } catch (err) {
+      console.error('Nest hydrateDashboard:', err);
+      if (token === dashboardHydrateToken) {
+        setDashError('Could not load your Nest. Please refresh the page or try again.');
+      }
     } finally {
-      setDashLoading(false);
+      if (token === dashboardHydrateToken) setDashLoading(false);
     }
   }
 
@@ -789,24 +790,30 @@
     }
 
     currentUser = user;
-    document.getElementById('view-auth').classList.remove('active');
-    document.getElementById('view-dashboard').classList.add('active');
+    const authView = document.getElementById('view-auth');
+    const dashView = document.getElementById('view-dashboard');
+    if (authView) authView.classList.remove('active');
+    if (dashView) dashView.classList.add('active');
+    resetLoginButton();
+    resetSignupButton();
     setTab('products');
     await hydrateDashboard();
   }
 
   function showAuth() {
     currentUser = null;
+    dashboardHydrateToken++;
+    signupInFlight = false;
     resetDashboardUi();
     showAuthViewNow();
     resetLoginButton();
+    resetSignupButton();
   }
 
   async function forceLogout() {
     suppressDashboard = true;
-    clearAllSupabaseAuthStorage();
-    showAuthViewNow();
-    resetDashboardUi();
+    currentUser = null;
+    dashboardHydrateToken++;
     try {
       await sb.auth.signOut({ scope: 'local' });
     } catch (e) {
@@ -830,13 +837,24 @@
     });
   }
 
-  sb.auth.onAuthStateChange(async (_evt, session) => {
-    if (suppressDashboard || loginInFlight || signupInFlight) {
+  sb.auth.onAuthStateChange((event, session) => {
+    if (suppressDashboard) {
       if (!session?.user) suppressDashboard = false;
       return;
     }
-    if (session?.user) await showDashboard();
-    else showAuth();
+    if (signupInFlight) return;
+
+    if (event === 'SIGNED_OUT') {
+      showAuth();
+      return;
+    }
+
+    if (
+      session?.user &&
+      (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED')
+    ) {
+      void showDashboard(session.user);
+    }
   });
 
   async function handleEmailConfirmCallback() {
@@ -859,7 +877,15 @@
     return data.session?.user || null;
   }
 
+  const btnNavProfile = document.getElementById('btn-nav-profile');
+  if (btnNavProfile) {
+    btnNavProfile.addEventListener('click', () => setTab('profile'));
+  }
+
   (async function init() {
+    resetLoginButton();
+    resetSignupButton();
+
     if (wantsLogout) {
       try {
         await sb.auth.signOut({ scope: 'local' });
