@@ -131,6 +131,23 @@
     .gate-content p { font-size: 0.85rem; color: var(--text-dim); line-height: 1.6; }
     .btn-ready { background: none; border: 1px solid var(--gold); border-radius: 6px; padding: 0.55rem 1.1rem; font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); cursor: pointer; transition: background 0.2s, color 0.2s; white-space: nowrap; }
     .btn-ready:hover { background: var(--gold); color: var(--dark); }
+    .deep-snapshot { background: rgba(245,200,66,0.05); border: 1px solid var(--gold-border); border-radius: 20px; padding: 1.5rem 1.75rem; margin-bottom: 2rem; animation: fadeUp 0.5s ease both; }
+    .deep-snapshot.empty { background: var(--dark-card); }
+    .deep-snap-label { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
+    .deep-snap-label::before { content: ''; width: 16px; height: 1px; background: var(--gold); }
+    .deep-snap-headline { font-family: var(--font-display); font-size: 1.4rem; font-weight: 400; font-style: italic; line-height: 1.3; margin-bottom: 0.4rem; color: var(--text); }
+    .deep-snap-desc { color: var(--text-dim); font-size: 0.88rem; line-height: 1.65; margin-bottom: 1rem; }
+    .deep-snap-types { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.85rem; }
+    .deep-snap-chip { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.3rem 0.65rem; border-radius: 99px; background: var(--gold-dim); color: var(--gold); border: 1px solid var(--gold-border); }
+    .deep-snap-chip.muted { background: rgba(255,255,255,0.03); color: var(--text-dim); border-color: rgba(255,255,255,0.08); }
+    .deep-snap-quote { font-family: var(--font-display); font-size: 0.95rem; font-style: italic; color: var(--text); border-left: 2px solid var(--gold-border); padding-left: 0.85rem; margin-top: 0.75rem; line-height: 1.55; }
+    .deep-snap-notes { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.65rem; line-height: 1.55; font-style: italic; }
+    .deep-snap-under { margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed rgba(245,200,66,0.18); }
+    .deep-snap-under-label { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.35rem; }
+    .deep-snap-under-headline { font-family: var(--font-display); font-style: italic; font-size: 1rem; color: var(--text-dim); }
+    .deep-snap-empty-text { color: var(--text-dim); font-size: 0.88rem; line-height: 1.7; margin-bottom: 1rem; }
+    .btn-deep-snap-cta { background: none; border: 1px solid var(--gold); border-radius: 6px; padding: 0.55rem 1.1rem; font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); cursor: pointer; transition: background 0.2s, color 0.2s; }
+    .btn-deep-snap-cta:hover { background: var(--gold); color: var(--dark); }
     .purchase-gate { background: linear-gradient(135deg, var(--dark-card), var(--dark-mid)); border: 1px solid var(--gold-border); border-radius: 32px; padding: 3rem 2rem; text-align: center; margin-top: 1rem; animation: fadeUp 0.5s 0.2s ease both; }
     .purchase-gate .bird-glyph { font-size: 2.5rem; display: block; margin-bottom: 1.25rem; }
     .purchase-gate h3 { font-family: var(--font-display); font-size: 1.6rem; font-weight: 400; font-style: italic; margin-bottom: 0.75rem; }
@@ -440,6 +457,7 @@
     </div>
   </div>
 
+  <script src="/lilbird-auth-bridge.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="https://js.stripe.com/v3/"></script>
   <script>
@@ -502,6 +520,15 @@
     let currentUser = null, userProfile = null, sessionData = [], activePromo = null;
     let activeSession = null, chatMsgs = [], isTyping = false, exchangeCount = 0;
     let sessionContext = {}, toolOutputsCache = {};
+    // Bridge to the lil' bird Deep Profile (Cloudflare Worker, KV-backed):
+    //   1. Solo course writes a single-use launch token to deep_profile_launches
+    //      when the user clicks "Take the Deep Profile" inside Session 3.
+    //   2. Assessment frontend POSTs back to the worker with that token + nestId,
+    //      which writes deep_profile_links { user_id → nest_id }.
+    //   3. Dashboard reads deep_profile_links and fetches the live profile JSON
+    //      via GET /get-profile?nestId=… (no auth — nestId is unguessable).
+    const ASSESSMENT_WORKER_URL = 'https://lilbird-assessment.cwwq46sn7m.workers.dev';
+    let deepProfileState = { loaded: false, nestId: null, profile: null };
 
     function showView(id) {
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -551,6 +578,9 @@
         userProfile = profile || null;
         await loadSessionProgress();
         await loadToolOutputs();
+        // Force a fresh deep-profile read on each full dashboard load so a
+        // user who just completed the assessment sees their card immediately.
+        deepProfileState = { loaded: false, nestId: null, profile: null };
         renderDashboard();
         showView('view-dashboard');
         await handlePostPurchaseReturn();
@@ -579,6 +609,81 @@
       } catch(e) { toolOutputsCache = {}; }
     }
 
+    async function loadDeepProfileLink({ force = false } = {}) {
+      if (!currentUser) return;
+      if (deepProfileState.loaded && !force) return;
+      try {
+        const link = await sb.from('deep_profile_links')
+          .select('nest_id')
+          .eq('user_id', currentUser.id)
+          .maybeSingle();
+        if (link.error || !link.data) { deepProfileState = { loaded: true, nestId: null, profile: null }; return; }
+        const nestId = link.data.nest_id;
+        const res = await fetch(ASSESSMENT_WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(nestId));
+        if (!res.ok) { deepProfileState = { loaded: true, nestId, profile: null }; return; }
+        const profile = await res.json();
+        deepProfileState = { loaded: true, nestId, profile };
+      } catch (e) {
+        console.warn('Deep profile fetch failed:', e);
+        deepProfileState = { loaded: true, nestId: null, profile: null };
+      }
+    }
+
+    function escapeHtml(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function renderDeepProfileCard() {
+      if (!deepProfileState.loaded) {
+        return '<div class="deep-snapshot empty"><div class="deep-snap-label">Identity · Deep Profile</div><div class="deep-snap-empty-text">Loading your profile…</div></div>';
+      }
+      const p = deepProfileState.profile;
+      if (!p) {
+        return '<div class="deep-snapshot empty">'
+          + '<div class="deep-snap-label">Identity · Deep Profile</div>'
+          + '<div class="deep-snap-empty-text">You haven\'t taken the Deep Profile yet — a 15-minute read of how you\'re wired. Start it from Session 3 and your result will land here automatically.</div>'
+          + '<button class="btn-deep-snap-cta" id="btn-deep-snap-cta">Open Session 3 →</button>'
+          + '</div>';
+      }
+      const headline = p.archetypePlain || p.archetype || 'Your Deep Profile';
+      const desc     = p.archetypePlainDescription || p.archetypeSub || '';
+      const chips = [
+        p.mbti       ? '<span class="deep-snap-chip">' + escapeHtml(p.mbti) + '</span>' : '',
+        p.enneagram  ? '<span class="deep-snap-chip">' + escapeHtml(p.enneagram) + '</span>' : '',
+        p.attachment ? '<span class="deep-snap-chip">' + escapeHtml(p.attachment) + '</span>' : '',
+      ].filter(Boolean).join('');
+      const baseMbti = String(p.likelyCoreMbti || '').toUpperCase().slice(0, 4);
+      const exprMbti = String(p.mbti || '').toUpperCase().slice(0, 4);
+      const baselineDiverges = baseMbti && exprMbti && baseMbti !== exprMbti;
+      const underLine = baselineDiverges
+        ? (p.likelyCoreArchetypePlain || p.likelyCoreArchetype || '')
+        : '';
+      const notes = p.confidence && p.confidence.notes ? p.confidence.notes : '';
+      const quote = p.quote || '';
+      let html = '<div class="deep-snapshot">';
+      html += '<div class="deep-snap-label">Identity · Deep Profile</div>';
+      html += '<div class="deep-snap-headline">' + escapeHtml(headline) + '</div>';
+      if (desc)  html += '<div class="deep-snap-desc">' + escapeHtml(desc) + '</div>';
+      if (chips) html += '<div class="deep-snap-types">' + chips + '</div>';
+      if (notes) html += '<div class="deep-snap-notes">' + escapeHtml(notes) + '</div>';
+      if (quote) html += '<div class="deep-snap-quote">' + escapeHtml(quote) + '</div>';
+      if (underLine) {
+        html += '<div class="deep-snap-under">'
+              + '<div class="deep-snap-under-label">Underneath the expression</div>'
+              + '<div class="deep-snap-under-headline">' + escapeHtml(underLine) + '</div>'
+              + '</div>';
+      }
+      html += '</div>';
+      return html;
+    }
+
+    function bindDeepProfileCard() {
+      const cta = document.getElementById('btn-deep-snap-cta');
+      if (cta) cta.addEventListener('click', () => openSession(3));
+    }
+
     function renderDashboard() {
       const name = userProfile?.full_name?.split(' ')[0] || '';
       const hour = new Date().getHours();
@@ -597,12 +702,26 @@
       document.getElementById('dash-progress').style.display = 'block';
       document.getElementById('progress-count').textContent = completed + ' of 8 sessions';
       document.getElementById('progress-fill').style.width = ((completed / 8) * 100) + '%';
-      let html = '<div class="sessions-grid">';
+      let html = renderDeepProfileCard();
+      html += '<div class="sessions-grid">';
       SESSIONS.forEach(session => { const progress = sessionData.find(s => s.session_number === session.number); html += renderSessionCard(session, progress?.status || 'locked', progress); });
       html += '</div>';
       content.innerHTML = html;
+      bindDeepProfileCard();
       document.querySelectorAll('.session-card.available, .session-card.in-progress, .session-card.complete').forEach(card => { card.addEventListener('click', () => openSession(parseInt(card.dataset.session))); });
       document.querySelectorAll('.btn-ready').forEach(btn => { btn.addEventListener('click', async (e) => { e.stopPropagation(); await bypassGate(parseInt(btn.dataset.next)); }); });
+      // Lazily fetch the deep profile (and re-render once) so the dashboard
+      // doesn't block on the network. If the data was already cached this is
+      // a no-op and the card keeps its current state.
+      if (!deepProfileState.loaded) {
+        loadDeepProfileLink().then(() => {
+          // Only re-render if we're still on the dashboard view (avoid stomping
+          // a screen the user has navigated to in the meantime).
+          if (document.getElementById('view-dashboard').classList.contains('active')) {
+            renderDashboard();
+          }
+        });
+      }
     }
 
     function renderSessionCard(session, status, progress) {
