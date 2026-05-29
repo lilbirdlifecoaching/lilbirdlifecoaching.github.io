@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
-  <link rel="stylesheet" href="./nest-styles.css?v=13" />
+  <link rel="stylesheet" href="./nest-styles.css?v=15" />
 </head>
 <body class="nest-page">
   <div id="view-auth" class="view active">
@@ -30,9 +30,8 @@
           <input id="login-password" type="password" placeholder="••••••••" required />
           <button id="btn-login" class="btn btn-gold" type="submit">Log in →</button>
           <button id="btn-forgot" class="btn btn-outline" type="button">Forgot password</button>
-          <button id="btn-resend-confirm" class="btn btn-outline" type="button">Resend confirmation email</button>
-          <p class="auth-hint">Just signed up? You must click the confirmation email before log in works. Check spam.</p>
-          <p class="auth-hint">Purchased or booked elsewhere? Use the same email you used at checkout.</p>
+          <button id="btn-magic-link" class="btn btn-outline" type="button">Email me a sign-in link</button>
+          <p class="auth-hint">After Create account you should land in your Nest straight away. If not, log in with the same password.</p>
           <p id="login-error" class="auth-error"></p>
         </form>
 
@@ -121,6 +120,6 @@
 
   <script src="/lilbird-auth-bridge.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="./nest-client.js?v=13"></script>
+  <script src="./nest-client.js?v=15"></script>
 </body>
 </html>

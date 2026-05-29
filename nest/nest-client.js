@@ -217,7 +217,8 @@
     loginError.textContent = error ? (error.message || 'Could not send reset email.') : 'Password reset email sent.';
   });
 
-  document.getElementById('btn-resend-confirm').addEventListener('click', async () => {
+  const btnResendConfirm = document.getElementById('btn-resend-confirm');
+  if (btnResendConfirm) btnResendConfirm.addEventListener('click', async () => {
     loginError.textContent = '';
     loginError.style.color = '';
     const email = document.getElementById('login-email').value.trim().toLowerCase();
@@ -233,6 +234,33 @@
     loginError.textContent = error
       ? error.message || 'Could not resend confirmation.'
       : 'Confirmation email sent — check inbox and spam, then click the link (it should open this Nest page).';
+  });
+
+  document.getElementById('btn-magic-link').addEventListener('click', async () => {
+    loginError.textContent = '';
+    loginError.style.color = '';
+    const email = document.getElementById('login-email').value.trim().toLowerCase();
+    if (!email) {
+      loginError.textContent = 'Enter your email first, then request a sign-in link.';
+      return;
+    }
+    const btn = document.getElementById('btn-magic-link');
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Sending link…';
+    }
+    const { error } = await sb.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: NEST_AUTH_REDIRECT }
+    });
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Email me a sign-in link';
+    }
+    loginError.style.color = error ? '' : 'var(--gold)';
+    loginError.textContent = error
+      ? error.message || 'Could not send sign-in link.'
+      : 'Sign-in link sent — check inbox and spam. Click it to open your Nest (no password needed for that login).';
   });
 
   function resetSignupButton() {
@@ -308,36 +336,43 @@
       const identities = data.user?.identities;
       const hasNewIdentity = Array.isArray(identities) && identities.length > 0;
 
-      // Supabase may return a user object with no identities when the email already exists
-      // (anti-enumeration when email confirmation is on).
-      if (data.user && !hasNewIdentity && !data.session) {
-        showSignupSuccess(
-          'If this email is new, check your inbox to confirm. If you already have an account (e.g. Solo course), use Log in instead — we may have sent a sign-in link to that inbox.'
-        );
-        document.getElementById('login-email').value = email;
-        return;
-      }
-
       if (data.session?.user) {
         await sendNestWelcomeEmail(email, name || email);
         await showDashboard(data.session.user);
         return;
       }
 
+      // Confirm-email is off in Supabase but signUp sometimes returns user without session.
       if (data.user && hasNewIdentity) {
-        await sendNestWelcomeEmail(email, name || email);
+        const signIn = await sb.auth.signInWithPassword({ email, password });
+        if (signIn.data.session?.user) {
+          await sendNestWelcomeEmail(email, name || email);
+          await showDashboard(signIn.data.session.user);
+          return;
+        }
+        if (signIn.error) {
+          signupError.textContent =
+            'Account was created but automatic login failed: ' +
+            loginErrorMessage(signIn.error) +
+            ' Try the Log in tab with the same password, or Forgot password.';
+          document.getElementById('login-email').value = email;
+          swapAuth(false);
+          return;
+        }
+      }
+
+      if (data.user && !hasNewIdentity && !data.session) {
         showSignupSuccess(
-          'Account created. Open the confirmation email from Supabase (check spam), click the link — it should return you here logged in. Until you confirm, password login will show “invalid credentials”.'
+          'If you already have an account (e.g. Solo), use Log in. Otherwise try again or use Forgot password.'
         );
         document.getElementById('login-email').value = email;
         swapAuth(false);
         return;
       }
 
-      showSignupSuccess(
-        'Check your email to confirm your account. Until you click that link, log in will not work. Use Resend confirmation on the Log in tab if needed.'
-      );
+      showSignupSuccess('Account may have been created. Try Log in with your password, or Forgot password.');
       document.getElementById('login-email').value = email;
+      swapAuth(false);
     } catch (err) {
       console.error('Nest signup:', err);
       signupError.textContent = 'Something went wrong. Please try again.';
