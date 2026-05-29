@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./intensive-enrol.css?v=1" />
+  <link rel="stylesheet" href="./intensive-enrol.css?v=2" />
   <script src="https://js.stripe.com/v3/"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -22,8 +22,8 @@
     <p class="eyebrow">life change intensive · enrolment</p>
     <h1>Read, sign, then <em>pay securely.</em></h1>
     <p class="lead">
-      You'll see the full agreement before payment — so you know exactly what you're signing up for and what your rights are.
-      After payment you'll get a welcome email and your Nest dashboard will walk you through booking your seven sessions and opening your workbook.
+      You'll read the full Client Agreement &amp; Terms of Engagement (Version 2.0) before payment — so you know exactly what you're signing up for and what your rights are.
+      After payment you'll get a welcome email and your Nest dashboard will walk you through booking your eight sessions and opening your workbook.
     </p>
 
     <div class="steps-strip" id="steps-strip">
@@ -33,19 +33,22 @@
     </div>
 
     <section class="card" id="section-contract">
-      <h2>Coaching agreement</h2>
-      <p class="contract-placeholder">CONTRACT PLACEHOLDER — replace this block with your final wording before go-live.</p>
-      <div class="contract-box" id="contract-text">
-        <h3>Life Change Intensive — Coaching Agreement (draft)</h3>
-        <p><strong>Parties.</strong> This agreement is between you (“Client”) and Luke Haythorpe / lil' bird coaching (“Coach”).</p>
-        <p><strong>Programme.</strong> The Life Change Intensive includes seven (7) in-person coaching sessions, approximately two hours each, following the Roots &amp; Wings curriculum. Sessions are booked by you via the scheduling link provided after enrolment.</p>
-        <p><strong>Fee &amp; payment.</strong> The total programme fee is shown at checkout on lilbird.life. Payment is due in full before your first session is booked. Fees are processed securely by Stripe.</p>
-        <p><strong>Scheduling.</strong> You will receive a Calendly link to book all seven sessions. Rescheduling is welcome with reasonable notice; repeated no-shows may affect remaining sessions at the Coach's discretion.</p>
-        <p><strong>Confidentiality.</strong> What you share in sessions stays between us, except where disclosure is required by law or there is risk of harm to you or others.</p>
-        <p><strong>Your rights.</strong> Coaching is not therapy, medical, or legal advice. You may pause or discontinue at any time; fees for unused sessions may be refunded or credited only as agreed in writing with the Coach.</p>
-        <p><strong>Materials.</strong> You receive access to the Roots &amp; Wings workbook and your Nest dashboard for the duration of the programme.</p>
-        <p><strong>Agreement.</strong> By typing your full legal name below and completing payment, you confirm you have read and accept this agreement.</p>
+      <h2>Client Agreement &amp; Terms of Engagement</h2>
+      <p class="contract-meta">
+        <strong>Version 2.0</strong> · Life Change Intensive · lil' bird life coaching<br />
+        Eight (8) sessions · 90 minutes to 2 hours each · Programme materials &amp; Nest access included.<br />
+        <a href="./lilbird-life-change-intensive-agreement-v3.pdf" target="_blank" rel="noopener">Open agreement as PDF (new tab) ↗</a>
+        — use this if the viewer below does not load on your device.
+      </p>
+      <div class="contract-pdf-wrap" id="contract-pdf-wrap">
+        <iframe
+          src="./lilbird-life-change-intensive-agreement-v3.pdf#view=FitH"
+          title="Life Change Intensive — Client Agreement &amp; Terms of Engagement (Version 2.0)"
+        ></iframe>
       </div>
+      <p class="contract-pdf-fallback">
+        This is a legally binding agreement. By signing below and completing payment, you confirm you have read and agree to all terms, including the refund policy (Section 6) and your responsibilities (Section 10). Questions before signing: <a href="mailto:hello@lilbird.life">hello@lilbird.life</a>.
+      </p>
     </section>
 
     <section class="card" id="section-sign">
@@ -76,7 +79,7 @@
 
         <label class="checkbox-row">
           <input id="agree-checkbox" type="checkbox" required />
-          <span>I have read the coaching agreement above. I understand the programme includes seven in-person sessions, the fee shown at checkout, and my rights including the ability to ask questions before and during the programme.</span>
+          <span>I have read the Life Change Intensive Client Agreement &amp; Terms of Engagement (Version 2.0) in full, including the refund policy (Section 6) and my responsibilities (Section 10). I understand the programme includes eight (8) coaching sessions, the fee shown at checkout, and I agree to be bound by all terms. I enter this agreement freely and without duress.</span>
         </label>
 
         <p id="form-error" class="form-error"></p>
@@ -101,6 +104,6 @@
     </div>
   </div>
 
-  <script src="./intensive-enrol.js?v=1"></script>
+  <script src="./intensive-enrol.js?v=2"></script>
 </body>
 </html>

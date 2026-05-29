@@ -3,7 +3,7 @@
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
   const WORKER_URL = 'https://worker-solo.cwwq46sn7m.workers.dev';
   const STRIPE_PUBLISHABLE_KEY = 'pk_live_51QSMYQGAu36WZ7DdlsoNqzwPnsf4HUoOj6F1NZAeGnnH1TPjDEdEQudXIGgTLaUq079aQMI1W2MS6UpMItmTjgxy00HbouBx2g';
-  const AGREEMENT_VERSION = 'v1-draft';
+  const AGREEMENT_VERSION = 'v2.0-agreement-v3-pdf';
   const NEST_REDIRECT = window.location.origin + '/nest/';
 
   const { createClient } = supabase;
