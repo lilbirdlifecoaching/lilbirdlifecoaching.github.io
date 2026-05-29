@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./intensive-enrol.css?v=2" />
+  <link rel="stylesheet" href="./intensive-enrol.css?v=3" />
   <script src="https://js.stripe.com/v3/"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -82,13 +82,23 @@
           <span>I have read the Life Change Intensive Client Agreement &amp; Terms of Engagement (Version 2.0) in full, including the refund policy (Section 6) and my responsibilities (Section 10). I understand the programme includes eight (8) coaching sessions, the fee shown at checkout, and I agree to be bound by all terms. I enter this agreement freely and without duress.</span>
         </label>
 
+        <div class="promo-block">
+          <label for="promo-input">Promo or referral code</label>
+          <p class="promo-hint">If you have a code, enter it here before payment. Valid codes are applied automatically; you can also add a code in the Stripe payment step.</p>
+          <div class="promo-input-wrap">
+            <input id="promo-input" type="text" class="promo-input" placeholder="Enter your code" autocomplete="off" />
+            <button type="button" class="btn btn-outline btn-apply-promo" id="btn-apply-promo">Apply code</button>
+          </div>
+          <p id="promo-message" class="promo-message" aria-live="polite"></p>
+        </div>
+
         <p id="form-error" class="form-error"></p>
 
         <div class="btn-row">
           <button id="btn-continue" class="btn btn-gold" type="submit">Continue to secure payment →</button>
           <a class="btn btn-outline" href="mailto:hello@lilbird.life">Questions first?</a>
         </div>
-        <p class="fine-print">Payment opens in a secure Stripe window. You'll receive a welcome email with your Nest link, booking link, and workbook link.</p>
+        <p class="fine-print">Payment opens in a secure Stripe window (promo field included). You'll receive a welcome email with your Nest link, booking link, and workbook link.</p>
       </form>
     </section>
   </main>
@@ -96,7 +106,10 @@
   <div id="checkout-modal" class="checkout-modal" role="dialog" aria-modal="true" aria-labelledby="checkout-title">
     <div class="checkout-panel">
       <div class="checkout-head">
-        <h3 id="checkout-title">Complete payment</h3>
+        <div>
+          <h3 id="checkout-title">Complete payment</h3>
+          <p id="checkout-promo-note" class="checkout-promo-note">Have a promo code? Use “Add promotion code” in the form below if you did not apply one already.</p>
+        </div>
         <button type="button" class="checkout-close" id="checkout-modal-close" aria-label="Close">&times;</button>
       </div>
       <div id="checkout-loading" class="checkout-loading">Opening secure checkout…</div>
@@ -104,6 +117,6 @@
     </div>
   </div>
 
-  <script src="./intensive-enrol.js?v=2"></script>
+  <script src="./intensive-enrol.js?v=4"></script>
 </body>
 </html>

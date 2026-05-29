@@ -19,6 +19,7 @@
   let currentUser = null;
   let stripeInstance = null;
   let embeddedCheckout = null;
+  let activePromoCode = null;
 
   const form = document.getElementById('form-enrol');
   const formError = document.getElementById('form-error');
@@ -27,6 +28,41 @@
   const accountFields = document.getElementById('account-fields');
   const enrolEmail = document.getElementById('enrol-email');
   const enrolPassword = document.getElementById('enrol-password');
+  const promoInput = document.getElementById('promo-input');
+  const promoMessage = document.getElementById('promo-message');
+  const checkoutPromoNote = document.getElementById('checkout-promo-note');
+
+  function normalisePromoCode(raw) {
+    return String(raw || '').trim().toUpperCase();
+  }
+
+  function setPromoMessage(text, kind) {
+    if (!promoMessage) return;
+    promoMessage.textContent = text || '';
+    promoMessage.className = 'promo-message' + (kind ? ' ' + kind : '');
+  }
+
+  function applyPromoFromInput() {
+    const code = normalisePromoCode(promoInput?.value);
+    if (!code) {
+      activePromoCode = null;
+      setPromoMessage('', '');
+      return;
+    }
+    activePromoCode = code;
+    setPromoMessage(
+      '“' + code + '” will be applied when you open payment (if valid in Stripe).',
+      'pending'
+    );
+  }
+
+  document.getElementById('btn-apply-promo')?.addEventListener('click', applyPromoFromInput);
+  promoInput?.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Enter') {
+      ev.preventDefault();
+      applyPromoFromInput();
+    }
+  });
 
   function setStep(step) {
     document.querySelectorAll('.step-pill').forEach((pill) => {
@@ -165,7 +201,8 @@
         body: JSON.stringify({
           user_id: userId,
           email,
-          signer_name: signerName
+          signer_name: signerName,
+          promo_code: activePromoCode || normalisePromoCode(promoInput?.value) || null
         })
       });
 
@@ -174,8 +211,25 @@
         throw new Error(errBody.error || 'Could not start checkout (HTTP ' + res.status + ').');
       }
 
-      const { client_secret } = await res.json();
+      const payload = await res.json();
+      const client_secret = payload.client_secret;
       if (!client_secret) throw new Error('Stripe did not return a checkout session.');
+
+      const codeUsed = payload.promo_code || activePromoCode;
+      if (checkoutPromoNote) {
+        if (payload.promo_applied && codeUsed) {
+          checkoutPromoNote.textContent = 'Promo code “' + codeUsed + '” applied to this payment.';
+          checkoutPromoNote.style.color = 'var(--green)';
+        } else if (codeUsed) {
+          checkoutPromoNote.textContent =
+            '“' + codeUsed + '” could not be pre-applied — use “Add promotion code” in the Stripe form below, or go back and check the spelling.';
+          checkoutPromoNote.style.color = '';
+        } else {
+          checkoutPromoNote.textContent =
+            'Have a promo code? Click “Add promotion code” in the Stripe form below.';
+          checkoutPromoNote.style.color = '';
+        }
+      }
 
       if (embeddedCheckout) {
         try { embeddedCheckout.destroy(); } catch (e) { /* ignore */ }
@@ -260,6 +314,12 @@
 
   async function init() {
     setStep(1);
+    const params = new URLSearchParams(window.location.search);
+    const urlPromo = params.get('code') || params.get('promo');
+    if (urlPromo && promoInput) {
+      promoInput.value = urlPromo.trim();
+      applyPromoFromInput();
+    }
     const { data: { user } } = await sb.auth.getUser();
     if (user) {
       currentUser = user;

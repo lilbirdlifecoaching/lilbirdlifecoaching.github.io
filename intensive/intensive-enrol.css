@@ -287,10 +287,16 @@ input:focus { outline: none; border-color: rgba(245, 200, 66, 0.4); }
 
 .checkout-head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   padding: 1rem 1.25rem;
   border-bottom: 1px solid var(--dark-border);
+  gap: 0.75rem;
+}
+
+.checkout-head > div:first-child {
+  flex: 1;
+  padding-right: 0.5rem;
 }
 
 .checkout-head h3 {
@@ -328,4 +334,63 @@ input:focus { outline: none; border-color: rgba(245, 200, 66, 0.4); }
   font-size: 0.8rem;
   color: var(--text-muted);
   margin-top: 1rem;
+}
+
+.promo-block {
+  margin: 1.25rem 0 0.5rem;
+  padding: 1rem;
+  background: rgba(245, 200, 66, 0.06);
+  border: 1px solid rgba(245, 200, 66, 0.2);
+  border-radius: 10px;
+}
+
+.promo-block label {
+  margin-top: 0;
+  color: var(--gold);
+  font-family: "DM Mono", monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.promo-hint {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin: 0.35rem 0 0.75rem;
+}
+
+.promo-input-wrap {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.promo-input {
+  flex: 1 1 160px;
+  min-width: 0;
+}
+
+.btn-apply-promo {
+  flex-shrink: 0;
+  padding: 0.75rem 1rem;
+}
+
+.promo-message {
+  min-height: 1.25rem;
+  margin: 0.6rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.promo-message.success { color: var(--green); }
+.promo-message.pending { color: var(--gold); }
+.promo-message.error { color: var(--ember); }
+
+.checkout-promo-note {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  margin: 0.35rem 0 0;
+  max-width: 28rem;
 }
