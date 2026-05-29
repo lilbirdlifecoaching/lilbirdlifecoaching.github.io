@@ -299,6 +299,48 @@
       color: var(--text-muted);
     }
 
+    .intensive-enrol-panel {
+      background: var(--dark-card);
+      border: 1px solid var(--dark-border);
+      border-radius: 16px;
+      padding: 2rem 1.75rem;
+      min-height: 520px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .intensive-enrol-panel.hidden { display: none; }
+    .intensive-enrol-panel h2 {
+      font-family: 'Playfair Display', serif;
+      font-weight: 400;
+      font-size: 1.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .intensive-enrol-panel h2 em { font-style: italic; color: var(--gold); }
+    .intensive-enrol-panel p { color: var(--text-muted); line-height: 1.7; margin-bottom: 1rem; font-size: 0.95rem; }
+    .intensive-steps { list-style: none; margin: 1.25rem 0 1.5rem; }
+    .intensive-steps li {
+      font-size: 0.9rem;
+      padding: 0.55rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      color: var(--text-main);
+    }
+    .intensive-cta {
+      display: inline-block;
+      margin-top: 0.5rem;
+      padding: 0.85rem 1.4rem;
+      background: var(--ember);
+      color: var(--dark);
+      text-decoration: none;
+      border-radius: 100px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: opacity 0.2s;
+    }
+    .intensive-cta:hover { opacity: 0.9; }
+
     /* FOOTER */
     footer {
       border-top: 1px solid var(--dark-border);
@@ -387,22 +429,22 @@
 
       <!-- Session type selector -->
       <div class="session-options reveal reveal-delay-3">
-        <div class="session-option active" data-url="https://calendly.com/lilbirdlifecoaching/first-flight-session" onclick="switchCalendly(this)">
+        <div class="session-option active" data-url="https://calendly.com/lilbirdlifecoaching/first-flight-session" onclick="switchSession(this)">
           <p class="opt-name">The First Flight</p>
           <p class="opt-tag">1 session · 2 hours · start here</p>
           <p class="opt-desc">One conversation to map your story, find the real issue, and leave with your next brave step. No commitment beyond the conversation. This is where most people begin.</p>
         </div>
-        <div class="session-option" id="intensive" data-url="https://calendly.com/lilbirdlifecoaching/packages/141b4b4c-dca7-46e5-9314-a8fc55f4320f" onclick="switchCalendly(this)">
+        <div class="session-option" id="intensive" onclick="switchSession(this)">
           <p class="opt-name">Life Change Intensive</p>
           <p class="opt-tag">in person · 7 sessions · 2 hours each · full curriculum</p>
           <p class="opt-desc">The full in-person runway. Seven deep sessions through the whole arc — story, wiring, relationships, next chapter. Not the self-paced Solo course (lilbird.life/solo/) — this is live coaching in the room.</p>
         </div>
-        <div class="session-option" data-url="https://calendly.com/lilbirdlifecoaching/coaching" onclick="switchCalendly(this)">
+        <div class="session-option" data-url="https://calendly.com/lilbirdlifecoaching/coaching" onclick="switchSession(this)">
           <p class="opt-name">Monthly Coaching</p>
           <p class="opt-tag">flexible · recurring or once-off</p>
           <p class="opt-desc">Some people need a regular thinking partner. Some just need one good conversation right now. Monthly coaching works both ways — a standing session to keep you moving, or a one-off when something specific needs working through. No pressure to commit to more than you need.</p>
         </div>
-        <div class="session-option" id="discovery" data-url="https://calendly.com/lilbirdlifecoaching/30min" onclick="switchCalendly(this)">
+        <div class="session-option" id="discovery" data-url="https://calendly.com/lilbirdlifecoaching/30min" onclick="switchSession(this)">
           <p class="opt-name">Discovery Call</p>
           <p class="opt-tag">free · 30 minutes · no hard sell</p>
           <p class="opt-desc">Not sure if this is for you? That's exactly what this call is for. We'll spend 30 minutes getting honest about where you are and whether we're the right fit. No script, no pitch. If we're not the right match, we'll tell you. Our bias is always you.</p>
@@ -437,6 +479,18 @@
         id="calendly-widget"
         data-url="https://calendly.com/lilbirdlifecoaching/first-flight-session?hide_event_type_details=1&hide_gdpr_banner=1&background_color=2a2d38&text_color=f0ead8&primary_color=F5C842"
       ></div>
+      <div id="intensive-enrol-panel" class="intensive-enrol-panel hidden">
+        <p class="section-label" style="margin-bottom:1rem;">life change intensive</p>
+        <h2>Read the agreement, then <em>pay securely.</em></h2>
+        <p>The Intensive is enrolled on lilbird.life — not through Calendly payment. You'll see the full coaching agreement before you pay, so you know your rights and what's included.</p>
+        <ol class="intensive-steps">
+          <li>1. Read &amp; sign the coaching agreement</li>
+          <li>2. Create your Nest account (or log in)</li>
+          <li>3. Pay in full via secure Stripe checkout</li>
+          <li>4. Book sessions one at a time from your Nest (8 sessions tracked automatically)</li>
+        </ol>
+        <a class="intensive-cta" href="/intensive/enrol.html">Start enrolment →</a>
+      </div>
     </div>
 
   </div>
@@ -495,8 +549,26 @@
       }
     }
 
-    // Switch session type
+    function switchToIntensiveEnrol(el) {
+      document.querySelectorAll('.session-option').forEach(function (o) { o.classList.remove('active'); });
+      el.classList.add('active');
+      document.getElementById('cal-loading').classList.add('hidden');
+      document.getElementById('calendly-widget').classList.add('hidden');
+      document.getElementById('intensive-enrol-panel').classList.remove('hidden');
+    }
+
+    function switchSession(el) {
+      if (el.id === 'intensive') {
+        switchToIntensiveEnrol(el);
+        return;
+      }
+      switchCalendly(el);
+    }
+
+    // Switch session type (Calendly embed)
     function switchCalendly(el) {
+      document.getElementById('intensive-enrol-panel').classList.add('hidden');
+      document.getElementById('calendly-widget').classList.remove('hidden');
       document.querySelectorAll('.session-option').forEach(o => o.classList.remove('active'));
       el.classList.add('active');
       const url = el.dataset.url;
@@ -523,7 +595,6 @@
 
     const SESSION_DEEP_LINKS = {
       discovery: 'https://calendly.com/lilbirdlifecoaching/30min',
-      intensive: 'https://calendly.com/lilbirdlifecoaching/packages/141b4b4c-dca7-46e5-9314-a8fc55f4320f',
       coaching: 'https://calendly.com/lilbirdlifecoaching/coaching',
       monthly: 'https://calendly.com/lilbirdlifecoaching/coaching',
     };
@@ -532,6 +603,9 @@
       const hash = (location.hash || '').replace(/^#/, '').toLowerCase();
       const params = new URLSearchParams(location.search);
       const key = (params.get('session') || hash || '').toLowerCase();
+      if (key === 'intensive') {
+        return document.getElementById('intensive');
+      }
       const url = SESSION_DEEP_LINKS[key];
       if (!url) return null;
       return document.querySelector('.session-option[data-url="' + url + '"]');
@@ -540,7 +614,7 @@
     function initBookPageFromDeepLink() {
       const option = sessionOptionFromDeepLink();
       if (option) {
-        switchCalendly(option);
+        switchSession(option);
         return;
       }
       setTimeout(showFirstFlightOffer, 600);

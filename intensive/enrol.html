@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Enrol · Life Change Intensive · lil' bird</title>
+  <meta name="description" content="Read the agreement, create your Nest account, and secure your place on the Life Change Intensive with lil' bird coaching." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./intensive-enrol.css?v=1" />
+  <script src="https://js.stripe.com/v3/"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <header class="top-bar">
+    <a class="wordmark" href="/">lil' bird</a>
+    <a class="back" href="/book.html#intensive">← back to booking</a>
+  </header>
+
+  <main class="wrap">
+    <p class="eyebrow">life change intensive · enrolment</p>
+    <h1>Read, sign, then <em>pay securely.</em></h1>
+    <p class="lead">
+      You'll see the full agreement before payment — so you know exactly what you're signing up for and what your rights are.
+      After payment you'll get a welcome email and your Nest dashboard will walk you through booking your seven sessions and opening your workbook.
+    </p>
+
+    <div class="steps-strip" id="steps-strip">
+      <span class="step-pill active" data-step="1">1 · Agreement</span>
+      <span class="step-pill" data-step="2">2 · Sign &amp; account</span>
+      <span class="step-pill" data-step="3">3 · Payment</span>
+    </div>
+
+    <section class="card" id="section-contract">
+      <h2>Coaching agreement</h2>
+      <p class="contract-placeholder">CONTRACT PLACEHOLDER — replace this block with your final wording before go-live.</p>
+      <div class="contract-box" id="contract-text">
+        <h3>Life Change Intensive — Coaching Agreement (draft)</h3>
+        <p><strong>Parties.</strong> This agreement is between you (“Client”) and Luke Haythorpe / lil' bird coaching (“Coach”).</p>
+        <p><strong>Programme.</strong> The Life Change Intensive includes seven (7) in-person coaching sessions, approximately two hours each, following the Roots &amp; Wings curriculum. Sessions are booked by you via the scheduling link provided after enrolment.</p>
+        <p><strong>Fee &amp; payment.</strong> The total programme fee is shown at checkout on lilbird.life. Payment is due in full before your first session is booked. Fees are processed securely by Stripe.</p>
+        <p><strong>Scheduling.</strong> You will receive a Calendly link to book all seven sessions. Rescheduling is welcome with reasonable notice; repeated no-shows may affect remaining sessions at the Coach's discretion.</p>
+        <p><strong>Confidentiality.</strong> What you share in sessions stays between us, except where disclosure is required by law or there is risk of harm to you or others.</p>
+        <p><strong>Your rights.</strong> Coaching is not therapy, medical, or legal advice. You may pause or discontinue at any time; fees for unused sessions may be refunded or credited only as agreed in writing with the Coach.</p>
+        <p><strong>Materials.</strong> You receive access to the Roots &amp; Wings workbook and your Nest dashboard for the duration of the programme.</p>
+        <p><strong>Agreement.</strong> By typing your full legal name below and completing payment, you confirm you have read and accept this agreement.</p>
+      </div>
+    </section>
+
+    <section class="card" id="section-sign">
+      <h2>Sign &amp; create your Nest account</h2>
+      <p class="fine-print" style="margin-top:0;margin-bottom:1rem;">
+        Your Nest is where you'll track progress, open your workbook, and book sessions. Same login as the Solo course if you already have one.
+      </p>
+
+      <div id="logged-in-banner" class="logged-in-banner hidden">
+        Signed in as <strong id="logged-in-email"></strong>.
+        <a href="#" id="link-logout">Use a different account</a>
+      </div>
+
+      <form id="form-enrol">
+        <label for="signer-name">Full legal name (as signature)</label>
+        <input id="signer-name" type="text" autocomplete="name" required placeholder="Your full name" />
+
+        <div id="account-fields">
+          <label for="enrol-email">Email</label>
+          <input id="enrol-email" type="email" autocomplete="email" required placeholder="you@example.com" />
+
+          <label for="enrol-password">Password (Nest login)</label>
+          <input id="enrol-password" type="password" autocomplete="new-password" required minlength="8" placeholder="At least 8 characters" />
+        </div>
+
+        <label for="signature-typed">Type your name to sign</label>
+        <input id="signature-typed" type="text" required placeholder="Must match full legal name above" />
+
+        <label class="checkbox-row">
+          <input id="agree-checkbox" type="checkbox" required />
+          <span>I have read the coaching agreement above. I understand the programme includes seven in-person sessions, the fee shown at checkout, and my rights including the ability to ask questions before and during the programme.</span>
+        </label>
+
+        <p id="form-error" class="form-error"></p>
+
+        <div class="btn-row">
+          <button id="btn-continue" class="btn btn-gold" type="submit">Continue to secure payment →</button>
+          <a class="btn btn-outline" href="mailto:hello@lilbird.life">Questions first?</a>
+        </div>
+        <p class="fine-print">Payment opens in a secure Stripe window. You'll receive a welcome email with your Nest link, booking link, and workbook link.</p>
+      </form>
+    </section>
+  </main>
+
+  <div id="checkout-modal" class="checkout-modal" role="dialog" aria-modal="true" aria-labelledby="checkout-title">
+    <div class="checkout-panel">
+      <div class="checkout-head">
+        <h3 id="checkout-title">Complete payment</h3>
+        <button type="button" class="checkout-close" id="checkout-modal-close" aria-label="Close">&times;</button>
+      </div>
+      <div id="checkout-loading" class="checkout-loading">Opening secure checkout…</div>
+      <div id="checkout-mount"></div>
+    </div>
+  </div>
+
+  <script src="./intensive-enrol.js?v=1"></script>
+</body>
+</html>

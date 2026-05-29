@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome · Life Change Intensive · lil' bird</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=DM+Sans:wght@400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./intensive-enrol.css?v=1" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <header class="top-bar">
+    <a class="wordmark" href="/">lil' bird</a>
+  </header>
+
+  <main class="wrap">
+    <p class="eyebrow">payment received</p>
+    <h1>You're in. <em>Check your email.</em></h1>
+    <p class="lead" id="success-lead">
+      We're confirming your payment and unlocking your Nest. This usually takes a few seconds.
+    </p>
+
+    <section class="card">
+      <h2>Your next steps</h2>
+      <ol style="padding-left:1.2rem;color:var(--text-muted);font-size:0.95rem;">
+        <li style="margin-bottom:0.65rem;">Open your <a href="/nest/">Nest dashboard</a> — your home base for this programme</li>
+        <li style="margin-bottom:0.65rem;">Open your <a href="/nest/">Nest dashboard</a> and use <strong>Book your next session</strong> on the Intensive card</li>
+        <li style="margin-bottom:0.65rem;">You have <strong>8 sessions</strong> — book one at a time as you go</li>
+        <li style="margin-bottom:0.65rem;">Open the <a href="/workbooks/roots-and-wings-workbook.html?from=nest">Roots &amp; Wings workbook</a> and start before session one</li>
+        <li>Reply to your welcome email if anything is unclear — hello@lilbird.life</li>
+      </ol>
+      <div class="btn-row">
+        <a class="btn btn-gold" href="/nest/">Open your Nest →</a>
+        <a class="btn btn-outline" href="mailto:hello@lilbird.life">Email Luke</a>
+      </div>
+    </section>
+
+    <p id="poll-status" class="fine-print"></p>
+  </main>
+
+  <script>
+    (function () {
+      const SUPABASE_URL = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
+      const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
+      const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+        auth: { storageKey: 'lilbird-solo-auth', detectSessionInUrl: false }
+      });
+
+      const lead = document.getElementById('success-lead');
+      const pollStatus = document.getElementById('poll-status');
+
+      async function pollEntitlement() {
+        const { data: { user } } = await sb.auth.getUser();
+        if (!user) {
+          pollStatus.textContent = 'Log in at your Nest with the same email you used to enrol.';
+          return;
+        }
+
+        for (let i = 0; i < 8; i++) {
+          const { data } = await sb.from('user_entitlements')
+            .select('product')
+            .eq('user_id', user.id)
+            .eq('product', 'life_change_intensive')
+            .eq('active', true)
+            .maybeSingle();
+
+          if (data) {
+            lead.textContent = 'Payment confirmed. Your welcome email is on its way with every link you need.';
+            pollStatus.textContent = 'Nest is unlocked — open it below to book your sessions.';
+            return;
+          }
+          pollStatus.textContent = 'Still confirming… (' + (i + 1) + '/8)';
+          await new Promise((r) => setTimeout(r, 2000));
+        }
+        pollStatus.textContent = 'Payment may still be processing. Open your Nest in a minute, or email hello@lilbird.life if access is missing.';
+      }
+
+      pollEntitlement();
+    })();
+  </script>
+</body>
+</html>
