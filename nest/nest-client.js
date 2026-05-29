@@ -6,6 +6,7 @@
   // Optional secure endpoint for sending a Resend "Your Nest is ready" email.
   // Leave empty unless you have a backend endpoint configured.
   const NEST_WELCOME_EMAIL_ENDPOINT = 'https://worker-solo.cwwq46sn7m.workers.dev/nest-welcome-email';
+  const LCI_BOOKING_URL = 'https://cal.com/luke-haythorpe/life-change-session';
 
   const { createClient } = supabase;
   const AUTH_STORAGE_KEY = 'lilbird-solo-auth';
@@ -25,6 +26,8 @@
   let sessionProgress = [];
   let deepProfile = null;
   let deepNestId = null;
+  let intensiveEnrolment = null;
+  let lciSessions = [];
   let chatMsgs = [];
   let suppressDashboard = false;
   let dashboardHydrateToken = 0;
@@ -390,11 +393,13 @@
     setDashLoading(true);
 
     try {
-      const [entRes, courseRes, progressRes, linkRes] = await Promise.all([
+      const [entRes, courseRes, progressRes, linkRes, intensiveRes, lciRes] = await Promise.all([
         sb.from('user_entitlements').select('product,active').eq('user_id', uid).eq('active', true),
         sb.from('course_users').select('*').eq('id', uid).maybeSingle(),
         sb.from('session_progress').select('*').eq('user_id', uid).order('session_number'),
-        sb.from('deep_profile_links').select('nest_id').eq('user_id', uid).maybeSingle()
+        sb.from('deep_profile_links').select('nest_id').eq('user_id', uid).maybeSingle(),
+        sb.from('intensive_enrolments').select('*').eq('user_id', uid).maybeSingle(),
+        sb.from('lci_sessions').select('*').eq('user_id', uid).order('session_number')
       ]);
 
       if (entRes.error) {
@@ -409,6 +414,11 @@
       courseProfile = courseRes.data || null;
       sessionProgress = progressRes.data || [];
       deepNestId = linkRes.data?.nest_id || null;
+      intensiveEnrolment = intensiveRes.data || null;
+      lciSessions = lciRes.data || [];
+      if (lciRes.error) {
+        console.warn('lci_sessions query:', lciRes.error);
+      }
       deepProfile = null;
 
       if (deepNestId) {
@@ -441,6 +451,91 @@
     }
   }
 
+  function intensiveProgressFlags() {
+    const hasIntensive = entitlements.has('life_change_intensive');
+    const paidDone = hasIntensive || !!intensiveEnrolment?.paid_at;
+    const contractDone = paidDone || !!intensiveEnrolment?.contract_signed_at;
+    return { paidDone, contractDone };
+  }
+
+  function lciStats() {
+    const total = 8;
+    if (!lciSessions.length) {
+      return { total, booked: 0, remaining: total, allBooked: false, hasRows: false, nextAvailable: null };
+    }
+    const booked = lciSessions.filter((s) => s.status === 'booked' || s.status === 'completed').length;
+    const remaining = lciSessions.filter((s) => s.status === 'available').length;
+    const nextAvailable = lciSessions.find((s) => s.status === 'available') || null;
+    return {
+      total,
+      booked,
+      remaining,
+      allBooked: remaining === 0,
+      hasRows: true,
+      nextAvailable
+    };
+  }
+
+  function formatLciSessionDate(iso) {
+    if (!iso) return '—';
+    try {
+      return new Date(iso).toLocaleString(undefined, {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit'
+      });
+    } catch (e) {
+      return '—';
+    }
+  }
+
+  function renderLciBookingSection() {
+    const stats = lciStats();
+    const pct = stats.hasRows ? Math.round((stats.booked / stats.total) * 100) : 0;
+
+    let sessionRows = '';
+    if (stats.hasRows) {
+      const nextNum = stats.nextAvailable?.session_number;
+      sessionRows = lciSessions
+        .map((s) => {
+          const isBooked = s.status === 'booked' || s.status === 'completed';
+          const isNext = !isBooked && s.session_number === nextNum;
+          const dateStr = isBooked ? formatLciSessionDate(s.session_date) : '—';
+          let badge = '';
+          if (isBooked) badge = '<span class="lci-badge booked">Booked</span>';
+          else if (isNext) badge = '<span class="lci-badge next">Up next</span>';
+          return `<li class="lci-session-row${isNext ? ' is-next' : ''}${isBooked ? ' is-booked' : ''}">
+            <span class="lci-session-num">Session ${s.session_number}</span>
+            <span class="lci-session-date">${escapeHtml(dateStr)}</span>
+            ${badge}
+          </li>`;
+        })
+        .join('');
+    } else {
+      sessionRows =
+        '<li class="lci-session-empty">Session slots are being set up — refresh in a moment or email hello@lilbird.life.</li>';
+    }
+
+    let bookingAction = '';
+    if (stats.hasRows && stats.remaining > 0) {
+      bookingAction = `<a class="btn btn-gold" href="${escapeHtml(LCI_BOOKING_URL)}" target="_blank" rel="noopener">Book your next session →</a>`;
+    } else if (stats.hasRows && stats.allBooked) {
+      bookingAction =
+        '<p class="lci-complete">All sessions booked. Reach out to Luke at <a href="mailto:hello@lilbird.life">hello@lilbird.life</a> if you need anything.</p>';
+    }
+
+    return `
+      <p class="lci-counter">Sessions remaining: <strong>${stats.remaining}</strong> of ${stats.total}</p>
+      <div class="progress lci-progress"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <ul class="lci-session-list">${sessionRows}</ul>
+      <div class="btn-row">
+        ${bookingAction}
+        <a class="btn btn-outline" href="${workbookHref('roots-and-wings-workbook.html')}">Open workbook</a>
+      </div>`;
+  }
+
   function renderNextSteps() {
     const steps = [];
     const hasInner = entitlements.has('inner_compass');
@@ -449,20 +544,36 @@
     const hasFirstFlight = entitlements.has('first_flight');
     const hasIntensive = entitlements.has('life_change_intensive');
 
-    steps.push({
-      done: innerDone,
-      text: innerDone
-        ? 'Inner Compass completed'
-        : hasInner
-          ? 'Take your Inner Compass assessment'
-          : 'Unlock Inner Compass in your Nest'
-    });
-    steps.push({ done: hasSolo || hasFirstFlight || hasIntensive, text: 'Your Nest account is active' });
-    steps.push({ done: hasSolo || hasIntensive || hasFirstFlight, text: hasSolo ? 'Continue your Solo journey' : 'Unlock your next product in the Nest' });
-    steps.push({
-      done: innerDone,
-      text: innerDone ? 'Profile ready in My profile' : 'Complete Inner Compass to fill My profile'
-    });
+    if (hasIntensive) {
+      const { contractDone, paidDone } = intensiveProgressFlags();
+      const stats = lciStats();
+      steps.push({ done: contractDone, text: contractDone ? 'Agreement signed' : 'Sign the coaching agreement' });
+      steps.push({ done: paidDone, text: paidDone ? 'Payment confirmed' : 'Complete Intensive payment' });
+      steps.push({
+        done: stats.hasRows && stats.allBooked,
+        text: stats.allBooked
+          ? 'All 8 sessions booked'
+          : stats.hasRows
+            ? `Book your next session (${stats.remaining} of 8 remaining)`
+            : 'Book sessions from your Intensive card'
+      });
+      steps.push({ done: paidDone, text: 'Open Roots & Wings workbook before session one' });
+    } else {
+      steps.push({
+        done: innerDone,
+        text: innerDone
+          ? 'Inner Compass completed'
+          : hasInner
+            ? 'Take your Inner Compass assessment'
+            : 'Unlock Inner Compass in your Nest'
+      });
+      steps.push({ done: hasSolo || hasFirstFlight || hasIntensive, text: 'Your Nest account is active' });
+      steps.push({ done: hasSolo || hasIntensive || hasFirstFlight, text: hasSolo ? 'Continue your Solo journey' : 'Unlock your next product in the Nest' });
+      steps.push({
+        done: innerDone,
+        text: innerDone ? 'Profile ready in My profile' : 'Complete Inner Compass to fill My profile'
+      });
+    }
 
     const ul = document.getElementById('next-steps-list');
     ul.innerHTML = steps
@@ -587,8 +698,8 @@
             <p class="eyebrow">full programme</p>
             <h3>Life Change Intensive</h3>
             <span class="status-badge">active</span>
-            <p>Your Roots & Wings workbook is ready. Fill it in and bring it to each session.</p>
-            <div class="btn-row"><a class="btn btn-gold" href="${workbookHref('roots-and-wings-workbook.html')}">Open workbook →</a></div>
+            <p>Book one session at a time — your Nest tracks all 8.</p>
+            ${renderLciBookingSection()}
           </article>`;
       }
       return `
@@ -596,9 +707,9 @@
           <span class="lock-pill"><i class="ti ti-lock"></i> not yet unlocked</span>
           <p class="eyebrow">full programme</p>
           <h3>Life Change Intensive</h3>
-          <p>Eight guided sessions with Luke. The deepest version of the work.</p>
+          <p>Eight in-person sessions with Luke. Read the agreement, sign, and pay securely on lilbird.life — then book from your Nest.</p>
           <div class="btn-row">
-            <a class="btn btn-ember" href="https://calendly.com/lilbirdlifecoaching/life-change-intensive">Book now →</a>
+            <a class="btn btn-ember" href="/intensive/enrol.html">Enrol — read agreement &amp; pay →</a>
             <button class="btn btn-outline" data-open-ask>Ask a question</button>
           </div>
         </article>`;

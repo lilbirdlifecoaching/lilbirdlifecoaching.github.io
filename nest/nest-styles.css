@@ -170,6 +170,72 @@ body.nest-page { line-height: 1.5; }
 .steps-list { list-style: none; margin-top: 0.6rem; display: grid; gap: 0.35rem; }
 .steps-list li { color: var(--gold-dim); font-size: 0.9rem; }
 .steps-list li.done { color: var(--green); }
+.intensive-checklist { margin: 0.75rem 0 1rem; }
+
+.lci-counter {
+  margin-top: 0.65rem;
+  font-size: 0.92rem;
+  color: var(--text-muted);
+}
+.lci-counter strong { color: var(--gold); font-weight: 500; }
+.lci-progress { margin: 0.5rem 0 0.85rem; }
+.lci-session-list {
+  list-style: none;
+  margin: 0 0 0.5rem;
+  padding: 0;
+  border: 1px solid rgba(245, 200, 66, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.lci-session-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 0.5rem 0.75rem;
+  align-items: center;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+}
+.lci-session-row:last-child { border-bottom: none; }
+.lci-session-row.is-next {
+  background: rgba(245, 200, 66, 0.06);
+  color: var(--text-main);
+}
+.lci-session-row.is-booked { color: var(--text-main); }
+.lci-session-num {
+  font-family: "DM Mono", monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+}
+.lci-session-date { font-size: 0.84rem; }
+.lci-badge {
+  font-family: "DM Mono", monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.18rem 0.45rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.lci-badge.booked {
+  border: 1px solid rgba(157, 191, 138, 0.35);
+  color: var(--green);
+}
+.lci-badge.next {
+  border: 1px solid rgba(245, 200, 66, 0.35);
+  color: var(--gold);
+}
+.lci-session-empty,
+.lci-complete {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  padding: 0.75rem;
+}
+.lci-complete a { color: var(--gold); }
 
 .dash-grid {
   display: grid;
