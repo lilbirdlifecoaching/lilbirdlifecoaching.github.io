@@ -5,7 +5,7 @@
   const ASSESSMENT_WORKER_URL = 'https://lilbird-assessment.cwwq46sn7m.workers.dev';
   // Optional secure endpoint for sending a Resend "Your Nest is ready" email.
   // Leave empty unless you have a backend endpoint configured.
-  const NEST_WELCOME_EMAIL_ENDPOINT = '';
+  const NEST_WELCOME_EMAIL_ENDPOINT = 'https://worker-solo.cwwq46sn7m.workers.dev/nest-welcome-email';
 
   const { createClient } = supabase;
   const AUTH_STORAGE_KEY = 'lilbird-solo-auth';
@@ -335,6 +335,10 @@
     return base;
   }
 
+  function workbookHref(filename) {
+    return '/workbooks/' + filename + '?from=nest';
+  }
+
   function progressSummary() {
     if (!sessionProgress.length) return { pct: 0, next: 'Session 0 · First Flight' };
     const complete = sessionProgress.filter((s) => s.status === 'complete').length;
@@ -392,7 +396,7 @@
             <span class="status-badge">booked</span>
             <p>Fill in your workbook before your session. It saves privately to your device.</p>
             <div class="btn-row">
-              <a class="btn btn-gold" href="/workbooks/first-flight-standalone.html">Open workbook</a>
+              <a class="btn btn-gold" href="${workbookHref('first-flight-standalone.html')}">Open workbook</a>
               <a class="btn btn-outline" href="https://calendly.com/lilbirdlifecoaching/first-flight-session">View booking</a>
             </div>
           </article>`;
@@ -437,7 +441,7 @@
             <h3>Life Change Intensive</h3>
             <span class="status-badge">active</span>
             <p>Your Roots & Wings workbook is ready. Fill it in and bring it to each session.</p>
-            <div class="btn-row"><a class="btn btn-gold" href="/workbooks/roots-and-wings-workbook.html">Open workbook →</a></div>
+            <div class="btn-row"><a class="btn btn-gold" href="${workbookHref('roots-and-wings-workbook.html')}">Open workbook →</a></div>
           </article>`;
       }
       return `
@@ -511,6 +515,7 @@
         <p class="sidebar-eyebrow">session context</p>
         <h4>First Flight booked</h4>
         <p>Session date/time placeholder. Confirm from your Calendly email and complete your workbook first.</p>
+        <a class="btn btn-outline full" href="${workbookHref('first-flight-standalone.html')}">Open workbook</a>
         <a class="btn btn-outline full" href="https://calendly.com/lilbirdlifecoaching/first-flight-session">View booking</a>`;
       return;
     }
