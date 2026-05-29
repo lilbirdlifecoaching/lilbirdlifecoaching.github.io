@@ -87,33 +87,6 @@
     return { user: data.user, error: null };
   }
 
-  function showSessionInfo(user, entitlementCount) {
-    const el = document.getElementById('dash-session-info');
-    if (!el || !user) return;
-
-    const email = (user.email || '').toLowerCase();
-    const id = user.id || '';
-    let text =
-      'Signed in as ' +
-      (user.email || '(no email)') +
-      ' · user id ' +
-      id +
-      ' · ' +
-      entitlementCount +
-      ' entitlement(s) loaded for this id';
-
-    el.classList.remove('warn');
-    if (entitlementCount === 0) {
-      el.classList.add('warn');
-      text +=
-        ' · No entitlements for this user id. In Supabase, grant rows in user_entitlements where user_id = ' +
-        id;
-    }
-
-    el.textContent = text;
-    el.classList.remove('hidden');
-  }
-
   function resetLogoutButton() {
     const btnLogout = document.getElementById('btn-logout');
     if (!btnLogout) return;
@@ -462,7 +435,6 @@
       renderProducts();
       renderProfile();
       renderSidebar();
-      showSessionInfo(currentUser, entitlements.size);
     } finally {
       setDashLoading(false);
     }
@@ -742,12 +714,6 @@
     document.getElementById('sidebar-context-card').innerHTML = '';
     document.getElementById('next-steps-list').innerHTML = '';
     document.getElementById('nav-user-name').textContent = '';
-    const sess = document.getElementById('dash-session-info');
-    if (sess) {
-      sess.textContent = '';
-      sess.classList.add('hidden');
-      sess.classList.remove('warn');
-    }
   }
   const tabProducts = document.getElementById('tab-products');
   const tabProfile = document.getElementById('tab-profile');
