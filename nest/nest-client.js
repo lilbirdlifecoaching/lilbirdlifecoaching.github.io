@@ -419,6 +419,23 @@
       if (lciRes.error) {
         console.warn('lci_sessions query:', lciRes.error);
       }
+
+      if (entitlements.has('life_change_intensive') && !lciSessions.length && !lciRes.error) {
+        const initRes = await sb.rpc('initialise_lci_sessions', { p_user_id: uid });
+        if (initRes.error) {
+          console.warn('initialise_lci_sessions:', initRes.error);
+        } else {
+          const refetch = await sb
+            .from('lci_sessions')
+            .select('*')
+            .eq('user_id', uid)
+            .order('session_number');
+          if (!refetch.error && refetch.data?.length) {
+            lciSessions = refetch.data;
+          }
+        }
+      }
+
       deepProfile = null;
 
       if (deepNestId) {
@@ -992,6 +1009,16 @@
   if (btnNavProfile) {
     btnNavProfile.addEventListener('click', () => setTab('profile'));
   }
+
+  document.addEventListener('visibilitychange', () => {
+    if (
+      document.visibilityState === 'visible' &&
+      currentUser &&
+      document.getElementById('view-dashboard')?.classList.contains('active')
+    ) {
+      void hydrateDashboard();
+    }
+  });
 
   (async function init() {
     resetLoginButton();
