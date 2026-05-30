@@ -478,7 +478,7 @@
   <div class="topbar-sep"></div>
   <span class="topbar-title">First Flight · Standalone Session</span>
   <div class="topbar-actions">
-    <a href="/nest/" class="topbar-nest" id="topbar-back-nest" hidden>← Nest</a>
+    <a href="/nest/" class="topbar-nest lilbird-nav-nest" id="topbar-back-nest" hidden>← back to your Nest</a>
     <button class="btn btn-ghost" onclick="saveData()">Save</button>
     <button class="btn btn-primary" onclick="window.print()">Export PDF</button>
   </div>
@@ -697,14 +697,6 @@
 
   loadData();
 
-  (function () {
-    var p = new URLSearchParams(window.location.search);
-    if (p.get('from') === 'nest' || document.referrer.indexOf('/nest') !== -1) {
-      var el = document.getElementById('topbar-back-nest');
-      if (el) el.hidden = false;
-    }
-  })();
-
   // Autosave on any input not already wired
   document.querySelectorAll('textarea, input').forEach(el => {
     el.addEventListener('input', autosave);
@@ -712,5 +704,6 @@
   });
 </script>
 <script src="/lilbird-auth-bridge.js"></script>
+<script src="/lilbird-nest-nav.js"></script>
 </body>
 </html>
