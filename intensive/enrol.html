@@ -11,11 +11,15 @@
   <link rel="stylesheet" href="./intensive-enrol.css?v=3" />
   <script src="https://js.stripe.com/v3/"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/lilbird-auth-bridge.js"></script>
 </head>
 <body>
   <header class="top-bar">
     <a class="wordmark" href="/">lil' bird</a>
-    <a class="back" href="/book.html#intensive">← back to booking</a>
+    <div class="top-bar-actions">
+      <a class="back back-nest" href="/nest/">← back to your Nest</a>
+      <a class="back" href="/book.html#intensive">← back to booking</a>
+    </div>
   </header>
 
   <main class="wrap">

@@ -45,6 +45,24 @@ a { color: var(--gold); }
   font-size: 0.9rem;
 }
 
+.top-bar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1.1rem;
+  justify-content: flex-end;
+}
+
+.top-bar a.back-nest {
+  color: var(--gold);
+  border: 1px solid rgba(245, 200, 66, 0.25);
+  border-radius: 100px;
+  padding: 0.35rem 0.75rem;
+  font-family: "DM Mono", monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
 .wrap {
   max-width: 720px;
   margin: 0 auto;
