@@ -709,7 +709,7 @@
           <h3>Life Change Intensive</h3>
           <p>Eight in-person sessions with Luke. Read the agreement, sign, and pay securely on lilbird.life — then book from your Nest.</p>
           <div class="btn-row">
-            <a class="btn btn-ember" href="/intensive/enrol.html">Enrol — read agreement &amp; pay →</a>
+            <a class="btn btn-ember" href="/intensive/enrol.html?from=nest">Enrol — read agreement &amp; pay →</a>
             <button class="btn btn-outline" data-open-ask>Ask a question</button>
           </div>
         </article>`;
