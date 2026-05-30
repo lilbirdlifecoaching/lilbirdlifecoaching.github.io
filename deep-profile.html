@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- lilbird deep-profile build: v7.0.2-20260513 (course bridge: reads ?launchToken from URL, fire-and-forget POST /link-to-course after analyze so nestId lands in the Solo Course deep_profile_links table — worker v7.0.2) -->
+<!-- lilbird deep-profile build: v7.0.3-20260529 (fix: stacked site header — nav + depth meter no longer overlap) -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -27,6 +27,12 @@
     --ember: #e8734a;
     --ember-faint: rgba(232,115,74,0.12);
     --transition: all 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    --site-nav-height: 4.5rem;
+    --site-depth-height: 0rem;
+  }
+
+  body.dp-in-chat {
+    --site-depth-height: 2.35rem;
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -74,16 +80,24 @@
     100% { transform: translateY(-110vh) translateX(-20px); opacity: 0; }
   }
 
-  nav {
+  .site-top {
     position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    padding: 1.25rem 2.5rem;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    background: rgba(30,32,40,0.96);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(245,200,66,0.08);
+  }
+
+  nav {
+    position: relative;
+    padding: 1rem 2.5rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: linear-gradient(to bottom, rgba(30,32,40,0.95), transparent);
-    backdrop-filter: blur(2px);
+    background: transparent;
   }
   .nav-logo { display: flex; align-items: center; gap: 0.65rem; text-decoration: none; }
   .nav-bird { width: 36px; height: 36px; border-radius: 8px; }
@@ -93,10 +107,16 @@
   .nav-back:hover { color: var(--gold); }
   .nav-back-nest { color: var(--gold); border: 1px solid rgba(245,200,66,0.25); border-radius: 100px; padding: 0.35rem 0.75rem; }
 
-  .progress-bar-wrap { position: fixed; top: 0; left: 0; right: 0; z-index: 200; background: rgba(30,32,40,0.92); }
+  .progress-bar-wrap { position: relative; background: transparent; }
   .progress-bar-fill { height: 3px; background: linear-gradient(to right, var(--gold), var(--ember)); transition: width 0.6s ease; }
 
-  .screen { display: none; min-height: 100vh; padding: 7rem 1.5rem 4rem; position: relative; z-index: 2; }
+  .screen {
+    display: none;
+    min-height: 100vh;
+    padding: calc(var(--site-nav-height) + var(--site-depth-height) + 2rem) 1.5rem 4rem;
+    position: relative;
+    z-index: 2;
+  }
   .screen.active { display: block; }
   .inner { max-width: 680px; margin: 0 auto; }
 
@@ -794,7 +814,7 @@
   .chat-screen {
     max-width: 640px;
     margin: 0 auto;
-    padding-top: 2rem;
+    padding-top: 0.5rem;
   }
   .chat-messages {
     display: flex;
@@ -1433,14 +1453,13 @@
   }
 
   .depth-meter-strip {
-    display: flex;
+    display: none;
     align-items: center;
     gap: 0.65rem;
-    padding: 0.35rem 1.25rem 0.5rem;
-    background: rgba(30,32,40,0.92);
-    border-bottom: 1px solid rgba(245,200,66,0.08);
+    padding: 0.15rem 1.25rem 0.45rem;
     max-width: 100vw;
   }
+  body.dp-in-chat .depth-meter-strip { display: flex; }
   .depth-meter-eyebrow {
     font-family: 'DM Mono', monospace;
     font-size: 0.55rem;
@@ -1698,8 +1717,11 @@
   }
 
   @media (max-width: 600px) {
-    nav { padding: 1rem 1.25rem; }
-    .screen { padding: 6rem 1.25rem 3rem; }
+    :root { --site-nav-height: 3.75rem; }
+    body.dp-in-chat { --site-depth-height: 2.15rem; }
+    nav { padding: 0.85rem 1.25rem; }
+    .depth-meter-strip { padding: 0.1rem 1.25rem 0.35rem; }
+    .screen { padding: calc(var(--site-nav-height) + var(--site-depth-height) + 1.5rem) 1.25rem 3rem; }
     .chapter-card { padding: 1.5rem; }
     .snap-preview, .email-capture, .offer-codes, .stripe-wrap { padding: 1.25rem; }
     .pay-amounts { gap: 0.5rem; }
@@ -1718,6 +1740,7 @@
   <p class="loading-sub">This can take up to a minute</p>
 </div>
 
+<header class="site-top">
 <nav>
   <a href="index.html" class="nav-logo">
     <img src="bird-logo.png" alt="lil' bird" class="nav-bird">
@@ -1737,6 +1760,7 @@
   </div>
   <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
 </div>
+</header>
 
 
 <!-- ══════════════════════════════════════
@@ -2575,6 +2599,7 @@ const PROGRESS = {
 // ═══════════════════════════════════════
 function goTo(screenId){
   if(typeof stopMic === 'function' && activeRecognitionId) stopMic();
+  document.body.classList.toggle('dp-in-chat', screenId === 'screen-chat');
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   const t = document.getElementById(screenId);
   if(t){ t.classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }
