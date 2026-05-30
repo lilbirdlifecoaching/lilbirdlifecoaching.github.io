@@ -461,6 +461,7 @@
       .wrap { padding-top: 4.75rem; }
     }
   </style>
+<link rel="stylesheet" href="/lilbird-nest-nav.css" />
 </head>
 <body>
 
@@ -469,7 +470,10 @@
     <img src="../bird-logo.png" alt="" width="28" height="28" />
     <span>lil' bird</span>
   </a>
-  <span class="nav-tag">Free tool</span>
+  <div style="display:flex;align-items:center;gap:0.65rem;flex-wrap:wrap;">
+    <a href="/nest/" id="nav-back-nest" class="lilbird-nav-nest" hidden>← back to your Nest</a>
+    <span class="nav-tag">Free tool</span>
+  </div>
 </nav>
 
 <!-- INTRO -->
@@ -855,5 +859,7 @@
   }
 })();
 </script>
+<script src="/lilbird-auth-bridge.js"></script>
+<script src="/lilbird-nest-nav.js"></script>
 </body>
 </html>
