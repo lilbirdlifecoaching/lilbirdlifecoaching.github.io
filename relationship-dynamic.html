@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/lilbird-nest-nav.css" />
 <style>
   :root {
     --gold: #F5C842;
@@ -75,6 +76,14 @@
     transition: color 0.2s, border-color 0.2s;
   }
   .nav-link:hover { color: var(--gold); border-color: rgba(245,200,66,0.35); }
+  .site-nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .nav-link-nest { color: var(--gold); border-color: rgba(245,200,66,0.3); }
 
   .page {
     position: relative;
@@ -330,8 +339,11 @@
 <body>
 
 <nav class="site-nav">
-  <a class="nav-brand" href="https://lilbird.life" target="_blank" rel="noopener">lil' bird</a>
-  <a class="nav-link" href="https://lilbird.life/deep-profile.html" target="_blank" rel="noopener">Inner Compass →</a>
+  <a class="nav-brand" href="/">lil' bird</a>
+  <div class="site-nav-actions">
+    <a href="/nest/" id="nav-back-nest" class="nav-link nav-link-nest lilbird-nav-nest" hidden>← back to your Nest</a>
+    <a class="nav-link" href="/deep-profile.html?from=nest">Inner Compass →</a>
+  </div>
 </nav>
 
 <main class="page">
@@ -409,7 +421,7 @@
 </main>
 
 <footer class="site-footer">
-  <p>Powered by <a href="https://lilbird.life" target="_blank" rel="noopener">lil' bird</a> · <a href="https://lilbird.life/deep-profile.html" target="_blank" rel="noopener">Take the Inner Compass</a></p>
+  <p>Powered by <a href="https://lilbird.life" target="_blank" rel="noopener">lil' bird</a> · <a href="https://lilbird.life/privacy.html" target="_blank" rel="noopener">Privacy</a> · <a href="https://lilbird.life/deep-profile.html" target="_blank" rel="noopener">Inner Compass</a></p>
 </footer>
 
 <script>
@@ -662,5 +674,7 @@ Optional query params:
   nest=nest-…      — load user profile from Inner Compass Nest
   relationship=    — colleague | manager | partner | friend | family
 -->
+<script src="/lilbird-auth-bridge.js"></script>
+<script src="/lilbird-nest-nav.js"></script>
 </body>
 </html>

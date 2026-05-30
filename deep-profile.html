@@ -7,6 +7,7 @@
 <title>lil' bird — The Inner Compass</title>
 <meta name="description" content="Who are you really? A guided self-discovery experience — patterns, strengths, motivations, and direction — through conversation, not multiple choice.">
 <link rel="icon" href="bird-logo.png" type="image/png">
+<link rel="stylesheet" href="/lilbird-nest-nav.css" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- Fonts load non-blocking so they don't delay first paint -->
@@ -1747,7 +1748,7 @@
     <span class="nav-wordmark">lil' bird</span>
   </a>
   <div class="nav-actions">
-    <a href="/nest/" class="nav-back nav-back-nest" id="nav-back-nest" hidden>← back to your Nest</a>
+    <a href="/nest/" class="nav-back nav-back-nest lilbird-nav-nest" id="nav-back-nest" hidden>← back to your Nest</a>
     <a href="https://lilbird.life/" class="nav-back">← back to home</a>
   </div>
 </nav>
@@ -2467,15 +2468,7 @@
 </footer>
 
 <script src="/lilbird-auth-bridge.js"></script>
-<script>
-(function () {
-  var params = new URLSearchParams(window.location.search);
-  if (params.get('from') === 'nest' || document.referrer.indexOf('/nest') !== -1) {
-    var nestLink = document.getElementById('nav-back-nest');
-    if (nestLink) nestLink.hidden = false;
-  }
-})();
-</script>
+<script src="/lilbird-nest-nav.js"></script>
 <script>
 (function () {
   const a = document.getElementById('footer-feedback-link');

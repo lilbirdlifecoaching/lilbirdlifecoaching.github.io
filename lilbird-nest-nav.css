@@ -1,0 +1,20 @@
+/* Shared Nest navigation — product back links + main-site login pill */
+.lilbird-nav-nest,
+.nav-nest {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold, #F5C842);
+  text-decoration: none;
+  border: 1px solid rgba(245, 200, 66, 0.25);
+  border-radius: 100px;
+  padding: 0.45rem 0.85rem;
+  transition: border-color 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+.lilbird-nav-nest:hover,
+.nav-nest:hover {
+  border-color: rgba(245, 200, 66, 0.55);
+  color: #fff;
+}
