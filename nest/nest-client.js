@@ -468,6 +468,11 @@
     }
   }
 
+  /** Solo unlock: Nest entitlement row and/or legacy course_users purchase (same Supabase login). */
+  function hasSoloCourseAccess() {
+    return entitlements.has('solo_course') || !!courseProfile?.purchased_at;
+  }
+
   function intensiveProgressFlags() {
     const hasIntensive = entitlements.has('life_change_intensive');
     const paidDone = hasIntensive || !!intensiveEnrolment?.paid_at;
@@ -543,21 +548,69 @@
         '<p class="lci-complete">All sessions booked. Reach out to Luke at <a href="mailto:hello@lilbird.life">hello@lilbird.life</a> if you need anything.</p>';
     }
 
+    const syncHint =
+      stats.hasRows && stats.remaining > 0
+        ? '<p class="lci-sync-hint">Just booked on Cal.com? Tap below if your count did not update.</p>'
+        : '';
+
+    const syncButton =
+      stats.hasRows && stats.remaining > 0
+        ? '<button type="button" class="btn btn-outline" id="btn-lci-claim">Update my session count</button>'
+        : '';
+
     return `
       <p class="lci-counter">Sessions remaining: <strong>${stats.remaining}</strong> of ${stats.total}</p>
       <div class="progress lci-progress"><div class="progress-fill" style="width:${pct}%"></div></div>
       <ul class="lci-session-list">${sessionRows}</ul>
+      ${syncHint}
       <div class="btn-row">
         ${bookingAction}
+        ${syncButton}
         <a class="btn btn-outline" href="${workbookHref('roots-and-wings-workbook.html')}">Open workbook</a>
       </div>`;
+  }
+
+  async function claimNextLciSession(btn) {
+    if (!currentUser?.id) return;
+    const original = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Updating…';
+    setDashError('');
+
+    try {
+      const { data, error } = await sb.rpc('claim_next_lci_session');
+      if (error) {
+        setDashError(
+          error.message === 'no available sessions'
+            ? 'No sessions left to mark — you may already be up to date.'
+            : 'Could not update your session count. Try refreshing, or email hello@lilbird.life.'
+        );
+        return;
+      }
+      await hydrateDashboard();
+      const num = data?.session_number;
+      if (num) {
+        btn.textContent = `Session ${num} marked booked ✓`;
+        setTimeout(() => {
+          btn.textContent = original;
+          btn.disabled = false;
+        }, 2500);
+        return;
+      }
+    } catch (e) {
+      console.error('claim_next_lci_session:', e);
+      setDashError('Could not update your session count. Try refreshing.');
+    }
+
+    btn.textContent = original;
+    btn.disabled = false;
   }
 
   function renderNextSteps() {
     const steps = [];
     const hasInner = entitlements.has('inner_compass');
     const innerDone = hasInnerCompassComplete();
-    const hasSolo = entitlements.has('solo_course');
+    const hasSolo = hasSoloCourseAccess();
     const hasFirstFlight = entitlements.has('first_flight');
     const hasIntensive = entitlements.has('life_change_intensive');
 
@@ -687,7 +740,8 @@
     }
 
     if (key === 'solo_course') {
-      if (unlocked) {
+      const soloUnlocked = hasSoloCourseAccess();
+      if (soloUnlocked) {
         const p = progressSummary();
         return `
           <article class="product-card">
@@ -745,6 +799,10 @@
     productsPane.querySelectorAll('[data-open-ask]').forEach((btn) => {
       btn.addEventListener('click', () => setTab('ask'));
     });
+    const claimBtn = productsPane.querySelector('#btn-lci-claim');
+    if (claimBtn) {
+      claimBtn.addEventListener('click', () => void claimNextLciSession(claimBtn));
+    }
   }
 
   function renderProfile() {
@@ -794,7 +852,7 @@
         <a class="btn btn-outline full" href="https://calendly.com/lilbirdlifecoaching/first-flight-session">View booking</a>`;
       return;
     }
-    if (entitlements.has('solo_course')) {
+    if (hasSoloCourseAccess()) {
       const p = progressSummary();
       el.innerHTML = `
         <p class="sidebar-eyebrow">session context</p>
