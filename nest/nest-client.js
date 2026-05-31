@@ -749,8 +749,15 @@
   function cardProduct(key) {
     const unlocked = entitlements.has(key);
     if (key === 'inner_compass') {
+      const done = hasInnerCompassComplete();
+      const connectBlock = done
+        ? ''
+        : `<p class="inner-compass-link-hint">Already finished? Paste the link from your results email (the part with <code>?nest=…</code>).</p>
+            <div class="btn-row inner-compass-connect-row">
+              <button type="button" class="btn btn-outline" id="btn-link-inner-compass">Connect my results</button>
+            </div>`;
+
       if (unlocked) {
-        const done = hasInnerCompassComplete();
         if (done) {
           const arch = deepProfile.archetypePlain || deepProfile.archetype || 'Your read';
           const mbti = deepProfile.mbti || deepProfile.likelyCoreMbti || '';
@@ -772,10 +779,9 @@
             <h3>Inner Compass read</h3>
             <span class="status-badge pending">ready to begin</span>
             <p>You have access. Take the assessment to generate your personal read.</p>
-            <p class="inner-compass-link-hint">Already finished? Connect the link from your results email so your Nest shows your read.</p>
+            ${connectBlock}
             <div class="btn-row">
               <a class="btn btn-gold" href="${innerCompassHref()}">Take the Inner Compass →</a>
-              <button type="button" class="btn btn-outline" id="btn-link-inner-compass">Connect my results</button>
             </div>
           </article>`;
       }
@@ -785,6 +791,7 @@
           <p class="eyebrow">assessment</p>
           <h3>Inner Compass read</h3>
           <p>Understand your wiring. The foundation everything else builds on.</p>
+          ${connectBlock}
           <div class="btn-row"><a class="btn btn-ember" href="/deep-profile.html?from=nest">Take the Inner Compass →</a></div>
         </article>`;
     }
