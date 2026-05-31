@@ -608,7 +608,7 @@
 
   function renderNextSteps() {
     const steps = [];
-    const hasInner = entitlements.has('inner_compass');
+    const hasInner = hasInnerCompassAccess();
     const innerDone = hasInnerCompassComplete();
     const hasSolo = hasSoloCourseAccess();
     const hasFirstFlight = entitlements.has('first_flight');
@@ -673,6 +673,15 @@
     return s.replace(/^nest[:\s]+/i, '').trim();
   }
 
+  async function fetchAssessmentProfile(nestId) {
+    const res = await fetch(
+      ASSESSMENT_WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(nestId)
+    );
+    if (!res.ok) return null;
+    const payload = await res.json();
+    return parseAssessmentProfile(payload);
+  }
+
   async function linkInnerCompassToAccount(btn) {
     const hint =
       'Paste your Inner Compass results link from email\n(for example: lilbird.life/deep-profile.html?nest=…)\n\nOr paste the nest id only:';
@@ -687,19 +696,35 @@
 
     const original = btn.textContent;
     btn.disabled = true;
-    btn.textContent = 'Connecting…';
+    btn.textContent = 'Checking your read…';
     setDashError('');
 
     try {
+      const profile = await fetchAssessmentProfile(nestId);
+      if (!profile) {
+        setDashError(
+          'That link did not load a saved read. Open it in a new tab — if it works there, copy the full URL again. The email on the assessment can differ from your Nest login; that is OK.'
+        );
+        return;
+      }
+
+      btn.textContent = 'Connecting…';
       const { error } = await sb.rpc('link_deep_profile_to_user', { p_nest_id: nestId });
       if (error) {
         setDashError(
           error.message.includes('function') || error.code === 'PGRST202'
-            ? 'Database not ready — run nest/link-inner-compass.sql in Supabase, then try again.'
-            : 'Could not connect your results. Check the link from your email and try again.'
+            ? 'Database not ready — run nest/link-inner-compass-grant-on-link.sql in Supabase, then try again.'
+            : 'Could not save the link. Try again or email hello@lilbird.life.'
         );
         return;
       }
+
+      deepNestId = nestId;
+      deepProfile = profile;
+      if (!entitlements.has('inner_compass')) {
+        entitlements.add('inner_compass');
+      }
+
       await hydrateDashboard();
       if (hasInnerCompassComplete()) {
         btn.textContent = 'Connected ✓';
@@ -709,9 +734,7 @@
         }, 2500);
         return;
       }
-      setDashError(
-        'Link saved, but your read could not be loaded yet. Open your results URL in a new tab to confirm it works, then refresh Nest.'
-      );
+      setDashError('Link saved — refresh the page if your profile does not appear.');
     } catch (e) {
       console.error('link_deep_profile_to_user:', e);
       setDashError('Could not connect your results. Try again or email hello@lilbird.life.');
@@ -719,6 +742,10 @@
 
     btn.textContent = original;
     btn.disabled = false;
+  }
+
+  function hasInnerCompassAccess() {
+    return entitlements.has('inner_compass') || !!deepNestId || hasInnerCompassComplete();
   }
 
   function hasInnerCompassComplete() {
@@ -750,14 +777,15 @@
     const unlocked = entitlements.has(key);
     if (key === 'inner_compass') {
       const done = hasInnerCompassComplete();
+      const hasAccess = hasInnerCompassAccess();
       const connectBlock = done
         ? ''
-        : `<p class="inner-compass-link-hint">Already finished? Paste the link from your results email (the part with <code>?nest=…</code>).</p>
+        : `<p class="inner-compass-link-hint">Already finished? Paste the link from your results email (the part with <code>?nest=…</code>). Your Nest email can differ from the assessment email.</p>
             <div class="btn-row inner-compass-connect-row">
               <button type="button" class="btn btn-outline" id="btn-link-inner-compass">Connect my results</button>
             </div>`;
 
-      if (unlocked) {
+      if (hasAccess) {
         if (done) {
           const arch = deepProfile.archetypePlain || deepProfile.archetype || 'Your read';
           const mbti = deepProfile.mbti || deepProfile.likelyCoreMbti || '';
@@ -892,7 +920,7 @@
 
   function renderProfile() {
     const pane = document.getElementById('pane-profile');
-    if (entitlements.has('inner_compass') && hasInnerCompassComplete()) {
+    if (hasInnerCompassComplete()) {
       pane.innerHTML = `
         <article class="product-card">
           <p class="eyebrow">my profile</p>
@@ -905,15 +933,22 @@
           <p>Your profile is loaded and ready to revisit.</p>
           <div class="btn-row"><a class="btn btn-gold" href="${innerCompassHref()}">Open Inner Compass result →</a></div>
         </article>`;
-    } else if (entitlements.has('inner_compass')) {
+    } else if (hasInnerCompassAccess()) {
       pane.innerHTML = `
         <article class="product-card">
           <p class="eyebrow">my profile</p>
           <h3>Inner Compass profile</h3>
-          <span class="status-badge pending">not started</span>
-          <p>You have access. Complete the Inner Compass and your profile will appear here.</p>
-          <div class="btn-row"><a class="btn btn-gold" href="${innerCompassHref()}">Take the Inner Compass →</a></div>
+          <span class="status-badge pending">connect your read</span>
+          <p>Paste your results link from email on the Inner Compass card (Products tab), or open your read below.</p>
+          <div class="btn-row">
+            <button type="button" class="btn btn-outline" id="btn-link-inner-compass-profile">Connect my results</button>
+            <a class="btn btn-gold" href="${innerCompassHref()}">Take / open Inner Compass →</a>
+          </div>
         </article>`;
+      const profileLinkBtn = pane.querySelector('#btn-link-inner-compass-profile');
+      if (profileLinkBtn) {
+        profileLinkBtn.addEventListener('click', () => void linkInnerCompassToAccount(profileLinkBtn));
+      }
     } else {
       pane.innerHTML = `
         <article class="product-card locked">
