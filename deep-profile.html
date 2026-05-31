@@ -2469,6 +2469,7 @@
 
 <script src="/lilbird-auth-bridge.js"></script>
 <script src="/lilbird-nest-nav.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 (function () {
   const a = document.getElementById('footer-feedback-link');
@@ -2488,9 +2489,28 @@
 // ═══════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════
-const DEEP_PROFILE_BUILD = 'v7.0.2-20260513';
+const DEEP_PROFILE_BUILD = 'v7.0.3-20260530';
 const WORKER_URL     = 'https://lilbird-assessment.cwwq46sn7m.workers.dev';
+const SUPABASE_URL   = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
+const SUPABASE_ANON  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
 console.info("lil' bird Inner Compass", DEEP_PROFILE_BUILD, '| worker:', WORKER_URL);
+
+async function _linkToNestIfLoggedIn(nestIdToLink){
+  if(!nestIdToLink || typeof supabase === 'undefined') return;
+  try{
+    const { createClient } = supabase;
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON, {
+      auth: { storageKey: 'lilbird-solo-auth', autoRefreshToken: true, persistSession: true, detectSessionInUrl: false }
+    });
+    const { data: { session } } = await sb.auth.getSession();
+    if(!session?.user?.id) return;
+    const { error } = await sb.rpc('link_deep_profile_to_user', { p_nest_id: nestIdToLink });
+    if(error) console.warn('Nest profile link RPC:', error.message || error);
+    else console.info('Inner Compass linked to your Nest account.');
+  }catch(e){
+    console.warn('Nest profile link:', e?.message || e);
+  }
+}
 
 // ── Course bridge: launchToken (Solo Course → Deep Profile → /link-to-course) ──
 // When the course launches us with ?launchToken=…, we stash it and POST it
@@ -2766,6 +2786,8 @@ async function processPayment(){
       try{
         // Store profile in KV first so Nest link works
         await fetch(`${WORKER_URL}/store-profile`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nestId,profile:profileData,canvasScores,canvasHistory:[],assessmentMode: assessmentPath === 'know' ? 'know-type' : 'full',peakPlunge: peakPlungeData,pairTheseLog})});
+        if(launchToken){ _postCourseLink(nestId).catch(err => console.warn('Course link unhandled:', err)); }
+        _linkToNestIfLoggedIn(nestId).catch(err => console.warn('Nest link unhandled:', err));
         // Then send email (which also marks as paid in KV)
         console.log('Sending promo profile email to:', emailVal);
         const emailRes = await fetch(`${WORKER_URL}/send-profile-email`,{
@@ -3094,6 +3116,7 @@ async function runAnalysis(){
     }
     await fetch(`${WORKER_URL}/store-profile`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nestId,profile:profileData,canvasScores,canvasHistory:[],assessmentMode: assessmentPath === 'know' ? 'know-type' : 'full',peakPlunge: peakPlungeData,pairTheseLog})});
     if(launchToken){ _postCourseLink(nestId).catch(err => console.warn('Course link unhandled:', err)); }
+    _linkToNestIfLoggedIn(nestId).catch(err => console.warn('Nest link unhandled:', err));
   }catch(e){
     console.error('Analysis error — using fallback:', e.message);
     profileData=getFallbackProfile();
