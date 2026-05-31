@@ -443,7 +443,7 @@
           const res = await fetch(ASSESSMENT_WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(deepNestId));
           if (res.ok) {
             const payload = await res.json();
-            deepProfile = payload?.profile || null;
+            deepProfile = parseAssessmentProfile(payload);
           }
         } catch (e) {
           console.error('Could not load deep profile:', e);
@@ -651,6 +651,76 @@
       .join('');
   }
 
+  function parseAssessmentProfile(payload) {
+    if (!payload || typeof payload !== 'object') return null;
+    if (payload.profile && typeof payload.profile === 'object') return payload.profile;
+    if (payload.archetype || payload.mbti || payload.archetypePlain) return payload;
+    return null;
+  }
+
+  function extractNestIdFromInput(raw) {
+    const s = String(raw || '').trim();
+    if (!s) return '';
+    try {
+      const u = new URL(s, window.location.origin);
+      const n = u.searchParams.get('nest');
+      if (n) return n.trim();
+    } catch (_) {
+      /* not a full URL */
+    }
+    const m = s.match(/[?&]nest=([^&]+)/i);
+    if (m) return decodeURIComponent(m[1]).trim();
+    return s.replace(/^nest[:\s]+/i, '').trim();
+  }
+
+  async function linkInnerCompassToAccount(btn) {
+    const hint =
+      'Paste your Inner Compass results link from email\n(for example: lilbird.life/deep-profile.html?nest=…)\n\nOr paste the nest id only:';
+    const raw = window.prompt(hint, '');
+    if (raw == null) return;
+
+    const nestId = extractNestIdFromInput(raw);
+    if (!nestId) {
+      setDashError('Could not read a nest id from that text. Use your full results link from email.');
+      return;
+    }
+
+    const original = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Connecting…';
+    setDashError('');
+
+    try {
+      const { error } = await sb.rpc('link_deep_profile_to_user', { p_nest_id: nestId });
+      if (error) {
+        setDashError(
+          error.message.includes('function') || error.code === 'PGRST202'
+            ? 'Database not ready — run nest/link-inner-compass.sql in Supabase, then try again.'
+            : 'Could not connect your results. Check the link from your email and try again.'
+        );
+        return;
+      }
+      await hydrateDashboard();
+      if (hasInnerCompassComplete()) {
+        btn.textContent = 'Connected ✓';
+        setTimeout(() => {
+          btn.textContent = original;
+          btn.disabled = false;
+        }, 2500);
+        return;
+      }
+      setDashError(
+        'Link saved, but your read could not be loaded yet. Open your results URL in a new tab to confirm it works, then refresh Nest.'
+      );
+    } catch (e) {
+      console.error('link_deep_profile_to_user:', e);
+      setDashError('Could not connect your results. Try again or email hello@lilbird.life.');
+    }
+
+    btn.textContent = original;
+    btn.disabled = false;
+  }
+
   function hasInnerCompassComplete() {
     return !!(deepNestId && deepProfile);
   }
@@ -702,7 +772,11 @@
             <h3>Inner Compass read</h3>
             <span class="status-badge pending">ready to begin</span>
             <p>You have access. Take the assessment to generate your personal read.</p>
-            <div class="btn-row"><a class="btn btn-gold" href="${innerCompassHref()}">Take the Inner Compass →</a></div>
+            <p class="inner-compass-link-hint">Already finished? Connect the link from your results email so your Nest shows your read.</p>
+            <div class="btn-row">
+              <a class="btn btn-gold" href="${innerCompassHref()}">Take the Inner Compass →</a>
+              <button type="button" class="btn btn-outline" id="btn-link-inner-compass">Connect my results</button>
+            </div>
           </article>`;
       }
       return `
@@ -802,6 +876,10 @@
     const claimBtn = productsPane.querySelector('#btn-lci-claim');
     if (claimBtn) {
       claimBtn.addEventListener('click', () => void claimNextLciSession(claimBtn));
+    }
+    const linkIcBtn = productsPane.querySelector('#btn-link-inner-compass');
+    if (linkIcBtn) {
+      linkIcBtn.addEventListener('click', () => void linkInnerCompassToAccount(linkIcBtn));
     }
   }
 
