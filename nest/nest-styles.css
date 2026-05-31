@@ -242,6 +242,64 @@ body.nest-page { line-height: 1.5; }
 .inner-compass-connect-row {
   margin-bottom: 0.65rem;
 }
+
+/* Inner Compass result snapshot (dashboard + profile) */
+.ic-snapshot-card {
+  padding: 0;
+  overflow: hidden;
+}
+.ic-snapshot-card .ic-snap-link {
+  display: block;
+  padding: 1.15rem 1.2rem 1.05rem;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.2s;
+}
+.ic-snapshot-card .ic-snap-link:hover {
+  background: rgba(245, 200, 66, 0.06);
+}
+.ic-snap-kicker {
+  margin: 0 0 0.35rem;
+  font-family: "DM Mono", monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.ic-snap-headline {
+  margin: 0 0 0.55rem;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 500;
+  font-style: italic;
+  line-height: 1.25;
+  color: var(--text-main);
+}
+.ic-snap-blurb {
+  margin: 0 0 0.65rem;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: rgba(240, 236, 228, 0.72);
+}
+.ic-snap-types {
+  margin: 0 0 0.75rem;
+  font-family: "DM Mono", monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  color: var(--gold-dim);
+  line-height: 1.5;
+}
+.ic-snap-cta {
+  display: inline-block;
+  font-family: "DM Mono", monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.ic-snapshot-card--profile .ic-snap-headline {
+  font-size: 1.5rem;
+}
 .lci-sync-hint {
   margin: 0.35rem 0 0.65rem;
   font-size: 0.82rem;

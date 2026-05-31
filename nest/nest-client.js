@@ -753,11 +753,74 @@
   }
 
   function innerCompassHref() {
-    const base = '/deep-profile.html?from=nest';
-    if (hasInnerCompassComplete()) {
-      return base + '&nest=' + encodeURIComponent(deepNestId);
+    const base = '/deep-profile.html';
+    if (hasInnerCompassComplete() && deepNestId) {
+      return (
+        base +
+        '?nest=' +
+        encodeURIComponent(deepNestId) +
+        '&from=nest'
+      );
     }
-    return base;
+    return base + '?from=nest';
+  }
+
+  function openInnerCompassRead() {
+    if (hasInnerCompassComplete()) {
+      window.location.href = innerCompassHref();
+      return;
+    }
+    setTab('profile');
+  }
+
+  function innerCompassSnapshot(profile) {
+    if (!profile) return null;
+    const headline =
+      profile.archetypePlain ||
+      profile.likelyCoreArchetypePlain ||
+      profile.archetype ||
+      profile.likelyCoreArchetype ||
+      'Your Inner Compass';
+    let blurb =
+      profile.archetypePlainDescription ||
+      profile.archetypeSub ||
+      profile.bridge ||
+      profile.quote ||
+      '';
+    blurb = String(blurb).trim();
+    if (blurb.length > 180) blurb = blurb.slice(0, 177).trim() + '…';
+
+    const parts = [];
+    const mbti = profile.mbti || profile.likelyCoreMbti;
+    const enne = profile.enneagram || profile.likelyCoreEnneagram;
+    const att = profile.attachment || profile.likelyCoreAttachment;
+    if (mbti) parts.push(String(mbti).trim());
+    if (enne) parts.push(String(enne).trim());
+    if (att) parts.push(String(att).trim());
+
+    return { headline, blurb, typeLine: parts.join(' · ') };
+  }
+
+  function renderInnerCompassSnapshotMarkup(variant) {
+    const snap = innerCompassSnapshot(deepProfile);
+    if (!snap) return '';
+    const href = innerCompassHref();
+    const kicker = variant === 'profile' ? 'Your wiring' : 'Inner Compass';
+    const blurbHtml = snap.blurb
+      ? `<p class="ic-snap-blurb">${escapeHtml(snap.blurb)}</p>`
+      : '';
+    const typesHtml = snap.typeLine
+      ? `<p class="ic-snap-types">${escapeHtml(snap.typeLine)}</p>`
+      : '';
+
+    return `
+      <a class="ic-snap-link" href="${escapeHtml(href)}">
+        <p class="ic-snap-kicker">${escapeHtml(kicker)}</p>
+        <h3 class="ic-snap-headline">${escapeHtml(snap.headline)}</h3>
+        ${blurbHtml}
+        ${typesHtml}
+        <span class="ic-snap-cta">Open your full read →</span>
+      </a>`;
   }
 
   function workbookHref(filename) {
@@ -787,18 +850,9 @@
 
       if (hasAccess) {
         if (done) {
-          const arch = deepProfile.archetypePlain || deepProfile.archetype || 'Your read';
-          const mbti = deepProfile.mbti || deepProfile.likelyCoreMbti || '';
-          const enne = deepProfile.enneagram || deepProfile.likelyCoreEnneagram || '';
-          const tags = [arch, mbti, enne].filter(Boolean).map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join('');
           return `
-          <article class="product-card">
-            <p class="eyebrow">assessment</p>
-            <h3>Inner Compass read</h3>
-            <span class="status-badge">complete</span>
-            <div class="tag-row">${tags}</div>
-            <p>Your foundational wiring read is ready to revisit.</p>
-            <div class="btn-row"><a class="btn btn-gold" href="${innerCompassHref()}">View full read →</a></div>
+          <article class="product-card ic-snapshot-card">
+            ${renderInnerCompassSnapshotMarkup('dashboard')}
           </article>`;
         }
         return `
@@ -922,16 +976,8 @@
     const pane = document.getElementById('pane-profile');
     if (hasInnerCompassComplete()) {
       pane.innerHTML = `
-        <article class="product-card">
-          <p class="eyebrow">my profile</p>
-          <h3>${escapeHtml(deepProfile.archetypePlain || deepProfile.archetype || 'Your Inner Compass read')}</h3>
-          <div class="tag-row">
-            <span class="tag">${escapeHtml(deepProfile.mbti || deepProfile.likelyCoreMbti || 'MBTI')}</span>
-            <span class="tag">${escapeHtml(deepProfile.enneagram || deepProfile.likelyCoreEnneagram || 'Enneagram')}</span>
-            <span class="tag">${escapeHtml(deepProfile.attachment || deepProfile.likelyCoreAttachment || 'Attachment')}</span>
-          </div>
-          <p>Your profile is loaded and ready to revisit.</p>
-          <div class="btn-row"><a class="btn btn-gold" href="${innerCompassHref()}">Open Inner Compass result →</a></div>
+        <article class="product-card ic-snapshot-card ic-snapshot-card--profile">
+          ${renderInnerCompassSnapshotMarkup('profile')}
         </article>`;
     } else if (hasInnerCompassAccess()) {
       pane.innerHTML = `
@@ -1027,7 +1073,7 @@
   const tabAsk = document.getElementById('tab-ask');
   const btnOpenAsk = document.getElementById('btn-open-ask');
   if (tabProducts) tabProducts.addEventListener('click', () => setTab('products'));
-  if (tabProfile) tabProfile.addEventListener('click', () => setTab('profile'));
+  if (tabProfile) tabProfile.addEventListener('click', () => openInnerCompassRead());
   if (tabAsk) tabAsk.addEventListener('click', () => setTab('ask'));
   if (btnOpenAsk) btnOpenAsk.addEventListener('click', () => setTab('ask'));
 
@@ -1185,7 +1231,7 @@
 
   const btnNavProfile = document.getElementById('btn-nav-profile');
   if (btnNavProfile) {
-    btnNavProfile.addEventListener('click', () => setTab('profile'));
+    btnNavProfile.addEventListener('click', () => openInnerCompassRead());
   }
 
   document.addEventListener('visibilitychange', () => {
