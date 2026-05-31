@@ -4,7 +4,7 @@
  * Also supports id="topbar-back-nest" (First Flight workbook).
  */
 (function () {
-  var IDS = ['nav-back-nest', 'topbar-back-nest'];
+  var IDS = ['nav-back-nest', 'nav-back-nest-session', 'topbar-back-nest'];
 
   function showNestBackLinks() {
     IDS.forEach(function (id) {
