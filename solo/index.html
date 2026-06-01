@@ -397,6 +397,10 @@
     .snap-bar-track { height: 3px; background: rgba(255,255,255,0.07); border-radius: 2px; overflow: hidden; }
     .snap-bar-fill { height: 100%; border-radius: 2px; background: var(--session-col); }
     .snap-mini-svg { width: 100%; display: block; margin-bottom: 6px; }
+    .snap-glow-legend { display: flex; justify-content: space-between; font-size: 0.62rem; color: rgba(240,236,228,0.4); margin-bottom: 6px; font-family: var(--font-mono); letter-spacing: 0.06em; }
+    .snap-delta-up { color: #9dbf8a; }
+    .snap-delta-down { color: #e8734a; }
+    .snap-delta-flat { color: rgba(240,236,228,0.35); }
 
     .tool-card-actions { display: flex; gap: 0; border-top: 1px solid rgba(255,255,255,0.05); }
     .tool-card-action { flex: 1; padding: 7px 10px; font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(240,236,228,0.35); cursor: pointer; text-align: center; transition: color 0.2s, background 0.2s; border: none; background: none; }
@@ -1165,6 +1169,9 @@
           var oc = k ? ('openToolEmbed(\'' + k + '\',TOOL_MAP[\'' + k + '\'])') : ('openTool(\'' + t.file + '\')');
           var dbKey = k ? getDbKey(k, sessionNumber) : '';
           var snapData = dbKey ? (toolOutputsCache[dbKey] || null) : null;
+          if (k === 'glow-map' && snapData) {
+            snapData = enrichGlowMapSnapshot(snapData, sessionNumber);
+          }
           var isDone = openedTools[k] || false;
           var snapHtml = (isDone && snapData) ? ('<div class="tool-item-snap">' + renderToolSnapshot(k, snapData).replace('<div class="tool-snapshot">', '').replace(/<\/div>\s*$/, '') + '</div>') : '';
           var doneStyle = isDone ? ' style="color:var(--session-col);opacity:1"' : '';
@@ -1238,14 +1245,86 @@
       }
     }
 
+    var GLOW_MAP_AXES = ['connections', 'spaces', 'purpose', 'resources', 'wellbeing'];
+    var GLOW_MAP_LABELS = {
+      connections: 'Connections',
+      spaces: 'Spaces',
+      purpose: 'Passion & purpose',
+      resources: 'Resources',
+      wellbeing: 'Energy & wellbeing',
+    };
+
+    function getGlowMapBaselineSession(sessionNumber) {
+      if (sessionNumber === 7 || sessionNumber === 4) return 2;
+      return null;
+    }
+
+    function enrichGlowMapSnapshot(data, sessionNumber) {
+      if (!data || !data.scores) return data;
+      var baselineSn = getGlowMapBaselineSession(sessionNumber);
+      if (!baselineSn) return data;
+      var baseline = toolOutputsCache['glow_map_s' + baselineSn];
+      if (!baseline || !baseline.scores) return data;
+      return Object.assign({}, data, {
+        compareScores: baseline.scores,
+        compareSession: baselineSn,
+      });
+    }
+
+    function buildGlowMapCompareSvg(nowScores, thenScores, compareSession) {
+      var w = 280, h = 72, cx = 140, cy = 36, r = 30, n = GLOW_MAP_AXES.length;
+      function polyPoints(scores) {
+        return GLOW_MAP_AXES.map(function (key, i) {
+          var angle = (i / n) * Math.PI * 2 - Math.PI / 2;
+          var val = (scores[key] || 5) / 10;
+          var x = cx + r * val * Math.cos(angle);
+          var y = cy + r * val * Math.sin(angle);
+          return Math.round(x) + ',' + Math.round(y);
+        }).join(' ');
+      }
+      var svg =
+        '<svg class="snap-mini-svg" viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">' +
+        '<polyline points="' + polyPoints(thenScores) + '" fill="rgba(160,152,128,0.08)" stroke="rgba(160,152,128,0.55)" stroke-width="1.5" stroke-linejoin="round"/>' +
+        '<polyline points="' + polyPoints(nowScores) + '" fill="rgba(126,184,201,0.12)" stroke="#7eb8c9" stroke-width="2" stroke-linejoin="round"/>' +
+        '</svg>';
+      svg +=
+        '<div class="snap-glow-legend"><span>Session ' +
+        compareSession +
+        '</span><span style="color:#7eb8c9">Now</span></div>';
+      return svg;
+    }
+
+    function scrollChatToBottom() {
+      var m = document.getElementById('chat-messages');
+      if (m) m.scrollTop = m.scrollHeight;
+    }
+
+    function scrollChatToToolCard(toolKey) {
+      var msgs = document.getElementById('chat-messages');
+      if (!msgs || !toolKey) {
+        scrollChatToBottom();
+        return;
+      }
+      var card = msgs.querySelector('.tool-card[data-key="' + toolKey + '"]');
+      var target = card ? card.closest('.tool-card-msg') || card : null;
+      if (target && target.scrollIntoView) {
+        target.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      } else {
+        scrollChatToBottom();
+      }
+    }
+
     function applyToolSaveFromEmbed(toolKey, outputData) {
       if (!toolKey || !outputData || !activeSession || !currentUser) return;
+      if (toolKey === 'glow-map') {
+        outputData = enrichGlowMapSnapshot(outputData, activeSession.number);
+      }
       var dbKey = getDbKey(toolKey, activeSession.number);
       toolOutputsCache[dbKey] = outputData;
       openedTools[toolKey] = true;
 
       var toolName = TOOL_MAP[toolKey] ? TOOL_MAP[toolKey].name : toolKey;
-      var ctx = '[Tool completed: ' + toolName + '] Data: ' + JSON.stringify(outputData).slice(0, 600);
+      var ctx = '[Tool completed: ' + toolName + '] Data: ' + JSON.stringify(outputData).slice(0, 2200);
       var existingIdx = chatMsgs.findIndex(function (m) {
         return m.role === 'user' && m.content.indexOf('[Tool completed: ' + toolName + ']') === 0;
       });
@@ -1297,10 +1376,6 @@
       };
       frame.src = toolInfo.file + '?uid=' + (currentUser ? currentUser.id : '') + '&session=' + (activeSession ? activeSession.number : 0) + '&token=' + encodeURIComponent(token) + '&embed=1';
       wrap.classList.add('active');
-      setTimeout(function () {
-        var c = document.querySelector('.chat-messages');
-        if (c) c.scrollTop = c.scrollHeight;
-      }, 100);
     }
 
     // Idempotency guard: a single user "save" can trigger closeToolEmbed twice
@@ -1314,27 +1389,29 @@
       var now = Date.now();
       if (now - _lastCloseAt < 4000) { wrap.classList.remove('active'); if (frame) setTimeout(function(){ frame.src = 'about:blank'; }, 300); return; }
       _lastCloseAt = now;
+      var closedToolKey = lastToolKey;
       wrap.classList.remove('active');
       setTimeout(function() { if (frame) frame.src = 'about:blank'; }, 300);
-      setTimeout(function() { var m = document.getElementById('chat-messages'); if (m) m.scrollTop = m.scrollHeight; }, 150);
 
-      if (activeSession && currentUser && lastToolKey) {
+      if (activeSession && currentUser && closedToolKey) {
         setTimeout(function () {
-          fetchToolOutputAfterClose(lastToolKey).finally(function () {
+          fetchToolOutputAfterClose(closedToolKey).finally(function () {
             setTimeout(function () {
-              var m = document.getElementById('chat-messages');
-              if (m) m.scrollTop = m.scrollHeight;
+              scrollChatToToolCard(closedToolKey);
               focusElNoScroll('chat-input');
-              triggerToolReturnAck();
+              triggerToolReturnAck(closedToolKey);
             }, 400);
           });
         }, 800);
       } else {
-        var m = document.getElementById('chat-messages'); if (m) setTimeout(function() { m.scrollTop = m.scrollHeight; }, 100);
+        setTimeout(function () { scrollChatToBottom(); }, 100);
       }
     }
 
     function updateLeftPanelTool(toolKey, snapData) {
+      if (toolKey === 'glow-map' && snapData && activeSession) {
+        snapData = enrichGlowMapSnapshot(snapData, activeSession.number);
+      }
       var toolList = document.querySelector('.tool-list');
       if (!toolList) return;
       toolList.querySelectorAll('.tool-item[data-tool-key="' + toolKey + '"]').forEach(function(item) {
@@ -1424,8 +1501,48 @@
         }
       }
       else if (k === 'glow-map') {
-        var scores=data.scores||{}, entries=Object.entries(scores).sort((a,b)=>b[1]-a[1]).slice(0,3);
-        entries.forEach(e=>{var pct=Math.round((e[1]/10)*100),label=e[0].charAt(0).toUpperCase()+e[0].slice(1).replace('_',' ');html+='<div class="snap-bar-wrap"><div class="snap-bar-label"><span>'+label+'</span><span class="snap-bar-val">'+e[1]+'/10</span></div><div class="snap-bar-track"><div class="snap-bar-fill" style="width:'+pct+'%"></div></div></div>';});
+        var scores = data.scores || {};
+        var thenScores = data.compareScores || null;
+        var compareSession = data.compareSession || 2;
+        if (thenScores) {
+          html += buildGlowMapCompareSvg(scores, thenScores, compareSession);
+          GLOW_MAP_AXES.forEach(function (axis) {
+            var now = scores[axis] || 0;
+            var then = thenScores[axis] || 0;
+            var delta = now - then;
+            var deltaCls = delta > 0 ? 'snap-delta-up' : delta < 0 ? 'snap-delta-down' : 'snap-delta-flat';
+            var deltaTxt = delta === 0 ? '—' : (delta > 0 ? '+' : '') + delta;
+            var pct = Math.round((now / 10) * 100);
+            html +=
+              '<div class="snap-bar-wrap"><div class="snap-bar-label"><span>' +
+              (GLOW_MAP_LABELS[axis] || axis) +
+              '</span><span class="snap-bar-val ' +
+              deltaCls +
+              '">' +
+              then +
+              '→' +
+              now +
+              ' <span style="opacity:0.85">(' +
+              deltaTxt +
+              ')</span></span></div><div class="snap-bar-track"><div class="snap-bar-fill" style="width:' +
+              pct +
+              '%"></div></div></div>';
+          });
+        } else {
+          var entries = Object.entries(scores).sort(function (a, b) { return b[1] - a[1]; }).slice(0, 5);
+          entries.forEach(function (e) {
+            var pct = Math.round((e[1] / 10) * 100);
+            var label = GLOW_MAP_LABELS[e[0]] || e[0];
+            html +=
+              '<div class="snap-bar-wrap"><div class="snap-bar-label"><span>' +
+              label +
+              '</span><span class="snap-bar-val">' +
+              e[1] +
+              '/10</span></div><div class="snap-bar-track"><div class="snap-bar-fill" style="width:' +
+              pct +
+              '%"></div></div></div>';
+          });
+        }
       }
       else if (k === 'shadows-sparks') {
         var shadows=(data.shadows||[]).slice(0,2),sparks=(data.sparks||[]).slice(0,2);
@@ -1570,6 +1687,9 @@
       var emoji = (activeSession&&activeSession.emoji)?activeSession.emoji:'🪶';
       var dbKey = getDbKey(toolKey, activeSession?activeSession.number:0);
       var snapData = toolOutputsCache[dbKey]||null;
+      if (toolKey === 'glow-map' && snapData && activeSession) {
+        snapData = enrichGlowMapSnapshot(snapData, activeSession.number);
+      }
       var snapHtml = (isUsed&&snapData) ? renderToolSnapshot(toolKey,snapData) : '';
       var actHtml = isUsed ? '<div class="tool-card-actions"><button class="tool-card-action tool-revisit-btn">Revisit</button><button class="tool-card-action tool-dismiss-btn">Close</button></div>' : '';
       wrap.innerHTML = '<div class="msg-avatar" style="background:var(--session-col);width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0;margin-top:2px;">'+emoji+'</div><div class="tool-card'+(isUsed?' used':'')+'" data-key="'+toolKey+'"><div class="tool-card-icon">'+toolInfo.icon+'</div><div class="tool-card-body"><div class="tool-card-label">'+(isUsed?'Completed':'Tool ready')+'</div><div class="tool-card-name">'+toolInfo.name+'</div>'+(isUsed?'':'<div class="tool-card-hint">'+toolInfo.hint+'</div>')+'</div><div class="tool-card-arrow">'+(isUsed?'&#x2713;':'&rarr;')+'</div></div>'+snapHtml+actHtml;
@@ -1585,7 +1705,8 @@
         if(rb) rb.addEventListener('click',function(){openToolEmbed(toolKey,toolInfo);});
         if(db) db.addEventListener('click',function(){wrap.style.display='none';});
       }
-      container.appendChild(wrap); container.scrollTop=container.scrollHeight;
+      container.appendChild(wrap);
+      scrollChatToToolCard(toolKey);
     }
 
     function updateToolCardSnapshot(toolKey, snapData) {
@@ -1597,7 +1718,11 @@
         var lbl=card.querySelector('.tool-card-label'); if(lbl) lbl.textContent='Completed';
         var arr=card.querySelector('.tool-card-arrow'); if(arr) arr.innerHTML='&#x2713;';
         var hint=card.querySelector('.tool-card-hint'); if(hint) hint.style.display='none';
-        var snapHtml=renderToolSnapshot(toolKey,snapData);
+        var snapForCard = snapData;
+        if (toolKey === 'glow-map' && snapForCard && activeSession) {
+          snapForCard = enrichGlowMapSnapshot(snapForCard, activeSession.number);
+        }
+        var snapHtml=renderToolSnapshot(toolKey,snapForCard);
         var actHtml='<div class="tool-card-actions"><button class="tool-card-action tool-revisit-btn">Revisit</button><button class="tool-card-action tool-dismiss-btn">Close</button></div>';
         card.insertAdjacentHTML('afterend',snapHtml+actHtml);
         var msg2=card.closest('.tool-card-msg'); if(!msg2) return;
@@ -1616,18 +1741,41 @@
 
     function hideTyping() { var el=document.getElementById('typing-indicator'); if(el) el.remove(); }
 
-    async function triggerToolReturnAck() {
+    async function triggerToolReturnAck(toolKey) {
       if (isTyping||!activeSession||!currentUser) return;
+      var tk = toolKey || lastToolKey;
+      var dbKey = tk ? getDbKey(tk, activeSession.number) : '';
+      var toolData = dbKey ? toolOutputsCache[dbKey] : null;
+      if (tk === 'glow-map' && toolData) {
+        toolData = enrichGlowMapSnapshot(toolData, activeSession.number);
+      }
       isTyping=true; document.getElementById('btn-send').disabled=true; showTyping();
       try {
-        var response=await fetch(WORKER_URL+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({session_number:activeSession.number,messages:chatMsgs,context:sessionContext,user_name:userProfile&&userProfile.full_name?userProfile.full_name.split(' ')[0]:null})});
+        var payload = {
+          session_number: activeSession.number,
+          messages: chatMsgs,
+          context: sessionContext,
+          user_name: userProfile && userProfile.full_name ? userProfile.full_name.split(' ')[0] : null,
+          tool_return: tk && toolData ? {
+            tool_key: tk,
+            tool_name: TOOL_MAP[tk] ? TOOL_MAP[tk].name : tk,
+            output: toolData,
+          } : null,
+        };
+        var response=await fetch(WORKER_URL+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
         if(!response.ok) throw new Error('Worker error');
-        var data=await response.json(), reply=data.reply||'How did that land for you?';
+        var data=await response.json(), reply=data.reply||'What stood out most in what you just mapped?';
         hideTyping(); renderMessage('assistant',reply); chatMsgs.push({role:'assistant',content:reply});
         await sb.from('ai_memory').upsert({user_id:currentUser.id,session_number:activeSession.number,messages:chatMsgs},{onConflict:'user_id,session_number'});
-        var m=document.getElementById('chat-messages'); if(m) m.scrollTop=m.scrollHeight;
+        scrollChatToToolCard(tk);
       } catch(e) {
-        hideTyping(); renderMessage('assistant','Welcome back. How did that land for you?'); chatMsgs.push({role:'assistant',content:'Welcome back. How did that land for you?'});
+        hideTyping();
+        var fallback = tk === 'glow-map' && toolData && toolData.compareScores
+          ? 'Your Glow Map shifted since Session 2 — what change surprises you most?'
+          : 'Welcome back. What stood out most from that exercise?';
+        renderMessage('assistant', fallback);
+        chatMsgs.push({role:'assistant',content:fallback});
+        scrollChatToToolCard(tk);
       }
       isTyping=false; document.getElementById('btn-send').disabled=false; focusElNoScroll('chat-input');
     }
