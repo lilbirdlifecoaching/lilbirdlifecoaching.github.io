@@ -168,6 +168,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="embed-supabase.js"></script>
 <script>
   function goBack() {
     if (window.parent !== window) {
@@ -178,17 +179,30 @@
   }
 </script>
 <script>
-  const { createClient } = supabase;
-  const _urlParams = new URLSearchParams(window.location.search);
-  const _token = _urlParams.get('token') ? decodeURIComponent(_urlParams.get('token')) : null;
-  const sb = createClient('https://mebqqzbuwkogdxvnihrq.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU', {
-    auth: { persistSession: false, autoRefreshToken: false }
-  });
-
+  const TOOL_KEY = 'forest';
+  const { sb, uid: urlUid } = LilbirdEmbed.createEmbedClient();
 
   const LAYER_COLORS = { canopy: '#7a9e7e', understory: '#9dbf8a', floor: '#a89060', lone: '#7eb8c9' };
+  const EMPTY_PEOPLE = { canopy: [], understory: [], floor: [], lone: [] };
   let people = { canopy: [], understory: [], floor: [], lone: [] };
-  let currentUser = null, saveTimer = null;
+  let currentUser = null;
+  let saveTimer = null;
+
+  function normalizePeople(raw) {
+    const out = { canopy: [], understory: [], floor: [], lone: [] };
+    if (!raw || typeof raw !== 'object') return out;
+    ['canopy', 'understory', 'floor', 'lone'].forEach(function (layer) {
+      if (Array.isArray(raw[layer])) out[layer] = raw[layer];
+    });
+    return out;
+  }
+
+  function getOutputPayload() {
+    return {
+      people: people,
+      intention: document.getElementById('intention').value || '',
+    };
+  }
 
   function drawForest() {
     const svg = document.getElementById('forest-svg');
@@ -306,39 +320,70 @@
 
   async function autoSave() {
     if (!currentUser) return;
-    try { await sb.from('tool_outputs').upsert({ user_id: currentUser.id, tool_name: 'forest', output_data: { people, intention: document.getElementById('intention').value }, updated_at: new Date().toISOString() }, { onConflict: 'user_id,tool_name' }); } catch {}
+    const payload = getOutputPayload();
+    try {
+      const { error } = await sb.from('tool_outputs').upsert(
+        {
+          user_id: currentUser.id,
+          tool_name: TOOL_KEY,
+          output_data: payload,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'user_id,tool_name' }
+      );
+      if (error) {
+        console.warn('Forest save failed:', error.message || error);
+        return;
+      }
+      LilbirdEmbed.notifyParent(TOOL_KEY, payload, false);
+    } catch (e) {
+      console.warn('Forest save error:', e);
+    }
   }
 
   document.getElementById('btn-save').addEventListener('click', async () => {
     await autoSave();
-    const s = document.getElementById('save-status'); s.classList.add('visible');
-    if (window.parent !== window) {
-      setTimeout(function() { window.parent.postMessage('tool-close', '*'); }, 2000);
-    } else { setTimeout(() => s.classList.remove('visible'), 2500); }
+    const s = document.getElementById('save-status');
+    s.classList.add('visible');
+    const payload = getOutputPayload();
+    LilbirdEmbed.notifyParent(TOOL_KEY, payload, true);
+    if (window.parent === window) {
+      setTimeout(() => s.classList.remove('visible'), 2500);
+    }
   });
 
-  (async () => {
-    const params = new URLSearchParams(window.location.search);
-    const urlUid = params.get('uid');
+  async function init() {
     if (urlUid) {
       currentUser = { id: urlUid };
-      if (_token) { try { await sb.auth.setSession({ access_token: _token, refresh_token: '' }); } catch(e) {} }
     } else {
       try {
-        const { data: { session } } = await sb.auth.getSession();
+        const {
+          data: { session },
+        } = await sb.auth.getSession();
         if (session?.user) currentUser = session.user;
-      } catch(e) {}
+      } catch (e) {}
     }
+
     if (currentUser) {
-      const { data } = await sb.from('tool_outputs').select('output_data').eq('user_id', currentUser.id).eq('tool_name', 'forest').single();
-      if (data?.output_data) {
-        if (data.output_data.people) people = { ...people, ...data.output_data.people };
-        if (data.output_data.intention) document.getElementById('intention').value = data.output_data.intention;
+      const { data, error } = await sb
+        .from('tool_outputs')
+        .select('output_data')
+        .eq('user_id', currentUser.id)
+        .eq('tool_name', TOOL_KEY)
+        .maybeSingle();
+      if (!error && data?.output_data) {
+        people = normalizePeople(data.output_data.people);
+        if (data.output_data.intention) {
+          document.getElementById('intention').value = data.output_data.intention;
+        }
       }
     }
-    ['canopy','understory','floor','lone'].forEach(renderLayer);
+
+    ['canopy', 'understory', 'floor', 'lone'].forEach(renderLayer);
     drawForest();
-  })();
+  }
+
+  init();
 </script>
 </body>
 </html>
