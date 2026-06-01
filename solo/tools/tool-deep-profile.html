@@ -216,8 +216,8 @@
     <div class="deep-profile-card">
       <h3>The lil' bird Deep Profile</h3>
       <p>A 15-minute personality assessment that explores how you think, what drives you, and how you show up in relationships and under pressure. Built specifically for the lil' bird coaching journey.</p>
-      <a href="https://lilbird.life/deep-profile.html" target="_blank" class="btn-do-assessment">Take the Deep Profile →</a>
-      <div class="assessment-note">Opens in a new tab. Come back here when you're done and enter your results above.</div>
+      <button type="button" id="btn-launch-deep-profile" class="btn-do-assessment">Take the Deep Profile →</button>
+      <div class="assessment-note" id="launch-note">Opens in a new tab. We'll auto-pull your result back here when you're done — no re-typing.</div>
     </div>
 
     <div class="return-card">
@@ -250,17 +250,24 @@
   const { createClient } = supabase;
   const _urlP2 = new URLSearchParams(window.location.search);
   const _tok2  = _urlP2.get('token') ? decodeURIComponent(_urlP2.get('token')) : null;
+  const SUPABASE_URL  = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
   const sb = createClient(
-    'https://mebqqzbuwkogdxvnihrq.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU',
-    { auth: { persistSession: false, autoRefreshToken: false } }
+    SUPABASE_URL,
+    SUPABASE_ANON,
+    {
+      auth: { persistSession: false, autoRefreshToken: false },
+      global: _tok2 ? { headers: { Authorization: 'Bearer ' + _tok2 } } : undefined,
+    }
   );
-  // setSession moved to init (awaited)
+  const ASSESSMENT_WORKER_URL = 'https://lilbird-assessment.cwwq46sn7m.workers.dev';
+  const ASSESSMENT_FRONTEND_URL = 'https://lilbird.life/deep-profile.html';
 
   var currentUser = null;
   var selectedMbti = '';
   var selectedEnneagram = '';
   var saveTimer = null;
+  var linkedProfile = null;
 
   // ── Tab switching ─────────────────────────────────────────
   document.querySelectorAll('.path-tab').forEach(function(tab) {
@@ -356,6 +363,102 @@
     document.getElementById('saved-card').classList.remove('visible');
   });
 
+  // ── Launcher: generate launch token, open assessment in new tab ─
+  // Opens the new tab synchronously (so the popup blocker doesn't fire),
+  // then sets the URL once Supabase has minted a launch token. The
+  // assessment frontend reads ?launchToken=... and POSTs back to the
+  // worker on completion, which writes the deep_profile_links row that
+  // the dashboard and this tool listen for.
+  document.getElementById('btn-launch-deep-profile').addEventListener('click', async function() {
+    const note = document.getElementById('launch-note');
+    if (!currentUser) {
+      // Last-ditch fallback: open the assessment with no token. The user
+      // will still be able to take it, they just won't get auto-linked.
+      window.open(ASSESSMENT_FRONTEND_URL, '_blank', 'noopener');
+      return;
+    }
+    // Open the new tab IMMEDIATELY so the click is treated as user-initiated.
+    const newTab = window.open('about:blank', '_blank');
+    try {
+      const expires = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString();
+      const ins = await sb.from('deep_profile_launches')
+        .insert({ user_id: currentUser.id, expires_at: expires })
+        .select('token')
+        .single();
+      if (ins.error || !ins.data || !ins.data.token) {
+        throw ins.error || new Error('No token returned');
+      }
+      const url = ASSESSMENT_FRONTEND_URL + '?launchToken=' + encodeURIComponent(ins.data.token);
+      if (newTab && !newTab.closed) {
+        newTab.location.href = url;
+      } else {
+        window.location.href = url;
+      }
+    } catch (e) {
+      console.error('Launch token insert failed:', e);
+      // Fall back to opening the assessment without a token so the user
+      // isn't blocked. They'll have to type their result back manually.
+      const fallback = ASSESSMENT_FRONTEND_URL;
+      if (newTab && !newTab.closed) {
+        newTab.location.href = fallback;
+      } else {
+        window.open(fallback, '_blank', 'noopener');
+      }
+      if (note) note.textContent = "Opens in a new tab. (Couldn't auto-link this run — enter your result manually when you return.)";
+    }
+  });
+
+  // ── Linked-profile fetch + prefill ───────────────────────
+  // If deep_profile_links has a row for this user, we treat their live
+  // assessment result as the source of truth: prefill the manual inputs
+  // and surface a richer saved-card so they don't need to re-type.
+  async function loadLinkedProfileIfAny() {
+    if (!currentUser) return;
+    try {
+      const link = await sb.from('deep_profile_links')
+        .select('nest_id')
+        .eq('user_id', currentUser.id)
+        .maybeSingle();
+      if (link.error || !link.data || !link.data.nest_id) return;
+      const res = await fetch(ASSESSMENT_WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(link.data.nest_id));
+      if (!res.ok) return;
+      linkedProfile = await res.json();
+      applyLinkedProfileToForm(linkedProfile);
+      showLinkedSavedState(linkedProfile);
+    } catch (e) {
+      console.warn('Linked profile fetch failed:', e);
+    }
+  }
+
+  function applyLinkedProfileToForm(p) {
+    if (!p) return;
+    const mbtiEl = document.getElementById('mbti-input');
+    const ennEl  = document.getElementById('enneagram-input');
+    if (mbtiEl && !mbtiEl.value && p.mbti) {
+      mbtiEl.value = String(p.mbti).toUpperCase().trim();
+      const chip = document.querySelector('.type-chip[data-type="mbti"][data-val="' + mbtiEl.value + '"]');
+      if (chip) chip.classList.add('selected');
+    }
+    if (ennEl && !ennEl.value && p.enneagram) {
+      const ennNorm = /^\d/.test(String(p.enneagram).trim()) && !/^Type/i.test(String(p.enneagram).trim())
+        ? 'Type ' + String(p.enneagram).trim()
+        : String(p.enneagram).trim();
+      ennEl.value = ennNorm;
+      const echip = document.querySelector('.type-chip[data-type="enneagram"][data-val="' + ennNorm + '"]');
+      if (echip) echip.classList.add('selected');
+    }
+  }
+
+  function showLinkedSavedState(p) {
+    const headline = p.archetypePlain || p.archetype || 'Your Deep Profile';
+    const techBits = [p.mbti, p.enneagram, p.attachment].filter(Boolean).join(' · ');
+    const card = document.getElementById('saved-card');
+    document.querySelector('#saved-card .saved-label').textContent = 'From your Deep Profile';
+    document.getElementById('saved-type-display').textContent = headline;
+    document.getElementById('saved-subtype-display').textContent = techBits || (p.archetypePlainDescription || '');
+    card.classList.add('visible');
+  }
+
   // ── Init ─────────────────────────────────────────────────
   (async function() {
     try {
@@ -364,7 +467,6 @@
       var _dpUid    = _dpParams.get('uid');
       var _dpTok    = _dpParams.get('token') ? decodeURIComponent(_dpParams.get('token')) : null;
       if (_dpUid && _dpTok) {
-        try { await sb.auth.setSession({ access_token: _dpTok, refresh_token: '' }); } catch(e) {}
         currentUser = { id: _dpUid };
       } else {
         var tokenRaw  = localStorage.getItem('lilbird-solo-auth');
@@ -397,6 +499,8 @@
         if (d.reflection) document.getElementById('type-reflection').value = d.reflection;
         showSavedState();
       }
+
+      await loadLinkedProfileIfAny();
     } catch(e) {}
   })();
 </script>
