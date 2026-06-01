@@ -1018,7 +1018,56 @@
     function focusElNoScroll(id) {
       var el = document.getElementById(id);
       if (!el) return;
-      try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
+      try {
+        el.focus({ preventScroll: true });
+      } catch (e) {
+        el.focus();
+      }
+    }
+
+    function applyToolSaveFromEmbed(toolKey, outputData) {
+      if (!toolKey || !outputData || !activeSession || !currentUser) return;
+      var dbKey = getDbKey(toolKey, activeSession.number);
+      toolOutputsCache[dbKey] = outputData;
+      openedTools[toolKey] = true;
+
+      var toolName = TOOL_MAP[toolKey] ? TOOL_MAP[toolKey].name : toolKey;
+      var ctx = '[Tool completed: ' + toolName + '] Data: ' + JSON.stringify(outputData).slice(0, 600);
+      var existingIdx = chatMsgs.findIndex(function (m) {
+        return m.role === 'user' && m.content.indexOf('[Tool completed: ' + toolName + ']') === 0;
+      });
+      if (existingIdx !== -1) chatMsgs[existingIdx] = { role: 'user', content: ctx };
+      else chatMsgs.push({ role: 'user', content: ctx });
+
+      var existingCards = document.querySelectorAll('.tool-card[data-key="' + toolKey + '"]');
+      if (existingCards.length > 0) updateToolCardSnapshot(toolKey, outputData);
+      else {
+        var ti = TOOL_MAP[toolKey];
+        if (ti) {
+          var el = document.getElementById('chat-messages');
+          if (el) renderToolCard(toolKey, ti, el);
+        }
+      }
+      updateLeftPanelTool(toolKey, outputData);
+    }
+
+    function fetchToolOutputAfterClose(toolKey) {
+      if (!activeSession || !currentUser || !toolKey) return Promise.resolve(null);
+      var dbKey = getDbKey(toolKey, activeSession.number);
+      return sb
+        .from('tool_outputs')
+        .select('output_data')
+        .eq('user_id', currentUser.id)
+        .eq('tool_name', dbKey)
+        .maybeSingle()
+        .then(function (result) {
+          var toolData = result && result.data && result.data.output_data;
+          if (toolData) applyToolSaveFromEmbed(toolKey, toolData);
+          return toolData;
+        })
+        .catch(function () {
+          return null;
+        });
     }
 
     function openToolEmbed(toolKey, toolInfo) {
@@ -1054,31 +1103,16 @@
       setTimeout(function() { var m = document.getElementById('chat-messages'); if (m) m.scrollTop = m.scrollHeight; }, 150);
 
       if (activeSession && currentUser && lastToolKey) {
-        // FIX 4: increased to 2500ms for drag-and-drop tools like Soar & Steady, Nurture & Prune
-        setTimeout(function() {
-          var sNum = activeSession.number;
-          var dbKey = getDbKey(lastToolKey, sNum);
-          sb.from('tool_outputs').select('output_data').eq('user_id', currentUser.id).eq('tool_name', dbKey).maybeSingle()
-            .then(function(result) {
-              var toolData = result && result.data && result.data.output_data;
-              if (toolData) {
-                var toolName = TOOL_MAP[lastToolKey] ? TOOL_MAP[lastToolKey].name : lastToolKey;
-                var ctx = '[Tool completed: ' + toolName + '] Data: ' + JSON.stringify(toolData).slice(0, 600);
-                // FIX 2: replace existing tool context in chatMsgs instead of appending
-                var existingIdx = chatMsgs.findIndex(function(m) { return m.role === 'user' && m.content.indexOf('[Tool completed: ' + toolName + ']') === 0; });
-                if (existingIdx !== -1) { chatMsgs[existingIdx] = { role: 'user', content: ctx }; }
-                else { chatMsgs.push({ role: 'user', content: ctx }); }
-                toolOutputsCache[dbKey] = toolData;
-                openedTools[lastToolKey] = true;
-                var existingCards = document.querySelectorAll('.tool-card[data-key="' + lastToolKey + '"]');
-                if (existingCards.length > 0) { updateToolCardSnapshot(lastToolKey, toolData); }
-                else { var ti = TOOL_MAP[lastToolKey]; if (ti) { var el = document.getElementById('chat-messages'); if (el) renderToolCard(lastToolKey, ti, el); } }
-                updateLeftPanelTool(lastToolKey, toolData);
-              }
-              setTimeout(function() { var m = document.getElementById('chat-messages'); if (m) m.scrollTop = m.scrollHeight; focusElNoScroll('chat-input'); triggerToolReturnAck(); }, 400);
-            })
-            .catch(function() { setTimeout(function() { var m = document.getElementById('chat-messages'); if (m) m.scrollTop = m.scrollHeight; focusElNoScroll('chat-input'); triggerToolReturnAck(); }, 400); });
-        }, 2500); // FIX 4: was 1500, now 2500
+        setTimeout(function () {
+          fetchToolOutputAfterClose(lastToolKey).finally(function () {
+            setTimeout(function () {
+              var m = document.getElementById('chat-messages');
+              if (m) m.scrollTop = m.scrollHeight;
+              focusElNoScroll('chat-input');
+              triggerToolReturnAck();
+            }, 400);
+          });
+        }, 800);
       } else {
         var m = document.getElementById('chat-messages'); if (m) setTimeout(function() { m.scrollTop = m.scrollHeight; }, 100);
       }
@@ -1138,7 +1172,15 @@
       el.scrollTop = el.scrollHeight;
     }
 
-    // ── TOOL SNAPSHOT RENDERER — FIX 3: added missing tool handlers ──
+    // ── TOOL SNAPSHOT RENDERER ────────────────────────────────
+    function escapeSnapText(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
     function renderToolSnapshot(toolKey, data) {
       if (!data) return '';
       var html = '';
@@ -1183,10 +1225,44 @@
         modes.slice(0,3).forEach(m=>{var pct=Math.round(((cur[m]||1)/10)*100),col=modeColors[m]||'var(--session-col)';html+='<div class="snap-bar-wrap"><div class="snap-bar-label"><span style="text-transform:capitalize">'+m+'</span><span style="color:'+col+'">'+(cur[m]||1)+'/10</span></div><div class="snap-bar-track"><div class="snap-bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div></div>';});
       }
       else if (k === 'forest') {
-        var people=data.people||{},canopy=(people.canopy||[]).slice(0,2),lone=(people.lone||[]).slice(0,1);
-        canopy.forEach(p=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-soar">Canopy</span><span class="snap-text">'+p.name+'</span></div>';});
-        lone.forEach(p=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-plunge">Lone</span><span class="snap-text">'+p.name+'</span></div>';});
-        if(data.intention) html+='<div class="snap-divider"></div><div class="snap-row"><span class="snap-text" style="font-style:italic;color:rgba(240,236,228,0.5)">'+data.intention.slice(0,80)+'</span></div>';
+        var peopleObj = data.people || {};
+        var layerDefs = [
+          { key: 'canopy', label: 'Canopy', cls: 'snap-badge-soar', max: 2 },
+          { key: 'understory', label: 'Understory', cls: 'snap-badge-spark', max: 1 },
+          { key: 'floor', label: 'Floor', cls: 'snap-badge-steady', max: 1 },
+          { key: 'lone', label: 'Lone', cls: 'snap-badge-plunge', max: 1 },
+        ];
+        var totalPeople = 0;
+        layerDefs.forEach(function (layer) {
+          var list = (peopleObj[layer.key] || []).slice(0, layer.max);
+          totalPeople += (peopleObj[layer.key] || []).length;
+          list.forEach(function (p) {
+            if (!p || !p.name) return;
+            html +=
+              '<div class="snap-row"><span class="snap-badge ' +
+              layer.cls +
+              '">' +
+              layer.label +
+              '</span><span class="snap-text">' +
+              escapeSnapText(p.name) +
+              '</span></div>';
+          });
+        });
+        if (data.intention) {
+          html +=
+            '<div class="snap-divider"></div><div class="snap-row"><span class="snap-text" style="font-style:italic;color:rgba(240,236,228,0.55)">' +
+            escapeSnapText(String(data.intention).slice(0, 100)) +
+            (String(data.intention).length > 100 ? '…' : '') +
+            '</span></div>';
+        }
+        if (!html && totalPeople > 0) {
+          html +=
+            '<div class="snap-row"><span class="snap-text">' +
+            totalPeople +
+            ' connection' +
+            (totalPeople === 1 ? '' : 's') +
+            ' mapped</span></div>';
+        }
       }
       // FIX 3: missing tool snapshot handlers added below
       else if (k === 'nurture-prune') {
@@ -1223,8 +1299,34 @@
       }
       else if (k === 'deep-profile') {
         var mbti=data.mbti||'',enn=data.enneagram||'';
-        if(mbti) html+='<div class="snap-row"><span class="snap-badge snap-badge-north">MBTI</span><span class="snap-text">'+mbti+'</span></div>';
-        if(enn) html+='<div class="snap-row"><span class="snap-badge snap-badge-spark">Enneagram</span><span class="snap-text">'+enn+'</span></div>';
+        if(mbti) html+='<div class="snap-row"><span class="snap-badge snap-badge-north">MBTI</span><span class="snap-text">'+escapeSnapText(mbti)+'</span></div>';
+        if(enn) html+='<div class="snap-row"><span class="snap-badge snap-badge-spark">Enneagram</span><span class="snap-text">'+escapeSnapText(enn)+'</span></div>';
+      }
+      else if (k === 'full-flight-plan') {
+        if (data.north_star) {
+          html +=
+            '<div class="snap-row"><span class="snap-badge snap-badge-north">North star</span><span class="snap-text">' +
+            escapeSnapText(String(data.north_star).slice(0, 90)) +
+            (String(data.north_star).length > 90 ? '…' : '') +
+            '</span></div>';
+        }
+        (data.commitments || [])
+          .filter(function (c) {
+            return c && String(c).trim();
+          })
+          .slice(0, 2)
+          .forEach(function (c) {
+            html +=
+              '<div class="snap-row"><span class="snap-badge snap-badge-spark">Commit</span><span class="snap-text">' +
+              escapeSnapText(String(c).slice(0, 70)) +
+              '</span></div>';
+          });
+      }
+      else if (k === 'childhood-photo') {
+        if (data.photo_url) {
+          html +=
+            '<div class="snap-row"><span class="snap-badge snap-badge-soar">Photo</span><span class="snap-text">Younger-you portrait saved for your Full Flight Plan</span></div>';
+        }
       }
 
       // Universal fallback — if no specific handler produced content, scan the
@@ -1366,7 +1468,20 @@
     const chatInput=document.getElementById('chat-input'), btnSend=document.getElementById('btn-send');
     chatInput.addEventListener('input',()=>{chatInput.style.height='auto';chatInput.style.height=Math.min(chatInput.scrollHeight,140)+'px';btnSend.disabled=!chatInput.value.trim();});
     document.addEventListener('click',function(e){if(e.target&&e.target.id==='btn-close-tool'){e.preventDefault();e.stopPropagation();closeToolEmbed();}});
-    window.addEventListener('message',function(e){if(e.data==='tool-close') closeToolEmbed();});
+    window.addEventListener('message', function (e) {
+      if (e.data === 'tool-close') {
+        closeToolEmbed();
+        return;
+      }
+      if (e.data && e.data.type === 'tool-saved' && e.data.toolKey && e.data.output) {
+        applyToolSaveFromEmbed(e.data.toolKey, e.data.output);
+        if (e.data.close) {
+          setTimeout(function () {
+            closeToolEmbed();
+          }, 200);
+        }
+      }
+    });
     chatInput.addEventListener('keydown',(e)=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();if(!btnSend.disabled) sendMessage(chatInput.value);}});
     btnSend.addEventListener('click',()=>{if(!btnSend.disabled) sendMessage(chatInput.value);});
     document.getElementById('btn-complete').addEventListener('click',completeSession);
