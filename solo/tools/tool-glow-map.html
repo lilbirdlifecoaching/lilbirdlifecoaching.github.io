@@ -64,7 +64,8 @@
   </nav>
   <div class="eyebrow">Session 02 · Vision</div>
   <h1>Glow Map</h1>
-  <p class="intro">Score each area of your life from 1–10. Where is energy flowing? Where is it dim? The shape that emerges tells you something your words might not.</p>
+  <p class="intro" id="intro-copy">Score each area of your life from 1–10. Where is energy flowing? Where is it dim? The shape that emerges tells you something your words might not.</p>
+  <p class="intro" id="compare-note" style="display:none;margin-top:-1rem;font-size:0.8rem;color:var(--session-col);">Faded shape = Session 2 · Solid = today</p>
 
   <div class="chart-wrap">
     <svg id="glow-svg" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg"></svg>
@@ -109,10 +110,12 @@
   ];
 
   let scores = { connections: 5, spaces: 5, purpose: 5, resources: 5, wellbeing: 5 };
+  let compareScores = null;
   let currentUser = null;
 
   const params = new URLSearchParams(window.location.search);
   const sessionNum = parseInt(params.get('session') || '2');
+  const showCompare = sessionNum === 4 || sessionNum === 7;
 
   function drawChart() {
     const svg = document.getElementById('glow-svg');
@@ -157,6 +160,21 @@
       const val   = (scores[axis.key] || 1) / 10;
       return [cx + r * val * Math.cos(angle), cy + r * val * Math.sin(angle)];
     });
+
+    if (compareScores && showCompare) {
+      const thenPts = AXES.map((axis, i) => {
+        const angle = (i / n) * Math.PI * 2 - Math.PI / 2;
+        const val = (compareScores[axis.key] || 1) / 10;
+        return [cx + r * val * Math.cos(angle), cy + r * val * Math.sin(angle)];
+      });
+      const thenPoly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+      thenPoly.setAttribute('points', thenPts.map(p => p.join(',')).join(' '));
+      thenPoly.setAttribute('fill', 'rgba(160,152,128,0.1)');
+      thenPoly.setAttribute('stroke', 'rgba(160,152,128,0.55)');
+      thenPoly.setAttribute('stroke-width', '1.5');
+      thenPoly.setAttribute('stroke-linejoin', 'round');
+      svg.appendChild(thenPoly);
+    }
 
     const poly = document.createElementNS('http://www.w3.org/2000/svg','polygon');
     poly.setAttribute('points', points.map(p => p.join(',')).join(' '));
@@ -234,6 +252,16 @@
       const toolName = sessionNum === 2 ? 'glow_map_s2' : sessionNum === 4 ? 'glow_map_s4' : 'glow_map_s7';
       const { data } = await sb.from('tool_outputs').select('output_data').eq('user_id', currentUser.id).eq('tool_name', toolName).single();
       if (data?.output_data?.scores) scores = { ...scores, ...data.output_data.scores };
+      if (showCompare) {
+        const { data: s2 } = await sb.from('tool_outputs').select('output_data').eq('user_id', currentUser.id).eq('tool_name', 'glow_map_s2').maybeSingle();
+        if (s2?.output_data?.scores) {
+          compareScores = { ...s2.output_data.scores };
+          var note = document.getElementById('compare-note');
+          if (note) note.style.display = 'block';
+          var intro = document.getElementById('intro-copy');
+          if (intro) intro.textContent = 'Score where you are now. The faded shape is your Session 2 map — see what brightened or dimmed.';
+        }
+      }
     }
     buildSliders();
     drawChart();
