@@ -408,6 +408,13 @@
     }
   });
 
+  function parseAssessmentProfilePayload(payload) {
+    if (!payload || typeof payload !== 'object') return null;
+    if (payload.profile && typeof payload.profile === 'object') return payload.profile;
+    if (payload.archetype || payload.mbti || payload.archetypePlain) return payload;
+    return null;
+  }
+
   // ── Linked-profile fetch + prefill ───────────────────────
   // If deep_profile_links has a row for this user, we treat their live
   // assessment result as the source of truth: prefill the manual inputs
@@ -422,7 +429,9 @@
       if (link.error || !link.data || !link.data.nest_id) return;
       const res = await fetch(ASSESSMENT_WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(link.data.nest_id));
       if (!res.ok) return;
-      linkedProfile = await res.json();
+      const payload = await res.json();
+      linkedProfile = parseAssessmentProfilePayload(payload);
+      if (!linkedProfile) return;
       applyLinkedProfileToForm(linkedProfile);
       showLinkedSavedState(linkedProfile);
     } catch (e) {
