@@ -42,7 +42,7 @@
       font-size: 16px;
       line-height: 1.6;
       min-height: 100vh;
-      overflow-x: hidden;
+      overflow-x: auto;
     }
 
     body::before {
@@ -52,8 +52,14 @@
       pointer-events: none; z-index: 0; opacity: 0.6;
     }
 
-    .view { display: none; position: relative; z-index: 1; min-height: 100vh; }
+    .view { display: none; position: relative; z-index: 1; min-height: 100vh; width: 100%; max-width: 100%; }
     .view.active { display: flex; flex-direction: column; }
+
+    #view-session {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: clip;
+    }
 
     #view-loading { align-items: center; justify-content: center; gap: 1.5rem; }
     .loading-bird { font-size: 2rem; animation: float 2s ease-in-out infinite; }
@@ -168,14 +174,42 @@
     .btn-purchase { background: var(--gold); color: var(--dark); border: none; border-radius: 6px; padding: 1rem 2.5rem; font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 500; cursor: pointer; transition: background 0.2s, transform 0.15s; }
     .btn-purchase:hover { background: #fff; transform: translateY(-2px); }
 
-    .session-nav { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 2rem; border-bottom: 1px solid var(--session-border); background: rgba(30,32,40,0.92); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; }
+    .session-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding: 1.25rem 2rem;
+      border-bottom: 1px solid var(--session-border);
+      background: rgba(30,32,40,0.92);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
     .session-nav-left { display: flex; align-items: center; gap: 0.75rem; }
     .session-nav-bird { width: 32px; height: 32px; background: var(--session-col); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
     .session-nav-label { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); }
     .btn-back-dash { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); background: none; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 0.35rem 0.75rem; cursor: pointer; transition: color 0.2s, border-color 0.2s; }
     .btn-back-dash:hover { color: var(--session-col); border-color: var(--session-border); }
-    .session-main { flex: 1; display: grid; grid-template-columns: 1fr 1fr; max-width: 1100px; width: 100%; margin: 0 auto; padding: 3rem 2rem; align-items: start; }
-    .session-info { padding-right: 3rem; position: sticky; top: 100px; }
+    .session-main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      max-width: 1100px;
+      width: 100%;
+      min-width: 0;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+      align-items: start;
+      gap: 2rem;
+      box-sizing: border-box;
+    }
+    .session-info { padding-right: 0; position: sticky; top: 100px; min-width: 0; max-width: 100%; }
     .session-tag-label { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--session-col); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
     .session-tag-label::before { content: ''; width: 20px; height: 1px; background: var(--session-col); display: inline-block; }
     .session-info h1 { font-family: var(--font-display); font-size: clamp(1.8rem, 3.5vw, 2.5rem); font-weight: 400; font-style: italic; line-height: 1.15; margin-bottom: 1rem; }
@@ -204,8 +238,26 @@
     .tool-item.clickable .tool-dot { background: var(--session-col); }
     .tool-tag { margin-left: auto; font-family: var(--font-mono); font-size: 0.55rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--session-col); opacity: 0.7; }
 
-    .session-chat-col { display: flex; flex-direction: column; min-height: calc(100vh - 200px); }
-    .chat-container { flex: 1; display: flex; flex-direction: column; background: var(--dark-card); border: 1px solid var(--session-border); border-radius: 28px; overflow: hidden; min-height: 580px; }
+    .session-chat-col {
+      display: flex;
+      flex-direction: column;
+      min-height: calc(100vh - 200px);
+      min-width: 0;
+      width: 100%;
+      max-width: 100%;
+    }
+    .chat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--dark-card);
+      border: 1px solid var(--session-border);
+      border-radius: 28px;
+      overflow: hidden;
+      min-height: 580px;
+      min-width: 0;
+      max-width: 100%;
+    }
     .chat-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; gap: 0.75rem; }
     .chat-avatar { width: 36px; height: 36px; background: var(--session-col); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
     .chat-avatar-info h3 { font-family: var(--font-display); font-size: 0.95rem; font-weight: 500; line-height: 1.2; }
@@ -228,8 +280,34 @@
     .typing-dots { padding: 0.875rem 1.1rem; background: var(--dark-mid); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; border-top-left-radius: 4px; display: flex; align-items: center; gap: 4px; }
     .typing-dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--session-col); opacity: 0.4; animation: dot 1.4s ease-in-out infinite; }
     .typing-dots span:nth-child(2){animation-delay:0.2s}.typing-dots span:nth-child(3){animation-delay:0.4s}
-    .chat-input-wrap { padding: 1rem 1.25rem; border-top: 1px solid rgba(255,255,255,0.06); display: flex; gap: 0.75rem; align-items: flex-end; }
-    .chat-textarea { flex: 1; background: var(--dark-mid); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 0.75rem 1rem; color: var(--text); font-family: var(--font-body); font-size: 0.88rem; line-height: 1.5; resize: none; outline: none; min-height: 44px; max-height: 140px; transition: border-color 0.2s; overflow-y: auto; }
+    .chat-input-wrap {
+      padding: 1rem 1.25rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-end;
+      min-width: 0;
+      max-width: 100%;
+    }
+    .chat-textarea {
+      flex: 1;
+      min-width: 0;
+      width: 100%;
+      background: var(--dark-mid);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      line-height: 1.5;
+      resize: none;
+      outline: none;
+      min-height: 44px;
+      max-height: 140px;
+      transition: border-color 0.2s;
+      overflow-y: auto;
+    }
     .chat-textarea:focus { border-color: var(--session-col); }
     .chat-textarea::placeholder { color: var(--text-muted); }
     .btn-send { width: 44px; height: 44px; background: var(--session-col); border: none; border-radius: 12px; color: var(--dark); font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: opacity 0.2s, transform 0.15s; }
@@ -257,8 +335,30 @@
     .btn-complete:hover { opacity: 0.85; transform: translateY(-2px); }
     .btn-complete:disabled { opacity: 0.5; cursor: default; transform: none; }
 
-    .tool-card-msg { display: flex; gap: 0.75rem; animation: msgIn 0.35s ease both; max-width: 88%; }
-    .tool-card { background: var(--dark-card); border: 1px solid var(--session-border); border-radius: 16px; border-top-left-radius: 4px; padding: 1rem 1.25rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: background 0.2s, border-color 0.2s, transform 0.15s; min-width: 220px; }
+    .tool-card-msg {
+      display: flex;
+      gap: 0.75rem;
+      animation: msgIn 0.35s ease both;
+      max-width: 100%;
+      width: 100%;
+      align-self: stretch;
+    }
+    .tool-card {
+      background: var(--dark-card);
+      border: 1px solid var(--session-border);
+      border-radius: 16px;
+      border-top-left-radius: 4px;
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+      min-width: 0;
+      max-width: 100%;
+      width: 100%;
+      box-sizing: border-box;
+    }
     .tool-card:hover { background: var(--session-dim); border-color: var(--session-col); transform: translateY(-1px); }
     .tool-card-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--session-dim); border: 1px solid var(--session-border); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
     .tool-card-body { flex: 1; min-width: 0; }
@@ -309,6 +409,21 @@
     @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
     @keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes dot { 0%,100% { opacity: 0.4; transform: scale(1); } 50% { opacity: 1; transform: scale(1.2); } }
+
+    /* Tablet / narrow desktop: stack so chat + send button are never clipped off-screen */
+    @media (max-width: 1024px) {
+      .session-main {
+        grid-template-columns: 1fr;
+        padding: 1.25rem 1rem 2rem;
+        gap: 1.5rem;
+      }
+      .session-info {
+        position: static;
+        top: auto;
+        padding-right: 0;
+        max-width: 100%;
+      }
+    }
 
     @media (max-width: 768px) {
       .dash-nav { padding: 1rem; }
@@ -540,6 +655,11 @@
     function showView(id) {
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
       document.getElementById(id).classList.add('active');
+      if (id === 'view-session') {
+        document.body.style.overflow = '';
+        document.documentElement.scrollLeft = 0;
+        document.body.scrollLeft = 0;
+      }
     }
 
     document.querySelectorAll('.auth-tab').forEach(tab => {
@@ -1084,7 +1204,10 @@
       };
       frame.src = toolInfo.file + '?uid=' + (currentUser ? currentUser.id : '') + '&session=' + (activeSession ? activeSession.number : 0) + '&token=' + encodeURIComponent(token) + '&embed=1';
       wrap.classList.add('active');
-      setTimeout(function() { var c = document.querySelector('.session-chat-col'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+      setTimeout(function () {
+        var c = document.querySelector('.chat-messages');
+        if (c) c.scrollTop = c.scrollHeight;
+      }, 100);
     }
 
     // Idempotency guard: a single user "save" can trigger closeToolEmbed twice
