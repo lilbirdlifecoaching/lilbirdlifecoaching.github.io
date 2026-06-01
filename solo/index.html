@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- solo shell build: v1.8-tool-save-pipeline-20260528 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -590,7 +591,9 @@
   <script>
     const SUPABASE_URL  = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
+    const SOLO_SHELL_BUILD = 'v1.8-tool-save-pipeline-20260528';
     const WORKER_URL    = 'https://worker-solo.cwwq46sn7m.workers.dev';
+    console.info("lil' bird Solo shell", SOLO_SHELL_BUILD, '| worker:', WORKER_URL);
     // Stripe publishable key — safe to ship in client code.
     // Use pk_test_... while testing, swap to pk_live_... when going live.
     const STRIPE_PUBLISHABLE_KEY = 'pk_live_51QSMYQGAu36WZ7DdlsoNqzwPnsf4HUoOj6F1NZAeGnnH1TPjDEdEQudXIGgTLaUq079aQMI1W2MS6UpMItmTjgxy00HbouBx2g';
@@ -1263,11 +1266,50 @@
       if (!data || !data.scores) return data;
       var baselineSn = getGlowMapBaselineSession(sessionNumber);
       if (!baselineSn) return data;
-      var baseline = toolOutputsCache['glow_map_s' + baselineSn];
+      var cacheKey = 'glow_map_s' + baselineSn;
+      var baseline = toolOutputsCache[cacheKey];
       if (!baseline || !baseline.scores) return data;
       return Object.assign({}, data, {
         compareScores: baseline.scores,
         compareSession: baselineSn,
+      });
+    }
+
+    async function ensureGlowMapBaselineLoaded(baselineSn) {
+      if (!baselineSn || !currentUser) return null;
+      var cacheKey = 'glow_map_s' + baselineSn;
+      var cached = toolOutputsCache[cacheKey];
+      if (cached && cached.scores) return cached;
+      try {
+        var result = await sb
+          .from('tool_outputs')
+          .select('output_data')
+          .eq('user_id', currentUser.id)
+          .eq('tool_name', cacheKey)
+          .maybeSingle();
+        if (result.data && result.data.output_data) {
+          toolOutputsCache[cacheKey] = result.data.output_data;
+          return result.data.output_data;
+        }
+      } catch (e) {
+        console.warn('Glow Map baseline fetch failed:', e);
+      }
+      return null;
+    }
+
+    async function enrichGlowMapSnapshotAsync(data, sessionNumber) {
+      if (!data || !data.scores) return data;
+      var baselineSn = getGlowMapBaselineSession(sessionNumber);
+      if (!baselineSn) return data;
+      var baseline = await ensureGlowMapBaselineLoaded(baselineSn);
+      if (!baseline || !baseline.scores) {
+        data._glowCompareMissing = true;
+        return data;
+      }
+      return Object.assign({}, data, {
+        compareScores: baseline.scores,
+        compareSession: baselineSn,
+        _glowCompareMissing: false,
       });
     }
 
@@ -1314,10 +1356,10 @@
       }
     }
 
-    function applyToolSaveFromEmbed(toolKey, outputData) {
+    async function applyToolSaveFromEmbed(toolKey, outputData) {
       if (!toolKey || !outputData || !activeSession || !currentUser) return;
       if (toolKey === 'glow-map') {
-        outputData = enrichGlowMapSnapshot(outputData, activeSession.number);
+        outputData = await enrichGlowMapSnapshotAsync(outputData, activeSession.number);
       }
       var dbKey = getDbKey(toolKey, activeSession.number);
       toolOutputsCache[dbKey] = outputData;
@@ -1352,9 +1394,15 @@
         .eq('user_id', currentUser.id)
         .eq('tool_name', dbKey)
         .maybeSingle()
-        .then(function (result) {
+        .then(async function (result) {
           var toolData = result && result.data && result.data.output_data;
-          if (toolData) applyToolSaveFromEmbed(toolKey, toolData);
+          if (toolData) await applyToolSaveFromEmbed(toolKey, toolData);
+          else if (toolOutputsCache[getDbKey(toolKey, activeSession.number)]) {
+            await applyToolSaveFromEmbed(
+              toolKey,
+              toolOutputsCache[getDbKey(toolKey, activeSession.number)]
+            );
+          }
           return toolData;
         })
         .catch(function () {
@@ -1378,34 +1426,47 @@
       wrap.classList.add('active');
     }
 
-    // Idempotency guard: a single user "save" can trigger closeToolEmbed twice
-    // (once from the tool's postMessage('tool-close') and once from a back-button
-    // click that fires the same event). Without this guard the post-tool AI
-    // ack fires twice → user sees two identical "How did that land for you?".
-    var _lastCloseAt = 0;
-    function closeToolEmbed() {
+    // Debounce coach ack only (not card refresh). Save + Back can both fire tool-close;
+    // the second close must still refresh the card but must not double-call the worker.
+    var _lastToolAckAt = 0;
+    var _lastToolAckKey = null;
+
+    function runAfterToolClose(closedToolKey, options) {
+      options = options || {};
+      if (!activeSession || !currentUser || !closedToolKey) return;
+      var fetchDelay = options.fetchDelay !== undefined ? options.fetchDelay : 400;
+      setTimeout(function () {
+        fetchToolOutputAfterClose(closedToolKey).finally(function () {
+          setTimeout(function () {
+            scrollChatToToolCard(closedToolKey);
+            focusElNoScroll('chat-input');
+            var now = Date.now();
+            var skipAck = !!options.skipAck;
+            var sameAckRecently =
+              _lastToolAckKey === closedToolKey && now - _lastToolAckAt < 5000;
+            if (!skipAck && !sameAckRecently) {
+              _lastToolAckAt = now;
+              _lastToolAckKey = closedToolKey;
+              triggerToolReturnAck(closedToolKey);
+            }
+          }, 200);
+        });
+      }, fetchDelay);
+    }
+
+    function closeToolEmbed(options) {
+      options = options || {};
       var wrap = document.getElementById('tool-embed-wrap'), frame = document.getElementById('tool-embed-frame');
       if (!wrap) return;
-      var now = Date.now();
-      if (now - _lastCloseAt < 4000) { wrap.classList.remove('active'); if (frame) setTimeout(function(){ frame.src = 'about:blank'; }, 300); return; }
-      _lastCloseAt = now;
       var closedToolKey = lastToolKey;
       wrap.classList.remove('active');
       setTimeout(function() { if (frame) frame.src = 'about:blank'; }, 300);
 
-      if (activeSession && currentUser && closedToolKey) {
-        setTimeout(function () {
-          fetchToolOutputAfterClose(closedToolKey).finally(function () {
-            setTimeout(function () {
-              scrollChatToToolCard(closedToolKey);
-              focusElNoScroll('chat-input');
-              triggerToolReturnAck(closedToolKey);
-            }, 400);
-          });
-        }, 800);
-      } else {
+      if (options.skipPipeline) {
         setTimeout(function () { scrollChatToBottom(); }, 100);
+        return;
       }
+      runAfterToolClose(closedToolKey, options);
     }
 
     function updateLeftPanelTool(toolKey, snapData) {
@@ -1450,7 +1511,7 @@
       } catch { sessionContext = {}; }
     }
 
-    function renderMessage(role, msgContent) {
+    function renderMessage(role, msgContent, scrollMode) {
       var el = document.getElementById('chat-messages');
       var toolMatch = msgContent.match(/\[TOOL:([a-z-]+)\]/);
       var actionMatch = msgContent.match(/\[ACTION:\s*([^\]]+)\]/i);
@@ -1464,7 +1525,7 @@
       }
       if (toolMatch && role==='assistant') { var tk=toolMatch[1], ti=TOOL_MAP[tk]; if (ti) setTimeout(function(){renderToolCard(tk,ti,el);}, cleanContent?400:0); }
       if (/\[COMPLETE\]/.test(msgContent) && role==='assistant') { setTimeout(function(){ var p=document.getElementById('complete-panel'); if(p) p.classList.add('visible'); },600); }
-      el.scrollTop = el.scrollHeight;
+      if (scrollMode !== false) el.scrollTop = el.scrollHeight;
     }
 
     // ── TOOL SNAPSHOT RENDERER ────────────────────────────────
@@ -1529,6 +1590,9 @@
               '%"></div></div></div>';
           });
         } else {
+          if (data._glowCompareMissing && (activeSession && (activeSession.number === 7 || activeSession.number === 4))) {
+            html += '<p style="font-size:0.72rem;color:rgba(240,236,228,0.45);margin:0 0 8px;line-height:1.45;">No Session 2 Glow Map on file yet — complete Session 2’s map once to unlock before/after here.</p>';
+          }
           var entries = Object.entries(scores).sort(function (a, b) { return b[1] - a[1]; }).slice(0, 5);
           entries.forEach(function (e) {
             var pct = Math.round((e[1] / 10) * 100);
@@ -1747,7 +1811,7 @@
       var dbKey = tk ? getDbKey(tk, activeSession.number) : '';
       var toolData = dbKey ? toolOutputsCache[dbKey] : null;
       if (tk === 'glow-map' && toolData) {
-        toolData = enrichGlowMapSnapshot(toolData, activeSession.number);
+        toolData = await enrichGlowMapSnapshotAsync(toolData, activeSession.number);
       }
       isTyping=true; document.getElementById('btn-send').disabled=true; showTyping();
       try {
@@ -1765,7 +1829,7 @@
         var response=await fetch(WORKER_URL+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
         if(!response.ok) throw new Error('Worker error');
         var data=await response.json(), reply=data.reply||'What stood out most in what you just mapped?';
-        hideTyping(); renderMessage('assistant',reply); chatMsgs.push({role:'assistant',content:reply});
+        hideTyping(); renderMessage('assistant', reply, false); chatMsgs.push({role:'assistant',content:reply});
         await sb.from('ai_memory').upsert({user_id:currentUser.id,session_number:activeSession.number,messages:chatMsgs},{onConflict:'user_id,session_number'});
         scrollChatToToolCard(tk);
       } catch(e) {
@@ -1773,7 +1837,7 @@
         var fallback = tk === 'glow-map' && toolData && toolData.compareScores
           ? 'Your Glow Map shifted since Session 2 — what change surprises you most?'
           : 'Welcome back. What stood out most from that exercise?';
-        renderMessage('assistant', fallback);
+        renderMessage('assistant', fallback, false);
         chatMsgs.push({role:'assistant',content:fallback});
         scrollChatToToolCard(tk);
       }
@@ -1853,17 +1917,20 @@
     chatInput.addEventListener('input',()=>{chatInput.style.height='auto';chatInput.style.height=Math.min(chatInput.scrollHeight,140)+'px';btnSend.disabled=!chatInput.value.trim();});
     document.addEventListener('click',function(e){if(e.target&&e.target.id==='btn-close-tool'){e.preventDefault();e.stopPropagation();closeToolEmbed();}});
     window.addEventListener('message', function (e) {
+      if (e.data && e.data.type === 'tool-cancel') {
+        closeToolEmbed({ skipPipeline: true });
+        return;
+      }
       if (e.data === 'tool-close') {
-        closeToolEmbed();
+        closeToolEmbed({ fetchDelay: 600 });
         return;
       }
       if (e.data && e.data.type === 'tool-saved' && e.data.toolKey && e.data.output) {
-        applyToolSaveFromEmbed(e.data.toolKey, e.data.output);
-        if (e.data.close) {
-          setTimeout(function () {
-            closeToolEmbed();
-          }, 200);
-        }
+        applyToolSaveFromEmbed(e.data.toolKey, e.data.output).then(function () {
+          if (e.data.close) {
+            closeToolEmbed({ fetchDelay: 0, skipAck: false });
+          }
+        });
       }
     });
     chatInput.addEventListener('keydown',(e)=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();if(!btnSend.disabled) sendMessage(chatInput.value);}});
