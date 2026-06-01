@@ -1388,6 +1388,245 @@
     text-align: right;
   }
 
+  /* CANVAS HISTORY MODAL */
+  .canvas-history-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem 1rem;
+    box-sizing: border-box;
+  }
+  .canvas-history-modal.active { display: flex; }
+  .canvas-history-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 16, 22, 0.88);
+    backdrop-filter: blur(6px);
+  }
+  .canvas-history-modal-panel {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 420px;
+    max-height: min(92vh, 820px);
+    overflow-y: auto;
+    border-radius: 18px;
+    border: 1px solid rgba(245, 200, 66, 0.22);
+    background: var(--dark-card);
+    padding: 1.35rem 1.4rem 1.25rem;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+    animation: fadeUp 0.35s ease both;
+  }
+  .canvas-history-modal-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.35rem;
+  }
+  .canvas-history-modal-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0.15rem 0.35rem;
+    border-radius: 4px;
+    transition: color 0.2s;
+  }
+  .canvas-history-modal-close:hover { color: var(--text-main); }
+  .canvas-history-view-tabs {
+    display: flex;
+    border: 1px solid rgba(245, 200, 66, 0.18);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 1rem 0 0.85rem;
+  }
+  .canvas-history-view-tab {
+    flex: 1;
+    border: none;
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.55rem 0.4rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+  .canvas-history-view-tab:last-child { border-right: none; }
+  .canvas-history-view-tab.active {
+    background: rgba(245, 200, 66, 0.12);
+    color: var(--gold);
+  }
+  .canvas-history-view-hint {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.55;
+    margin-bottom: 1rem;
+  }
+  .canvas-history-overall-block {
+    border-radius: 14px;
+    padding: 1rem 1.1rem 0.85rem;
+    background: rgba(245, 200, 66, 0.06);
+    border: 1px solid rgba(245, 200, 66, 0.18);
+    margin-bottom: 1rem;
+  }
+  .canvas-history-overall-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.35rem;
+  }
+  .canvas-history-overall-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--gold);
+  }
+  .canvas-history-overall-delta {
+    margin-left: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+  }
+  .canvas-history-date-span {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--text-muted);
+    opacity: 0.75;
+    margin-top: 0.25rem;
+  }
+  .canvas-history-areas-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.65rem;
+  }
+  .canvas-history-area-row {
+    border-radius: 12px;
+    padding: 0.85rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(0, 0, 0, 0.15);
+    margin-bottom: 0.65rem;
+  }
+  .canvas-history-area-row:last-child { margin-bottom: 0; }
+  .canvas-history-area-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+  .canvas-history-area-title { font-size: 0.88rem; font-weight: 500; line-height: 1.3; }
+  .canvas-history-area-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+  .canvas-history-area-score {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--text-main);
+  }
+  .canvas-history-area-delta {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    min-width: 2rem;
+    text-align: right;
+  }
+  .canvas-history-trend-svg { display: block; width: 100%; height: auto; }
+  .canvas-history-patterns-chart { display: block; width: 100%; height: auto; }
+  .canvas-history-legend-hint {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    margin: 0.35rem 0 0.65rem;
+  }
+  .canvas-history-legend-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    width: 100%;
+    text-align: left;
+    padding: 0.45rem 0.65rem;
+    margin-bottom: 0.35rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(0, 0, 0, 0.12);
+    cursor: pointer;
+    font: inherit;
+    color: var(--text-main);
+    transition: opacity 0.2s, background 0.2s;
+  }
+  .canvas-history-legend-btn.is-hidden { opacity: 0.45; background: transparent; }
+  .canvas-history-legend-swatch {
+    width: 14px;
+    height: 3px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .canvas-history-legend-label { flex: 1; font-size: 0.8rem; }
+  .canvas-history-legend-delta {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+  }
+  .canvas-history-tend-callout {
+    border-radius: 12px;
+    padding: 0.9rem 1rem;
+    border: 1px solid rgba(232, 115, 74, 0.35);
+    background: rgba(232, 115, 74, 0.08);
+    margin-bottom: 1rem;
+    font-size: 0.88rem;
+    line-height: 1.55;
+  }
+  .canvas-history-tend-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ember);
+    margin-bottom: 0.35rem;
+  }
+  .canvas-history-radar-wrap { display: flex; justify-content: center; margin: 0.5rem 0; }
+  .canvas-history-snapshot-legend {
+    display: flex;
+    justify-content: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    margin: 0.75rem 0 1rem;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+  .canvas-history-snapshot-legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .canvas-history-snapshot-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    display: inline-block;
+  }
+  .canvas-history-snapshot-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.45rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.82rem;
+  }
+  .canvas-history-snapshot-row:last-child { border-bottom: none; }
+
   /* ─── v7 — path picker + depth meter + nest + overlays ─── */
   .path-picker {
     display: grid;
@@ -2382,11 +2621,9 @@
             ↻ Update my Canvas
           </button>
 
-          <!-- Canvas history -->
-          <div id="canvas-history-wrap" style="display:none;">
-            <p class="sidebar-card-eyebrow" style="margin-top:1.5rem;margin-bottom:0.75rem;">canvas history</p>
-            <div id="canvas-history-list"></div>
-          </div>
+          <button type="button" class="sidebar-action-btn" id="canvas-history-btn" onclick="openCanvasHistoryModal()" style="display:none;margin-top:0.65rem;">
+            See your history →
+          </button>
         </div>
 
         <!-- CANVAS REDO PANEL (hidden until triggered) -->
@@ -5125,38 +5362,289 @@ async function saveCanvasUpdate(){
   }
 }
 
-function renderCanvasHistory(){
-  if(!canvasHistory || canvasHistory.length < 2){
-    document.getElementById('canvas-history-wrap').style.display = 'none';
-    return;
+const CANVAS_HISTORY_DIMS = [
+  { key: 'why', title: 'Purpose & direction', color: '#F5C842' },
+  { key: 'who', title: 'People & relationships', color: '#4adea8' },
+  { key: 'where', title: 'Place & environment', color: '#5ab4f0' },
+  { key: 'what', title: 'Resources & provision', color: '#e8734a' },
+  { key: 'how', title: 'Personal health', color: '#c94aad' },
+];
+const CANVAS_HISTORY_VIEW_HINTS = {
+  arc: 'Your overall journey, then each life area — how you\'ve shifted since your first check-in.',
+  patterns: 'All areas on one timeline. Tap a row in the legend to hide or show that line.',
+  snapshot: 'First check-in compared with today — including what might need tending.',
+};
+let canvasHistoryModalView = 'arc';
+let canvasHistoryPatternsHidden = {};
+
+function getCanvasHistoryChronological() {
+  if (!canvasHistory || !canvasHistory.length) return [];
+  return canvasHistory.slice().sort(function (a, b) {
+    return new Date(a.date) - new Date(b.date);
+  });
+}
+
+function formatCanvasHistoryDate(iso) {
+  return new Date(iso).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
+}
+
+function canvasHistoryDelta(chrono, key) {
+  if (chrono.length < 2) return 0;
+  var first = key === 'overall' ? chrono[0].overall : chrono[0].scores[key];
+  var last = key === 'overall' ? chrono[chrono.length - 1].overall : chrono[chrono.length - 1].scores[key];
+  return last - first;
+}
+
+function canvasHistoryDeltaColor(d) {
+  if (d > 0) return '#4adea8';
+  if (d < 0) return '#e8734a';
+  return '#a09880';
+}
+
+function canvasHistoryLowestDim(scores) {
+  return CANVAS_HISTORY_DIMS.reduce(function (low, d) {
+    return scores[d.key] < scores[low.key] ? d : low;
+  }, CANVAS_HISTORY_DIMS[0]);
+}
+
+function buildTrendLineSvg(data, color, width, height, fill, strokeWidth) {
+  var padL = 4, padR = 4, padT = 8, padB = 6;
+  var innerW = width - padL - padR;
+  var innerH = height - padT - padB;
+  var pts = data.map(function (v, i) {
+    var x = padL + (i / Math.max(data.length - 1, 1)) * innerW;
+    var y = padT + (1 - v / 100) * innerH;
+    return { x: x, y: y };
+  });
+  var line = pts.map(function (p) { return p.x + ',' + p.y; }).join(' ');
+  var area = '';
+  if (fill && pts.length) {
+    area = '<polygon points="' + line + ' ' + pts[pts.length - 1].x + ',' + (padT + innerH) + ' ' + pts[0].x + ',' + (padT + innerH) + '" fill="' + color + '" fill-opacity="0.12"/>';
   }
-  document.getElementById('canvas-history-wrap').style.display = 'block';
-  const list = document.getElementById('canvas-history-list');
-  if(!list) return;
+  var dot = pts.length
+    ? '<circle cx="' + pts[pts.length - 1].x + '" cy="' + pts[pts.length - 1].y + '" r="3.5" fill="' + color + '"/>'
+    : '';
+  return '<svg class="canvas-history-trend-svg" viewBox="0 0 ' + width + ' ' + height + '" preserveAspectRatio="none">' +
+    area +
+    '<polyline fill="none" stroke="' + color + '" stroke-width="' + (strokeWidth || 2.25) + '" stroke-linecap="round" stroke-linejoin="round" points="' + line + '"/>' +
+    dot +
+    '</svg>';
+}
 
-  list.innerHTML = canvasHistory.map((entry, i) => {
-    const date = new Date(entry.date);
-    const dateStr = date.toLocaleDateString('en-AU', {day:'numeric',month:'short',year:'numeric'});
-    const prev = canvasHistory[i+1];
-    const delta = prev ? entry.overall - prev.overall : null;
-    const deltaStr = delta !== null ? (delta > 0 ? `+${delta}` : `${delta}`) : '';
-    const deltaColor = delta > 0 ? '#4adea8' : delta < 0 ? '#e8734a' : '#a09880';
-    return `<div class="canvas-history-item" onclick="viewHistoricalCanvas(${i})">
-      <span class="canvas-history-date">${dateStr}</span>
-      <span class="canvas-history-score">${entry.overall}</span>
-      <div class="canvas-history-bar"><div class="canvas-history-bar-fill" style="width:${entry.overall}%"></div></div>
-      ${deltaStr ? `<span class="canvas-history-delta" style="color:${deltaColor}">${deltaStr}</span>` : '<span class="canvas-history-delta"></span>'}
-    </div>`;
+function renderCanvasHistoryArcView(chrono) {
+  var overallData = chrono.map(function (h) { return h.overall; });
+  var overall = chrono[chrono.length - 1].overall;
+  var overallDelta = canvasHistoryDelta(chrono, 'overall');
+  var html = '<div class="canvas-history-overall-block">' +
+    '<div class="canvas-history-overall-row">' +
+    '<span class="canvas-history-overall-num">' + overall + '</span>' +
+    '<span style="font-style:italic;color:var(--text-muted);font-size:0.88rem;">overall</span>' +
+    '<span class="canvas-history-overall-delta" style="color:' + canvasHistoryDeltaColor(overallDelta) + '">' +
+    (overallDelta >= 0 ? '+' : '') + overallDelta + ' since you began</span></div>' +
+    buildTrendLineSvg(overallData, '#F5C842', 360, 96, true, 2.5) +
+    '<div class="canvas-history-date-span"><span>' + formatCanvasHistoryDate(chrono[0].date) + '</span><span>' +
+    formatCanvasHistoryDate(chrono[chrono.length - 1].date) + '</span></div></div>' +
+    '<p class="canvas-history-areas-label">By life area</p>';
+
+  CANVAS_HISTORY_DIMS.forEach(function (dim) {
+    var data = chrono.map(function (h) { return h.scores[dim.key]; });
+    var latest = data[data.length - 1];
+    var d = canvasHistoryDelta(chrono, dim.key);
+    html += '<div class="canvas-history-area-row">' +
+      '<div class="canvas-history-area-head">' +
+      '<span class="canvas-history-area-title" style="color:' + dim.color + '">' + dim.title + '</span>' +
+      '<div class="canvas-history-area-meta">' +
+      '<span class="canvas-history-area-score">' + latest + '</span>' +
+      '<span class="canvas-history-area-delta" style="color:' + canvasHistoryDeltaColor(d) + '">' +
+      (d >= 0 ? '+' : '') + d + '</span></div></div>' +
+      buildTrendLineSvg(data, dim.color, 360, 56, false, 2) +
+      '</div>';
+  });
+  return html;
+}
+
+function renderCanvasHistoryPatternsView(chrono) {
+  var width = 360;
+  var height = 200;
+  var padL = 36, padR = 12, padT = 14, padB = 28;
+  var innerW = width - padL - padR;
+  var innerH = height - padT - padB;
+  var series = [{ name: 'Overall', color: '#F5C842', data: chrono.map(function (h) { return h.overall; }), w: 2.5 }]
+    .concat(CANVAS_HISTORY_DIMS.map(function (d) {
+      return { name: d.title, color: d.color, data: chrono.map(function (h) { return h.scores[d.key]; }), w: 1.75, key: d.key };
+    }));
+
+  var svg = '<svg class="canvas-history-patterns-chart" viewBox="0 0 ' + width + ' ' + height + '">';
+  [0.25, 0.5, 0.75].forEach(function (t) {
+    var y = padT + innerH * t;
+    svg += '<line x1="' + padL + '" x2="' + (width - padR) + '" y1="' + y + '" y2="' + y + '" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="3 6"/>';
+  });
+  series.forEach(function (s) {
+    if (canvasHistoryPatternsHidden[s.name]) return;
+    var pts = s.data.map(function (v, i) {
+      var x = padL + (i / Math.max(s.data.length - 1, 1)) * innerW;
+      var y = padT + (1 - v / 100) * innerH;
+      return x + ',' + y;
+    }).join(' ');
+    svg += '<polyline fill="none" stroke="' + s.color + '" stroke-width="' + s.w + '" stroke-linecap="round" stroke-linejoin="round" points="' + pts + '"/>';
+  });
+  svg += '<text x="' + padL + '" y="' + (height - 8) + '" fill="rgba(240,236,228,0.4)" font-size="10" font-family="DM Mono, monospace">' +
+    formatCanvasHistoryDate(chrono[0].date) + '</text>';
+  svg += '<text x="' + (width - padR) + '" y="' + (height - 8) + '" fill="rgba(240,236,228,0.4)" font-size="10" font-family="DM Mono, monospace" text-anchor="end">' +
+    formatCanvasHistoryDate(chrono[chrono.length - 1].date) + '</text></svg>';
+
+  var legend = '<p class="canvas-history-legend-hint">Tap a line to hide or show it</p>';
+  series.forEach(function (s) {
+    var hidden = !!canvasHistoryPatternsHidden[s.name];
+    var d = s.key ? canvasHistoryDelta(chrono, s.key) : canvasHistoryDelta(chrono, 'overall');
+    legend += '<button type="button" class="canvas-history-legend-btn' + (hidden ? ' is-hidden' : '') + '" data-series="' +
+      s.name.replace(/"/g, '&quot;') + '">' +
+      '<span class="canvas-history-legend-swatch" style="background:' + s.color + '"></span>' +
+      '<span class="canvas-history-legend-label">' + s.name + '</span>' +
+      '<span class="canvas-history-legend-delta" style="color:' + canvasHistoryDeltaColor(d) + '">' +
+      (d >= 0 ? '+' : '') + d + '</span></button>';
+  });
+  return svg + legend;
+}
+
+function renderCanvasHistorySnapshotView(chrono) {
+  var first = chrono[0];
+  var last = chrono[chrono.length - 1];
+  var firstScores = first.scores;
+  var lastScores = last.scores;
+  var low = canvasHistoryLowestDim(lastScores);
+  var size = 220;
+  var cx = size / 2;
+  var cy = size / 2;
+  var maxR = 78;
+  var keys = CANVAS_HISTORY_DIMS.map(function (d) { return d.key; });
+
+  function polyPoints(scores) {
+    return keys.map(function (k, i) {
+      var angle = -Math.PI / 2 + (i * 2 * Math.PI) / keys.length;
+      var r = (scores[k] / 100) * maxR;
+      return (cx + r * Math.cos(angle)) + ',' + (cy + r * Math.sin(angle));
+    }).join(' ');
+  }
+
+  var svg = '<div class="canvas-history-radar-wrap"><svg width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '">';
+  [0.33, 0.66, 1].forEach(function (t) {
+    svg += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (maxR * t) + '" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>';
+  });
+  keys.forEach(function (k, i) {
+    var angle = -Math.PI / 2 + (i * 2 * Math.PI) / keys.length;
+    svg += '<line x1="' + cx + '" y1="' + cy + '" x2="' + (cx + maxR * Math.cos(angle)) + '" y2="' + (cy + maxR * Math.sin(angle)) + '" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>';
+  });
+  svg += '<polygon points="' + polyPoints(firstScores) + '" fill="rgba(160,152,128,0.08)" stroke="rgba(160,152,128,0.45)" stroke-width="1.5"/>';
+  svg += '<polygon points="' + polyPoints(lastScores) + '" fill="rgba(245,200,66,0.18)" stroke="#F5C842" stroke-width="1.5"/>';
+  CANVAS_HISTORY_DIMS.forEach(function (dim, i) {
+    var angle = -Math.PI / 2 + (i * 2 * Math.PI) / keys.length;
+    var lx = cx + (maxR + 22) * Math.cos(angle);
+    var ly = cy + (maxR + 22) * Math.sin(angle);
+    var words = dim.title.split(' ');
+    var mid = Math.ceil(words.length / 2);
+    var line1 = words.slice(0, mid).join(' ');
+    var line2 = words.slice(mid).join(' ');
+    svg += '<text x="' + lx + '" y="' + ly + '" text-anchor="middle" fill="' + dim.color + '" font-size="8" font-family="Playfair Display, serif">';
+    svg += '<tspan x="' + lx + '" dy="' + (line2 ? -5 : 0) + '">' + line1 + '</tspan>';
+    if (line2) svg += '<tspan x="' + lx + '" dy="11">' + line2 + '</tspan>';
+    svg += '</text>';
+  });
+  svg += '</svg></div>';
+
+  var overallCh = last.overall - first.overall;
+  var rows = CANVAS_HISTORY_DIMS.map(function (dim) {
+    var ch = lastScores[dim.key] - firstScores[dim.key];
+    var isLow = dim.key === low.key;
+    return '<div class="canvas-history-snapshot-row">' +
+      '<span style="color:' + dim.color + '">' + dim.title + (isLow ? ' · lowest today' : '') + '</span>' +
+      '<span style="font-family:DM Mono,monospace;font-size:0.68rem;color:' + canvasHistoryDeltaColor(ch) + '">' +
+      firstScores[dim.key] + ' → ' + lastScores[dim.key] + ' (' + (ch >= 0 ? '+' : '') + ch + ')</span></div>';
   }).join('');
+
+  return '<div class="canvas-history-tend-callout">' +
+    '<p class="canvas-history-tend-label">Might need tending</p>' +
+    '<p><span style="color:' + low.color + ';font-weight:500">' + low.title + '</span> is your lowest area today (' +
+    lastScores[low.key] + '). It was ' + firstScores[low.key] + ' when you started.</p></div>' +
+    svg +
+    '<div class="canvas-history-snapshot-legend">' +
+    '<span><span class="canvas-history-snapshot-swatch" style="background:rgba(160,152,128,0.35)"></span>First · ' + first.overall + '</span>' +
+    '<span><span class="canvas-history-snapshot-swatch" style="background:#F5C842"></span>Today · ' + last.overall +
+    ' <span style="color:' + canvasHistoryDeltaColor(overallCh) + '">(' + (overallCh >= 0 ? '+' : '') + overallCh + ')</span></span></div>' +
+    rows;
 }
 
-function viewHistoricalCanvas(idx){
-  const entry = canvasHistory[idx];
-  if(!entry) return;
-  renderCanvasResults(entry.scores, '');
-  const overallEl = document.getElementById('canvas-overall-score');
-  if(overallEl) overallEl.textContent = entry.overall + ' (historical)';
+function bindCanvasHistoryPatternsLegend() {
+  var body = document.getElementById('canvas-history-modal-body');
+  if (!body) return;
+  body.querySelectorAll('.canvas-history-legend-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var name = btn.getAttribute('data-series');
+      if (canvasHistoryPatternsHidden[name]) delete canvasHistoryPatternsHidden[name];
+      else canvasHistoryPatternsHidden[name] = true;
+      setCanvasHistoryView('patterns');
+    });
+  });
 }
+
+function setCanvasHistoryView(view) {
+  canvasHistoryModalView = view;
+  document.querySelectorAll('#canvas-history-view-tabs .canvas-history-view-tab').forEach(function (tab) {
+    var active = tab.getAttribute('data-view') === view;
+    tab.classList.toggle('active', active);
+    tab.setAttribute('aria-selected', active ? 'true' : 'false');
+  });
+  var hint = document.getElementById('canvas-history-view-hint');
+  if (hint) hint.textContent = CANVAS_HISTORY_VIEW_HINTS[view] || '';
+  var body = document.getElementById('canvas-history-modal-body');
+  if (!body) return;
+  var chrono = getCanvasHistoryChronological();
+  if (view === 'arc') body.innerHTML = renderCanvasHistoryArcView(chrono);
+  else if (view === 'patterns') {
+    body.innerHTML = renderCanvasHistoryPatternsView(chrono);
+    bindCanvasHistoryPatternsLegend();
+  } else body.innerHTML = renderCanvasHistorySnapshotView(chrono);
+}
+
+function bindCanvasHistoryTabsOnce() {
+  var tabs = document.querySelectorAll('#canvas-history-view-tabs .canvas-history-view-tab');
+  tabs.forEach(function (tab) {
+    if (tab._canvasHistoryBound) return;
+    tab._canvasHistoryBound = true;
+    tab.addEventListener('click', function () {
+      setCanvasHistoryView(tab.getAttribute('data-view'));
+    });
+  });
+}
+
+function openCanvasHistoryModal() {
+  if (!canvasHistory || canvasHistory.length < 2) return;
+  canvasHistoryPatternsHidden = {};
+  var modal = document.getElementById('canvas-history-modal');
+  if (!modal) return;
+  modal.classList.add('active');
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  bindCanvasHistoryTabsOnce();
+  setCanvasHistoryView(canvasHistoryModalView || 'arc');
+}
+
+function closeCanvasHistoryModal() {
+  var modal = document.getElementById('canvas-history-modal');
+  if (!modal) return;
+  modal.classList.remove('active');
+  modal.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+}
+
+function renderCanvasHistory() {
+  var btn = document.getElementById('canvas-history-btn');
+  if (btn) btn.style.display = (canvasHistory && canvasHistory.length >= 2) ? 'block' : 'none';
+}
+
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') closeCanvasHistoryModal();
+});
 
 // ═══════════════════════════════════════
 // VOICE INPUT — Web Speech API
@@ -5348,5 +5836,26 @@ window.addEventListener('DOMContentLoaded', function() {
   })();
 });
 </script>
+
+<div id="canvas-history-modal" class="canvas-history-modal" role="dialog" aria-modal="true" aria-labelledby="canvas-history-modal-title" aria-hidden="true">
+  <div class="canvas-history-modal-backdrop" onclick="closeCanvasHistoryModal()"></div>
+  <div class="canvas-history-modal-panel" onclick="event.stopPropagation()">
+    <div class="canvas-history-modal-head">
+      <div>
+        <p class="sidebar-card-eyebrow" style="margin-bottom:0.35rem;">life canvas</p>
+        <p class="canvas-result-title" id="canvas-history-modal-title" style="margin:0;">Your season over time</p>
+      </div>
+      <button type="button" class="canvas-history-modal-close" onclick="closeCanvasHistoryModal()" aria-label="Close">×</button>
+    </div>
+    <div class="canvas-history-view-tabs" id="canvas-history-view-tabs" role="tablist">
+      <button type="button" class="canvas-history-view-tab active" data-view="arc" role="tab" aria-selected="true">The arc</button>
+      <button type="button" class="canvas-history-view-tab" data-view="patterns" role="tab" aria-selected="false">Patterns</button>
+      <button type="button" class="canvas-history-view-tab" data-view="snapshot" role="tab" aria-selected="false">Then &amp; now</button>
+    </div>
+    <p class="canvas-history-view-hint" id="canvas-history-view-hint"></p>
+    <div id="canvas-history-modal-body"></div>
+  </div>
+</div>
+
 </body>
 </html>
