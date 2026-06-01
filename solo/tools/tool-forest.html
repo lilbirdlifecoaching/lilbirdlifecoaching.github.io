@@ -172,7 +172,7 @@
 <script>
   function goBack() {
     if (window.parent !== window) {
-      window.parent.postMessage('tool-close', '*');
+      window.parent.postMessage({ type: 'tool-cancel' }, '*');
     } else {
       history.back();
     }
@@ -346,7 +346,7 @@
     const s = document.getElementById('save-status');
     s.classList.add('visible');
     const payload = getOutputPayload();
-    LilbirdEmbed.notifyParent(TOOL_KEY, payload, true);
+    LilbirdEmbed.finishEmbedSave(TOOL_KEY, payload);
     if (window.parent === window) {
       setTimeout(() => s.classList.remove('visible'), 2500);
     }

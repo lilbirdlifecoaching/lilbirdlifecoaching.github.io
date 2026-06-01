@@ -135,6 +135,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="embed-supabase.js"></script>
 <script>
   const SUPABASE_URL  = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
@@ -159,7 +160,7 @@
   let pendingFile = null;
 
   function goBack() {
-    if (window.parent !== window) window.parent.postMessage('tool-close', '*');
+    if (window.parent !== window) window.parent.postMessage({ type: 'tool-cancel' }, '*');
     else history.back();
   }
 
@@ -310,14 +311,20 @@
       }).catch(() => {});
 
       // Mirror into tool_outputs so the dashboard knows this tool has been completed
-      sb.from('tool_outputs').upsert({
+      await sb.from('tool_outputs').upsert({
         user_id:     currentUser.id,
         tool_name:   'childhood_photo',
         output_data: { photo_url: photoUrl, uploaded_at: new Date().toISOString() },
         updated_at:  new Date().toISOString(),
-      }, { onConflict: 'user_id,tool_name' }).then(() => {});
+      }, { onConflict: 'user_id,tool_name' });
 
       setStatus('Saved. Your illustrator gets a heads-up automatically.', 'success');
+      if (window.parent !== window && window.LilbirdEmbed) {
+        LilbirdEmbed.finishEmbedSave('childhood-photo', {
+          photo_url: photoUrl,
+          uploaded_at: new Date().toISOString(),
+        });
+      }
       showSavedBlock(photoUrl, new Date().toISOString());
       document.getElementById('actions').style.display = 'none';
       pendingFile = null;

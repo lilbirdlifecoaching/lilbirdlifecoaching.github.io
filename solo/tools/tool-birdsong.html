@@ -114,10 +114,11 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="embed-supabase.js"></script>
 <script>
   function goBack() {
     if (window.parent !== window) {
-      window.parent.postMessage('tool-close', '*');
+      window.parent.postMessage({ type: 'tool-cancel' }, '*');
     } else {
       history.back();
     }
@@ -246,7 +247,13 @@
   document.getElementById('btn-save').addEventListener('click', async () => {
     await autoSave();
     const s = document.getElementById('save-status'); s.classList.add('visible');
-    if (window.parent !== window) {
+    if (window.parent !== window && window.LilbirdEmbed) {
+      LilbirdEmbed.finishEmbedSave('birdsong', {
+        current: { ...current },
+        desired: { ...desired },
+        resonance: document.getElementById('resonance').value,
+      });
+    } else if (window.parent !== window) {
       setTimeout(function() { window.parent.postMessage('tool-close', '*'); }, 2000);
     } else { setTimeout(() => s.classList.remove('visible'), 2500); }
   });

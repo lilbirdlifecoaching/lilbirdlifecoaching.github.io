@@ -506,10 +506,15 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="embed-supabase.js"></script>
   <script>
   function goBack() {
     if (window.parent !== window) {
-      window.parent.postMessage('tool-close', '*');
+      if (window.LilbirdEmbed && window.__deepRootsFinish) {
+        window.__deepRootsFinish();
+      } else {
+        window.parent.postMessage({ type: 'tool-cancel' }, '*');
+      }
     } else {
       history.back();
     }
@@ -724,6 +729,18 @@
         // silent fail
       }
     }
+
+    window.__deepRootsFinish = async function () {
+      await saveToSupabase();
+      var hasContent = Object.keys(responses).some(function (k) {
+        return responses[k] && String(responses[k]).trim();
+      });
+      if (window.LilbirdEmbed && hasContent) {
+        LilbirdEmbed.finishEmbedSave('deep-roots', { responses: { ...responses }, currentIndex: currentIndex });
+      } else {
+        window.parent.postMessage({ type: 'tool-cancel' }, '*');
+      }
+    };
 
     // ── Init ─────────────────────────────────────────────────
     async function init() {

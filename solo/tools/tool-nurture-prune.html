@@ -557,10 +557,11 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="embed-supabase.js"></script>
 <script>
   function goBack() {
     if (window.parent !== window) {
-      window.parent.postMessage('tool-close', '*');
+      window.parent.postMessage({ type: 'tool-cancel' }, '*');
     } else {
       history.back();
     }
@@ -690,7 +691,9 @@
     await autoSave();
     const status = document.getElementById('save-status');
     status.classList.add('visible');
-    if (window.parent !== window) {
+    if (window.parent !== window && window.LilbirdEmbed) {
+      LilbirdEmbed.finishEmbedSave('nurture-prune', { people: JSON.parse(JSON.stringify(people)) });
+    } else if (window.parent !== window) {
       setTimeout(function() { window.parent.postMessage('tool-close', '*'); }, 1800);
     } else {
       setTimeout(() => status.classList.remove('visible'), 2500);

@@ -30,9 +30,15 @@
     } catch (e) {}
   }
 
+  /** After a successful save in the Solo iframe — updates the chat card immediately and closes the embed. */
+  function finishEmbedSave(toolKey, outputData) {
+    notifyParent(toolKey, outputData || null, true);
+  }
+
   global.LilbirdEmbed = {
     createEmbedClient: createEmbedClient,
     notifyParent: notifyParent,
+    finishEmbedSave: finishEmbedSave,
     SUPABASE_URL: SUPABASE_URL,
     SUPABASE_ANON: SUPABASE_ANON,
   };

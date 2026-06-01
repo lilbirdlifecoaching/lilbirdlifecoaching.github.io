@@ -83,10 +83,11 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="embed-supabase.js"></script>
 <script>
   function goBack() {
     if (window.parent !== window) {
-      window.parent.postMessage('tool-close', '*');
+      window.parent.postMessage({ type: 'tool-cancel' }, '*');
     } else {
       history.back();
     }
@@ -229,7 +230,9 @@
     await autoSave();
     const s = document.getElementById('save-status');
     s.classList.add('visible');
-    if (window.parent !== window) {
+    if (window.parent !== window && window.LilbirdEmbed) {
+      LilbirdEmbed.finishEmbedSave('glow-map', { scores: { ...scores } });
+    } else if (window.parent !== window) {
       setTimeout(function() { window.parent.postMessage('tool-close', '*'); }, 1800);
     } else {
       setTimeout(() => s.classList.remove('visible'), 2500);
@@ -250,7 +253,7 @@
     }
     if (currentUser) {
       const toolName = sessionNum === 2 ? 'glow_map_s2' : sessionNum === 4 ? 'glow_map_s4' : 'glow_map_s7';
-      const { data } = await sb.from('tool_outputs').select('output_data').eq('user_id', currentUser.id).eq('tool_name', toolName).single();
+      const { data } = await sb.from('tool_outputs').select('output_data').eq('user_id', currentUser.id).eq('tool_name', toolName).maybeSingle();
       if (data?.output_data?.scores) scores = { ...scores, ...data.output_data.scores };
       if (showCompare) {
         const { data: s2 } = await sb.from('tool_outputs').select('output_data').eq('user_id', currentUser.id).eq('tool_name', 'glow_map_s2').maybeSingle();

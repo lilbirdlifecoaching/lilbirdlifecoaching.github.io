@@ -573,10 +573,11 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="embed-supabase.js"></script>
   <script>
   function goBack() {
     if (window.parent !== window) {
-      window.parent.postMessage('tool-close', '*');
+      window.parent.postMessage({ type: 'tool-cancel' }, '*');
     } else {
       history.back();
     }
@@ -704,7 +705,13 @@
       status.classList.add('visible');
       // Close iframe + return to session chat after the user sees the "Saved" pulse.
       // Matches the pattern in the other journaling tools.
-      if (window.parent !== window) {
+      if (window.parent !== window && window.LilbirdEmbed) {
+        LilbirdEmbed.finishEmbedSave('roots-feathers', {
+          roots: roots.slice(),
+          feathers: feathers.slice(),
+          reflection: document.getElementById('reflection-area').value,
+        });
+      } else if (window.parent !== window) {
         setTimeout(function() { window.parent.postMessage('tool-close', '*'); }, 1800);
       } else {
         setTimeout(() => status.classList.remove('visible'), 2500);

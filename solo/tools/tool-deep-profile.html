@@ -237,10 +237,11 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="embed-supabase.js"></script>
 <script>
   function goBack() {
     if (window.parent !== window) {
-      window.parent.postMessage('tool-close', '*');
+      window.parent.postMessage({ type: 'tool-cancel' }, '*');
     } else {
       history.back();
     }
@@ -337,7 +338,9 @@
     showSavedState();
     var s = document.getElementById('save-status');
     s.classList.add('visible');
-    if (window.parent !== window) {
+    if (window.parent !== window && window.LilbirdEmbed) {
+      LilbirdEmbed.finishEmbedSave('deep-profile', getData());
+    } else if (window.parent !== window) {
       setTimeout(function() { window.parent.postMessage('tool-close', '*'); }, 1800);
     } else {
       setTimeout(function() { s.classList.remove('visible'); }, 2500);
