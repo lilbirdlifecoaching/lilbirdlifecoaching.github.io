@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- lilbird deep-profile build: v7.0.4-20260530 (life canvas history seed + saturday opt-in confirm) -->
+<!-- lilbird deep-profile build: v7.0.9-20260528-single-email-gate -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -296,9 +296,16 @@
   }
   .email-gate-row input:focus { outline: none; border-color: var(--gold); }
   .email-gate-row input::placeholder { color: rgba(240,234,216,0.3); }
-  #gate-error { display: none; color: var(--ember); font-size: 0.82rem; margin-top: 0.75rem; }
-  .snap-content { display: none; }
-  .snap-content.revealed { display: block; }
+  #gate-error, #unlock-error { display: none; color: var(--ember); font-size: 0.82rem; margin-top: 0.75rem; }
+  .gate-hook { margin-bottom: 1.5rem; text-align: left; }
+  .gate-opt-in {
+    display: flex; gap: 0.65rem; align-items: flex-start;
+    text-align: left; font-size: 0.86rem; color: var(--text-muted);
+    line-height: 1.5; margin: 0.85rem 0 0; cursor: pointer;
+  }
+  .gate-opt-in input { margin-top: 0.2rem; flex-shrink: 0; accent-color: var(--gold); }
+  .email-gate-row { flex-direction: column; align-items: stretch; }
+  .email-gate-row .btn { width: 100%; justify-content: center; margin-top: 0.25rem; }
 
   .snap-badge { display: flex; flex-direction: column; align-items: flex-start; gap: 0.85rem; background: var(--gold-faint); border: 1px solid var(--dark-border); border-radius: 16px; padding: 1rem 1.25rem; margin-bottom: 2rem; max-width: 100%; }
   .snap-types-row { display: flex; flex-wrap: wrap; gap: 0.5rem 0.75rem; align-items: stretch; width: 100%; }
@@ -2369,65 +2376,45 @@
     <p class="eyebrow" style="justify-content:center;">almost there</p>
     <h2>Your story is<br><em>being read.</em></h2>
     <p style="max-width:420px;margin:1.5rem auto;">Give it up to a minute — the AI is working through everything you wrote and building something specific to you.</p>
-    <p style="font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.12em;color:var(--gold-dim);margin-top:2rem;text-transform:uppercase;">Your Nest ID: <span id="nest-id" style="color:var(--gold);">generating…</span></p>
+    <p style="font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.12em;color:var(--gold-dim);margin-top:2rem;text-transform:uppercase;">Saving your read: <span id="nest-id" style="color:var(--gold);">generating…</span></p>
   </div>
 </div>
 
 
 <!-- ══════════════════════════════════════
-     SNAPSHOT (email capture + teaser)
+     UNLOCK — one email, full read (lead gen)
 ══════════════════════════════════════ -->
 <div class="screen" id="screen-snapshot">
   <div class="inner">
     <p class="eyebrow">your inner compass is ready</p>
-    <h2>Almost.<br><em>One quick thing.</em></h2>
+    <h2>Here's a taste.<br><em>One step to your full read.</em></h2>
 
-    <!-- EMAIL GATE — shown until email submitted -->
-    <div class="email-gate" id="email-gate">
-      <h3>Drop your email to<br><em>see your snapshot.</em></h3>
-      <p>We'll keep a copy safe for you. No inbox clutter, just your read waiting when you need it.</p>
-      <div class="email-gate-row">
-        <input type="email" id="snap-email" placeholder="your@email.com" onkeydown="if(event.key==='Enter') submitEmail()">
-        <button class="btn btn-gold" onclick="submitEmail()" style="white-space:nowrap;">Show me →</button>
-      </div>
-      <p id="gate-error">Please enter a valid email address.</p>
-    </div>
-
-    <!-- SNAPSHOT CONTENT — hidden until email submitted -->
-    <div class="snap-content" id="snap-content">
-
+    <div class="gate-hook" id="gate-hook">
       <div class="snap-badge">
         <div class="snap-types-row" id="snap-types-row">
           <span class="snap-type-pill">Your types load here</span>
         </div>
-        <span class="snap-badge-label" id="snap-archetype">The Connector</span>
+        <span class="snap-badge-label" id="snap-archetype">…</span>
       </div>
-
       <div class="snap-preview">
-        <div id="snap-preview">
+        <div id="gate-hook-preview">
           <p style="color:var(--text-muted);font-style:italic;">Your read is loading…</p>
         </div>
       </div>
+    </div>
 
-      <div class="teaser-section">
-        <div class="teaser-content teaser-blur">
-          <h3>How you're wired</h3>
-          <p>Your mind processes the world relationally before it processes it logically. You're energised by people, make decisions through the lens of impact, and carry a quiet but persistent drive to make things better for everyone around you.</p>
-          <h3 style="margin-top:1.25rem;">Your stuck places</h3>
-          <p>Your pattern probably involves saying yes when you mean not yet, or carrying the emotional weight of a room so nobody else has to. The leap from Rescuer to Coach is one of the most significant shifts your type can make.</p>
-          <h3 style="margin-top:1.25rem;">Your attachment style</h3>
-          <p>You lean anxious-secure — capable of deep connection, but under stress you can spiral into "are we okay?" before the other person even knows anything's wrong. You're not needy. You're just paying very close attention.</p>
-        </div>
-        <div class="teaser-overlay">
-          <span class="lock-icon">🔒</span>
-          <p>Your full Inner Compass read is one step away</p>
-        </div>
+    <div class="email-gate" id="email-gate">
+      <p id="email-gate-hint">Enter your email. We'll open your full read here and send a link so you can come back anytime. Free. No card. No account required.</p>
+      <div class="email-gate-row">
+        <input type="email" id="snap-email" placeholder="your@email.com" autocomplete="email" onkeydown="if(event.key==='Enter') submitEmail()">
+        <label class="gate-opt-in" for="gate-newsletter-opt">
+          <input type="checkbox" id="gate-newsletter-opt">
+          <span>Send me occasional letters from lil' bird (optional — not required for your read)</span>
+        </label>
+        <button type="button" class="btn btn-gold" id="btn-snap-email" onclick="submitEmail()">Get my full read →</button>
       </div>
-
-      <div class="btn-row" style="margin-top:2rem;">
-        <button class="btn btn-gold" onclick="goTo('screen-pay')">Unlock my full read →</button>
-      </div>
-
+      <p id="gate-error">Please enter a valid email address.</p>
+      <p id="unlock-error"></p>
     </div>
   </div>
 </div>
@@ -2499,7 +2486,8 @@
 
     <!-- HEADER -->
     <div class="result-header">
-      <p class="eyebrow">your nest</p>
+      <p class="eyebrow">your saved read</p>
+      <p id="results-email-note" style="display:none;font-size:0.88rem;color:var(--text-muted);margin:0 0 1rem;line-height:1.5;"></p>
       <div class="result-hero-landing">
         <h1 id="result-archetype" style="margin-bottom:0.25rem;">The Connector</h1>
         <p id="result-archetype-sub" style="color:var(--gold-dim);font-family:'Playfair Display',serif;font-style:italic;font-size:1.05rem;margin-bottom:0.35rem;"></p>
@@ -2538,8 +2526,8 @@
       </div>
 
       <div class="saturday-opt" id="saturday-opt-box">
-        <label><input type="checkbox" id="saturday-opt-in"> <span><strong>Saturday pulse</strong> — one short email with a link back here for a 2-minute canvas check-in. Low noise. You can turn it off anytime from your Nest.</span></label>
-        <p class="saturday-opt-hint" id="saturday-opt-hint">Saves as soon as you check or uncheck — we use the email you already gave at pay / unlock.</p>
+        <label><input type="checkbox" id="saturday-opt-in"> <span><strong>Saturday pulse</strong> — one short email with a link back to this read for a 2-minute check-in. Low noise. Turn it off anytime.</span></label>
+        <p class="saturday-opt-hint" id="saturday-opt-hint">Saves as soon as you check or uncheck — uses the email you used to unlock this read.</p>
         <div class="saturday-email-capture" id="saturday-email-capture">
           <input type="email" id="saturday-email-inline" placeholder="your@email.com" autocomplete="email" aria-label="Email for Saturday pulse">
           <button type="button" id="saturday-email-save">Save &amp; turn on Saturday pulse</button>
@@ -2735,15 +2723,21 @@
           <a href="https://lilbird.life/solo/" target="_blank" rel="noopener" class="btn btn-outline" style="width:100%;justify-content:center;margin-top:1rem;">Open Solo →</a>
         </div>
 
-        <!-- NEST LINK -->
+        <!-- SAVED READ LINK -->
         <div class="sidebar-card">
-          <p class="sidebar-card-eyebrow">your nest</p>
-          <p class="sidebar-card-body" style="margin-bottom:0.75rem;">This is your permanent link. Bookmark it — your read and canvas history live here.</p>
+          <p class="sidebar-card-eyebrow">your link</p>
+          <p class="sidebar-card-body" style="margin-bottom:0.75rem;">Bookmark this URL or use the link we emailed you. Your read and Life Canvas history stay here.</p>
           <p class="nest-id" id="result-nest-id" style="font-size:0.72rem;margin-bottom:1rem;word-break:break-all;"></p>
           <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
             <button class="btn btn-outline" onclick="copyNestLink()" style="flex:1;justify-content:center;">Copy link</button>
             <button class="btn btn-outline" id="retake-btn" onclick="restartAssessment()" style="flex:1;justify-content:center;">Retake ↺</button>
           </div>
+        </div>
+
+        <div class="sidebar-card">
+          <p class="sidebar-card-eyebrow">optional</p>
+          <h3 class="sidebar-card-title">One login for all tools</h3>
+          <p class="sidebar-card-body" style="margin-bottom:0.75rem;">Using Solo or coaching? <a href="/nest/" style="color:var(--gold-dim);">Open your Nest account</a> to tie this read to your dashboard. Not required to view what you have now.</p>
         </div>
 
         <!-- BACK HOME -->
@@ -2780,7 +2774,12 @@
 // ═══════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════
-const DEEP_PROFILE_BUILD = 'v7.0.4-20260530';
+const DEEP_PROFILE_BUILD = 'v7.0.9-20260528-single-email-gate';
+/** Default: email unlock for ads/lead gen. Add ?paywall=1 to URL to restore pay-what-you-want flow. */
+const INNER_COMPASS_PAYWALL = (function(){
+  try{ return new URLSearchParams(window.location.search).get('paywall') === '1'; }catch(_){ return false; }
+})();
+const INNER_COMPASS_LEADGEN = !INNER_COMPASS_PAYWALL;
 const WORKER_URL     = 'https://lilbird-assessment.cwwq46sn7m.workers.dev';
 const SUPABASE_URL   = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
 const SUPABASE_ANON  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
@@ -2902,6 +2901,10 @@ const PROGRESS = {
 // NAVIGATION
 // ═══════════════════════════════════════
 function goTo(screenId){
+  if(screenId==='screen-pay' && INNER_COMPASS_LEADGEN && userEmail){
+    unlockFullRead();
+    return;
+  }
   if(typeof stopMic === 'function' && activeRecognitionId) stopMic();
   document.body.classList.toggle('dp-in-chat', screenId === 'screen-chat');
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -2912,7 +2915,7 @@ function goTo(screenId){
   if(screenId==='screen-pay') prefillPayEmail();
   if(screenId==='screen-preview') runPreview();
   if(screenId==='screen-landing') runAnalysis();
-  // Don't populate snapshot until email gate is passed — submitEmail handles that
+  if(screenId==='screen-snapshot' && profileData) populateGateHook(profileData);
 }
 
 function prefillPayEmail(){
@@ -3421,13 +3424,15 @@ async function runAnalysis(){
     renderCanvasResults(canvasScores, '');
   }
 
+  if(profileData) populateGateHook(profileData);
+  updateGateCopy();
   goTo('screen-snapshot');
 }
 
 // ═══════════════════════════════════════
-// SNAPSHOT
+// UNLOCK GATE — hook preview + single email
 // ═══════════════════════════════════════
-function populateSnapshot(profile){
+function populateGateHook(profile){
   if(!profile) return;
   const row = document.getElementById('snap-types-row');
   const nowLine = [profile.mbti, profile.enneagram].filter(Boolean).join(' · ');
@@ -3469,59 +3474,76 @@ function populateSnapshot(profile){
       a.textContent = baseA;
     }
   }
-  const prev=document.getElementById('snap-preview');
+  const prev=document.getElementById('gate-hook-preview');
   if(prev && profile.whoYouAre){
-    const paras=profile.whoYouAre.split(/\n\n/).slice(0,2);
+    const paras=profile.whoYouAre.split(/\n\n/).slice(0,1);
     prev.innerHTML=paras.map(p=>`<p>${p}</p>`).join('');
   }
 }
 
+function updateGateCopy(){
+  const hint = document.getElementById('email-gate-hint');
+  const btn = document.getElementById('btn-snap-email');
+  if(INNER_COMPASS_PAYWALL){
+    if(hint) hint.textContent = 'Enter your email. We\'ll show your read next; pay what feels fair to unlock and save your link.';
+    if(btn) btn.textContent = 'Continue →';
+  }else{
+    if(hint) hint.textContent = 'Enter your email. We\'ll open your full read here and send a link so you can come back anytime. Free. No card. No account required.';
+    if(btn) btn.textContent = 'Get my full read →';
+  }
+}
+
+function getGateSubmitBtn(){
+  return document.getElementById('btn-snap-email');
+}
+
 // ═══════════════════════════════════════
-// EMAIL → BEEHIIV
+// EMAIL → unlock (optional Beehiiv opt-in)
 // ═══════════════════════════════════════
 async function submitEmail(){
   const emailEl = document.getElementById('snap-email');
-  const errorEl = document.getElementById('gate-error');
+  const gateErr = document.getElementById('gate-error');
+  const unlockErr = document.getElementById('unlock-error');
   const email   = emailEl ? emailEl.value.trim() : '';
 
   if(!email || !email.includes('@') || !email.includes('.')){
-    if(errorEl) errorEl.style.display = 'block';
+    if(gateErr) gateErr.style.display = 'block';
+    if(unlockErr) unlockErr.style.display = 'none';
     return;
   }
-  if(errorEl) errorEl.style.display = 'none';
+  if(gateErr) gateErr.style.display = 'none';
+  if(unlockErr) unlockErr.style.display = 'none';
 
-  // Store for pay screen — no second ask needed
   userEmail = email;
 
-  // Subscribe via worker (avoids CORS; Beehiiv API key lives on worker only)
-  try{
-    const subRes = await fetch(`${WORKER_URL}/subscribe-email`, {
-      method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        email,
-        pubId: BEEHIIV_PUB_ID,
-        customFields: [
-          {name:'archetype',  value:profileData?.archetype  || ''},
-          {name:'mbti',       value:profileData?.mbti       || ''},
-          {name:'enneagram',  value:profileData?.enneagram  || ''},
-          {name:'likely_core_mbti', value:profileData?.likelyCoreMbti || ''},
-          {name:'likely_core_enneagram', value:profileData?.likelyCoreEnneagram || ''},
-          {name:'attachment', value:profileData?.attachment  || ''},
-          {name:'nest_id',    value:nestId                   || ''},
-          {name:'source',     value:'deep-profile-snapshot'       },
-        ]
-      })
-    });
-    const subJson = await subRes.json().catch(() => ({}));
-    if(subRes.ok && subJson.success){
-      console.info('Beehiiv: subscribed', email);
-    }else{
-      console.warn('Beehiiv subscribe did not succeed:', subRes.status, subJson);
-    }
-  }catch(e){ console.warn('Beehiiv request failed:', e); }
+  const wantNewsletter = document.getElementById('gate-newsletter-opt')?.checked === true;
+  if(wantNewsletter){
+    try{
+      const subRes = await fetch(`${WORKER_URL}/subscribe-email`, {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          email,
+          pubId: BEEHIIV_PUB_ID,
+          customFields: [
+            {name:'archetype',  value:profileData?.archetype  || ''},
+            {name:'mbti',       value:profileData?.mbti       || ''},
+            {name:'enneagram',  value:profileData?.enneagram  || ''},
+            {name:'likely_core_mbti', value:profileData?.likelyCoreMbti || ''},
+            {name:'likely_core_enneagram', value:profileData?.likelyCoreEnneagram || ''},
+            {name:'attachment', value:profileData?.attachment  || ''},
+            {name:'nest_id',    value:nestId                   || ''},
+            {name:'source',     value:'deep-profile-gate-opt-in'},
+          ]
+        })
+      });
+      const subJson = await subRes.json().catch(() => ({}));
+      if(subRes.ok && subJson.success){
+        console.info('Beehiiv: subscribed (opt-in)', email);
+      }
+    }catch(e){ console.warn('Beehiiv request failed:', e); }
+  }
 
-  // Registry row for nest recovery (email + nestId only — no assessment answers)
-  logToSheet({ event: 'email_captured', email });
+  logToSheet({ event: 'email_captured', email, paid: INNER_COMPASS_PAYWALL ? 'no' : 'pending' });
 
   if(nestId){
     fetch(WORKER_URL + '/nest-preferences', {
@@ -3531,14 +3553,94 @@ async function submitEmail(){
     }).catch(function(){});
   }
 
-  // Hide gate, reveal snapshot content
-  const gate    = document.getElementById('email-gate');
-  const snapContent = document.getElementById('snap-content');
-  if(gate)        gate.style.display = 'none';
-  if(snapContent) snapContent.classList.add('revealed');
+  await unlockFullRead();
+}
 
-  // Populate snapshot now it's visible
-  if(profileData) populateSnapshot(profileData);
+async function unlockFullRead(){
+  const unlockErr = document.getElementById('unlock-error');
+  const gateErr = document.getElementById('gate-error');
+  const btn = getGateSubmitBtn();
+  const emailVal = (userEmail || document.getElementById('snap-email')?.value || '').trim();
+
+  if(!emailVal || !emailVal.includes('@') || !emailVal.includes('.')){
+    if(gateErr) gateErr.style.display = 'block';
+    return;
+  }
+  if(unlockErr) unlockErr.style.display = 'none';
+  if(!profileData || !nestId){
+    if(unlockErr){
+      unlockErr.textContent = 'Your read is still loading. Wait a moment and try again.';
+      unlockErr.style.display = 'block';
+    }
+    return;
+  }
+
+  if(INNER_COMPASS_PAYWALL){
+    userEmail = emailVal;
+    goTo('screen-pay');
+    return;
+  }
+
+  userEmail = emailVal;
+  if(btn){ btn.disabled = true; btn.textContent = 'Opening your read…'; }
+
+  try{
+    await fetch(`${WORKER_URL}/store-profile`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        nestId,
+        profile:profileData,
+        canvasScores,
+        canvasHistory:canvasHistory || [],
+        email:emailVal,
+        assessmentMode: assessmentPath === 'know' ? 'know-type' : 'full',
+        peakPlunge: peakPlungeData,
+        pairTheseLog,
+      }),
+    });
+
+    const unlockRes = await fetch(`${WORKER_URL}/lead-unlock`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ nestId, email: emailVal }),
+    });
+    if(!unlockRes.ok){
+      const t = await unlockRes.text().catch(()=>'');
+      throw new Error('Unlock failed (' + unlockRes.status + '). ' + t.slice(0,120));
+    }
+
+    try{
+      await fetch(`${WORKER_URL}/send-profile-email`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ email: emailVal, nestId, profile: profileData }),
+      });
+    }catch(emailErr){
+      console.warn('Nest link email failed (non-fatal):', emailErr);
+    }
+
+    if(launchToken){ _postCourseLink(nestId).catch(err => console.warn('Course link unhandled:', err)); }
+    _linkToNestIfLoggedIn(nestId).catch(err => console.warn('Nest link unhandled:', err));
+
+    logToSheet({ event: 'lead_unlock', email: emailVal, paid: 'yes', amount: 0 });
+
+    hasPaid = true;
+    renderResults(profileData);
+    const emailNote = document.getElementById('results-email-note');
+    if(emailNote && emailVal){
+      emailNote.textContent = 'Your full read is open below. We also emailed your saved link to ' + emailVal + '.';
+      emailNote.style.display = 'block';
+    }
+    goTo('screen-results');
+  }catch(e){
+    console.error('unlockFullRead:', e);
+    if(unlockErr){
+      unlockErr.textContent = e.message || 'Something went wrong. Try again or email hello@lilbird.life.';
+      unlockErr.style.display = 'block';
+    }
+    if(btn){ btn.disabled = false; updateGateCopy(); }
+  }
 }
 
 // ═══════════════════════════════════════
@@ -3626,7 +3728,7 @@ function bindSaturdayOptIn(){
         if(result.error === 'email_required'){
           satIn.checked = false;
           if(cap) cap.classList.add('open');
-          setSaturdayHint('Add the email you used to unlock — then we can send Saturday pulses.', 'err');
+          setSaturdayHint('Add the email you used for this read — then we can send Saturday pulses.', 'err');
           return;
         }
         satIn.checked = !wantOn;
@@ -4343,7 +4445,7 @@ async function restartAssessment(){
   }
   // Free retake — one time only
   if(hasRetake){
-    alert('You have already used your free retake. Unlock your read to get unlimited retakes — or email hello@lilbird.life if you need help.');
+    alert('You have already used your free retake. Email hello@lilbird.life if you need another run.');
     return;
   }
   hasRetake = true;
@@ -5979,19 +6081,21 @@ async function generatePartnerDynamic(){
 window.addEventListener('DOMContentLoaded', function() {
   const params = new URLSearchParams(window.location.search);
 
-  // Test mode: skip to snapshot with fallback profile
-  if (params.get('testpay') === '1') {
+  updateGateCopy();
+
+  // Test mode: skip to unlock gate with fallback profile
+  if (params.get('testpay') === '1' || params.get('testunlock') === '1') {
     nestId = generateNestId();
     profileData = getFallbackProfile();
-    userEmail = 'test@lilbird.life';
     document.getElementById('nest-id').textContent = nestId;
-    // Skip email gate in test mode
-    const gate = document.getElementById('email-gate');
-    const snapContent = document.getElementById('snap-content');
-    if(gate) gate.style.display = 'none';
-    if(snapContent) snapContent.classList.add('revealed');
-    populateSnapshot(profileData);
+    populateGateHook(profileData);
     goTo('screen-snapshot');
+    if (params.get('testunlock') === '1') {
+      userEmail = 'test@lilbird.life';
+      const snap = document.getElementById('snap-email');
+      if(snap) snap.value = userEmail;
+      setTimeout(function(){ unlockFullRead(); }, 400);
+    }
     return;
   }
 
