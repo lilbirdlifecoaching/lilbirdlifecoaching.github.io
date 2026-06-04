@@ -3615,6 +3615,9 @@ async function unlockFullRead(){
       throw new Error('Unlock failed (' + unlockRes.status + '). ' + t.slice(0,120));
     }
 
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({ event: 'deep_profile_email_capture' });
+
     try{
       await fetch(`${WORKER_URL}/send-profile-email`,{
         method:'POST',
