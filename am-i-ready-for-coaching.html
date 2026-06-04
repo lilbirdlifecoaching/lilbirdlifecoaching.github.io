@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- ═══════════ SEO META TAGS ═══════════ -->
-  <meta name="description" content="Take the lil' bird coaching readiness quiz and find out if coaching is right for where you are right now." />
+  <meta name="description" content="Free quiz: is life coaching right for you right now? Seven honest questions from Luke Haythorpe (lil' bird). Bay Area &amp; Melbourne coaching for people in transition." />
   <meta name="keywords" content="am I ready for coaching, life coaching quiz, lil bird coaching, Luke Haythorpe, coaching readiness, life transitions coach" />
   <meta name="author" content="Luke Haythorpe" />
   <meta name="robots" content="index, follow" />
@@ -12,12 +12,12 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://lilbird.life/am-i-ready-for-coaching.html" />
   <meta property="og:title" content="Am I Ready for Coaching? — lil' bird" />
-  <meta property="og:description" content="Take the lil' bird coaching readiness quiz and find out if coaching is right for where you are right now." />
+  <meta property="og:description" content="Seven honest questions. Find out if coaching fits where you are right now — no sales pitch." />
   <meta property="og:image" content="https://lilbird.life/bird-logo.png" />
   <meta property="og:site_name" content="lil’ bird coaching" />
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="Am I Ready for Coaching? — lil' bird" />
-  <meta name="twitter:description" content="Take the lil' bird coaching readiness quiz and find out if coaching is right for where you are right now." />
+  <meta name="twitter:description" content="Seven honest questions. Find out if coaching fits where you are right now — no sales pitch." />
   <meta name="twitter:image" content="https://lilbird.life/bird-logo.png" />
   <script type="application/ld+json">
   {
@@ -26,12 +26,15 @@
     "name": "lil’ bird coaching",
     "url": "https://lilbird.life",
     "logo": "https://lilbird.life/bird-logo.png",
-    "description": "Life and leadership coaching for people in transition.",
+    "description": "Life and leadership coaching for people in transition. In-person and online sessions for career changers, leaders, and anyone whose life looks fine on paper but doesn't feel like theirs.",
     "founder": {
       "@type": "Person",
       "name": "Luke Haythorpe",
-      "url": "https://lilbird.life"
-    }
+      "jobTitle": "Life and Leadership Coach",
+      "url": "https://lilbird.life/about-luke.html"
+    },
+    "serviceType": ["Life Coaching", "Leadership Coaching", "Career Transition Coaching"],
+    "areaServed": ["San Francisco Bay Area", "Melbourne", "Worldwide"]
   }
   </script>
   <title>Am I Ready for Coaching? — lil' bird</title>
@@ -411,7 +414,7 @@
     Let's find out <em>if now is the moment.</em>
   </h1>
   <p class="intro-body">
-    Seven honest questions. No sales pitch. Just a clear read on where you are and whether coaching could actually move the needle for you right now.
+    Seven honest questions from Luke Haythorpe, a life and leadership coach for people in transition. No sales pitch. Just a straight read on whether coaching could help you right now.
   </p>
   <div class="intro-meta">
     <span class="meta-pill">⏱ ~2 minutes</span>
@@ -434,7 +437,7 @@
 <!-- CAPTURE -->
 <div class="screen" id="screen-capture">
   <h2>One last thing</h2>
-  <p>Drop your details and we'll show your results right here.<br/>You'll also get occasional insights from lil' bird — no noise, just the good stuff.</p>
+  <p>Drop your details and we'll show your results right here.<br/>Occasional letters from lil' bird if you want them. Unsubscribe any time.</p>
   <div class="capture-field">
     <input id="inp-first" type="text" placeholder="Your first name"/>
     <div class="err-msg" id="err-first">Please enter your name</div>
@@ -557,15 +560,15 @@ const QUESTIONS = [
 const OBJECTION_RESPONSES = {
   cost: {
     label: "💬 On the cost question",
-    text: "Coaching is an investment — that's real. But the free discovery call exists precisely for this: to have an honest conversation about what's possible, what it costs, and whether the timing actually works. No pressure, no pitch."
+    text: "Coaching is an investment, and that's real. The free discovery call is for an honest conversation about what's possible, what it costs, and whether the timing works. No pressure, no pitch."
   },
   threshold: {
     label: "💬 You don't have to be in crisis",
-    text: "Coaching isn't triage. The people who get the most out of it aren't falling apart — they're functioning well and ready to go further. You don't need to hit rock bottom to deserve support."
+    text: "Coaching isn't triage. Plenty of clients are functioning well and ready to go further. You don't need to hit rock bottom to deserve support."
   },
   independence: {
     label: "💬 On figuring things out alone",
-    text: "That's actually a strength. But there's a difference between solving problems and seeing yourself clearly. A good coach isn't there to fix you — they're there to help you see what you can't see when you're inside the picture."
+    text: "That's a strength. There's still a difference between solving problems and seeing yourself clearly. A coach helps you notice what you can't see from inside the picture."
   },
   none: {
     label: "✦ That openness matters",
@@ -715,38 +718,38 @@ function showResult() {
     badgeClass   = 'badge-yes';
     badgeText    = '✦ strong fit';
     headline     = name + ', you\'re ready for this.';
-    tagline      = 'You know what you\'re carrying, you\'re willing to be honest about it, and you\'re in a season where real movement is possible. That\'s not everyone — that\'s someone coaching can actually work with.';
+    tagline      = 'You know what you\'re carrying, you\'re willing to be honest about it, and you\'re in a season where real movement is possible. That\'s someone coaching can actually work with.';
     primaryCta   = PAID_CALL_URL;
     primaryLabel = 'Book a First Flight — $149 (code IMREADY) →';
     ghostLabel   = 'Retake quiz';
     sections = [
-      { label: '🌱 What this means', text: 'The gap between where you are and where you want to be is real — but it\'s closeable. You have the self-awareness, the motivation, and the honesty it takes to do real work in coaching.' },
-      { label: '⚡ What coaching could do for you', text: 'Help you see what you can\'t see on your own. Get out of your own way. Stop repeating the same patterns and start moving with clarity and intention.' },
-      { label: '◈ What happens next', html: 'A First Flight is a focused 2-hour coaching session. List price is $' + FIRST_FLIGHT_LIST_USD + '; as a thank-you for finishing this quiz, you can book for <strong>$' + FIRST_FLIGHT_QUIZ_PRICE_USD + '</strong> using the code when you tap Book. It\'s the real thing — not a sales call, not a taster.' }
+      { label: '🌱 What this means', text: 'The gap between where you are and where you want to be is real, and it\'s closeable. You have enough self-awareness and honesty to do real work in coaching.' },
+      { label: '⚡ What coaching could do for you', text: 'Help you hear yourself think. Name what\'s really going on. Stop looping the same argument and pick one next move you\'ll actually take.' },
+      { label: '◈ What happens next', html: 'A First Flight is a focused 2-hour coaching session. List price is $' + FIRST_FLIGHT_LIST_USD + '; as a thank-you for finishing this quiz, you can book for <strong>$' + FIRST_FLIGHT_QUIZ_PRICE_USD + '</strong> using the code when you tap Book. It\'s the real session, not a sales call or a taster.' }
     ];
   } else if (pct >= 0.42) {
     badgeClass   = 'badge-maybe';
     badgeText    = '◈ possible fit';
     headline     = name + ', you\'re closer than you think.';
-    tagline      = 'There\'s something real pulling you here — you\'re not just browsing. A few things are still in the way, and that\'s okay. Let\'s have an honest conversation and figure out what\'s actually going on.';
+    tagline      = 'Something real is pulling you here. A few things are still in the way, and that\'s okay. A discovery call is an honest conversation about what\'s actually going on.';
     primaryCta   = FREE_CALL_URL;
     primaryLabel = 'Book a free discovery call →';
     ghostLabel   = 'Retake quiz';
     sections = [
-      { label: '🌱 What this means', text: 'You\'re moving in the right direction — something is shifting and you know it. The question isn\'t whether coaching could help. It\'s whether now is the moment, and what\'s in the way.' },
-      { label: '⚡ What a discovery call does', text: 'It\'s 30 minutes. No commitment, no pitch. Just enough space to get honest about where you are and whether this is actually the right fit — for both of us.' },
+      { label: '🌱 What this means', text: 'You\'re moving in the right direction; something is shifting and you know it. The question is whether now is the moment, and what\'s in the way.' },
+      { label: '⚡ What a discovery call does', text: 'It\'s 30 minutes. No commitment, no pitch. Enough space to get honest about where you are and whether we\'re the right fit, for both of us.' },
       { label: '◈ Zero pressure', text: 'If it\'s not the right time, I\'ll tell you that. A good coaching relationship only works if both people are in.' }
     ];
   } else {
     badgeClass   = 'badge-not-yet';
     badgeText    = '— not quite yet';
     headline     = name + ', the timing might not be right.';
-    tagline      = 'Coaching lands best when you\'re ready to be honest and do the work. It sounds like you\'re still figuring out what you actually want — and that\'s not a problem. Keep exploring.';
+    tagline      = 'Coaching lands best when you\'re ready to be honest and do the work. It sounds like you\'re still figuring out what you want, and that\'s fine. Keep exploring.';
     primaryCta   = FREE_CALL_URL;
     primaryLabel = 'Still curious? Book a free call →';
     ghostLabel   = 'Retake quiz';
     sections = [
-      { label: '🌱 What this means', text: 'You\'re in a season of gathering, not yet acting — and there\'s nothing wrong with that. Awareness always comes before movement.' },
+      { label: '🌱 What this means', text: 'You\'re in a season of gathering, not yet acting, and there\'s nothing wrong with that. Awareness often comes before movement.' },
       { label: '◈ When the moment shifts', text: 'You\'ll know. The door stays open and lil\' bird will be ready when you are. In the meantime, the newsletter is a low-commitment way to stay connected to ideas that might help.' }
     ];
   }

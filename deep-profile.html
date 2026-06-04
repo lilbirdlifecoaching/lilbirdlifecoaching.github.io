@@ -4,8 +4,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>lil' bird — The Inner Compass</title>
-<meta name="description" content="Who are you really? A guided self-discovery experience — patterns, strengths, motivations, and direction — through conversation, not multiple choice.">
+<title>Inner Compass — personality read | lil' bird</title>
+<meta name="description" content="Inner Compass: a story-first personality read (MBTI, Enneagram, attachment) through conversation, not multiple choice. By Luke Haythorpe. Words for what you've been circling.">
+<meta name="keywords" content="Inner Compass, deep profile, personality assessment, MBTI, Enneagram, attachment style, Luke Haythorpe, life coach, self discovery, lil bird">
+<meta name="author" content="Luke Haythorpe">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://lilbird.life/deep-profile.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lilbird.life/deep-profile.html">
+<meta property="og:title" content="Inner Compass — guided personality read | lil' bird">
+<meta property="og:description" content="Story-first self-discovery: MBTI, Enneagram, and attachment woven together through conversation. Save your read in your Nest.">
+<meta property="og:image" content="https://lilbird.life/bird-logo.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Inner Compass — guided personality read | lil' bird">
+<meta name="twitter:description" content="Story-first self-discovery through conversation, not multiple choice. By Luke Haythorpe at lil' bird.">
+<meta name="twitter:image" content="https://lilbird.life/bird-logo.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Inner Compass — Deep Profile",
+  "url": "https://lilbird.life/deep-profile.html",
+  "applicationCategory": "LifestyleApplication",
+  "description": "Guided personality and wiring read for people in transition. Conversation-based assessment integrating MBTI, Enneagram, and attachment style.",
+  "provider": {
+    "@type": "ProfessionalService",
+    "name": "lil\u2019 bird coaching",
+    "url": "https://lilbird.life",
+    "areaServed": ["San Francisco Bay Area", "Melbourne", "Worldwide"]
+  },
+  "author": {
+    "@type": "Person",
+    "name": "Luke Haythorpe",
+    "jobTitle": "Life and Leadership Coach",
+    "url": "https://lilbird.life/about-luke.html"
+  }
+}
+</script>
 <link rel="icon" href="bird-logo.png" type="image/png">
 <link rel="stylesheet" href="/lilbird-nest-nav.css" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2024,21 +2059,21 @@
 <div class="screen active" id="screen-intro">
   <div class="inner">
     <p class="eyebrow">The Inner Compass</p>
-    <h1>Who Are You <em>Really?</em></h1>
-    <p class="intro-lead">A guided self-discovery experience to help you uncover your patterns, strengths, motivations, and direction.</p>
-    <p class="intro-mechanic">This isn&apos;t multiple choice — it&apos;s a conversation. Your answers drive the read; what comes back feels like someone who knows you, not a generic label.</p>
+    <h1>Who are you <em>really?</em></h1>
+    <p class="intro-lead">Inner Compass is a guided read on your wiring: patterns, strengths, what drains you, and where you're headed. Built for people in transition who want words for what they've been circling.</p>
+    <p class="intro-mechanic">Not multiple choice. A conversation. Your answers shape the read; what comes back should feel specific to you, not a generic quiz label.</p>
     <div class="intro-features">
       <div class="intro-feature">
         <div class="intro-icon">✦</div>
-        <div><p><strong>Story-first</strong> — your answers drive the analysis, not a preset algorithm</p></div>
+        <div><p><strong>Story-first.</strong> Your words drive the analysis, not a preset algorithm.</p></div>
       </div>
       <div class="intro-feature">
         <div class="intro-icon">🧠</div>
-        <div><p><strong>MBTI · Enneagram · Attachment Style</strong> — all three lenses, integrated</p></div>
+        <div><p><strong>MBTI · Enneagram · Attachment.</strong> Three lenses, one integrated read.</p></div>
       </div>
       <div class="intro-feature">
         <div class="intro-icon">🪺</div>
-        <div><p><strong>Your Nest</strong> — a permanent link to your read you can return to any time</p></div>
+        <div><p><strong>Your Nest.</strong> A permanent link to return to your read any time.</p></div>
       </div>
     </div>
     <p id="intro-retake-hint" class="intro-retake-hint" hidden>You're starting a fresh run — choose <strong>full discovery</strong> or <strong>I already know my type</strong> before you tap Begin.</p>
@@ -2046,16 +2081,16 @@
       <button type="button" class="path-card path-card-active" id="path-full" onclick="selectAssessmentPath('full')">
         <span class="path-card-kicker">Full arc</span>
         <span class="path-card-title">Read me from scratch</span>
-        <span class="path-card-body">27 story questions — we discover your wiring together. Best if you're curious or unsure.</span>
+        <span class="path-card-body">27 story questions. We discover your wiring together. Best if you're curious or unsure.</span>
       </button>
       <button type="button" class="path-card" id="path-know" onclick="selectAssessmentPath('know')">
         <span class="path-card-kicker">Shorter</span>
         <span class="path-card-title">I already know my type</span>
-        <span class="path-card-body">Tell us your letters — then we go deep on stress, season, and what it means right now.</span>
+        <span class="path-card-body">Tell us your letters, then we go deep on stress, season, and what it means right now.</span>
       </button>
     </div>
     <div class="know-fields" id="know-type-fields" style="display:none;">
-      <p class="know-fields-hint">Optional but helpful — we won't quiz you on labels you've already earned.</p>
+      <p class="know-fields-hint">Optional but helpful. We won't quiz you on labels you've already earned.</p>
       <div class="know-grid">
         <label class="know-field">MBTI (if you know it)
           <input type="text" id="know-mbti" maxlength="4" placeholder="e.g. INFJ" autocomplete="off" style="text-transform:uppercase;">
@@ -2071,7 +2106,7 @@
     <div class="btn-row">
       <button class="btn btn-gold" onclick="startChat()">Begin → 🐦</button>
     </div>
-    <p class="intro-note" id="intro-timing-note">Full path: about 25–35 minutes — <strong>27</strong> questions, then Life Canvas. Shorter path: ~12 focused questions. Honesty beats speed.</p>
+    <p class="intro-note" id="intro-timing-note">Full path: about 25–35 minutes (<strong>27</strong> questions, then Life Canvas). Shorter path: ~12 focused questions. Honesty beats speed.</p>
   </div>
 </div>
 
@@ -2350,7 +2385,7 @@
     <!-- EMAIL GATE — shown until email submitted -->
     <div class="email-gate" id="email-gate">
       <h3>Drop your email to<br><em>see your snapshot.</em></h3>
-      <p>We'll keep a copy safe for you — no inbox clutter, just your read waiting whenever you need it.</p>
+      <p>We'll keep a copy safe for you. No inbox clutter, just your read waiting when you need it.</p>
       <div class="email-gate-row">
         <input type="email" id="snap-email" placeholder="your@email.com" onkeydown="if(event.key==='Enter') submitEmail()">
         <button class="btn btn-gold" onclick="submitEmail()" style="white-space:nowrap;">Show me →</button>
@@ -2405,7 +2440,7 @@
   <div class="inner">
     <p class="eyebrow">unlock your nest</p>
     <h2>Pay what<br><em>feels right.</em></h2>
-    <p class="pay-intro">Your full Inner Compass read, The Nest, and a permanent link to return to whenever you need it. Choose what feels honest.</p>
+    <p class="pay-intro">Your full Inner Compass read, saved in your Nest, with a link you can return to. Pay what feels honest for the unlock.</p>
 
     <div class="pay-amounts">
       <button class="pay-btn" onclick="selectAmount(5,this)">$5<span>just getting started</span></button>
