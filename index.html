@@ -135,22 +135,30 @@
     .reveal-delay-4 { transition-delay: 0.5s; }
 
     /* ─── NAV ─── */
-    nav {
+    .site-nav {
       position: fixed;
       top: 0; left: 0; right: 0;
       z-index: 100;
+      background: linear-gradient(to bottom, rgba(30,32,40,0.98), rgba(30,32,40,0.92));
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid transparent;
+    }
+    .site-nav.menu-open {
+      border-bottom-color: var(--dark-border);
+    }
+    .nav-bar {
       padding: 1.25rem 2.5rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: linear-gradient(to bottom, rgba(30,32,40,0.95), transparent);
-      backdrop-filter: blur(2px);
+      gap: 1rem;
     }
     .nav-logo {
       display: flex;
       align-items: center;
       gap: 0.65rem;
       text-decoration: none;
+      flex-shrink: 0;
     }
     .nav-bird {
       width: 36px;
@@ -163,6 +171,24 @@
       color: var(--gold);
       letter-spacing: 0.02em;
     }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .nav-secondary {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+      text-decoration: none;
+      transition: color 0.2s;
+      white-space: nowrap;
+    }
+    .nav-secondary:hover { color: var(--gold); }
     .nav-cta {
       font-family: 'DM Mono', monospace;
       font-size: 0.7rem;
@@ -174,10 +200,69 @@
       border-radius: 2px;
       text-decoration: none;
       transition: var(--transition);
+      white-space: nowrap;
+      flex-shrink: 0;
     }
     .nav-cta:hover {
       background: #fff;
       transform: translateY(-1px);
+    }
+    .nav-cta .nav-cta-short { display: none; }
+    .nav-menu-btn {
+      display: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: transparent;
+      border: 1px solid var(--dark-border);
+      border-radius: 2px;
+      padding: 0.5rem 0.85rem;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .nav-menu-btn:hover {
+      border-color: rgba(245, 200, 66, 0.45);
+      background: rgba(245, 200, 66, 0.06);
+    }
+    .nav-menu-panel {
+      display: none;
+      padding: 0 1.25rem 1.25rem;
+      border-top: 1px solid var(--dark-border);
+      background: rgba(30, 32, 40, 0.98);
+      max-height: min(78vh, 520px);
+      overflow-y: auto;
+    }
+    .site-nav.menu-open .nav-menu-panel { display: block; }
+    .nav-menu-group { padding: 1rem 0 0.25rem; }
+    .nav-menu-group + .nav-menu-group {
+      border-top: 1px solid rgba(245, 200, 66, 0.08);
+      margin-top: 0.5rem;
+      padding-top: 1rem;
+    }
+    .nav-menu-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+      margin-bottom: 0.5rem;
+    }
+    .nav-menu-panel a {
+      display: block;
+      padding: 0.55rem 0;
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-menu-panel a:hover { color: var(--gold); }
+    .nav-menu-panel a.nav-menu-strong {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.02rem;
+      color: var(--text-main);
     }
 
     /* ─── HERO ─── */
@@ -415,26 +500,13 @@
     }
 
     /* ─── PATHFINDER (starting points) ─── */
-    #pathfinder.story-section { max-width: 980px; }
+    #pathfinder.story-section { max-width: 1060px; }
     .pathfinder-layout {
       display: grid;
-      grid-template-columns: 1fr min(300px, 36%);
-      gap: 2.5rem 2rem;
+      grid-template-columns: 1fr min(380px, 42%);
+      gap: 2.5rem 2.75rem;
       align-items: start;
       margin-top: 2rem;
-    }
-    .pathfinder-hero {
-      position: sticky;
-      top: 5.5rem;
-    }
-    .pathfinder-hero img {
-      width: 100%;
-      height: auto;
-      display: block;
-      border-radius: 6px;
-      border: 1px solid var(--dark-border);
-      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
-      background: var(--dark-card);
     }
     .pathfinder-tiers {
       display: flex;
@@ -446,6 +518,86 @@
       border-radius: 4px;
       overflow: hidden;
       background: var(--dark-card);
+      scroll-margin-top: 6rem;
+    }
+    .pathfinder-tier.is-visual-active {
+      border-color: rgba(245, 200, 66, 0.22);
+    }
+    .pathfinder-tier-visual-mobile {
+      display: none;
+      line-height: 0;
+      border-bottom: 1px solid var(--dark-border);
+    }
+    .pathfinder-tier-visual-mobile img {
+      width: 100%;
+      height: auto;
+      max-height: 280px;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+    .pathfinder-tier[data-pathfinder-tier="2"] .pathfinder-tier-visual-mobile img {
+      object-position: center 38%;
+    }
+    .pathfinder-visual-col {
+      position: sticky;
+      top: 5.5rem;
+      align-self: start;
+    }
+    .pathfinder-visual-stack {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--dark-border);
+      box-shadow: 0 28px 56px rgba(0, 0, 0, 0.4);
+      background: var(--dark-mid);
+    }
+    .pathfinder-visual-stack::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(30, 32, 40, 0.55) 0%, transparent 45%);
+      pointer-events: none;
+      z-index: 2;
+    }
+    .pathfinder-visual {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      opacity: 0;
+      transform: scale(1.03);
+      transition: opacity 0.55s ease, transform 0.7s ease;
+      z-index: 0;
+    }
+    .pathfinder-visual.is-active {
+      opacity: 1;
+      transform: scale(1);
+      z-index: 1;
+    }
+    .pathfinder-visual[data-pathfinder-visual="2"] {
+      object-position: center 38%;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .pathfinder-visual { transition: opacity 0.2s ease; transform: none; }
+    }
+    .pathfinder-visual-caption {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 3;
+      padding: 1.25rem 1.35rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(240, 236, 228, 0.85);
+      pointer-events: none;
     }
     .tier-head {
       display: flex;
@@ -454,16 +606,6 @@
       padding: 1rem 1.25rem;
       border-bottom: 1px solid var(--dark-border);
       background: rgba(245, 200, 66, 0.03);
-    }
-    .tier-accent {
-      width: 52px;
-      height: 52px;
-      object-fit: cover;
-      object-position: center;
-      border-radius: 4px;
-      border: 1px solid rgba(245, 200, 66, 0.12);
-      flex-shrink: 0;
-      background: var(--dark-mid);
     }
     .tier-name {
       font-family: 'DM Mono', monospace;
@@ -1111,8 +1253,21 @@
     }
 
     /* ─── MOBILE ─── */
+    @media (max-width: 768px) {
+      .nav-desktop-only { display: none !important; }
+      .nav-menu-btn { display: inline-flex; align-items: center; }
+      .nav-bar { padding: 1rem 1.25rem; gap: 0.5rem; }
+      .nav-actions { gap: 0.5rem; }
+      .nav-cta { padding: 0.5rem 0.85rem; font-size: 0.62rem; }
+      .nav-cta .nav-cta-long { display: none; }
+      .nav-cta .nav-cta-short { display: inline; }
+    }
+    @media (min-width: 769px) {
+      .nav-cta .nav-cta-short { display: none; }
+      .nav-menu-panel { display: none !important; }
+    }
     @media (max-width: 640px) {
-      nav { padding: 1rem 1.25rem; }
+      .nav-bar { padding: 1rem 1.25rem; }
       .hero { padding: 6rem 1.25rem 4rem; }
       .story-section { padding: 4rem 1.25rem; }
       .recognition-grid { grid-template-columns: 1fr; }
@@ -1127,11 +1282,11 @@
       .newsletter-section { padding: 3.5rem 1.25rem; }
       .hero-actions { flex-direction: column; align-items: flex-start; }
       .pathfinder-layout { grid-template-columns: 1fr; gap: 2rem; }
-      .pathfinder-hero { order: -1; position: static; max-width: min(280px, 72vw); margin: 0 auto; }
+      .pathfinder-visual-col { display: none; }
+      .pathfinder-tier-visual-mobile { display: block; }
       .pathfinder-row { grid-template-columns: 1fr; }
       .pf-go { justify-self: start; }
       .tier-head { padding: 0.9rem 1rem; }
-      .tier-accent { width: 44px; height: 44px; }
     }
   </style>
   <!-- Google Analytics 4 -->
@@ -1149,16 +1304,42 @@
   <div class="embers" id="embers"></div>
 
   <!-- NAV -->
-  <nav>
-    <a href="#" class="nav-logo">
-      <img src="bird-logo.png" alt="lil bird" class="nav-bird" style="border-radius:10px;" />
-      <span class="nav-wordmark">lil'  bird</span>
-    </a>
-    <div style="display:flex;align-items:center;gap:1.25rem;">
-      <a href="/nest/" class="nav-nest">My Nest →</a>
-      <a href="deep-profile.html" class="nav-secondary" style="font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold-dim);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--gold-dim)'">Find Your Deep Profile</a>
-      <a href="am-i-ready-for-coaching.html" class="nav-secondary" style="font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold-dim);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--gold-dim)'">Am I Ready?</a>
-      <a href="book.html" class="nav-cta">Book a Session</a>
+  <nav class="site-nav" id="site-nav">
+    <div class="nav-bar">
+      <a href="#" class="nav-logo">
+        <img src="bird-logo.png" alt="lil bird" class="nav-bird" style="border-radius:10px;" />
+        <span class="nav-wordmark">lil'  bird</span>
+      </a>
+      <div class="nav-actions">
+        <a href="/nest/" class="nav-nest">My Nest →</a>
+        <a href="deep-profile.html" class="nav-secondary nav-desktop-only">Find Your Deep Profile</a>
+        <a href="am-i-ready-for-coaching.html" class="nav-secondary nav-desktop-only">Am I Ready?</a>
+        <a href="book.html" class="nav-cta"><span class="nav-cta-long">Book a Session</span><span class="nav-cta-short">Book</span></a>
+        <button type="button" class="nav-menu-btn" id="nav-menu-btn" aria-expanded="false" aria-controls="nav-menu-panel">Menu</button>
+      </div>
+    </div>
+    <div class="nav-menu-panel" id="nav-menu-panel" role="region" aria-label="Site menu" aria-hidden="true">
+      <div class="nav-menu-group">
+        <p class="nav-menu-label">Still deciding</p>
+        <a href="am-i-ready-for-coaching.html">Am I Ready?</a>
+        <a href="https://calendly.com/lilbirdlifecoaching/30min">Discovery call</a>
+      </div>
+      <div class="nav-menu-group">
+        <p class="nav-menu-label">Dip your toe in</p>
+        <a href="deep-profile.html">Inner Compass — Deep Profile</a>
+        <a href="https://lilbird.life/solo/">Life Change Sessions — Solo</a>
+      </div>
+      <div class="nav-menu-group">
+        <p class="nav-menu-label">Dive in — one-on-one</p>
+        <a href="https://calendly.com/lilbirdlifecoaching/first-flight-session">First Flight</a>
+        <a href="book.html#intensive">Life Change Intensive</a>
+      </div>
+      <div class="nav-menu-group">
+        <p class="nav-menu-label">More</p>
+        <a href="#pathfinder" class="nav-menu-strong">Pick where to start</a>
+        <a href="/nest/">My Nest →</a>
+        <a href="about-luke.html">About Luke</a>
+      </div>
     </div>
   </nav>
 
@@ -1219,11 +1400,13 @@
     <p class="story-body reveal reveal-delay-2">
       No single "right" first step — just the one that fits today. Self-serve tools and live sessions all live here; the acts below explain how coaching works once you're in the room (or on the call).
     </p>
-    <div class="pathfinder-layout reveal reveal-delay-2">
+    <div class="pathfinder-layout reveal reveal-delay-2" id="pathfinder-layout">
       <div class="pathfinder-tiers">
-        <div class="pathfinder-tier">
+        <div class="pathfinder-tier is-visual-active" data-pathfinder-tier="0">
+          <div class="pathfinder-tier-visual-mobile">
+            <img src="images/pathfinder/tier-still-deciding.jpg" alt="" width="1200" height="900" loading="lazy" decoding="async" />
+          </div>
           <div class="tier-head">
-            <img class="tier-accent" src="images/pathfinder/accent-key.png" alt="" width="104" height="104" loading="lazy" decoding="async" />
             <div>
               <p class="tier-name">Still deciding</p>
               <p class="tier-sub">No commitment — just clarity</p>
@@ -1246,9 +1429,11 @@
             </a>
           </div>
         </div>
-        <div class="pathfinder-tier">
+        <div class="pathfinder-tier" data-pathfinder-tier="1">
+          <div class="pathfinder-tier-visual-mobile">
+            <img src="images/pathfinder/tier-dip-toe.jpg" alt="" width="1200" height="900" loading="lazy" decoding="async" />
+          </div>
           <div class="tier-head">
-            <img class="tier-accent" src="images/pathfinder/accent-walk.png" alt="" width="104" height="104" loading="lazy" decoding="async" />
             <div>
               <p class="tier-name">Dip your toe in</p>
               <p class="tier-sub">Explore on your own time</p>
@@ -1271,9 +1456,11 @@
             </a>
           </div>
         </div>
-        <div class="pathfinder-tier">
+        <div class="pathfinder-tier" data-pathfinder-tier="2">
+          <div class="pathfinder-tier-visual-mobile">
+            <img src="images/pathfinder/tier-dive-in.jpg" alt="" width="1200" height="900" loading="lazy" decoding="async" />
+          </div>
           <div class="tier-head">
-            <img class="tier-accent" src="images/pathfinder/accent-climb.png" alt="" width="104" height="104" loading="lazy" decoding="async" />
             <div>
               <p class="tier-name">Dive in — one-on-one</p>
               <p class="tier-sub">In-person with Luke</p>
@@ -1297,9 +1484,14 @@
           </div>
         </div>
       </div>
-      <aside class="pathfinder-hero" aria-hidden="true">
-        <img src="images/pathfinder/hero-main.png" alt="" width="600" height="680" loading="lazy" decoding="async" />
-      </aside>
+      <div class="pathfinder-visual-col" aria-hidden="true">
+        <div class="pathfinder-visual-stack" id="pathfinder-visual-stack">
+          <img class="pathfinder-visual is-active" data-pathfinder-visual="0" src="images/pathfinder/tier-still-deciding.jpg" alt="" width="1200" height="1500" loading="eager" decoding="async" />
+          <img class="pathfinder-visual" data-pathfinder-visual="1" src="images/pathfinder/tier-dip-toe.jpg" alt="" width="1200" height="1500" loading="lazy" decoding="async" />
+          <img class="pathfinder-visual" data-pathfinder-visual="2" src="images/pathfinder/tier-dive-in.jpg" alt="" width="1200" height="1500" loading="lazy" decoding="async" />
+          <p class="pathfinder-visual-caption" id="pathfinder-visual-caption">Still deciding</p>
+        </div>
+      </div>
     </div>
     <p class="pathfinder-chat-note reveal reveal-delay-3">
       Quick questions while you browse? Tap the bird — <button type="button" id="pathfinder-chat-trigger">open chat</button>.
@@ -2101,6 +2293,86 @@
       typing=false;send.disabled=false;input.focus();
     });
   }
+})();
+</script>
+<script>
+(function () {
+  var layout = document.getElementById('pathfinder-layout');
+  if (layout && window.matchMedia('(min-width: 769px)').matches) {
+    var tiers = layout.querySelectorAll('.pathfinder-tier[data-pathfinder-tier]');
+    var visuals = layout.querySelectorAll('.pathfinder-visual');
+    var caption = document.getElementById('pathfinder-visual-caption');
+    var captions = ['Still deciding', 'Dip your toe in', 'Dive in — one-on-one'];
+    var activeIdx = '0';
+
+    function setVisual(idx) {
+      if (idx === activeIdx) return;
+      activeIdx = idx;
+      visuals.forEach(function (img) {
+        img.classList.toggle('is-active', img.getAttribute('data-pathfinder-visual') === idx);
+      });
+      tiers.forEach(function (tier) {
+        tier.classList.toggle('is-visual-active', tier.getAttribute('data-pathfinder-tier') === idx);
+      });
+      if (caption && captions[parseInt(idx, 10)]) caption.textContent = captions[parseInt(idx, 10)];
+    }
+
+    if (tiers.length && visuals.length && 'IntersectionObserver' in window) {
+      var visibility = new Map();
+      var observer = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            visibility.set(entry.target, entry.intersectionRatio);
+          });
+          var bestTier = null;
+          var bestRatio = 0;
+          tiers.forEach(function (tier) {
+            var ratio = visibility.get(tier) || 0;
+            if (ratio > bestRatio) {
+              bestRatio = ratio;
+              bestTier = tier;
+            }
+          });
+          if (bestTier && bestRatio >= 0.2) {
+            setVisual(bestTier.getAttribute('data-pathfinder-tier'));
+          }
+        },
+        { root: null, rootMargin: '-10% 0px -35% 0px', threshold: [0, 0.15, 0.35, 0.55, 0.75] }
+      );
+      tiers.forEach(function (tier) { observer.observe(tier); });
+    }
+  }
+})();
+
+(function () {
+  var nav = document.getElementById('site-nav');
+  var btn = document.getElementById('nav-menu-btn');
+  var panel = document.getElementById('nav-menu-panel');
+  if (!nav || !btn || !panel) return;
+
+  function setOpen(open) {
+    nav.classList.toggle('menu-open', open);
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+    btn.textContent = open ? 'Close' : 'Menu';
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
+
+  btn.addEventListener('click', function () {
+    setOpen(!nav.classList.contains('menu-open'));
+  });
+
+  panel.querySelectorAll('a').forEach(function (link) {
+    link.addEventListener('click', function () { setOpen(false); });
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && nav.classList.contains('menu-open')) setOpen(false);
+  });
+
+  window.addEventListener('resize', function () {
+    if (window.innerWidth > 768 && nav.classList.contains('menu-open')) setOpen(false);
+  });
 })();
 </script>
 <script src="/lilbird-auth-bridge.js"></script>
