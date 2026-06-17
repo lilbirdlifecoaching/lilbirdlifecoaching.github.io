@@ -1,1 +1,732 @@
+<!DOCTYPE html>
+<!-- lilbird day/night build: v1.0.0-20260617-qa -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Life and leadership coaching with Luke Haythorpe for people in transition — career change, identity, and the Sunday-night stuck feeling. Bay Area &amp; Melbourne, in person and online. GiANT Worldwide certified." />
+  <!-- Staging: noindex until this replaces lilbird.life/ or ships on an approved preview URL -->
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#1e2028" />
+  <title>lil' bird — life coaching for what's next</title>
+  <link rel="icon" type="image/png" href="https://lilbird.life/bird-logo.png" />
+  <!-- Google Tag Manager -->
+  <script src="https://lilbird.life/lilbird-gtm-id.js"></script>
+  <script src="https://lilbird.life/lilbird-gtm.js"></script>
+  <script>
+    (function(){
+      var k='lilbird-theme', s=null;
+      try{s=localStorage.getItem(k);}catch(e){}
+      var t=s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+      if(s==='light'||s==='dark') t=s;
+      document.documentElement.setAttribute('data-theme', t);
+      document.documentElement.style.colorScheme=t;
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/site.css" />
+  <link rel="stylesheet" href="css/chat.css" />
+</head>
+<body>
+  <div class="theme-wipe" id="theme-wipe" aria-hidden="true"></div>
+  <div class="cmyk-stripe" aria-hidden="true"><span class="cs-c"></span><span class="cs-m"></span><span class="cs-y"></span><span class="cs-k"></span></div>
+  <div class="particles" id="particles" aria-hidden="true"></div>
+  <div class="ambient-layer" id="ambient-layer" aria-hidden="true"></div>
+<!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NG8ZFNX2" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- NAV -->
+  <nav class="site-nav" id="site-nav">
+    <div class="nav-bar">
+      <a href="#" class="nav-logo">
+        <img src="https://lilbird.life/bird-logo.png" alt="" class="nav-bird" data-logo-dark="https://lilbird.life/bird-logo.png" data-logo-light="https://lilbird.life/bird-logo-teal.png" />
+        <span class="nav-wordmark">lil'  bird</span>
+      </a>
+      <div class="nav-actions">
+        <a href="https://lilbird.life/nest/" class="nav-nest">My Nest →</a>
+        <a href="https://lilbird.life/deep-profile.html" class="nav-secondary nav-desktop-only">Find Your Deep Profile</a>
+        <a href="https://lilbird.life/am-i-ready-for-coaching.html" class="nav-secondary nav-desktop-only">Am I Ready?</a>
+        
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false" aria-label="Switch appearance">
+          <span class="theme-toggle-track" aria-hidden="true">
+            <span class="theme-toggle-thumb">
+              <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"/><g stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></g></svg>
+              <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5z"/></svg>
+            </span>
+          </span>
+          <span class="theme-toggle-label">Night</span>
+        </button>
+        <a href="https://lilbird.life/book.html" class="nav-cta"><span class="nav-cta-long">Book a Session</span><span class="nav-cta-short">Book</span></a>
+        <button type="button" class="nav-menu-btn" id="nav-menu-btn" aria-expanded="false" aria-controls="nav-menu-panel">Menu</button>
+      </div>
+    </div>
+    <div class="nav-menu-panel" id="nav-menu-panel" role="region" aria-label="Site menu" aria-hidden="true">
+      <div class="nav-menu-group">
+        <p class="nav-menu-label">Still deciding</p>
+        <a href="https://lilbird.life/am-i-ready-for-coaching.html">Am I Ready?</a>
+        <a href="https://calendly.com/lilbirdlifecoaching/30min">Discovery call</a>
+      </div>
+      <div class="nav-menu-group">
+        <p class="nav-menu-label">Dip your toe in</p>
+        <a href="https://lilbird.life/deep-profile.html">Inner Compass — Deep Profile</a>
+        <a href="https://lilbird.life/solo/">Life Change Sessions — Solo</a>
+      </div>
+      <div class="nav-menu-group">
+        <p class="nav-menu-label">Dive in — one-on-one</p>
+        <a href="https://calendly.com/lilbirdlifecoaching/first-flight-session">First Flight</a>
+        <a href="https://lilbird.life/book.html#intensive">Life Change Intensive</a>
+      </div>
+      <div class="nav-menu-group">
+        <p class="nav-menu-label">More</p>
+        <a href="#pathfinder" class="nav-menu-strong">Pick where to start</a>
+        <a href="https://lilbird.life/nest/">My Nest →</a>
+        <a href="https://lilbird.life/about-luke.html">About Luke</a>
+      </div>
+    </div>
+  </nav>
 
+  <!-- ══════════════════════════════════
+       HERO — "This gets me"
+  ══════════════════════════════════ -->
+  <section class="hero">
+    <div class="hero-art" aria-hidden="true">
+      <div class="hero-art-dark">
+        <span class="hero-orb hero-orb-a"></span>
+        <span class="hero-orb hero-orb-b"></span>
+        <span class="hero-constellation"></span>
+      </div>
+      <div class="hero-art-light">
+        <div class="hero-illus-wrap">
+          <div class="hero-balloons-bg" aria-hidden="true"></div>
+          <img class="hero-kids" src="images/hero/hero-kids.png" alt="" width="1000" height="389" decoding="async" />
+          <div class="hero-art-light-fade"></div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-inner">
+        <h1 class="hero-headline reveal reveal-delay-1">
+      Sunday night<br/>
+      <em>shouldn't feel like this.</em>
+    </h1>
+    <p class="hero-sub reveal reveal-delay-2">
+      You feel it before you can name it: tight chest, low-grade dread, the same inner argument on repeat. From the outside your life looks fine. From the inside it doesn't quite feel like yours.<br/><br/>
+      One honest conversation can shift that. Not because someone has your answers, but because you finally get to hear yourself think.
+    </p>
+    <div class="hero-actions reveal reveal-delay-3">
+      <a href="https://calendly.com/lilbirdlifecoaching/first-flight-session" class="btn-primary">
+        Start with a First Flight
+        <span>→</span>
+      </a>
+      <a href="#pathfinder" class="btn-secondary">Pick your starting point</a>
+    </div>
+    <div class="hero-scroll-hint reveal reveal-delay-4">
+      <span class="scroll-arrow"></span>
+      scroll to explore
+    </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════
+       RECOGNITION — Does this sound like you?
+  ══════════════════════════════════ -->
+  <section class="story-section" style="padding-bottom: 0;" id="the-story">
+    <p class="section-label reveal">does this sound like you?</p>
+    <div class="recognition-grid reveal reveal-delay-1">
+      <div class="recognition-item">
+        <p class="recognition-text">"I know something needs to change.<br/>I just can't name what."</p>
+      </div>
+      <div class="recognition-item">
+        <p class="recognition-text">"I keep having the same conversations with myself and going nowhere."</p>
+      </div>
+      <div class="recognition-item">
+        <p class="recognition-text">"On paper, my life looks fine.<br/>From the inside, it doesn't feel like mine."</p>
+      </div>
+      <div class="recognition-item">
+        <p class="recognition-text">"I'm not in crisis.<br/>I'm just stuck. And I'm tired of it."</p>
+      </div>
+    </div>
+    <p class="story-body reveal reveal-delay-2" style="margin-top: 2.5rem; max-width: 36rem;">
+      If that's you, you're in the right place. Luke Haythorpe is a certified life and leadership coach for people in transition — not a crisis hotline, not a lecture series.
+    </p>
+  </section>
+
+  <!-- ══════════════════════════════════
+       TESTIMONIALS
+  ══════════════════════════════════ -->
+  <div class="divider reveal"><div class="divider-line"></div><span class="divider-glyph">✦</span><div class="divider-line"></div></div>
+
+  <section class="story-section" id="testimonials">
+    <p class="section-label reveal">what people say</p>
+    <h2 class="story-headline reveal reveal-delay-1">
+      Voices from<br/>
+      <em>the work.</em>
+    </h2>
+    <p class="story-body reveal reveal-delay-2">
+      Real clients, in their own words. Entrepreneurs, engineers, teachers, pastors, parents. Swipe or use the arrows for more.
+    </p>
+
+    <div class="testimonial-carousel reveal reveal-delay-2" id="testimonial-carousel">
+      <div class="carousel-viewport"><div class="carousel-track" id="carousel-track">
+
+        <div class="testimonial-card">
+          <p class="testimonial-quote">"Luke's a fantastic guide — his style is very laid back, allowing me to work myself verbally towards the direction I want to go. Judgement doesn't exist with him and he has no agenda. He'll give you nudges and challenges, but he will not outright tell you what to do."</p>
+          <div class="testimonial-author">
+            <img class="testimonial-face" src="https://lilbird.life/Testimonials/Goodwyn-D.jpeg" alt="Goodwyn D" loading="lazy" decoding="async" />
+            <div class="testimonial-meta">
+              <p class="testimonial-name">Goodwyn D</p>
+              <p class="testimonial-role">Entrepreneur · Life coaching client</p>
+            </div>
+          </div>
+        </div>
+
+
+
+        <div class="testimonial-card">
+          <p class="testimonial-quote">"I was dealing with a tough transition — moving across the country, figuring out my career path, and dealing with post-lock-in emotional fatigue. Luke asked me to dream, something I hadn't done in a long time. I'm confident that even after one session, you will feel empowered and capable."</p>
+          <div class="testimonial-author">
+            <img class="testimonial-face" src="https://lilbird.life/Testimonials/Wanda-L-web.jpg" alt="Wanda L" loading="lazy" decoding="async" />
+            <div class="testimonial-meta">
+              <p class="testimonial-name">Wanda L</p>
+              <p class="testimonial-role">Marketing and brand consultant · Life coaching client</p>
+            </div>
+          </div>
+        </div>
+
+
+
+        <div class="testimonial-card">
+          <p class="testimonial-quote">"One welcome surprise was the lack of tracking toward specific professional goals — the exercises focused on deeper themes and passions in life. An important breakthrough was realising the calling didn't have to be about duty. It was OK to ask, 'Ed, what do <em>you</em> want?' I'd recommend this to anyone at a transition in life."</p>
+          <div class="testimonial-author">
+            <img class="testimonial-face" src="https://lilbird.life/Testimonials/Ed-B.jpeg" alt="Ed Barker" loading="lazy" decoding="async" />
+            <div class="testimonial-meta">
+              <p class="testimonial-name">Ed Barker</p>
+              <p class="testimonial-role">VP of Engineering · Life coaching client</p>
+            </div>
+          </div>
+        </div>
+
+
+
+        <div class="testimonial-card">
+          <p class="testimonial-quote">"If you want to be led by someone who lives out what they are talking about, Luke is the real deal."</p>
+          <div class="testimonial-author">
+            <img class="testimonial-face" src="https://lilbird.life/Testimonials/Todd-V.jpeg" alt="J. Todd Vinson" loading="lazy" decoding="async" />
+            <div class="testimonial-meta">
+              <p class="testimonial-name">J. Todd Vinson</p>
+              <p class="testimonial-role">Principal, Overlander Consulting</p>
+            </div>
+          </div>
+        </div>
+
+
+
+        <div class="testimonial-card">
+          <p class="testimonial-quote">"I came with four objectives: health, finance, work, and relationships. Luke's encouragement, listening skills, and supportive coaching style helped me delve into each area. I've reached a greater work/life balance, more confidence, and a clear vision for my future."</p>
+          <div class="testimonial-author">
+            <img class="testimonial-face" src="https://lilbird.life/Testimonials/Deb-B-web.jpg" alt="Deb B" loading="lazy" decoding="async" />
+            <div class="testimonial-meta">
+              <p class="testimonial-name">Deb B</p>
+              <p class="testimonial-role">Hair stylist · Life coaching client</p>
+            </div>
+          </div>
+        </div>
+
+
+
+        <div class="testimonial-card">
+          <p class="testimonial-quote">"My time with Luke has felt nothing short of a gift. As the seasons changed, Luke showed up to help guide me as a whole person — not just in the workplace, but how I show up in life and relationships as well."</p>
+          <div class="testimonial-author">
+            <img class="testimonial-face" src="https://lilbird.life/Testimonials/MelB.jpeg" alt="Mel B" loading="lazy" decoding="async" />
+            <div class="testimonial-meta">
+              <p class="testimonial-name">Mel B</p>
+              <p class="testimonial-role">Video director, producer &amp; teacher · Life coaching client</p>
+            </div>
+          </div>
+        </div>
+
+
+
+        <div class="testimonial-card">
+          <p class="testimonial-quote">"What's helped me most has been Luke's encouragement to be curious about what might be different if I tried something new — and how life might look if I follow the creative idea that comes to me. Allowing time to reflect during and after our sessions has been so helpful."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-meta">
+              <p class="testimonial-name">Anna H</p>
+              <p class="testimonial-role">Teacher · Life coaching client</p>
+            </div>
+          </div>
+        </div>
+
+
+
+        <div class="testimonial-card">
+          <p class="testimonial-quote">"Luke possesses an uncanny and uncommon ability to build immediate trust and safety."</p>
+          <div class="testimonial-author">
+            <img class="testimonial-face" src="https://lilbird.life/Testimonials/Andrew-R.jpeg" alt="Andrew Robinson" loading="lazy" decoding="async" />
+            <div class="testimonial-meta">
+              <p class="testimonial-name">Andrew Robinson</p>
+              <p class="testimonial-role">Partner, GiANT Worldwide</p>
+            </div>
+          </div>
+        </div>
+
+
+
+        <div class="testimonial-card">
+          <p class="testimonial-quote">"Working with Luke has been a great way to kickstart my journey towards wholeness and being centred. He's amazing at reflecting your own emotions and desires back to you in a way that helps you focus on what you truly want out of life. I would absolutely recommend him."</p>
+          <div class="testimonial-author">
+            <img class="testimonial-face" src="https://lilbird.life/Testimonials/Brianna-M.jpeg" alt="Brianna M" loading="lazy" decoding="async" />
+            <div class="testimonial-meta">
+              <p class="testimonial-name">Brianna M</p>
+              <p class="testimonial-role">Brand strategist · Life coaching client</p>
+            </div>
+          </div>
+        </div>
+
+
+
+        <div class="testimonial-card">
+          <p class="testimonial-quote">"I uncovered blind spots, gained practical tools, and felt recognised for who I was becoming — not just what I was producing. A powerful experience for anyone ready to grow."</p>
+          <div class="testimonial-author">
+            <img class="testimonial-face" src="https://lilbird.life/Testimonials/Nathan-D.jpeg" alt="Nathan Dunn" loading="lazy" decoding="async" />
+            <div class="testimonial-meta">
+              <p class="testimonial-name">Nathan Dunn</p>
+              <p class="testimonial-role">Mechanical Engineering Manager, Lam Research</p>
+            </div>
+          </div>
+        </div>
+
+
+
+        <div class="testimonial-card">
+          <p class="testimonial-quote">"If you're looking to elevate your game and find a coach who genuinely sees you — Luke is your go-to."</p>
+          <div class="testimonial-author">
+            <img class="testimonial-face" src="https://lilbird.life/Testimonials/Jen-D.jpg" alt="Jen Dorrough" loading="lazy" decoding="async" />
+            <div class="testimonial-meta">
+              <p class="testimonial-name">Jen Dorrough</p>
+              <p class="testimonial-role">Director, YWAM North Cascades</p>
+            </div>
+          </div>
+        </div>
+
+
+
+        <div class="testimonial-card">
+          <p class="testimonial-quote">"His coaching gave me the clarity, tools, and confidence to lead with purpose — and the impact showed up in both my personal life and professional recognition."</p>
+          <div class="testimonial-author">
+            <img class="testimonial-face" src="https://lilbird.life/Testimonials/Confidence-U-web.jpg" alt="Confidence Udegbue" loading="lazy" decoding="async" />
+            <div class="testimonial-meta">
+              <p class="testimonial-name">Confidence Udegbue</p>
+              <p class="testimonial-role">VP of Product, Freeletics · Forbes 30u30 · Life coaching client</p>
+            </div>
+          </div>
+        </div>
+
+      
+
+      </div></div>
+
+      <div class="carousel-controls">
+        <button class="carousel-btn" id="carousel-prev" aria-label="Previous">←</button>
+        <div class="carousel-dots" id="carousel-dots"></div>
+        <button class="carousel-btn" id="carousel-next" aria-label="Next">→</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider reveal"><div class="divider-line"></div><span class="divider-glyph">✦</span><div class="divider-line"></div></div>
+
+  <!-- ══════════════════════════════════
+       MEET LUKE
+  ══════════════════════════════════ -->
+  <section class="story-section" id="meet-luke">
+    <p class="section-label reveal">the person behind it</p>
+    <h2 class="story-headline reveal reveal-delay-1">
+      Hi. I'm Luke.<br/><em>This started young.</em>
+    </h2>
+
+    <div class="luke-grid">
+      <div class="luke-photo-column reveal reveal-delay-1">
+        <figure class="luke-lil-frame">
+          <img src="https://lilbird.life/lil-luke.png" alt="Luke as a child — lil' bird illustration" class="luke-lil-photo" width="501" height="984" loading="lazy" decoding="async" />
+        </figure>
+      </div>
+
+      <div class="luke-right">
+        <figure class="luke-head-frame reveal reveal-delay-2">
+          <img src="https://lilbird.life/luke-head-edit.png" alt="Luke Haythorpe, founder of lil' bird coaching" class="luke-head-photo" width="800" height="800" loading="lazy" decoding="async" />
+        </figure>
+
+        <div class="luke-content">
+          <p class="luke-body reveal reveal-delay-3">
+            I spent years in ministry sitting with people in the thick of real life — the questions, the tension, the turning points. Coaching is how I carry that same work today: helping you find clarity, confidence, and a way forward that actually feels like yours.
+          </p>
+          <p class="luke-body reveal reveal-delay-4" style="margin-top: 1rem;">
+            lil' bird is what happens when you take that instinct and build a proper container around it: long sessions, good questions, and enough steadiness that you can hear yourself think again. Therapy and advice are different work; this is coaching.
+          </p>
+          <a href="https://lilbird.life/about-luke.html" class="btn-secondary reveal reveal-delay-4" style="display:inline-block; margin-top: 2rem;">More about Luke →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider reveal"><div class="divider-line"></div><span class="divider-glyph">✦</span><div class="divider-line"></div></div>
+
+  <!-- ══════════════════════════════════
+       PATHFINDER — all ways in
+  ══════════════════════════════════ -->
+  <section class="story-section" id="pathfinder" style="padding-top: 3rem;">
+    <p class="section-label reveal">map the doors</p>
+    <h2 class="story-headline reveal reveal-delay-1">
+      Pick where to<br/><em>start.</em>
+    </h2>
+    <p class="story-body reveal reveal-delay-2">
+      No single "right" first step — just the one that fits today. Self-serve tools and live sessions all live here; the acts below explain how coaching works once you're in the room (or on the call).
+    </p>
+    <div class="pathfinder-layout reveal reveal-delay-2" id="pathfinder-layout">
+      <div class="pathfinder-tiers">
+        <div class="pathfinder-tier is-visual-active" data-pathfinder-tier="0">
+          <div class="pathfinder-tier-visual-mobile">
+            <img src="https://lilbird.life/images/pathfinder/tier-still-deciding.jpg" alt="" width="1200" height="900" loading="lazy" decoding="async" />
+          </div>
+          <div class="tier-head">
+            <div>
+              <p class="tier-name">Still deciding</p>
+              <p class="tier-sub">No commitment — just clarity</p>
+            </div>
+          </div>
+          <div class="tier-rows">
+            <a class="pathfinder-row" href="https://lilbird.life/am-i-ready-for-coaching.html">
+              <div>
+                <p class="pf-name">Am I Ready?</p>
+                <p class="pf-desc">Short survey — is coaching the right kind of help for what you're carrying?</p>
+              </div>
+              <span class="pf-go">Start →</span>
+            </a>
+            <a class="pathfinder-row" href="https://calendly.com/lilbirdlifecoaching/30min">
+              <div>
+                <p class="pf-name">Discovery call</p>
+                <p class="pf-desc">30 minutes, no hard sell — figure out together if this is the right fit.</p>
+              </div>
+              <span class="pf-go">Schedule →</span>
+            </a>
+          </div>
+        </div>
+        <div class="pathfinder-tier" data-pathfinder-tier="1">
+          <div class="pathfinder-tier-visual-mobile">
+            <img src="https://lilbird.life/images/pathfinder/tier-dip-toe.jpg" alt="" width="1200" height="900" loading="lazy" decoding="async" />
+          </div>
+          <div class="tier-head">
+            <div>
+              <p class="tier-name">Dip your toe in</p>
+              <p class="tier-sub">Explore on your own time</p>
+            </div>
+          </div>
+          <div class="tier-rows">
+            <a class="pathfinder-row" href="https://lilbird.life/deep-profile.html">
+              <div>
+                <p class="pf-name">Inner Compass — Deep Profile</p>
+                <p class="pf-desc">A structured read on your wiring. Words for the thing you've been circling but couldn't quite say.</p>
+              </div>
+              <span class="pf-go">Explore →</span>
+            </a>
+            <a class="pathfinder-row" href="https://lilbird.life/solo/">
+              <div>
+                <p class="pf-name">Life Change Sessions — Solo Course</p>
+                <p class="pf-desc">The curriculum at your own pace — same arc, without the standing appointments.</p>
+              </div>
+              <span class="pf-go">Go to solo →</span>
+            </a>
+          </div>
+        </div>
+        <div class="pathfinder-tier" data-pathfinder-tier="2">
+          <div class="pathfinder-tier-visual-mobile">
+            <img src="https://lilbird.life/images/pathfinder/tier-dive-in.jpg" alt="" width="1200" height="900" loading="lazy" decoding="async" />
+          </div>
+          <div class="tier-head">
+            <div>
+              <p class="tier-name">Dive in — one-on-one</p>
+              <p class="tier-sub">In-person with Luke</p>
+            </div>
+          </div>
+          <div class="tier-rows">
+            <a class="pathfinder-row" href="https://calendly.com/lilbirdlifecoaching/first-flight-session">
+              <div>
+                <p class="pf-name">First Flight</p>
+                <p class="pf-desc">One 2-hour in-person session. Map your story, name what's really going on, leave with one next move you'll actually take.</p>
+              </div>
+              <span class="pf-go">Book →</span>
+            </a>
+            <a class="pathfinder-row" href="https://lilbird.life/book.html#intensive">
+              <div>
+                <p class="pf-name">Life Change Intensive</p>
+                <p class="pf-desc">The full in-person package for when you already know one conversation won't be enough.</p>
+              </div>
+              <span class="pf-go">Book →</span>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="pathfinder-visual-col" aria-hidden="true">
+        <div class="pathfinder-visual-stack" id="pathfinder-visual-stack">
+          <img class="pathfinder-visual is-active" data-pathfinder-visual="0" src="https://lilbird.life/images/pathfinder/tier-still-deciding.jpg" alt="" width="1200" height="1500" loading="eager" decoding="async" />
+          <img class="pathfinder-visual" data-pathfinder-visual="1" src="https://lilbird.life/images/pathfinder/tier-dip-toe.jpg" alt="" width="1200" height="1500" loading="lazy" decoding="async" />
+          <img class="pathfinder-visual" data-pathfinder-visual="2" src="https://lilbird.life/images/pathfinder/tier-dive-in.jpg" alt="" width="1200" height="1500" loading="lazy" decoding="async" />
+          <p class="pathfinder-visual-caption" id="pathfinder-visual-caption">Still deciding</p>
+        </div>
+      </div>
+    </div>
+    <p class="pathfinder-chat-note reveal reveal-delay-3">
+      Quick questions while you browse? Tap the bird — <button type="button" id="pathfinder-chat-trigger">open chat</button>.
+    </p>
+  </section>
+
+  <div class="divider reveal"><div class="divider-line"></div><span class="divider-glyph">✦</span><div class="divider-line"></div></div>
+
+  <!-- ══════════════════════════════════
+       ACT 1 — THE MOMENT
+  ══════════════════════════════════ -->
+  <section class="story-section">
+    <p class="section-label reveal">act one — the moment</p>
+
+    <h2 class="story-headline reveal reveal-delay-1">
+      Something has to<br/><em>change.</em>
+    </h2>
+
+    <p class="story-body reveal reveal-delay-2">
+      The problem usually isn't a missing spreadsheet or a lack of discipline. It's living in the gap — between the life you built and the life that fits who you're becoming. Nothing is "wrong enough" to justify stopping. Nothing feels right enough to keep going. So you default to another week of performing fine.<br/><br/>
+      Coaching isn't a pep talk. It's a pause long enough to tell yourself the truth, then choose a next step you can actually own.
+    </p>
+  </section>
+
+  <div class="divider reveal"><div class="divider-line"></div><span class="divider-glyph">✦</span><div class="divider-line"></div></div>
+
+  <!-- ══════════════════════════════════
+       ACT 2 — The Approach
+  ══════════════════════════════════ -->
+  <section class="story-section">
+    <p class="section-label reveal">act two — how we work</p>
+    <h2 class="story-headline reveal reveal-delay-1">
+      Less advice.<br/>
+      More <em>listening.</em>
+    </h2>
+    <p class="story-body reveal reveal-delay-2">
+      I won't script your life. The workable answer is almost always already in you — it needs air, not another opinion. We start with your story and your wiring, not a template.
+    </p>
+
+    <div class="journey-steps">
+      <div class="journey-step reveal">
+        <div class="step-left">
+          <div class="step-num">01</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <p class="step-title">The Glow Map — your story, mapped</p>
+          <p class="step-desc">Where you've been isn't baggage — it's data. We map what lit you up, what drained you, and what actually shaped you (not the résumé version).</p>
+        </div>
+      </div>
+      <div class="journey-step reveal reveal-delay-1">
+        <div class="step-left">
+          <div class="step-num">02</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <p class="step-title">Relational Intelligence — the voice beneath the noise</p>
+          <p class="step-desc">How you relate to yourself, to the people who matter, and to work — most "stuck" lives trace back here. We go there on purpose.</p>
+        </div>
+      </div>
+      <div class="journey-step reveal reveal-delay-2">
+        <div class="step-left">
+          <div class="step-num">03</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <p class="step-title">Tools, then one next move</p>
+          <p class="step-desc">Maps, inventories, prompts you can hold. Then one honest next move: small enough to do, true enough that you'll still respect yourself in a month. No five-year fantasy plan.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-block reveal">
+      <p class="card-block-eyebrow">the format</p>
+      <p class="card-block-headline">Two hours. Story first. No slide deck.</p>
+      <p class="card-block-body">Sessions vary person to person. The spine doesn't: slow down, go real, work with the you in the room — not the version you perform for everyone else.</p>
+    </div>
+
+    <a href="https://lilbird.life/format.html" class="btn-secondary reveal" style="display:inline-block;">See session-by-session detail →</a>
+
+    <p class="engage-strip reveal">
+      Not ready for a full session? <a href="#pathfinder">Pick a lighter door above</a>.
+    </p>
+  </section>
+
+  <div class="divider reveal"><div class="divider-line"></div><span class="divider-glyph">✦</span><div class="divider-line"></div></div>
+
+  <!-- ══════════════════════════════════
+       ACT 3 — What We Believe
+  ══════════════════════════════════ -->
+  <section class="story-section">
+    <p class="section-label reveal">act three — what holds</p>
+    <h2 class="story-headline reveal reveal-delay-1">
+      What you can<br/>
+      <em>count on.</em>
+    </h2>
+    <p class="story-body reveal reveal-delay-2">
+      What clients say held when the work got hard.
+    </p>
+
+    <div class="values-list">
+      <div class="value-item reveal">
+        <div class="value-marker"></div>
+        <div>
+          <p class="value-name">No fixing you</p>
+          <p class="value-desc">You're not a project. I ask, reflect, and challenge — I don't take over your decisions or perform "expert" on your life.</p>
+        </div>
+      </div>
+      <div class="value-item reveal reveal-delay-1">
+        <div class="value-marker"></div>
+        <div>
+          <p class="value-name">Safety without fluff</p>
+          <p class="value-desc">Real warmth, real directness. You can name the embarrassing, tired, angry parts without being managed out of them.</p>
+        </div>
+      </div>
+      <div class="value-item reveal reveal-delay-2">
+        <div class="value-marker"></div>
+        <div>
+          <p class="value-name">Something to walk away with</p>
+          <p class="value-desc">Insight that dies in the parking lot isn't the point. You leave with clarity you can act on — or at least one move you're willing to try.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider reveal"><div class="divider-line"></div><span class="divider-glyph">✦</span><div class="divider-line"></div></div>
+
+  <!-- ══════════════════════════════════
+       ACT 4 — The Offerings
+  ══════════════════════════════════ -->
+  <section class="story-section">
+    <p class="section-label reveal">act four — your move</p>
+    <h2 class="story-headline reveal reveal-delay-1">
+      Live work,<br/>
+      <em>your pace.</em>
+    </h2>
+    <p class="story-body reveal reveal-delay-2">
+      Every format is listed in <a href="#pathfinder" class="inline-link">Pick where to start</a> above. The usual first live session is <strong>First Flight</strong> (one long in-person conversation). When you want the full arc, there's the <strong>Life Change Intensive</strong>, <strong>monthly</strong> rhythm, or the self-paced <a href="https://lilbird.life/solo/" class="inline-link">Solo course</a>.
+    </p>
+
+    <div class="hero-actions reveal reveal-delay-3" style="margin-top: 2rem;">
+      <a href="https://calendly.com/lilbirdlifecoaching/first-flight-session" class="btn-primary">
+        Book First Flight
+        <span>→</span>
+      </a>
+      <a href="https://lilbird.life/book.html" class="btn-secondary">Full calendar</a>
+    </div>
+
+  </section>
+
+  <!-- ══════════════════════════════════
+       NEWSLETTER
+  ══════════════════════════════════ -->
+  <section class="newsletter-section">
+    <div class="newsletter-inner">
+      <p class="section-label reveal" style="justify-content:center;">stay connected</p>
+      <h2 class="newsletter-headline reveal reveal-delay-1">The lil' bird letter</h2>
+      <p class="newsletter-body reveal reveal-delay-2">Letters for people in transition — short reads, tools that hold up, and the occasional nudge. Free.</p>
+      <div class="newsletter-embed reveal reveal-delay-3">
+        <div id="beehiiv-slot" class="beehiiv-slot-wrap">
+          <p class="beehiiv-placeholder">Loading signup form…</p>
+        </div>
+        <p class="beehiiv-fallback" id="beehiiv-fallback" hidden>
+          Form not loading? <a href="https://subscribe-forms.beehiiv.com/8d432d00-8b5d-4842-aca7-682776d54c79" target="_blank" rel="noopener noreferrer">Subscribe to the lil' bird letter →</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+    <!-- ══════════════════════════════════
+       DISCOVERY CTA
+  ══════════════════════════════════ -->
+  <div class="discovery-section">
+    <div class="discovery-inner">
+      <p class="section-label reveal" style="justify-content:center;">no pressure. really.</p>
+      <h2 class="discovery-headline reveal reveal-delay-1">
+        Not sure yet?<br/>
+        <em>That's the right place to start.</em>
+      </h2>
+      <p class="discovery-body reveal reveal-delay-2">
+        Thirty minutes. No pitch. If we're not the match, we'll say so. The point is understanding what's actually going on, not booking you into something you don't need.
+      </p>
+      <div class="discovery-actions reveal reveal-delay-3">
+        <a href="https://calendly.com/lilbirdlifecoaching/30min" class="btn-primary">Book a discovery call →</a>
+        <a href="https://lilbird.life/book.html" class="btn-secondary">Open the calendar</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       FINAL CTA
+  ══════════════════════════════════ -->
+  <section class="final-section">
+    <div class="final-inner">
+      <img src="https://lilbird.life/bird-logo.png" alt="lil bird" class="final-bird reveal" data-logo-dark="https://lilbird.life/bird-logo.png" data-logo-light="https://lilbird.life/bird-logo-teal.png" width="72" height="72" />
+      <h2 class="final-headline reveal reveal-delay-1">
+        Ready to stop<br/>
+        <em>looping alone?</em>
+      </h2>
+      <p class="final-body reveal reveal-delay-2">
+        If something here landed, that matters. First Flight is one long honest conversation: no package pressure, no performance. Or step in wherever fits: <a href="#pathfinder" class="inline-link">pick your door</a>.
+      </p>
+      <a href="https://calendly.com/lilbirdlifecoaching/first-flight-session" class="btn-primary reveal reveal-delay-3" style="display:inline-flex;">
+        Start with a First Flight →
+      </a>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════
+       FOOTER
+  ══════════════════════════════════ -->
+  <footer>
+    <span class="footer-brand">lil' bird</span>
+    <div class="footer-links">
+      <a href="https://lilbird.life/about-luke.html">About Luke</a>
+      <a href="https://lilbird.life/deep-profile.html">Find Your Deep Profile</a>
+      <a href="https://lilbird.life/book.html">Book</a>
+      <a href="mailto:hello@lilbird.life" id="footer-feedback-link" title="Broken link, typo, bug, or idea">Site feedback</a>
+      <a href="https://lilbird.life/privacy.html">Privacy</a>
+    </div>
+    <span class="footer-note">part of the Orangery Solutions ecosystem</span>
+  </footer>
+<div class="lb-chat-launch">
+  <div class="lb-chat-prompt" aria-hidden="true">
+    <p class="lb-chat-hint"><span class="lb-chat-hint-line1">Questions?</span><span class="lb-chat-hint-line2">He knows this site cold.</span></p>
+    <svg class="lb-chat-arrow-svg" viewBox="0 0 132 58" aria-hidden="true"><path d="M 8 12 C 44 2, 96 8, 122 42" fill="none" stroke="currentColor" stroke-width="2.15" stroke-linecap="round"/></svg>
+  </div>
+  <button type="button" id="lb-chat-btn" aria-label="Chat with lil bird">
+    <img src="https://lilbird.life/bird-logo.png" alt="" data-logo-dark="https://lilbird.life/bird-logo.png" data-logo-light="https://lilbird.life/bird-logo-teal.png" />
+    <span class="lb-notif"></span>
+  </button>
+</div>
+<div id="lb-win">
+  <div class="lb-hdr">
+    <img src="https://lilbird.life/bird-logo.png" alt="" data-logo-dark="https://lilbird.life/bird-logo.png" data-logo-light="https://lilbird.life/bird-logo-teal.png" />
+    <div style="flex:1">
+      <div class="lb-hdr-name">lil' bird</div>
+      <div class="lb-hdr-sub"><span class="lb-dot"></span>here with you</div>
+    </div>
+    <button type="button" id="lb-close" aria-label="Close chat">✕</button>
+  </div>
+  <div id="lb-msgs"></div>
+  <div class="lb-foot">
+    <textarea id="lb-input" placeholder="say something..." rows="1"></textarea>
+    <button type="button" id="lb-send" aria-label="Send">→</button>
+  </div>
+</div>
+<script src="https://lilbird.life/first-flight-booking.js"></script>
+<script src="https://lilbird.life/lb-chat-safe.js"></script>
+<script src="js/theme.js"></script>
+<script src="js/site.js"></script>
+<script src="js/chat.js"></script>
+</body>
+</html>
