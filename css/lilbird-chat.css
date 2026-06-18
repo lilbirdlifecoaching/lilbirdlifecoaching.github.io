@@ -9,13 +9,20 @@
   flex-direction: column;
   align-items: flex-end;
   pointer-events: none;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  padding-right: env(safe-area-inset-right, 0);
 }
 .lb-chat-launch #lb-chat-btn { pointer-events: auto; }
 .lb-chat-prompt {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
   max-width: 14rem;
   text-align: right;
   margin-bottom: 0.15rem;
   padding-right: 2px;
+  pointer-events: none;
 }
 .lb-chat-hint {
   margin: 0;
@@ -31,6 +38,7 @@
 .lb-chat-arrow-svg path { stroke: var(--text-accent); }
 
 #lb-chat-btn {
+  position: relative;
   width: 58px;
   height: 58px;
   border-radius: 50%;
@@ -43,6 +51,7 @@
   box-shadow: var(--chat-btn-shadow);
   transition: transform 0.3s var(--ease-out), box-shadow 0.3s;
   margin-top: 2px;
+  flex-shrink: 0;
 }
 [data-theme="light"] #lb-chat-btn { border-color: var(--c-ink); }
 #lb-chat-btn:hover { transform: scale(1.08) translateY(-2px); }
@@ -57,6 +66,8 @@
   border-radius: 50%;
   border: 2px solid var(--bg);
   animation: lb-pulse 2s ease infinite;
+  pointer-events: none;
+  z-index: 1;
 }
 @keyframes lb-pulse {
   0%, 100% { transform: scale(1); }
@@ -215,5 +226,16 @@
   font-size: 1rem;
 }
 @media (max-width: 480px) {
-  #lb-win { width: calc(100vw - 2rem); right: 1rem; }
+  #lb-win {
+    width: calc(100vw - 2rem);
+    right: 1rem;
+    bottom: calc(5rem + env(safe-area-inset-bottom, 0));
+  }
+  .lb-chat-launch {
+    bottom: calc(1rem + env(safe-area-inset-bottom, 0));
+    right: calc(1rem + env(safe-area-inset-right, 0));
+  }
+  .lb-chat-prompt { max-width: 11rem; }
+  .lb-chat-hint { font-size: 0.52rem; letter-spacing: 0.09em; }
+  .lb-chat-arrow-svg { width: 6.6rem; margin-right: 0.85rem; }
 }

@@ -1329,6 +1329,20 @@ footer, .site-footer {
   .footer-links { justify-content: flex-start; }
   .footer-note { text-align: left; }
   .beehiiv-embed { height: 420px; }
+  .nav-actions { gap: 0.45rem; }
+  .nav-nest { font-size: 0.58rem; padding: 0.4rem 0.65rem; }
+  .theme-toggle { padding: 0.2rem 0.4rem 0.2rem 0.25rem; }
+}
+@media (max-width: 480px) {
+  .nav-bar { padding: 0.75rem 1rem; }
+  .nav-wordmark { font-size: 1rem; }
+  .nav-bird { width: 34px; height: 34px; }
+  .site-nav.menu-open .nav-menu-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: 1rem 1.25rem 1.5rem;
+  }
 }
 @media (max-width: 640px) {
   .testimonial-card {
