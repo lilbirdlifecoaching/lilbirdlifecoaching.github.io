@@ -1,83 +1,234 @@
 /**
- * lil' bird — light mode remaps for legacy marketing pages (--gold, --dark, etc.)
- * Load after page inline styles + lilbird-tokens.css
+ * lil' bird — light mode for legacy marketing pages (book, format, about-luke, privacy, quiz).
+ * Load AFTER each page's inline <style> so remaps beat :root { --dark: … }.
  */
-[data-theme="light"] {
+html[data-theme="light"] {
   --gold: #111111;
   --gold-dim: #0d6b6b;
   --gold-faint: rgba(17, 17, 17, 0.06);
+  --gold-line: rgba(17, 17, 17, 0.14);
   --dark: #f5f2eb;
   --dark-mid: #ede9e0;
   --dark-card: #fffdf8;
   --dark-border: rgba(17, 17, 17, 0.14);
   --text-main: #111111;
   --text-muted: #5a5348;
+  --border: rgba(17, 17, 17, 0.14);
+  color-scheme: light;
 }
 
-[data-theme="light"] body {
-  background: var(--dark) !important;
-  color: var(--text-main) !important;
+html[data-theme="light"] body {
+  background: #f5f2eb !important;
+  color: #111111 !important;
 }
 
-[data-theme="light"] nav {
-  background: rgba(245, 242, 235, 0.95) !important;
-  border-bottom-color: rgba(17, 17, 17, 0.12) !important;
+html[data-theme="light"] body::before {
+  opacity: 0.2 !important;
 }
 
-[data-theme="light"] .nav-wordmark,
-[data-theme="light"] .nav-logo {
+html[data-theme="light"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(17, 17, 17, 0.04) 1px, transparent 1px);
+  background-size: 7px 7px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── Nav (all page variants) ─── */
+html[data-theme="light"] nav {
+  background: linear-gradient(to bottom, rgba(245, 242, 235, 0.98), rgba(245, 242, 235, 0.85)) !important;
+  border-bottom-color: rgba(17, 17, 17, 0.1) !important;
+}
+
+html[data-theme="light"] .nav-wordmark,
+html[data-theme="light"] .nav-logo,
+html[data-theme="light"] .nav-brand {
   color: #111 !important;
 }
 
-[data-theme="light"] .nav-bird {
+html[data-theme="light"] .nav-bird {
   border-radius: 50%;
   border: 2px solid #111;
 }
 
-[data-theme="light"] .btn-primary,
-[data-theme="light"] .nav-cta,
-[data-theme="light"] button.primary {
+html[data-theme="light"] .nav-back,
+html[data-theme="light"] .back-link {
+  color: #5a5348 !important;
+}
+
+html[data-theme="light"] .nav-back:hover,
+html[data-theme="light"] .back-link:hover {
+  color: #111 !important;
+}
+
+/* ─── Heroes ─── */
+html[data-theme="light"] .hero {
+  background: linear-gradient(160deg, #f5f2eb 0%, #ebe6da 55%, #f5f2eb 100%) !important;
+}
+
+html[data-theme="light"] .hero::before,
+html[data-theme="light"] .hero::after {
+  border-color: rgba(17, 17, 17, 0.06) !important;
+}
+
+/* ─── Cards & panels ─── */
+html[data-theme="light"] .card,
+html[data-theme="light"] .session-card,
+html[data-theme="light"] .format-card,
+html[data-theme="light"] .faq-item,
+html[data-theme="light"] .quiz-card,
+html[data-theme="light"] .choice-btn,
+html[data-theme="light"] .result-card,
+html[data-theme="light"] .dim-card {
+  background: #fffdf8 !important;
+  border-color: rgba(17, 17, 17, 0.14) !important;
+}
+
+html[data-theme="light"] .session-block:hover,
+html[data-theme="light"] .for-item:hover,
+html[data-theme="light"] .curriculum-item:hover,
+html[data-theme="light"] .outcome-item:hover {
+  background: #faf6ee !important;
+}
+
+html[data-theme="light"] .session-option:hover,
+html[data-theme="light"] .session-option.active {
+  background: #faf6ee !important;
+  border-color: rgba(17, 17, 17, 0.2) !important;
+}
+
+html[data-theme="light"] .intensive-enrol-panel {
+  background: linear-gradient(165deg, #fffdf8 0%, #f5f2eb 45%, #ede9e0 100%) !important;
+  border-color: rgba(17, 17, 17, 0.18) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+}
+
+html[data-theme="light"] .intensive-steps li {
+  border-bottom-color: rgba(17, 17, 17, 0.08) !important;
+}
+
+html[data-theme="light"] .approach-block,
+html[data-theme="light"] .cta-inner {
+  background: linear-gradient(135deg, #ede9e0 0%, #f5f2eb 100%) !important;
+}
+
+html[data-theme="light"] .who-card {
+  background: #fffdf8 !important;
+}
+
+html[data-theme="light"] .timeline-item::before {
+  background: linear-gradient(to right, rgba(17, 17, 17, 0.12), transparent) !important;
+}
+
+html[data-theme="light"] .curriculum-item.highlight {
+  background: linear-gradient(135deg, rgba(17, 17, 17, 0.04), #fffdf8) !important;
+}
+
+html[data-theme="light"] .calendly-loading {
+  background: #fffdf8 !important;
+}
+
+/* ─── Quiz page ─── */
+html[data-theme="light"] .choice-btn:hover {
+  border-color: rgba(17, 17, 17, 0.35) !important;
+  background: rgba(17, 17, 17, 0.04) !important;
+}
+
+html[data-theme="light"] .choice-btn.selected {
+  border-color: #111 !important;
+  background: rgba(17, 17, 17, 0.06) !important;
+}
+
+html[data-theme="light"] .quiz-offer-highlight {
+  background: rgba(17, 17, 17, 0.05) !important;
+  border-color: rgba(17, 17, 17, 0.12) !important;
+}
+
+html[data-theme="light"] #progress-bar {
+  background: rgba(17, 17, 17, 0.08) !important;
+}
+
+html[data-theme="light"] #progress-fill {
+  background: #111 !important;
+}
+
+html[data-theme="light"] .dim-track {
+  background: rgba(17, 17, 17, 0.08) !important;
+}
+
+html[data-theme="light"] .dim-fill {
+  background: #111 !important;
+}
+
+/* ─── Privacy tables ─── */
+html[data-theme="light"] th {
+  background: rgba(17, 17, 17, 0.04) !important;
+}
+
+html[data-theme="light"] th,
+html[data-theme="light"] td {
+  border-color: rgba(17, 17, 17, 0.12) !important;
+}
+
+/* ─── Typography accents ─── */
+html[data-theme="light"] h1 em,
+html[data-theme="light"] h2 em,
+html[data-theme="light"] .headline em,
+html[data-theme="light"] .page-headline em,
+html[data-theme="light"] .cta-headline em {
+  color: #e8186c !important;
+}
+
+html[data-theme="light"] a:hover {
+  color: #0d6b6b !important;
+}
+
+/* ─── Buttons ─── */
+html[data-theme="light"] .btn-primary,
+html[data-theme="light"] .nav-cta,
+html[data-theme="light"] #btn-next,
+html[data-theme="light"] .btn-cta,
+html[data-theme="light"] button.primary {
   background: #111 !important;
   color: #ffe620 !important;
   border-color: #111 !important;
   box-shadow: 4px 4px 0 #28c4c4 !important;
 }
 
-[data-theme="light"] .btn-secondary,
-[data-theme="light"] .nav-back {
+html[data-theme="light"] .btn-primary:hover,
+html[data-theme="light"] .nav-cta:hover,
+html[data-theme="light"] #btn-next:hover,
+html[data-theme="light"] .btn-cta:hover {
+  background: #28c4c4 !important;
+  color: #111 !important;
+}
+
+html[data-theme="light"] .btn-secondary,
+html[data-theme="light"] .nav-back {
   border-color: rgba(17, 17, 17, 0.25) !important;
   color: #111 !important;
 }
 
-[data-theme="light"] .card,
-[data-theme="light"] .session-card,
-[data-theme="light"] .format-card,
-[data-theme="light"] .faq-item,
-[data-theme="light"] .quiz-card {
-  background: var(--dark-card) !important;
-  border-color: var(--dark-border) !important;
+html[data-theme="light"] .intensive-cta {
+  background: #111 !important;
+  color: #ffe620 !important;
+  box-shadow: 4px 4px 0 #28c4c4 !important;
 }
 
-[data-theme="light"] h1 em,
-[data-theme="light"] h2 em,
-[data-theme="light"] .headline em {
-  color: #e8186c !important;
+html[data-theme="light"] .intensive-cta:hover {
+  background: #28c4c4 !important;
+  color: #111 !important;
 }
 
-[data-theme="light"] a:hover {
-  color: #0d6b6b !important;
-}
-
-[data-theme="light"] .lilbird-nav-nest,
-[data-theme="light"] .nav-nest {
+html[data-theme="light"] .lilbird-nav-nest,
+html[data-theme="light"] .nav-nest {
   color: #111 !important;
   border-color: rgba(17, 17, 17, 0.2) !important;
 }
 
-[data-theme="light"] body::before {
-  opacity: 0.35 !important;
-}
-
-[data-theme="light"] .embers .ember {
-  opacity: 0.15 !important;
+/* ─── Embers (subtle in day mode) ─── */
+html[data-theme="light"] .embers .ember {
+  opacity: 0.12 !important;
 }
