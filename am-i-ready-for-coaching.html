@@ -3,6 +3,19 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>
+    (function(){
+      var k='lilbird-theme', s=null;
+      try{s=localStorage.getItem(k);}catch(e){}
+      var t=(s==='light'||s==='dark')?s:(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+      document.documentElement.setAttribute('data-theme', t);
+      document.documentElement.style.colorScheme=t;
+    })();
+  </script>
+  <link rel="stylesheet" href="/css/lilbird-tokens.css" />
+  <link rel="stylesheet" href="/css/lilbird-theme-chrome.css" />
+  <link rel="stylesheet" href="/css/lilbird-theme-pages.css" />
+
   <!-- ═══════════ SEO META TAGS ═══════════ -->
   <meta name="description" content="Free quiz: is life coaching right for you right now? Seven honest questions from Luke Haythorpe (lil' bird). Bay Area &amp; Melbourne coaching for people in transition." />
   <meta name="keywords" content="am I ready for coaching, life coaching quiz, lil bird coaching, Luke Haythorpe, coaching readiness, life transitions coach" />
@@ -925,5 +938,8 @@ document.addEventListener('DOMContentLoaded', function() {
 </footer>
 <script src="/lilbird-auth-bridge.js"></script>
 <script src="/lilbird-nest-nav.js"></script>
+
+<script src="/js/lilbird-theme.js"></script>
+<script src="/js/lilbird-theme-nav.js"></script>
 </body>
 </html>

@@ -1,9 +1,22 @@
 <!DOCTYPE html>
-<!-- deploy-1775108309 -->
+<!-- format.html + day/night v1.1.0-20260617-site-wide-theme -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>
+    (function(){
+      var k='lilbird-theme', s=null;
+      try{s=localStorage.getItem(k);}catch(e){}
+      var t=(s==='light'||s==='dark')?s:(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+      document.documentElement.setAttribute('data-theme', t);
+      document.documentElement.style.colorScheme=t;
+    })();
+  </script>
+  <link rel="stylesheet" href="/css/lilbird-tokens.css" />
+  <link rel="stylesheet" href="/css/lilbird-theme-chrome.css" />
+  <link rel="stylesheet" href="/css/lilbird-theme-pages.css" />
+
   <!-- ═══════════ SEO META TAGS ═══════════ -->
   <meta name="description" content="How Luke Haythorpe's life coaching sessions work: First Flight (2 hours), the Life Change Intensive, and monthly rhythm. Bay Area &amp; Melbourne. Story-first, no slide deck." />
   <meta name="keywords" content="life coach, life coaching, life transitions coach, coach for millennials, career change coach, leadership coach, executive pastor coaching, startup coaching, Luke Haythorpe, lil bird coaching, GiANT Worldwide, clarity coaching, identity coaching" />
@@ -956,5 +969,8 @@
       a.href = 'mailto:hello@lilbird.life?subject=' + subject + '&body=' + body;
     })();
   </script>
+
+<script src="/js/lilbird-theme.js"></script>
+<script src="/js/lilbird-theme-nav.js"></script>
 </body>
 </html>

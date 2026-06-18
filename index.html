@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- deploy-1775108309 -->
+<!-- lilbird homepage build: v1.1.0-20260617-site-wide-theme -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -39,1303 +39,81 @@
     "areaServed": ["San Francisco Bay Area", "Melbourne", "Worldwide"]
   }
   </script>
-  <title>lil' bird — life coaching for what's next</title>
-  <link rel="icon" type="image/png" href="bird-logo.png" />
+    <meta name="theme-color" content="#1e2028" />
+  <link rel="icon" type="image/png" href="/bird-logo.png" />
+  <script>
+    (function(){
+      var k='lilbird-theme', s=null;
+      try{s=localStorage.getItem(k);}catch(e){}
+      var t=s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+      if(s==='light'||s==='dark') t=s;
+      document.documentElement.setAttribute('data-theme', t);
+      document.documentElement.style.colorScheme=t;
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/lilbird-nest-nav.css" />
-  <style>
-    :root {
-      --gold: #F5C842;
-      --gold-dim: #c9a130;
-      --gold-faint: rgba(245,200,66,0.08);
-      --dark: #1e2028;
-      --dark-mid: #252830;
-      --dark-card: #2a2d38;
-      --dark-border: rgba(245,200,66,0.18);
-      --text-main: #f0ead8;
-      --text-muted: #a09880;
-      --text-gold: #F5C842;
-      --ember: #e8734a;
-      --ember-faint: rgba(232,115,74,0.12);
-      --transition: all 0.55s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--dark);
-      color: var(--text-main);
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 300;
-      line-height: 1.7;
-      overflow-x: hidden;
-    }
-
-    /* ─── GRAIN OVERLAY ─── */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 1000;
-      opacity: 0.6;
-    }
-
-    /* ─── EMBER PARTICLES ─── */
-    .embers {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 1;
-      overflow: hidden;
-    }
-    .ember {
-      position: absolute;
-      width: 2px;
-      height: 2px;
-      background: var(--gold);
-      border-radius: 50%;
-      animation: float-up linear infinite;
-      opacity: 0;
-    }
-    @keyframes float-up {
-      0%   { transform: translateY(100vh) translateX(0) scale(1); opacity: 0; }
-      10%  { opacity: 0.7; }
-      50%  { transform: translateY(50vh) translateX(30px) scale(0.8); opacity: 0.4; }
-      90%  { opacity: 0.1; }
-      100% { transform: translateY(-10vh) translateX(-20px) scale(0.3); opacity: 0; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .embers { display: none !important; }
-    }
-
-    /* ─── SCROLL REVEAL ─── */
-    .reveal {
-      opacity: 1;
-      transform: translateY(0);
-      transition: opacity 0.7s ease, transform 0.7s ease;
-    }
-    /* Only animate if JS successfully adds the 'js-reveal-ready' class to body */
-    body.js-reveal-ready .reveal {
-      opacity: 0;
-      transform: translateY(32px);
-    }
-    body.js-reveal-ready .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .reveal-delay-1 { transition-delay: 0.1s; }
-    .reveal-delay-2 { transition-delay: 0.2s; }
-    .reveal-delay-3 { transition-delay: 0.35s; }
-    .reveal-delay-4 { transition-delay: 0.5s; }
-
-    /* ─── NAV ─── */
-    .site-nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      background: linear-gradient(to bottom, rgba(30,32,40,0.98), rgba(30,32,40,0.92));
-      backdrop-filter: blur(8px);
-      border-bottom: 1px solid transparent;
-    }
-    .site-nav.menu-open {
-      border-bottom-color: var(--dark-border);
-    }
-    .nav-bar {
-      padding: 1.25rem 2.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-    }
-    .nav-logo {
-      display: flex;
-      align-items: center;
-      gap: 0.65rem;
-      text-decoration: none;
-      flex-shrink: 0;
-    }
-    .nav-bird {
-      width: 36px;
-      height: 36px;
-    }
-    .nav-wordmark {
-      font-family: 'Playfair Display', serif;
-      font-style: italic;
-      font-size: 1.1rem;
-      color: var(--gold);
-      letter-spacing: 0.02em;
-    }
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 1.25rem;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-    .nav-secondary {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.68rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--gold-dim);
-      text-decoration: none;
-      transition: color 0.2s;
-      white-space: nowrap;
-    }
-    .nav-secondary:hover { color: var(--gold); }
-    .nav-cta {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--dark);
-      background: var(--gold);
-      padding: 0.55rem 1.25rem;
-      border-radius: 2px;
-      text-decoration: none;
-      transition: var(--transition);
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-    .nav-cta:hover {
-      background: #fff;
-      transform: translateY(-1px);
-    }
-    .nav-cta .nav-cta-short { display: none; }
-    .nav-menu-btn {
-      display: none;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.68rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--gold);
-      background: transparent;
-      border: 1px solid var(--dark-border);
-      border-radius: 2px;
-      padding: 0.5rem 0.85rem;
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
-    }
-    .nav-menu-btn:hover {
-      border-color: rgba(245, 200, 66, 0.45);
-      background: rgba(245, 200, 66, 0.06);
-    }
-    .nav-menu-panel {
-      display: none;
-      padding: 0 1.25rem 1.25rem;
-      border-top: 1px solid var(--dark-border);
-      background: rgba(30, 32, 40, 0.98);
-      max-height: min(78vh, 520px);
-      overflow-y: auto;
-    }
-    .site-nav.menu-open .nav-menu-panel { display: block; }
-    .nav-menu-group { padding: 1rem 0 0.25rem; }
-    .nav-menu-group + .nav-menu-group {
-      border-top: 1px solid rgba(245, 200, 66, 0.08);
-      margin-top: 0.5rem;
-      padding-top: 1rem;
-    }
-    .nav-menu-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.58rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--gold-dim);
-      margin-bottom: 0.5rem;
-    }
-    .nav-menu-panel a {
-      display: block;
-      padding: 0.55rem 0;
-      font-size: 0.92rem;
-      color: var(--text-muted);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .nav-menu-panel a:hover { color: var(--gold); }
-    .nav-menu-panel a.nav-menu-strong {
-      font-family: 'Playfair Display', serif;
-      font-style: italic;
-      font-size: 1.02rem;
-      color: var(--text-main);
-    }
-
-    /* ─── HERO ─── */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 7rem 2.5rem 5rem;
-      max-width: 820px;
-      margin: 0 auto;
-      position: relative;
-    }
-    .hero-eyebrow {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.7rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--gold-dim);
-      margin-bottom: 1.75rem;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-    .hero-eyebrow::before {
-      content: '';
-      display: block;
-      width: 28px;
-      height: 1px;
-      background: var(--gold-dim);
-    }
-    .hero-headline {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(2.8rem, 6vw, 5rem);
-      line-height: 1.12;
-      font-weight: 700;
-      color: var(--text-main);
-      margin-bottom: 1.5rem;
-    }
-    .hero-headline em {
-      font-style: italic;
-      color: var(--gold);
-    }
-    .hero-sub {
-      font-size: 1.15rem;
-      color: var(--text-muted);
-      max-width: 540px;
-      line-height: 1.75;
-      margin-bottom: 3rem;
-    }
-    .hero-actions {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .btn-primary {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.72rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--dark);
-      background: var(--gold);
-      padding: 1rem 2rem;
-      border-radius: 2px;
-      text-decoration: none;
-      transition: var(--transition);
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .btn-primary:hover {
-      background: #fff;
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(245,200,66,0.25);
-    }
-    .btn-secondary {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.72rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--gold);
-      background: transparent;
-      border: 1px solid var(--dark-border);
-      padding: 1rem 2rem;
-      border-radius: 2px;
-      text-decoration: none;
-      transition: var(--transition);
-    }
-    .btn-secondary:hover {
-      border-color: var(--gold);
-      background: var(--gold-faint);
-    }
-    .hero-scroll-hint {
-      position: absolute;
-      bottom: 2.5rem;
-      left: 2.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.62rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      opacity: 0.5;
-    }
-    .scroll-arrow {
-      width: 16px;
-      height: 16px;
-      border-right: 1px solid var(--text-muted);
-      border-bottom: 1px solid var(--text-muted);
-      transform: rotate(45deg);
-      animation: bounce 2s ease infinite;
-    }
-    @keyframes bounce {
-      0%, 100% { transform: rotate(45deg) translateY(0); }
-      50% { transform: rotate(45deg) translateY(4px); }
-    }
-
-    /* ─── DIVIDER ─── */
-    .divider {
-      width: 100%;
-      max-width: 820px;
-      margin: 0 auto;
-      padding: 0 2.5rem;
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-    }
-    .divider-line {
-      flex: 1;
-      height: 1px;
-      background: linear-gradient(to right, transparent, var(--dark-border), transparent);
-    }
-    .divider-glyph {
-      font-size: 1.1rem;
-      color: var(--gold-dim);
-      opacity: 0.6;
-    }
-
-    /* ─── STORY SECTIONS ─── */
-    .story-section {
-      max-width: 820px;
-      margin: 0 auto;
-      padding: 6rem 2.5rem;
-      position: relative;
-    }
-    .story-section + .story-section {
-      padding-top: 0;
-    }
-    /* Room for 3–4 testimonial cards side by side */
-    #testimonials.story-section {
-      box-sizing: border-box;
-      max-width: min(1180px, 100vw);
-    }
-
-    .section-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--gold-dim);
-      margin-bottom: 2rem;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-    .section-label::before {
-      content: '';
-      display: block;
-      width: 20px;
-      height: 1px;
-      background: var(--gold-dim);
-    }
-
-    .story-headline {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(1.9rem, 3.5vw, 2.75rem);
-      line-height: 1.2;
-      color: var(--text-main);
-      margin-bottom: 1.25rem;
-    }
-    .story-headline em {
-      font-style: italic;
-      color: var(--gold);
-    }
-
-    .story-body {
-      font-size: 1.05rem;
-      color: var(--text-muted);
-      max-width: 580px;
-      line-height: 1.8;
-      margin-bottom: 2rem;
-    }
-
-    /* ─── RECOGNITION BLOCK ─── */
-    .recognition-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1px;
-      margin: 2.5rem 0;
-      background: var(--dark-border);
-      border: 1px solid var(--dark-border);
-      border-radius: 4px;
-      overflow: hidden;
-    }
-    .recognition-item {
-      background: var(--dark-card);
-      padding: 2.5rem 2rem;
-      transition: background 0.3s ease;
-      position: relative;
-    }
-    .recognition-item::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0;
-      width: 3px;
-      height: 0;
-      background: var(--gold);
-      transition: height 0.4s ease;
-    }
-    .recognition-item:hover {
-      background: #2f3240;
-    }
-    .recognition-item:hover::before {
-      height: 100%;
-    }
-    .recognition-text {
-      font-family: 'Playfair Display', serif;
-      font-style: italic;
-      font-size: 1.15rem;
-      color: var(--text-main);
-      line-height: 1.6;
-    }
-
-    /* ─── PATHFINDER (starting points) ─── */
-    #pathfinder.story-section { max-width: 1060px; }
-    .pathfinder-layout {
-      display: grid;
-      grid-template-columns: 1fr min(380px, 42%);
-      gap: 2.5rem 2.75rem;
-      align-items: start;
-      margin-top: 2rem;
-    }
-    .pathfinder-tiers {
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-    }
-    .pathfinder-tier {
-      border: 1px solid var(--dark-border);
-      border-radius: 4px;
-      overflow: hidden;
-      background: var(--dark-card);
-      scroll-margin-top: 6rem;
-    }
-    .pathfinder-tier.is-visual-active {
-      border-color: rgba(245, 200, 66, 0.22);
-    }
-    .pathfinder-tier-visual-mobile {
-      display: none;
-      line-height: 0;
-      border-bottom: 1px solid var(--dark-border);
-    }
-    .pathfinder-tier-visual-mobile img {
-      width: 100%;
-      height: auto;
-      max-height: 280px;
-      object-fit: cover;
-      object-position: center;
-      display: block;
-    }
-    .pathfinder-tier[data-pathfinder-tier="2"] .pathfinder-tier-visual-mobile img {
-      object-position: center 38%;
-    }
-    .pathfinder-visual-col {
-      position: sticky;
-      top: 5.5rem;
-      align-self: start;
-    }
-    .pathfinder-visual-stack {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 4 / 5;
-      border-radius: 6px;
-      overflow: hidden;
-      border: 1px solid var(--dark-border);
-      box-shadow: 0 28px 56px rgba(0, 0, 0, 0.4);
-      background: var(--dark-mid);
-    }
-    .pathfinder-visual-stack::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(30, 32, 40, 0.55) 0%, transparent 45%);
-      pointer-events: none;
-      z-index: 2;
-    }
-    .pathfinder-visual {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
-      opacity: 0;
-      transform: scale(1.03);
-      transition: opacity 0.55s ease, transform 0.7s ease;
-      z-index: 0;
-    }
-    .pathfinder-visual.is-active {
-      opacity: 1;
-      transform: scale(1);
-      z-index: 1;
-    }
-    .pathfinder-visual[data-pathfinder-visual="2"] {
-      object-position: center 38%;
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .pathfinder-visual { transition: opacity 0.2s ease; transform: none; }
-    }
-    .pathfinder-visual-caption {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 3;
-      padding: 1.25rem 1.35rem;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.58rem;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: rgba(240, 236, 228, 0.85);
-      pointer-events: none;
-    }
-    .tier-head {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 1rem 1.25rem;
-      border-bottom: 1px solid var(--dark-border);
-      background: rgba(245, 200, 66, 0.03);
-    }
-    .tier-name {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.62rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 0.25rem;
-    }
-    .tier-sub {
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      line-height: 1.45;
-    }
-    .tier-rows { display: flex; flex-direction: column; }
-    .pathfinder-row {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 0.75rem 1.25rem;
-      align-items: center;
-      padding: 1.2rem 1.5rem;
-      text-decoration: none;
-      color: inherit;
-      border-bottom: 1px solid var(--dark-border);
-      background: var(--dark-card);
-      transition: background 0.25s ease;
-    }
-    .pathfinder-row:last-child { border-bottom: none; }
-    .pathfinder-row:hover { background: #2f3240; }
-    .pf-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.05rem;
-      color: var(--text-main);
-      margin-bottom: 0.2rem;
-    }
-    .pf-desc {
-      font-size: 0.88rem;
-      color: var(--text-muted);
-      line-height: 1.55;
-    }
-    .pf-go {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.58rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--gold);
-      white-space: nowrap;
-    }
-    .pathfinder-chat-note {
-      margin-top: 1.75rem;
-      font-size: 0.88rem;
-      color: var(--text-muted);
-      line-height: 1.65;
-      max-width: 560px;
-    }
-    .pathfinder-chat-note button {
-      background: none;
-      border: none;
-      color: var(--gold);
-      font-family: inherit;
-      font-size: inherit;
-      cursor: pointer;
-      text-decoration: underline;
-      text-underline-offset: 3px;
-      padding: 0;
-    }
-    .engage-strip {
-      margin: 2.5rem 0 0;
-      padding: 1.25rem 1.5rem;
-      border: 1px solid var(--dark-border);
-      border-radius: 4px;
-      background: rgba(245,200,66,0.04);
-      font-size: 0.92rem;
-      color: var(--text-muted);
-      line-height: 1.7;
-    }
-    .engage-strip a {
-      color: var(--gold-dim);
-      text-decoration: none;
-      border-bottom: 1px solid rgba(245,200,66,0.35);
-    }
-    .engage-strip a:hover { color: var(--gold); }
-
-    /* ─── JOURNEY STEPS ─── */
-    .journey-steps {
-      margin: 3rem 0;
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-    }
-    .journey-step {
-      display: grid;
-      grid-template-columns: 48px 1fr;
-      gap: 1.5rem;
-      position: relative;
-      padding-bottom: 3rem;
-    }
-    .journey-step:last-child {
-      padding-bottom: 0;
-    }
-    .journey-step:last-child .step-line {
-      display: none;
-    }
-    .step-left {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .step-num {
-      width: 40px;
-      height: 40px;
-      border: 1px solid var(--dark-border);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.7rem;
-      color: var(--gold);
-      background: var(--dark-card);
-      flex-shrink: 0;
-      transition: all 0.3s ease;
-    }
-    .journey-step:hover .step-num {
-      background: var(--gold);
-      color: var(--dark);
-      border-color: var(--gold);
-    }
-    .step-line {
-      flex: 1;
-      width: 1px;
-      background: linear-gradient(to bottom, var(--dark-border), transparent);
-      margin-top: 0.5rem;
-    }
-    .step-content {
-      padding-top: 0.6rem;
-    }
-    .step-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.2rem;
-      color: var(--text-main);
-      margin-bottom: 0.5rem;
-    }
-    .step-desc {
-      font-size: 0.95rem;
-      color: var(--text-muted);
-      line-height: 1.7;
-    }
-
-    /* ─── CARD BLOCK ─── */
-    .card-block {
-      background: var(--dark-card);
-      border: 1px solid var(--dark-border);
-      border-radius: 4px;
-      padding: 2.5rem;
-      margin: 2.5rem 0;
-      position: relative;
-      overflow: hidden;
-    }
-    .card-block::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0;
-      width: 3px;
-      height: 100%;
-      background: var(--gold);
-    }
-    .card-block-eyebrow {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--gold-dim);
-      margin-bottom: 1rem;
-    }
-    .card-block-headline {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.35rem;
-      color: var(--text-main);
-      margin-bottom: 0.75rem;
-    }
-    .card-block-body {
-      font-size: 0.95rem;
-      color: var(--text-muted);
-      line-height: 1.75;
-    }
-
-    /* ─── VALUES ─── */
-    .values-list {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-      margin: 2.5rem 0;
-    }
-    .value-item {
-      display: flex;
-      gap: 1.25rem;
-      align-items: flex-start;
-      padding: 1.5rem;
-      border-radius: 4px;
-      border: 1px solid transparent;
-      transition: all 0.3s ease;
-    }
-    .value-item:hover {
-      background: var(--dark-card);
-      border-color: var(--dark-border);
-    }
-    .value-marker {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--gold);
-      margin-top: 0.55rem;
-      flex-shrink: 0;
-      transition: transform 0.3s ease;
-    }
-    .value-item:hover .value-marker {
-      transform: scale(1.5);
-    }
-    .value-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.05rem;
-      color: var(--text-main);
-      margin-bottom: 0.3rem;
-    }
-    .value-desc {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      line-height: 1.65;
-    }
-
-    /* ─── WHAT YOU GET ─── */
-    .offering-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.25rem;
-      margin: 2.5rem 0;
-    }
-    .offering-card {
-      background: var(--dark-card);
-      border: 1px solid var(--dark-border);
-      border-radius: 4px;
-      padding: 2rem 1.75rem;
-      text-decoration: none;
-      transition: var(--transition);
-      display: block;
-      position: relative;
-      overflow: hidden;
-    }
-    .offering-card::after {
-      content: '→';
-      position: absolute;
-      bottom: 1.5rem;
-      right: 1.5rem;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.85rem;
-      color: var(--gold);
-      opacity: 0;
-      transform: translateX(-6px);
-      transition: var(--transition);
-    }
-    .offering-card:hover {
-      border-color: var(--gold);
-      transform: translateY(-3px);
-      box-shadow: 0 12px 32px rgba(0,0,0,0.3);
-    }
-    .offering-card:hover::after {
-      opacity: 1;
-      transform: translateX(0);
-    }
-    .offering-card.featured {
-      border-color: var(--gold);
-      background: linear-gradient(135deg, rgba(245,200,66,0.06), var(--dark-card));
-    }
-    .offering-tag {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--gold-dim);
-      margin-bottom: 1rem;
-    }
-    .offering-card.featured .offering-tag {
-      color: var(--gold);
-    }
-    .offering-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.2rem;
-      color: var(--text-main);
-      margin-bottom: 0.6rem;
-      line-height: 1.3;
-    }
-    .offering-desc {
-      font-size: 0.88rem;
-      color: var(--text-muted);
-      line-height: 1.65;
-    }
-
-    /* ─── DISCOVERY CTA ─── */
-    .discovery-section {
-      background: var(--dark-mid);
-      border-top: 1px solid var(--dark-border);
-      border-bottom: 1px solid var(--dark-border);
-      padding: 6rem 2.5rem;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .discovery-section::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(circle, rgba(245,200,66,0.04) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .discovery-inner {
-      max-width: 620px;
-      margin: 0 auto;
-      position: relative;
-    }
-    .discovery-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--gold-dim);
-      margin-bottom: 1.5rem;
-    }
-    .discovery-headline {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(2rem, 4vw, 3rem);
-      line-height: 1.2;
-      margin-bottom: 1.25rem;
-    }
-    .discovery-headline em {
-      font-style: italic;
-      color: var(--gold);
-    }
-    .discovery-body {
-      font-size: 1rem;
-      color: var(--text-muted);
-      line-height: 1.8;
-      margin-bottom: 2.5rem;
-    }
-    .discovery-actions {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    /* ─── FINAL SIGN UP ─── */
-    .final-section {
-      max-width: 820px;
-      margin: 0 auto;
-      padding: 6rem 2.5rem;
-    }
-    .final-inner {
-      text-align: center;
-    }
-    .final-bird {
-      width: 72px;
-      height: 72px;
-      margin: 0 auto 2rem;
-      display: block;
-    }
-    .final-headline {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(1.75rem, 3vw, 2.5rem);
-      line-height: 1.25;
-      margin-bottom: 1rem;
-    }
-    .final-headline em {
-      font-style: italic;
-      color: var(--gold);
-    }
-    .final-body {
-      font-size: 1rem;
-      color: var(--text-muted);
-      max-width: 480px;
-      margin: 0 auto 2.5rem;
-      line-height: 1.8;
-    }
-
-    /* ─── FOOTER ─── */
-    footer {
-      border-top: 1px solid var(--dark-border);
-      padding: 2.5rem 2.5rem;
-      max-width: 820px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-    .footer-brand {
-      font-family: 'Playfair Display', serif;
-      font-style: italic;
-      color: var(--gold-dim);
-      font-size: 0.95rem;
-    }
-    .footer-note {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.62rem;
-      letter-spacing: 0.1em;
-      color: var(--text-muted);
-      opacity: 0.5;
-    }
-    .footer-links {
-      display: flex;
-      gap: 1.5rem;
-    }
-    .footer-links a {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .footer-links a:hover { color: var(--gold); }
-
-    /* ─── TESTIMONIALS CAROUSEL ─── */
-    .testimonial-carousel {
-      margin: 2.5rem 0;
-      position: relative;
-    }
-    .carousel-viewport {
-      overflow: hidden;
-      width: 100%;
-    }
-    .carousel-track {
-      display: flex;
-      gap: 1.25rem;
-      transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-      will-change: transform;
-    }
-    .testimonial-card {
-      background: var(--dark-card);
-      border: 1px solid var(--dark-border);
-      border-radius: 4px;
-      padding: 1.5rem 1.25rem;
-      flex: 0 0 100%;
-      min-width: 100%;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 1.25rem;
-      min-height: 200px;
-    }
-    @media (min-width: 640px) {
-      .testimonial-card {
-        flex: 0 0 calc((100% - 1.25rem) / 2);
-        min-width: calc((100% - 1.25rem) / 2);
-      }
-    }
-    @media (min-width: 960px) {
-      .testimonial-card {
-        flex: 0 0 calc((100% - 2 * 1.25rem) / 3);
-        min-width: calc((100% - 2 * 1.25rem) / 3);
-      }
-    }
-    @media (min-width: 1240px) {
-      .testimonial-card {
-        flex: 0 0 calc((100% - 3 * 1.25rem) / 4);
-        min-width: calc((100% - 3 * 1.25rem) / 4);
-      }
-    }
-    .testimonial-quote {
-      font-family: 'Playfair Display', serif;
-      font-style: italic;
-      font-size: 1rem;
-      color: var(--text-main);
-      line-height: 1.75;
-      flex: 1;
-    }
-    .testimonial-quote::before {
-      content: '\201C';
-      color: var(--gold);
-      font-size: 1.6rem;
-      line-height: 0;
-      vertical-align: -0.35em;
-      margin-right: 0.1em;
-    }
-    .testimonial-author { display: flex; align-items: center; gap: 0.85rem; }
-    .testimonial-face {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      object-fit: cover;
-      flex-shrink: 0;
-      border: 1px solid var(--dark-border);
-      background: var(--dark-mid);
-    }
-    .testimonial-name { font-size: 0.9rem; color: var(--text-main); font-weight: 500; }
-    .testimonial-role {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.62rem;
-      letter-spacing: 0.08em;
-      color: var(--text-muted);
-      margin-top: 0.15rem;
-    }
-    .carousel-controls {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1.25rem;
-      margin-top: 1.75rem;
-    }
-    .carousel-btn {
-      background: none;
-      border: 1px solid var(--dark-border);
-      color: var(--gold);
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.25s;
-    }
-    .carousel-btn:hover { background: var(--gold-faint); border-color: var(--gold); }
-    .carousel-btn:disabled { opacity: 0.25; cursor: default; }
-    .carousel-dots { display: flex; gap: 0.5rem; align-items: center; }
-    .carousel-dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--dark-border);
-      border: none;
-      cursor: pointer;
-      transition: all 0.25s;
-      padding: 0;
-    }
-    .carousel-dot.active {
-      background: var(--gold);
-      width: 18px;
-      border-radius: 3px;
-    }
-
-    /* ─── MEET LUKE ─── */
-    .luke-grid {
-      display: grid;
-      grid-template-columns: minmax(200px, 320px) minmax(0, 1fr);
-      gap: clamp(2rem, 5vw, 3.75rem);
-      align-items: start;
-      margin: 2.5rem 0 0;
-    }
-    .luke-photo-column {
-      display: flex;
-      justify-content: center;
-    }
-    .luke-lil-frame {
-      position: relative;
-      margin: 0;
-      width: 100%;
-      max-width: 300px;
-      aspect-ratio: 3 / 7;
-      border-radius: 6px;
-      overflow: hidden;
-      border: 1px solid var(--dark-border);
-      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.28);
-      background: var(--dark-mid);
-    }
-    .luke-lil-photo {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      display: block;
-      object-fit: cover;
-      object-position: 50% 40%;
-      filter: sepia(0.12) contrast(1.04);
-    }
-    .luke-right {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
-    .luke-head-frame {
-      position: relative;
-      margin: 0;
-      width: 100%;
-      max-width: 220px;
-      aspect-ratio: 1 / 1;
-      border-radius: 6px;
-      overflow: hidden;
-      border: 1px solid var(--dark-border);
-      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.28);
-      background: var(--dark-mid);
-    }
-    .luke-head-photo {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      display: block;
-      object-fit: cover;
-      object-position: 50% 18%;
-      filter: sepia(0.12) contrast(1.04);
-    }
-    .luke-body {
-      font-size: 1.05rem;
-      color: var(--text-muted);
-      line-height: 1.85;
-    }
-
-    /* ─── NEWSLETTER ─── */
-    .newsletter-section {
-      background: var(--dark-mid);
-      border-top: 1px solid var(--dark-border);
-      border-bottom: 1px solid var(--dark-border);
-      padding: 5rem 2.5rem;
-    }
-    .newsletter-inner {
-      max-width: 620px;
-      margin: 0 auto;
-      text-align: center;
-    }
-    .newsletter-headline {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(1.8rem, 3vw, 2.5rem);
-      font-style: italic;
-      color: var(--gold);
-      margin-bottom: 0.75rem;
-    }
-    .newsletter-body {
-      font-size: 1rem;
-      color: var(--text-muted);
-      line-height: 1.8;
-      margin-bottom: 2rem;
-    }
-    .newsletter-embed {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    /* ─── MOBILE ─── */
-    @media (max-width: 768px) {
-      .nav-desktop-only { display: none !important; }
-      .nav-menu-btn { display: inline-flex; align-items: center; }
-      .nav-bar { padding: 1rem 1.25rem; gap: 0.5rem; }
-      .nav-actions { gap: 0.5rem; }
-      .nav-cta { padding: 0.5rem 0.85rem; font-size: 0.62rem; }
-      .nav-cta .nav-cta-long { display: none; }
-      .nav-cta .nav-cta-short { display: inline; }
-    }
-    @media (min-width: 769px) {
-      .nav-cta .nav-cta-short { display: none; }
-      .nav-menu-panel { display: none !important; }
-    }
-    @media (max-width: 640px) {
-      .nav-bar { padding: 1rem 1.25rem; }
-      .hero { padding: 6rem 1.25rem 4rem; }
-      .story-section { padding: 4rem 1.25rem; }
-      .recognition-grid { grid-template-columns: 1fr; }
-      .offering-grid { grid-template-columns: 1fr; }
-      .discovery-section { padding: 4rem 1.25rem; }
-      .final-section { padding: 4rem 1.25rem; }
-      footer { padding: 2rem 1.25rem; flex-direction: column; align-items: flex-start; }
-      .luke-grid { grid-template-columns: 1fr; gap: 2rem; }
-      .luke-photo-column { justify-content: flex-start; }
-      .luke-lil-frame { max-width: min(280px, 78vw); }
-      .luke-head-frame { max-width: min(200px, 56vw); }
-      .newsletter-section { padding: 3.5rem 1.25rem; }
-      .hero-actions { flex-direction: column; align-items: flex-start; }
-      .pathfinder-layout { grid-template-columns: 1fr; gap: 2rem; }
-      .pathfinder-visual-col { display: none; }
-      .pathfinder-tier-visual-mobile { display: block; }
-      .pathfinder-row { grid-template-columns: 1fr; }
-      .pf-go { justify-self: start; }
-      .tier-head { padding: 0.9rem 1rem; }
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/lilbird-tokens.css" />
+  <link rel="stylesheet" href="/css/lilbird-home.css" />
+  <link rel="stylesheet" href="/css/lilbird-chat.css" />
   <!-- Google Tag Manager -->
   <script src="/lilbird-gtm-id.js"></script>
   <script src="/lilbird-gtm.js"></script>
 </head>
 <body>
-  <!-- Google Tag Manager (noscript) -->
+  <div class="theme-wipe" id="theme-wipe" aria-hidden="true"></div>
+  <div class="cmyk-stripe" aria-hidden="true"><span class="cs-c"></span><span class="cs-m"></span><span class="cs-y"></span><span class="cs-k"></span></div>
+  <div class="particles" id="particles" aria-hidden="true"></div>
+  <div class="ambient-layer" id="ambient-layer" aria-hidden="true"></div>
+<!-- Google Tag Manager (noscript) -->
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NG8ZFNX2" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-
-  <!-- Ember particles -->
-  <div class="embers" id="embers"></div>
-
-  <!-- NAV -->
+<!-- NAV -->
   <nav class="site-nav" id="site-nav">
     <div class="nav-bar">
       <a href="#" class="nav-logo">
-        <img src="bird-logo.png" alt="lil bird" class="nav-bird" style="border-radius:10px;" />
+        <img src="/bird-logo.png" alt="" class="nav-bird" data-logo-dark="/bird-logo.png" data-logo-light="/bird-logo-teal.png" />
         <span class="nav-wordmark">lil'  bird</span>
       </a>
       <div class="nav-actions">
         <a href="/nest/" class="nav-nest">My Nest →</a>
-        <a href="deep-profile.html" class="nav-secondary nav-desktop-only">Find Your Deep Profile</a>
-        <a href="am-i-ready-for-coaching.html" class="nav-secondary nav-desktop-only">Am I Ready?</a>
-        <a href="book.html" class="nav-cta"><span class="nav-cta-long">Book a Session</span><span class="nav-cta-short">Book</span></a>
+        <a href="/deep-profile.html" class="nav-secondary nav-desktop-only">Find Your Deep Profile</a>
+        <a href="/am-i-ready-for-coaching.html" class="nav-secondary nav-desktop-only">Am I Ready?</a>
+        
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false" aria-label="Switch appearance">
+          <span class="theme-toggle-track" aria-hidden="true">
+            <span class="theme-toggle-thumb">
+              <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"/><g stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></g></svg>
+              <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5z"/></svg>
+            </span>
+          </span>
+          <span class="theme-toggle-label">Night</span>
+        </button>
+        <a href="/book.html" class="nav-cta"><span class="nav-cta-long">Book a Session</span><span class="nav-cta-short">Book</span></a>
         <button type="button" class="nav-menu-btn" id="nav-menu-btn" aria-expanded="false" aria-controls="nav-menu-panel">Menu</button>
       </div>
     </div>
     <div class="nav-menu-panel" id="nav-menu-panel" role="region" aria-label="Site menu" aria-hidden="true">
       <div class="nav-menu-group">
         <p class="nav-menu-label">Still deciding</p>
-        <a href="am-i-ready-for-coaching.html">Am I Ready?</a>
+        <a href="/am-i-ready-for-coaching.html">Am I Ready?</a>
         <a href="https://calendly.com/lilbirdlifecoaching/30min">Discovery call</a>
       </div>
       <div class="nav-menu-group">
         <p class="nav-menu-label">Dip your toe in</p>
-        <a href="deep-profile.html">Inner Compass — Deep Profile</a>
-        <a href="https://lilbird.life/solo/">Life Change Sessions — Solo</a>
+        <a href="/deep-profile.html">Inner Compass — Deep Profile</a>
+        <a href="/solo/">Life Change Sessions — Solo</a>
       </div>
       <div class="nav-menu-group">
         <p class="nav-menu-label">Dive in — one-on-one</p>
         <a href="https://calendly.com/lilbirdlifecoaching/first-flight-session">First Flight</a>
-        <a href="book.html#intensive">Life Change Intensive</a>
+        <a href="/book.html#intensive">Life Change Intensive</a>
       </div>
       <div class="nav-menu-group">
         <p class="nav-menu-label">More</p>
         <a href="#pathfinder" class="nav-menu-strong">Pick where to start</a>
         <a href="/nest/">My Nest →</a>
-        <a href="about-luke.html">About Luke</a>
+        <a href="/about-luke.html">About Luke</a>
       </div>
     </div>
   </nav>
@@ -1344,6 +122,21 @@
        HERO — "This gets me"
   ══════════════════════════════════ -->
   <section class="hero">
+    <div class="hero-art" aria-hidden="true">
+      <div class="hero-art-dark">
+        <span class="hero-orb hero-orb-a"></span>
+        <span class="hero-orb hero-orb-b"></span>
+        <span class="hero-constellation"></span>
+      </div>
+      <div class="hero-art-light">
+        <div class="hero-illus-wrap">
+          <div class="hero-balloons-bg" aria-hidden="true"></div>
+          <img class="hero-kids" src="/images/hero/hero-kids.png" alt="" width="1000" height="389" decoding="async" />
+          <div class="hero-art-light-fade"></div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-inner">
         <h1 class="hero-headline reveal reveal-delay-1">
       Sunday night<br/>
       <em>shouldn't feel like this.</em>
@@ -1362,6 +155,7 @@
     <div class="hero-scroll-hint reveal reveal-delay-4">
       <span class="scroll-arrow"></span>
       scroll to explore
+    </div>
     </div>
   </section>
 
@@ -1586,13 +380,13 @@
     <div class="luke-grid">
       <div class="luke-photo-column reveal reveal-delay-1">
         <figure class="luke-lil-frame">
-          <img src="lil-luke.png" alt="Luke as a child — lil' bird illustration" class="luke-lil-photo" width="501" height="984" loading="lazy" decoding="async" />
+          <img src="/lil-luke.png" alt="Luke as a child — lil' bird illustration" class="luke-lil-photo" width="501" height="984" loading="lazy" decoding="async" />
         </figure>
       </div>
 
       <div class="luke-right">
         <figure class="luke-head-frame reveal reveal-delay-2">
-          <img src="luke-head-edit.png" alt="Luke Haythorpe, founder of lil' bird coaching" class="luke-head-photo" width="800" height="800" loading="lazy" decoding="async" />
+          <img src="/luke-head-edit.png" alt="Luke Haythorpe, founder of lil' bird coaching" class="luke-head-photo" width="800" height="800" loading="lazy" decoding="async" />
         </figure>
 
         <div class="luke-content">
@@ -1602,7 +396,7 @@
           <p class="luke-body reveal reveal-delay-4" style="margin-top: 1rem;">
             lil' bird is what happens when you take that instinct and build a proper container around it: long sessions, good questions, and enough steadiness that you can hear yourself think again. Therapy and advice are different work; this is coaching.
           </p>
-          <a href="about-luke.html" class="btn-secondary reveal reveal-delay-4" style="display:inline-block; margin-top: 2rem;">More about Luke →</a>
+          <a href="/about-luke.html" class="btn-secondary reveal reveal-delay-4" style="display:inline-block; margin-top: 2rem;">More about Luke →</a>
         </div>
       </div>
     </div>
@@ -1625,7 +419,7 @@
       <div class="pathfinder-tiers">
         <div class="pathfinder-tier is-visual-active" data-pathfinder-tier="0">
           <div class="pathfinder-tier-visual-mobile">
-            <img src="images/pathfinder/tier-still-deciding.jpg" alt="" width="1200" height="900" loading="lazy" decoding="async" />
+            <img src="/images/pathfinder/tier-still-deciding.jpg" alt="" width="1200" height="900" loading="lazy" decoding="async" />
           </div>
           <div class="tier-head">
             <div>
@@ -1634,7 +428,7 @@
             </div>
           </div>
           <div class="tier-rows">
-            <a class="pathfinder-row" href="am-i-ready-for-coaching.html">
+            <a class="pathfinder-row" href="/am-i-ready-for-coaching.html">
               <div>
                 <p class="pf-name">Am I Ready?</p>
                 <p class="pf-desc">Short survey — is coaching the right kind of help for what you're carrying?</p>
@@ -1652,7 +446,7 @@
         </div>
         <div class="pathfinder-tier" data-pathfinder-tier="1">
           <div class="pathfinder-tier-visual-mobile">
-            <img src="images/pathfinder/tier-dip-toe.jpg" alt="" width="1200" height="900" loading="lazy" decoding="async" />
+            <img src="/images/pathfinder/tier-dip-toe.jpg" alt="" width="1200" height="900" loading="lazy" decoding="async" />
           </div>
           <div class="tier-head">
             <div>
@@ -1661,14 +455,14 @@
             </div>
           </div>
           <div class="tier-rows">
-            <a class="pathfinder-row" href="deep-profile.html">
+            <a class="pathfinder-row" href="/deep-profile.html">
               <div>
                 <p class="pf-name">Inner Compass — Deep Profile</p>
                 <p class="pf-desc">A structured read on your wiring. Words for the thing you've been circling but couldn't quite say.</p>
               </div>
               <span class="pf-go">Explore →</span>
             </a>
-            <a class="pathfinder-row" href="https://lilbird.life/solo/">
+            <a class="pathfinder-row" href="/solo/">
               <div>
                 <p class="pf-name">Life Change Sessions — Solo Course</p>
                 <p class="pf-desc">The curriculum at your own pace — same arc, without the standing appointments.</p>
@@ -1679,7 +473,7 @@
         </div>
         <div class="pathfinder-tier" data-pathfinder-tier="2">
           <div class="pathfinder-tier-visual-mobile">
-            <img src="images/pathfinder/tier-dive-in.jpg" alt="" width="1200" height="900" loading="lazy" decoding="async" />
+            <img src="/images/pathfinder/tier-dive-in.jpg" alt="" width="1200" height="900" loading="lazy" decoding="async" />
           </div>
           <div class="tier-head">
             <div>
@@ -1695,7 +489,7 @@
               </div>
               <span class="pf-go">Book →</span>
             </a>
-            <a class="pathfinder-row" href="book.html#intensive">
+            <a class="pathfinder-row" href="/book.html#intensive">
               <div>
                 <p class="pf-name">Life Change Intensive</p>
                 <p class="pf-desc">The full in-person package for when you already know one conversation won't be enough.</p>
@@ -1707,9 +501,9 @@
       </div>
       <div class="pathfinder-visual-col" aria-hidden="true">
         <div class="pathfinder-visual-stack" id="pathfinder-visual-stack">
-          <img class="pathfinder-visual is-active" data-pathfinder-visual="0" src="images/pathfinder/tier-still-deciding.jpg" alt="" width="1200" height="1500" loading="eager" decoding="async" />
-          <img class="pathfinder-visual" data-pathfinder-visual="1" src="images/pathfinder/tier-dip-toe.jpg" alt="" width="1200" height="1500" loading="lazy" decoding="async" />
-          <img class="pathfinder-visual" data-pathfinder-visual="2" src="images/pathfinder/tier-dive-in.jpg" alt="" width="1200" height="1500" loading="lazy" decoding="async" />
+          <img class="pathfinder-visual is-active" data-pathfinder-visual="0" src="/images/pathfinder/tier-still-deciding.jpg" alt="" width="1200" height="1500" loading="eager" decoding="async" />
+          <img class="pathfinder-visual" data-pathfinder-visual="1" src="/images/pathfinder/tier-dip-toe.jpg" alt="" width="1200" height="1500" loading="lazy" decoding="async" />
+          <img class="pathfinder-visual" data-pathfinder-visual="2" src="/images/pathfinder/tier-dive-in.jpg" alt="" width="1200" height="1500" loading="lazy" decoding="async" />
           <p class="pathfinder-visual-caption" id="pathfinder-visual-caption">Still deciding</p>
         </div>
       </div>
@@ -1791,7 +585,7 @@
       <p class="card-block-body">Sessions vary person to person. The spine doesn't: slow down, go real, work with the you in the room — not the version you perform for everyone else.</p>
     </div>
 
-    <a href="format.html" class="btn-secondary reveal" style="display:inline-block;">See session-by-session detail →</a>
+    <a href="/format.html" class="btn-secondary reveal" style="display:inline-block;">See session-by-session detail →</a>
 
     <p class="engage-strip reveal">
       Not ready for a full session? <a href="#pathfinder">Pick a lighter door above</a>.
@@ -1850,7 +644,7 @@
       <em>your pace.</em>
     </h2>
     <p class="story-body reveal reveal-delay-2">
-      Every format is listed in <a href="#pathfinder" style="color:var(--gold-dim);text-decoration:none;border-bottom:1px solid rgba(245,200,66,0.35);">Pick where to start</a> above. The usual first live session is <strong>First Flight</strong> (one long in-person conversation). When you want the full arc, there's the <strong>Life Change Intensive</strong>, <strong>monthly</strong> rhythm, or the self-paced <a href="https://lilbird.life/solo/" style="color:var(--gold-dim);text-decoration:none;border-bottom:1px solid rgba(245,200,66,0.35);">Solo course</a>.
+      Every format is listed in <a href="#pathfinder" class="inline-link">Pick where to start</a> above. The usual first live session is <strong>First Flight</strong> (one long in-person conversation). When you want the full arc, there's the <strong>Life Change Intensive</strong>, <strong>monthly</strong> rhythm, or the self-paced <a href="/solo/" class="inline-link">Solo course</a>.
     </p>
 
     <div class="hero-actions reveal reveal-delay-3" style="margin-top: 2rem;">
@@ -1858,7 +652,7 @@
         Book First Flight
         <span>→</span>
       </a>
-      <a href="book.html" class="btn-secondary">Full calendar</a>
+      <a href="/book.html" class="btn-secondary">Full calendar</a>
     </div>
 
   </section>
@@ -1871,8 +665,13 @@
       <p class="section-label reveal" style="justify-content:center;">stay connected</p>
       <h2 class="newsletter-headline reveal reveal-delay-1">The lil' bird letter</h2>
       <p class="newsletter-body reveal reveal-delay-2">Letters for people in transition — short reads, tools that hold up, and the occasional nudge. Free.</p>
-      <div class="newsletter-embed reveal reveal-delay-3" id="beehiiv-slot">
-        <p class="beehiiv-placeholder" style="font-size:0.85rem;color:var(--text-muted);">Loading signup form…</p>
+      <div class="newsletter-embed reveal reveal-delay-3">
+        <div id="beehiiv-slot" class="beehiiv-slot-wrap">
+          <p class="beehiiv-placeholder">Loading signup form…</p>
+        </div>
+        <p class="beehiiv-fallback" id="beehiiv-fallback" hidden>
+          Form not loading? <a href="https://subscribe-forms.beehiiv.com/8d432d00-8b5d-4842-aca7-682776d54c79" target="_blank" rel="noopener noreferrer">Subscribe to the lil' bird letter →</a>
+        </p>
       </div>
     </div>
   </section>
@@ -1892,7 +691,7 @@
       </p>
       <div class="discovery-actions reveal reveal-delay-3">
         <a href="https://calendly.com/lilbirdlifecoaching/30min" class="btn-primary">Book a discovery call →</a>
-        <a href="book.html" class="btn-secondary">Open the calendar</a>
+        <a href="/book.html" class="btn-secondary">Open the calendar</a>
       </div>
     </div>
   </div>
@@ -1902,13 +701,13 @@
   ══════════════════════════════════ -->
   <section class="final-section">
     <div class="final-inner">
-      <img src="bird-logo.png" alt="lil bird" class="final-bird reveal" style="border-radius:16px;" />
+      <img src="/bird-logo.png" alt="lil bird" class="final-bird reveal" data-logo-dark="/bird-logo.png" data-logo-light="/bird-logo-teal.png" width="72" height="72" />
       <h2 class="final-headline reveal reveal-delay-1">
         Ready to stop<br/>
         <em>looping alone?</em>
       </h2>
       <p class="final-body reveal reveal-delay-2">
-        If something here landed, that matters. First Flight is one long honest conversation: no package pressure, no performance. Or step in wherever fits: <a href="#pathfinder" style="color:var(--gold-dim);text-decoration:none;border-bottom:1px solid rgba(245,200,66,0.35);">pick your door</a>.
+        If something here landed, that matters. First Flight is one long honest conversation: no package pressure, no performance. Or step in wherever fits: <a href="#pathfinder" class="inline-link">pick your door</a>.
       </p>
       <a href="https://calendly.com/lilbirdlifecoaching/first-flight-session" class="btn-primary reveal reveal-delay-3" style="display:inline-flex;">
         Start with a First Flight →
@@ -1922,448 +721,43 @@
   <footer>
     <span class="footer-brand">lil' bird</span>
     <div class="footer-links">
-      <a href="about-luke.html">About Luke</a>
-      <a href="deep-profile.html">Find Your Deep Profile</a>
-      <a href="book.html">Book</a>
+      <a href="/about-luke.html">About Luke</a>
+      <a href="/deep-profile.html">Find Your Deep Profile</a>
+      <a href="/book.html">Book</a>
       <a href="mailto:hello@lilbird.life" id="footer-feedback-link" title="Broken link, typo, bug, or idea">Site feedback</a>
-      <a href="privacy.html">Privacy</a>
+      <a href="/privacy.html">Privacy</a>
     </div>
     <span class="footer-note">part of the Orangery Solutions ecosystem</span>
   </footer>
-
-  <script>
-    // ─── EMBER PARTICLES ───
-    const emberContainer = document.getElementById('embers');
-    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (emberContainer && !reduceMotion) {
-      for (let i = 0; i < 18; i++) {
-        const e = document.createElement('div');
-        e.className = 'ember';
-        e.style.left = Math.random() * 100 + '%';
-        e.style.animationDuration = (8 + Math.random() * 14) + 's';
-        e.style.animationDelay = (Math.random() * 12) + 's';
-        e.style.width = e.style.height = (1 + Math.random() * 2.5) + 'px';
-        e.style.opacity = '0';
-        if (Math.random() > 0.6) e.style.background = '#e8734a';
-        emberContainer.appendChild(e);
-      }
-    }
-
-    // ─── BEEHIIV (lazy: load when newsletter block nears viewport) ───
-    (function () {
-      const slot = document.getElementById('beehiiv-slot');
-      if (!slot) return;
-      let loaded = false;
-      function loadBeehiiv() {
-        if (loaded) return;
-        loaded = true;
-        slot.innerHTML = '';
-        const s1 = document.createElement('script');
-        s1.async = true;
-        s1.src = 'https://subscribe-forms.beehiiv.com/embed.js';
-        document.head.appendChild(s1);
-        const iframe = document.createElement('iframe');
-        iframe.className = 'beehiiv-embed';
-        iframe.setAttribute('data-test-id', 'beehiiv-embed');
-        iframe.setAttribute('frameborder', '0');
-        iframe.setAttribute('scrolling', 'no');
-        iframe.title = 'Newsletter signup';
-        iframe.style.cssText = 'width:759px;height:379px;margin:0;border-radius:0;background-color:transparent;box-shadow:none;max-width:100%;';
-        iframe.src = 'https://subscribe-forms.beehiiv.com/8d432d00-8b5d-4842-aca7-682776d54c79';
-        slot.appendChild(iframe);
-        const s2 = document.createElement('script');
-        s2.async = true;
-        s2.src = 'https://subscribe-forms.beehiiv.com/attribution.js';
-        document.head.appendChild(s2);
-      }
-      if (!('IntersectionObserver' in window)) {
-        loadBeehiiv();
-        return;
-      }
-      const obs = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            loadBeehiiv();
-            obs.disconnect();
-          }
-        });
-      }, { rootMargin: '140px', threshold: 0.01 });
-      obs.observe(slot);
-    })();
-
-    // ─── SCROLL REVEAL ───
-    // Only enable scroll animations when served over http/https
-    // On file:// or error pages content stays fully visible
-    try {
-      if (window.location.protocol === 'https:' || window.location.protocol === 'http:') {
-        document.body.classList.add('js-reveal-ready');
-        const obs = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) entry.target.classList.add('visible');
-          });
-        }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-        document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
-      }
-    } catch(e) { /* fail silently, content stays visible */ }
-
-    // ─── SITE FEEDBACK (mailto + current page URL; inbox: hello@lilbird.life) ───
-    (function () {
-      const a = document.getElementById('footer-feedback-link');
-      if (!a) return;
-      const subject = encodeURIComponent('lilbird.life — site feedback');
-      const body = encodeURIComponent(
-        'What went wrong or what would help?\n' +
-        '(broken link, typo, bug, confusing copy, feature idea)\n\n' +
-        '—\nPage: ' + window.location.href + '\n'
-      );
-      a.href = 'mailto:hello@lilbird.life?subject=' + subject + '&body=' + body;
-    })();
-
-    // ─── TESTIMONIAL CAROUSEL (1 / 2 / 3 / 4 visible — matches CSS breakpoints) ───
-    (function() {
-      const track = document.getElementById('carousel-track');
-      const dotsContainer = document.getElementById('carousel-dots');
-      const prevBtn = document.getElementById('carousel-prev');
-      const nextBtn = document.getElementById('carousel-next');
-      if (!track || !dotsContainer || !prevBtn || !nextBtn) return;
-
-      const cards = track.querySelectorAll('.testimonial-card');
-      const total = cards.length;
-      let steps = 0;
-      let current = 0;
-
-      function getVisible() {
-        const w = window.innerWidth;
-        if (w < 640) return 1;
-        if (w < 960) return 2;
-        if (w < 1240) return 3;
-        return 4;
-      }
-
-      function gapPx() {
-        const n = parseFloat(getComputedStyle(track).gap);
-        return Number.isFinite(n) ? n : 20;
-      }
-
-      function stepPx() {
-        if (!cards.length) return 0;
-        return cards[0].offsetWidth + gapPx();
-      }
-
-      function buildDots() {
-        steps = Math.max(0, total - getVisible());
-        dotsContainer.innerHTML = '';
-        for (let i = 0; i <= steps; i++) {
-          const dot = document.createElement('button');
-          dot.type = 'button';
-          dot.className = 'carousel-dot' + (i === current ? ' active' : '');
-          dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
-          dot.addEventListener('click', () => goTo(i));
-          dotsContainer.appendChild(dot);
-        }
-      }
-
-      function goTo(index) {
-        current = Math.max(0, Math.min(index, steps));
-        const sp = stepPx();
-        track.style.transform = sp ? 'translateX(-' + (current * sp) + 'px)' : 'translateX(0)';
-        dotsContainer.querySelectorAll('.carousel-dot').forEach((d, i) => {
-          d.classList.toggle('active', i === current);
-        });
-        prevBtn.disabled = current === 0;
-        nextBtn.disabled = current === steps;
-      }
-
-      function refresh() {
-        current = Math.min(current, Math.max(0, total - getVisible()));
-        buildDots();
-        goTo(current);
-      }
-
-      prevBtn.addEventListener('click', () => goTo(current - 1));
-      nextBtn.addEventListener('click', () => goTo(current + 1));
-
-      buildDots();
-      goTo(0);
-
-      let resizeT;
-      window.addEventListener('resize', () => {
-        clearTimeout(resizeT);
-        resizeT = setTimeout(refresh, 80);
-      });
-    })();
-  </script>
-
-<!-- lil' bird chat widget -->
-<style>
-.lb-chat-launch{position:fixed;bottom:1.25rem;right:1.25rem;z-index:9998;display:flex;flex-direction:column;align-items:flex-end;gap:0;pointer-events:none;}
-.lb-chat-launch #lb-chat-btn{pointer-events:auto;}
-.lb-chat-prompt{position:relative;display:flex;flex-direction:column;align-items:flex-end;max-width:14rem;text-align:right;margin-bottom:0.15rem;padding-right:2px;}
-.lb-chat-hint{margin:0;font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.11em;text-transform:uppercase;color:#a09880;line-height:1.5;opacity:0.95;}
-.lb-chat-hint-line1{display:block;color:#c9b896;}
-.lb-chat-hint-line2{display:block;margin-top:0.2em;color:#a09880;}
-.lb-chat-arrow-svg{display:block;width:7.85rem;height:auto;margin:0.25rem 1rem 0.05rem 0;overflow:visible;flex-shrink:0;}
-.lb-chat-arrow-svg path{vector-effect:non-scaling-stroke;}
-#lb-chat-btn{position:relative;width:58px;height:58px;border-radius:50%;background:#F5C842;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(245,200,66,0.4);transition:transform 0.3s,box-shadow 0.3s;margin-top:2px;}
-#lb-chat-btn:hover{transform:scale(1.08) translateY(-2px);box-shadow:0 8px 28px rgba(245,200,66,0.5);}
-#lb-chat-btn img{width:36px;height:36px;border-radius:8px;}
-.lb-notif{position:absolute;top:-2px;right:-2px;width:14px;height:14px;background:#e8734a;border-radius:50%;border:2px solid #1e2028;animation:lb-pulse 2s ease infinite;}
-@keyframes lb-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
-#lb-win{position:fixed;bottom:5.5rem;right:1.5rem;z-index:10000;width:360px;max-height:540px;background:#1e2028;border:1px solid rgba(245,200,66,0.2);border-radius:12px;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.5);transform:scale(0.9) translateY(20px);opacity:0;pointer-events:none;transition:transform 0.3s cubic-bezier(0.22,1,0.36,1),opacity 0.3s ease;overflow:hidden;}
-#lb-win.open{transform:scale(1) translateY(0);opacity:1;pointer-events:all;}
-.lb-hdr{padding:1rem 1.25rem;background:#252830;border-bottom:1px solid rgba(245,200,66,0.15);display:flex;align-items:center;gap:0.75rem;flex-shrink:0;}
-.lb-hdr img{width:32px;height:32px;border-radius:8px;flex-shrink:0;}
-.lb-hdr-name{font-family:'Playfair Display',serif;font-style:italic;font-size:0.95rem;color:#F5C842;flex:1;}
-.lb-hdr-sub{font-family:monospace;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:#a09880;display:flex;align-items:center;gap:0.35rem;}
-.lb-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;}
-#lb-close{background:none;border:none;color:#a09880;cursor:pointer;font-size:1.1rem;padding:0.25rem;transition:color 0.2s;}
-#lb-close:hover{color:#F5C842;}
-#lb-msgs{flex:1;overflow-y:auto;padding:1.25rem;display:flex;flex-direction:column;gap:1rem;scrollbar-width:thin;scrollbar-color:rgba(245,200,66,0.2) transparent;}
-.lb-m{display:flex;flex-direction:column;max-width:88%;animation:lb-in 0.3s ease;}
-@keyframes lb-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.lb-m.bot{align-self:flex-start;}.lb-m.usr{align-self:flex-end;}
-.lb-b{padding:0.75rem 1rem;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:0.88rem;line-height:1.65;}
-.bot .lb-b{background:#2a2d38;border:1px solid rgba(245,200,66,0.12);color:#f0ead8;border-bottom-left-radius:4px;}
-.usr .lb-b{background:#F5C842;color:#1e2028;font-weight:500;border-bottom-right-radius:4px;}
-.lb-typing{display:flex;gap:4px;padding:0.75rem 1rem;background:#2a2d38;border:1px solid rgba(245,200,66,0.12);border-radius:12px;border-bottom-left-radius:4px;width:fit-content;}
-.lb-typing span{width:6px;height:6px;border-radius:50%;background:#a09880;animation:lb-b 1.2s ease infinite;}
-.lb-typing span:nth-child(2){animation-delay:0.2s;}.lb-typing span:nth-child(3){animation-delay:0.4s;}
-@keyframes lb-b{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
-.lb-foot{padding:0.85rem 1rem;background:#252830;border-top:1px solid rgba(245,200,66,0.12);display:flex;gap:0.6rem;align-items:center;flex-shrink:0;}
-#lb-input{flex:1;background:#1e2028;border:1px solid rgba(245,200,66,0.2);border-radius:8px;padding:0.6rem 0.9rem;color:#f0ead8;font-family:'DM Sans',sans-serif;font-size:0.88rem;outline:none;transition:border-color 0.2s;resize:none;line-height:1.5;max-height:80px;overflow-y:auto;}
-#lb-input::placeholder{color:#a09880;}#lb-input:focus{border-color:rgba(245,200,66,0.45);}
-#lb-send{width:36px;height:36px;border-radius:8px;background:#F5C842;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.2s,transform 0.2s;color:#1e2028;font-size:1rem;}
-#lb-send:hover{background:#fff;transform:scale(1.05);}.lb-cta-btn{display:inline-block;margin-top:0.5rem;padding:0.5rem 1rem;background:#F5C842;color:#1e2028;border-radius:4px;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;}
-@media(max-width:480px){#lb-win{width:calc(100vw - 2rem);right:1rem;}.lb-chat-launch{bottom:1rem;right:1rem;}.lb-chat-prompt{max-width:11rem;}.lb-chat-hint{font-size:0.52rem;letter-spacing:0.09em;}.lb-chat-arrow-svg{width:6.6rem;margin-right:0.85rem;}}
-</style>
-
 <div class="lb-chat-launch">
   <div class="lb-chat-prompt" aria-hidden="true">
-    <p class="lb-chat-hint">
-      <span class="lb-chat-hint-line1">Questions?</span>
-      <span class="lb-chat-hint-line2">He knows this site cold.</span>
-    </p>
-    <svg class="lb-chat-arrow-svg" viewBox="0 0 132 58" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-      <defs>
-        <marker id="lbChatArrowHead" markerWidth="7" markerHeight="7" refX="5.8" refY="3.5" orient="auto" markerUnits="strokeWidth">
-          <path d="M0,0 L7,3.5 L0,7 Z" fill="#F5C842" opacity="0.95"/>
-        </marker>
-      </defs>
-      <!-- Wider shadow stroke for a slightly hand-drawn weight -->
-      <path d="M 8 12 C 44 2, 96 8, 122 42" fill="none" stroke="rgba(30,32,40,0.55)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M 8 12 C 44 2, 96 8, 122 42" fill="none" stroke="#e8bc3a" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#lbChatArrowHead)" opacity="0.94"/>
-    </svg>
+    <p class="lb-chat-hint"><span class="lb-chat-hint-line1">Questions?</span><span class="lb-chat-hint-line2">He knows this site cold.</span></p>
+    <svg class="lb-chat-arrow-svg" viewBox="0 0 132 58" aria-hidden="true"><path d="M 8 12 C 44 2, 96 8, 122 42" fill="none" stroke="currentColor" stroke-width="2.15" stroke-linecap="round"/></svg>
   </div>
   <button type="button" id="lb-chat-btn" aria-label="Chat with lil bird">
-    <img src="bird-logo.png" alt="" />
+    <img src="/bird-logo.png" alt="" data-logo-dark="/bird-logo.png" data-logo-light="/bird-logo-teal.png" />
     <span class="lb-notif"></span>
   </button>
 </div>
-
 <div id="lb-win">
   <div class="lb-hdr">
-    <img src="bird-logo.png" alt="lil bird" />
+    <img src="/bird-logo.png" alt="" data-logo-dark="/bird-logo.png" data-logo-light="/bird-logo-teal.png" />
     <div style="flex:1">
       <div class="lb-hdr-name">lil' bird</div>
       <div class="lb-hdr-sub"><span class="lb-dot"></span>here with you</div>
     </div>
-    <button id="lb-close">✕</button>
+    <button type="button" id="lb-close" aria-label="Close chat">✕</button>
   </div>
   <div id="lb-msgs"></div>
   <div class="lb-foot">
     <textarea id="lb-input" placeholder="say something..." rows="1"></textarea>
-    <button id="lb-send">→</button>
+    <button type="button" id="lb-send" aria-label="Send">→</button>
   </div>
 </div>
-
-<script src="first-flight-booking.js"></script>
-<script src="lb-chat-safe.js"></script>
-<script>
-(function(){
-  var WORKER='https://lilbird-chat.cwwq46sn7m.workers.dev/';
-  var OPEN_MSG="Hey. You showed up — that already says something.\n\nI\'m here to listen, not lecture. What\'s going on for you right now?";
-  var msgs=[],isOpen=false,typing=false;
-  var btn=document.getElementById('lb-chat-btn');
-  var pathTrig=document.getElementById('pathfinder-chat-trigger');
-  if(pathTrig&&btn){pathTrig.addEventListener('click',function(){btn.click();});}
-  var win=document.getElementById('lb-win');
-  var closeBtn=document.getElementById('lb-close');
-  var msgsEl=document.getElementById('lb-msgs');
-  var input=document.getElementById('lb-input');
-  var send=document.getElementById('lb-send');
-  var notif=btn.querySelector('.lb-notif');
-
-  btn.addEventListener('click',function(){
-    isOpen=!isOpen;
-    win.classList.toggle('open',isOpen);
-    if(isOpen){notif.style.display='none';if(!msgs.length)addBot(OPEN_MSG);setTimeout(function(){input.focus();},300);}
-  });
-
-  // Delegated click handler for Calendly booking links injected by bot
-  msgsEl.addEventListener('click',function(e){
-    var trigger=e.target.closest('.lb-book-trigger');
-    if(!trigger)return;
-    e.preventDefault();
-    var url=trigger.getAttribute('data-url');
-    if(!url||!(window.lbChatSafe&&window.lbChatSafe.isAllowedCalendlyUrl(url)))return;
-    if(window.LbFirstFlight&&window.LbFirstFlight.isFirstFlightUrl(url)){
-      window.LbFirstFlight.openModal();
-      return;
-    }
-    // Open Calendly in a lightweight overlay
-    var overlay=document.createElement('div');
-    overlay.id='lb-calendly-overlay';
-    overlay.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;';
-    var inner=document.createElement('div');
-    inner.style.cssText='position:relative;width:min(680px,95vw);height:min(700px,90vh);background:#fff;border-radius:12px;overflow:hidden;';
-    var closeO=document.createElement('button');
-    closeO.textContent='✕';
-    closeO.style.cssText='position:absolute;top:10px;right:14px;z-index:2;background:none;border:none;font-size:1.2rem;cursor:pointer;color:#555;';
-    closeO.addEventListener('click',function(){overlay.remove();});
-    var iframe=document.createElement('iframe');
-    iframe.src=url;
-    iframe.style.cssText='width:100%;height:100%;border:none;';
-    inner.appendChild(closeO);
-    inner.appendChild(iframe);
-    overlay.appendChild(inner);
-    overlay.addEventListener('click',function(ev){if(ev.target===overlay)overlay.remove();});
-    document.body.appendChild(overlay);
-  });
-  closeBtn.addEventListener('click',function(){isOpen=false;win.classList.remove('open');});
-  input.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();doSend();}});
-  send.addEventListener('click',doSend);
-  input.addEventListener('input',function(){input.style.height='auto';input.style.height=Math.min(input.scrollHeight,80)+'px';});
-
-  function addBot(t){
-    var m=document.createElement('div');m.className='lb-m bot';
-    var b=document.createElement('div');b.className='lb-b';
-    var html=(window.lbChatSafe&&window.lbChatSafe.sanitizeAssistantHtml)?window.lbChatSafe.sanitizeAssistantHtml(t):String(t).replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
-    b.innerHTML=html;
-    m.appendChild(b);msgsEl.appendChild(m);scroll();
-    msgs.push({role:'assistant',content:t});
-  }
-  function addUsr(t){
-    var m=document.createElement('div');m.className='lb-m usr';
-    var b=document.createElement('div');b.className='lb-b';b.textContent=t;
-    m.appendChild(b);msgsEl.appendChild(m);scroll();
-    msgs.push({role:'user',content:t});
-  }
-  function showTyping(){
-    var e=document.createElement('div');e.className='lb-m bot';e.id='lb-typ';
-    e.innerHTML='<div class="lb-typing"><span></span><span></span><span></span></div>';
-    msgsEl.appendChild(e);scroll();
-  }
-  function hideTyping(){var e=document.getElementById('lb-typ');if(e)e.remove();}
-  function scroll(){msgsEl.scrollTop=msgsEl.scrollHeight;}
-
-  function doSend(){
-    var t=input.value.trim();
-    if(!t||typing)return;
-    addUsr(t);input.value='';input.style.height='auto';
-    send.disabled=true;typing=true;showTyping();
-    var MAX_HISTORY=6;
-    var hist=msgs.filter(function(m){return m.role==='user'||m.role==='assistant';}).slice(-MAX_HISTORY);
-    var userTurnCount=msgs.filter(function(m){return m.role==='user';}).length;
-    fetch(WORKER,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({messages:hist,userTurnCount:userTurnCount})
-    }).then(function(r){
-      if(!r.ok){hideTyping();addBot('The chat service is unavailable right now. Please try again in a moment.');return Promise.reject();}
-      return r.json();
-    }).then(function(d){
-      hideTyping();
-      if(d.content&&d.content[0])addBot(d.content[0].text);
-      else addBot("Something got tangled. Try again in a moment?");
-    }).catch(function(){
-      hideTyping();addBot("Having a little trouble connecting. Try again in a moment?");
-    }).finally(function(){
-      typing=false;send.disabled=false;input.focus();
-    });
-  }
-})();
-</script>
-<script>
-(function () {
-  var layout = document.getElementById('pathfinder-layout');
-  if (layout && window.matchMedia('(min-width: 769px)').matches) {
-    var tiers = layout.querySelectorAll('.pathfinder-tier[data-pathfinder-tier]');
-    var visuals = layout.querySelectorAll('.pathfinder-visual');
-    var caption = document.getElementById('pathfinder-visual-caption');
-    var captions = ['Still deciding', 'Dip your toe in', 'Dive in — one-on-one'];
-    var activeIdx = '0';
-
-    function setVisual(idx) {
-      if (idx === activeIdx) return;
-      activeIdx = idx;
-      visuals.forEach(function (img) {
-        img.classList.toggle('is-active', img.getAttribute('data-pathfinder-visual') === idx);
-      });
-      tiers.forEach(function (tier) {
-        tier.classList.toggle('is-visual-active', tier.getAttribute('data-pathfinder-tier') === idx);
-      });
-      if (caption && captions[parseInt(idx, 10)]) caption.textContent = captions[parseInt(idx, 10)];
-    }
-
-    if (tiers.length && visuals.length && 'IntersectionObserver' in window) {
-      var visibility = new Map();
-      var observer = new IntersectionObserver(
-        function (entries) {
-          entries.forEach(function (entry) {
-            visibility.set(entry.target, entry.intersectionRatio);
-          });
-          var bestTier = null;
-          var bestRatio = 0;
-          tiers.forEach(function (tier) {
-            var ratio = visibility.get(tier) || 0;
-            if (ratio > bestRatio) {
-              bestRatio = ratio;
-              bestTier = tier;
-            }
-          });
-          if (bestTier && bestRatio >= 0.2) {
-            setVisual(bestTier.getAttribute('data-pathfinder-tier'));
-          }
-        },
-        { root: null, rootMargin: '-10% 0px -35% 0px', threshold: [0, 0.15, 0.35, 0.55, 0.75] }
-      );
-      tiers.forEach(function (tier) { observer.observe(tier); });
-    }
-  }
-})();
-
-(function () {
-  var nav = document.getElementById('site-nav');
-  var btn = document.getElementById('nav-menu-btn');
-  var panel = document.getElementById('nav-menu-panel');
-  if (!nav || !btn || !panel) return;
-
-  function setOpen(open) {
-    nav.classList.toggle('menu-open', open);
-    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-    panel.setAttribute('aria-hidden', open ? 'false' : 'true');
-    btn.textContent = open ? 'Close' : 'Menu';
-    document.body.style.overflow = open ? 'hidden' : '';
-  }
-
-  btn.addEventListener('click', function () {
-    setOpen(!nav.classList.contains('menu-open'));
-  });
-
-  panel.querySelectorAll('a').forEach(function (link) {
-    link.addEventListener('click', function () { setOpen(false); });
-  });
-
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && nav.classList.contains('menu-open')) setOpen(false);
-  });
-
-  window.addEventListener('resize', function () {
-    if (window.innerWidth > 768 && nav.classList.contains('menu-open')) setOpen(false);
-  });
-})();
-</script>
-<script src="/lilbird-auth-bridge.js"></script>
-<script src="/lilbird-nest-nav.js"></script>
+<script src="/first-flight-booking.js"></script>
+<script src="/lb-chat-safe.js"></script>
+<script src="/js/lilbird-theme.js"></script>
+<script src="/js/lilbird-home.js"></script>
+<script src="/js/lilbird-chat.js"></script>
 </body>
 </html>

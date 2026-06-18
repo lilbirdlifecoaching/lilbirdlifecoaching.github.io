@@ -3,6 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>
+    (function(){
+      var k='lilbird-theme', s=null;
+      try{s=localStorage.getItem(k);}catch(e){}
+      var t=(s==='light'||s==='dark')?s:(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+      document.documentElement.setAttribute('data-theme', t);
+      document.documentElement.style.colorScheme=t;
+    })();
+  </script>
+  <link rel="stylesheet" href="/css/lilbird-tokens.css" />
+  <link rel="stylesheet" href="/css/lilbird-theme-chrome.css" />
+  <link rel="stylesheet" href="/css/lilbird-theme-pages.css" />
+
   <meta name="description" content="Privacy policy for lil' bird life coaching — lilbird.life, Inner Compass, Solo course, and related tools." />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://lilbird.life/privacy.html" />
@@ -346,5 +359,8 @@
   <p>lil' bird life coaching · <a href="index.html">lilbird.life</a> · <a href="mailto:hello@lilbird.life">hello@lilbird.life</a></p>
 </footer>
 
+
+<script src="/js/lilbird-theme.js"></script>
+<script src="/js/lilbird-theme-nav.js"></script>
 </body>
 </html>
