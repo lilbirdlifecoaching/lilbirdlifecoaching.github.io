@@ -407,6 +407,45 @@
     }
     .compare-row:last-child { border-bottom: none; }
 
+    /* ─── PRICING ─── */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.85rem;
+      margin-top: 1.5rem;
+    }
+    .pricing-card {
+      border: 1px solid var(--dark-border);
+      border-radius: 6px;
+      padding: 1.1rem;
+      background: var(--dark-card);
+    }
+    .pricing-card.featured { border-color: var(--gold-dim); background: var(--gold-faint); }
+    .pricing-name {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+      margin-bottom: 0.4rem;
+    }
+    .pricing-amount {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      color: var(--text-main);
+      margin-bottom: 0.35rem;
+    }
+    .pricing-note {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .pricing-detail { font-size: 0.82rem; color: var(--text-muted); line-height: 1.5; }
+    @media (max-width: 900px) { .pricing-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 520px) { .pricing-grid { grid-template-columns: 1fr; } }
+
     /* ─── BOTTOM CTA ─── */
     .bottom-cta {
       background: var(--dark-mid);
@@ -603,7 +642,7 @@
     </a>
     <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
       <a href="/nest/" class="nav-nest">My Nest →</a>
-      <a href="book.html" class="nav-cta">Book a Session</a>
+      <a href="https://calendly.com/lilbirdlifecoaching/30min" class="nav-cta">Free discovery call</a>
     </div>
   </nav>
 
@@ -616,8 +655,35 @@
   <div class="page-hero">
     <p class="section-label reveal">the experience</p>
     <h1 class="page-headline reveal reveal-delay-1">What happens in<br/>the <em>First Flight.</em></h1>
-    <p class="page-sub reveal reveal-delay-2">A single 2-hour session: your story mapped, what's really going on named, and one next move you'll actually take. Here's what that looks like in the room.</p>
+    <p class="page-sub reveal reveal-delay-2">A single 2-hour session: your story mapped, what's really going on named, and one next move you'll actually take. Not sure yet? <a href="https://calendly.com/lilbirdlifecoaching/30min" style="color:var(--gold);text-decoration:none;">Start with a free discovery call</a>.</p>
   </div>
+
+  <section class="content-section" style="padding-top: 2rem; padding-bottom: 2rem;">
+    <p class="section-label reveal">what things cost</p>
+    <h2 class="story-headline reveal reveal-delay-1" style="font-size: clamp(1.8rem, 3vw, 2.4rem);">Clear numbers.<br/><em>No surprises.</em></h2>
+    <div class="pricing-grid reveal reveal-delay-2">
+      <div class="pricing-card">
+        <p class="pricing-name">Discovery call</p>
+        <p class="pricing-amount">Free</p>
+        <p class="pricing-detail">30 min · fit and next steps</p>
+      </div>
+      <div class="pricing-card featured">
+        <p class="pricing-name">First Flight</p>
+        <p class="pricing-amount">$299 <span class="pricing-note">often $149</span></p>
+        <p class="pricing-detail">One 2-hour session · code IMREADY from quiz or chat</p>
+      </div>
+      <div class="pricing-card">
+        <p class="pricing-name">Life Change — Solo</p>
+        <p class="pricing-amount">$197</p>
+        <p class="pricing-detail">Self-paced curriculum</p>
+      </div>
+      <div class="pricing-card">
+        <p class="pricing-name">Life Change Intensive</p>
+        <p class="pricing-amount">On the call</p>
+        <p class="pricing-detail">Full in-person program · scope and investment on a discovery call</p>
+      </div>
+    </div>
+  </section>
 
   <div class="divider reveal"><div class="divider-line"></div><span class="divider-glyph">✦</span><div class="divider-line"></div></div>
 
@@ -628,7 +694,7 @@
       Three ways in.<br/><em>One destination.</em>
     </h2>
     <p class="story-body reveal reveal-delay-2">
-      First Flight is one session to see if this fits. The Life Change Intensive (in person) is the full arc. The <a href="https://lilbird.life/solo/" style="color:var(--gold);text-decoration:none;">Solo course</a> is the same curriculum at your pace. Monthly coaching is for keeping momentum. Full menu: <a href="index.html#pathfinder" style="color:var(--gold);text-decoration:none;">starting points on the home page</a>.
+      Most people start with a <a href="https://calendly.com/lilbirdlifecoaching/30min" style="color:var(--gold);text-decoration:none;">free discovery call</a>. <strong>First Flight</strong> is one session to see if live coaching fits. The <strong>Life Change Intensive</strong> (in person) is the full arc — we'll cover scope and investment on the call. <a href="https://lilbird.life/solo/" style="color:var(--gold);text-decoration:none;">Solo</a> ($197) is the same curriculum at your pace. Monthly coaching keeps momentum.
     </p>
 
     <div class="journey-steps">
@@ -904,12 +970,12 @@
       <p class="section-label reveal" style="justify-content:center;">you've read enough</p>
       <h2 class="cta-headline reveal reveal-delay-1">The next step is<br/><em>pretty simple.</em></h2>
       <p class="cta-body reveal reveal-delay-2">
-        Start with a First Flight. Show up as you are. We'll take it from there.
+        Start with a free discovery call. We'll talk through what's going on, what things cost, and whether we're the right fit.
       </p>
       <div class="cta-actions reveal reveal-delay-3">
-        <a href="book.html" class="btn-primary">Book a First Flight →</a>
-        <a href="book.html#discovery" class="btn-secondary">Talk First (Discovery Call)</a>
-        <a href="am-i-ready-for-coaching.html" class="btn-secondary">Am I Ready for Coaching?</a>
+        <a href="https://calendly.com/lilbirdlifecoaching/30min" class="btn-primary">Book a free discovery call →</a>
+        <a href="book.html" class="btn-secondary">Full calendar</a>
+        <a href="am-i-ready-for-coaching.html" class="btn-secondary">Am I Ready quiz</a>
       </div>
     </div>
   </div>

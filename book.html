@@ -195,8 +195,19 @@
       font-size: 0.98rem;
       color: var(--text-muted);
       line-height: 1.8;
-      margin-bottom: 2.5rem;
+      margin-bottom: 1.5rem;
     }
+    .pricing-mini {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+      padding: 0.85rem 1rem;
+      border: 1px solid var(--dark-border);
+      border-radius: 4px;
+      margin-bottom: 1.75rem;
+      background: var(--dark-card);
+    }
+    .pricing-mini strong { color: var(--text-main); font-weight: 500; }
 
     /* SESSION TYPE SELECTOR */
     .session-options {
@@ -462,34 +473,38 @@
     <div class="left-panel">
       <p class="section-label reveal">let's do this</p>
       <h1 class="page-headline reveal reveal-delay-1">
-        Pick a time.<br/>
-        <em>Show up as you are.</em>
+        Start with a<br/>
+        <em>free call.</em>
       </h1>
       <p class="page-body reveal reveal-delay-2">
-        No prep needed. No perfect version of yourself required. Just pick a slot that works and we'll take it from there.
+        Not sure what you need? Book a 30-minute discovery call — no pitch, no pressure. We'll talk through what's going on, what things cost, and whether we're the right fit. Or pick another session type below.
       </p>
+
+      <div class="pricing-mini reveal reveal-delay-2">
+        <p><strong>Discovery</strong> — free · <strong>First Flight</strong> — $299 (often $149) · <strong>Solo</strong> — $197 · <strong>Intensive</strong> — on the call</p>
+      </div>
 
       <!-- Session type selector -->
       <div class="session-options reveal reveal-delay-3">
-        <div class="session-option active" data-url="https://calendly.com/lilbirdlifecoaching/first-flight-session" onclick="switchSession(this)">
+        <div class="session-option active" id="discovery" data-url="https://calendly.com/lilbirdlifecoaching/30min" onclick="switchSession(this)">
+          <p class="opt-name">Discovery Call</p>
+          <p class="opt-tag">free · 30 minutes · start here</p>
+          <p class="opt-desc">Not sure if this is for you? That's exactly what this call is for. We'll spend 30 minutes getting honest about where you are and whether we're the right fit. No script, no pitch. If we're not the right match, we'll tell you. Our bias is always you.</p>
+        </div>
+        <div class="session-option" data-url="https://calendly.com/lilbirdlifecoaching/first-flight-session" onclick="switchSession(this)">
           <p class="opt-name">The First Flight</p>
-          <p class="opt-tag">1 session · 2 hours · start here</p>
+          <p class="opt-tag">$299 · often $149 · 2 hours</p>
           <p class="opt-desc">One 2-hour conversation: your story mapped, what's really going on named, one next move to take. No commitment beyond that session.</p>
         </div>
         <div class="session-option" id="intensive" onclick="switchSession(this)">
           <p class="opt-name">Life Change Intensive</p>
-          <p class="opt-tag">in person · 8 sessions · full curriculum</p>
-          <p class="opt-desc">Eight in-person sessions through the full arc: story, wiring, relationships, next chapter. Enrol on lilbird.life (agreement + payment), then book each session from your Nest.</p>
+          <p class="opt-tag">in person · full program · on the call</p>
+          <p class="opt-desc">Eight in-person sessions through the full arc. Scope and investment are covered on a discovery call first — then enrol on lilbird.life when you're ready.</p>
         </div>
         <div class="session-option" data-url="https://calendly.com/lilbirdlifecoaching/coaching" onclick="switchSession(this)">
           <p class="opt-name">Monthly Coaching</p>
           <p class="opt-tag">flexible · recurring or once-off</p>
           <p class="opt-desc">A regular thinking partner, or one good conversation when something specific needs working through. Recurring or once-off. No pressure to commit beyond what you need.</p>
-        </div>
-        <div class="session-option" id="discovery" data-url="https://calendly.com/lilbirdlifecoaching/30min" onclick="switchSession(this)">
-          <p class="opt-name">Discovery Call</p>
-          <p class="opt-tag">free · 30 minutes · no hard sell</p>
-          <p class="opt-desc">Not sure if this is for you? That's exactly what this call is for. We'll spend 30 minutes getting honest about where you are and whether we're the right fit. No script, no pitch. If we're not the right match, we'll tell you. Our bias is always you.</p>
         </div>
       </div>
 
@@ -504,8 +519,8 @@
           <span>No hard sell, ever. Our bias is always you.</span>
         </div>
         <div class="reassurance-item">
-          <span class="reassurance-icon">🔄</span>
-          <span>Need to reschedule? Easy. Life happens.</span>
+          <span class="reassurance-icon">🎓</span>
+          <span>GiANT Worldwide certified · coaching, not therapy.</span>
         </div>
       </div>
     </div>
@@ -520,13 +535,13 @@
       <div
         class="calendly-inline-widget"
         id="calendly-widget"
-        data-url="https://calendly.com/lilbirdlifecoaching/first-flight-session?hide_event_type_details=1&hide_gdpr_banner=1&background_color=2a2d38&text_color=f0ead8&primary_color=F5C842"
+        data-url="https://calendly.com/lilbirdlifecoaching/30min?hide_event_type_details=1&hide_gdpr_banner=1&background_color=2a2d38&text_color=f0ead8&primary_color=F5C842"
       ></div>
       </div>
       <div id="booking-panel-intensive" class="intensive-enrol-panel booking-panel-hidden">
         <p class="section-label" style="margin-bottom:1rem;">life change intensive</p>
         <h2>Read the agreement, then <em>pay securely.</em></h2>
-        <p>The Intensive is enrolled on lilbird.life, not through Calendly payment. You'll see the full coaching agreement before you pay, so you know your rights and what's included.</p>
+        <p>The Intensive is enrolled on lilbird.life after a discovery call — not through Calendly payment. We'll cover scope and investment on the call first. When you're ready, you'll read the full coaching agreement before you pay.</p>
         <ol class="intensive-steps">
           <li>1. Read &amp; sign the coaching agreement</li>
           <li>2. Create your Nest account (or log in)</li>
@@ -545,7 +560,7 @@
   <footer>
     <span class="footer-brand">lil' bird</span>
     <div class="footer-links">
-      <a href="https://lilbirddeepprofile.netlify.app/">Take the Assessment</a>
+      <a href="/deep-profile.html">Inner Compass</a>
       <a href="format.html">How It Works</a>
       <a href="index.html">Home</a>
       <a href="mailto:hello@lilbird.life" id="footer-feedback-link" title="Broken link, typo, bug, or idea">Site feedback</a>
@@ -665,7 +680,6 @@
         switchSession(option);
         return;
       }
-      setTimeout(showFirstFlightOffer, 600);
     }
 
     initBookPageFromDeepLink();
