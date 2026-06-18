@@ -229,6 +229,7 @@ html[data-theme="light"] .nav-nest {
 }
 
 /* ─── Embers (subtle in day mode) ─── */
-html[data-theme="light"] .embers .ember {
-  opacity: 0.12 !important;
+html[data-theme="light"] .pricing-mini {
+  background: #fffdf8 !important;
+  border-color: rgba(17, 17, 17, 0.14) !important;
 }
