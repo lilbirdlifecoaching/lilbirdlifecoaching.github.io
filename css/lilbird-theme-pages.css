@@ -1,0 +1,83 @@
+/**
+ * lil' bird — light mode remaps for legacy marketing pages (--gold, --dark, etc.)
+ * Load after page inline styles + lilbird-tokens.css
+ */
+[data-theme="light"] {
+  --gold: #111111;
+  --gold-dim: #0d6b6b;
+  --gold-faint: rgba(17, 17, 17, 0.06);
+  --dark: #f5f2eb;
+  --dark-mid: #ede9e0;
+  --dark-card: #fffdf8;
+  --dark-border: rgba(17, 17, 17, 0.14);
+  --text-main: #111111;
+  --text-muted: #5a5348;
+}
+
+[data-theme="light"] body {
+  background: var(--dark) !important;
+  color: var(--text-main) !important;
+}
+
+[data-theme="light"] nav {
+  background: rgba(245, 242, 235, 0.95) !important;
+  border-bottom-color: rgba(17, 17, 17, 0.12) !important;
+}
+
+[data-theme="light"] .nav-wordmark,
+[data-theme="light"] .nav-logo {
+  color: #111 !important;
+}
+
+[data-theme="light"] .nav-bird {
+  border-radius: 50%;
+  border: 2px solid #111;
+}
+
+[data-theme="light"] .btn-primary,
+[data-theme="light"] .nav-cta,
+[data-theme="light"] button.primary {
+  background: #111 !important;
+  color: #ffe620 !important;
+  border-color: #111 !important;
+  box-shadow: 4px 4px 0 #28c4c4 !important;
+}
+
+[data-theme="light"] .btn-secondary,
+[data-theme="light"] .nav-back {
+  border-color: rgba(17, 17, 17, 0.25) !important;
+  color: #111 !important;
+}
+
+[data-theme="light"] .card,
+[data-theme="light"] .session-card,
+[data-theme="light"] .format-card,
+[data-theme="light"] .faq-item,
+[data-theme="light"] .quiz-card {
+  background: var(--dark-card) !important;
+  border-color: var(--dark-border) !important;
+}
+
+[data-theme="light"] h1 em,
+[data-theme="light"] h2 em,
+[data-theme="light"] .headline em {
+  color: #e8186c !important;
+}
+
+[data-theme="light"] a:hover {
+  color: #0d6b6b !important;
+}
+
+[data-theme="light"] .lilbird-nav-nest,
+[data-theme="light"] .nav-nest {
+  color: #111 !important;
+  border-color: rgba(17, 17, 17, 0.2) !important;
+}
+
+[data-theme="light"] body::before {
+  opacity: 0.35 !important;
+}
+
+[data-theme="light"] .embers .ember {
+  opacity: 0.15 !important;
+}

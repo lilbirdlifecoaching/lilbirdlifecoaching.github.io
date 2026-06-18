@@ -1,0 +1,126 @@
+/**
+ * lil' bird lilbird site-wide — semantic design tokens
+ * Dark = embers & gold (live lilbird.life)
+ * Light = paper & CMYK halftone (light v2)
+ */
+
+:root {
+  color-scheme: light dark;
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'DM Mono', ui-monospace, monospace;
+  --font-mono-light: 'Space Mono', ui-monospace, monospace;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --transition: 0.45s var(--ease-out);
+  --radius-sm: 4px;
+  --radius-md: 12px;
+  --radius-pill: 100px;
+
+  /* CMYK accents (light mode hero) */
+  --c-cyan: #28c4c4;
+  --c-magenta: #e8186c;
+  --c-yellow: #ffe620;
+  --c-ink: #111111;
+}
+
+/* ─── DARK (default / night) ─── */
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #1e2028;
+  --bg-mid: #252830;
+  --bg-card: #2a2d38;
+  --bg-card-hover: #2f3240;
+  --border: rgba(245, 200, 66, 0.18);
+  --border-strong: rgba(245, 200, 66, 0.35);
+
+  --text: #f0ead8;
+  --text-muted: #a09880;
+  --text-accent: #f5c842;
+  --text-accent-dim: #c9a130;
+  --text-accent-faint: rgba(245, 200, 66, 0.08);
+  --accent-hot: #e8734a;
+  --accent-hot-faint: rgba(232, 115, 74, 0.12);
+
+  --nav-bg: linear-gradient(to bottom, rgba(30, 32, 40, 0.98), rgba(30, 32, 40, 0.92));
+  --nav-border: transparent;
+  --nav-shadow: none;
+  --grain-opacity: 0.6;
+  --grain-strength: 0.035;
+  --halftone-opacity: 0;
+  --particle-layer: embers;
+
+  --btn-primary-bg: var(--text-accent);
+  --btn-primary-text: var(--bg);
+  --btn-primary-shadow: 0 8px 28px rgba(245, 200, 66, 0.25);
+  --btn-secondary-border: var(--border);
+  --btn-secondary-hover-bg: var(--text-accent-faint);
+
+  --logo-url: url('/bird-logo.png');
+  --hero-glow: radial-gradient(ellipse 80% 60% at 70% 20%, rgba(245, 200, 66, 0.07), transparent 60%);
+  --divider-glyph: '✦';
+  --pathfinder-shadow: 0 28px 56px rgba(0, 0, 0, 0.4);
+  --pathfinder-overlay: linear-gradient(to top, rgba(30, 32, 40, 0.55) 0%, transparent 45%);
+
+  --chat-btn-bg: #f5c842;
+  --chat-btn-shadow: 0 4px 20px rgba(245, 200, 66, 0.4);
+  --theme-label: 'Night';
+}
+
+/* ─── LIGHT (day) ─── */
+[data-theme="light"] {
+  color-scheme: light;
+
+  --bg: #f5f2eb;
+  --bg-mid: #ede9e0;
+  --bg-card: #fffdf8;
+  --bg-card-hover: #faf6ee;
+  --border: rgba(17, 17, 17, 0.14);
+  --border-strong: #111111;
+
+  --text: #111111;
+  --text-muted: #6b6560;
+  --text-accent: #28c4c4;
+  --text-accent-dim: #1a9696;
+  --text-accent-faint: rgba(40, 196, 196, 0.1);
+  --accent-hot: #e8186c;
+  --accent-hot-faint: rgba(232, 24, 108, 0.08);
+
+  --nav-bg: rgba(245, 242, 235, 0.94);
+  --nav-border: #111111;
+  --nav-shadow: 0 2px 0 rgba(17, 17, 17, 0.06);
+  --grain-opacity: 0.55;
+  --grain-strength: 0.04;
+  --halftone-opacity: 1;
+  --particle-layer: seeds;
+
+  --btn-primary-bg: #111111;
+  --btn-primary-text: #f5f2eb;
+  --btn-primary-shadow: 3px 3px 0 var(--c-cyan);
+  --btn-secondary-border: var(--border-strong);
+  --btn-secondary-hover-bg: rgba(40, 196, 196, 0.08);
+
+  --logo-url: url('https://lilbird.life/bird-logo-teal.png');
+  --hero-glow: radial-gradient(ellipse 70% 50% at 85% 15%, rgba(255, 230, 32, 0.25), transparent 55%);
+  --divider-glyph: '◆';
+  --pathfinder-shadow: 6px 6px 0 rgba(17, 17, 17, 0.08);
+  --pathfinder-overlay: linear-gradient(to top, rgba(245, 242, 235, 0.92) 0%, transparent 50%);
+
+  --chat-btn-bg: #111111;
+  --chat-btn-shadow: 3px 3px 0 var(--c-magenta);
+  --theme-label: 'Day';
+}
+
+[data-theme="light"] .section-label,
+[data-theme="light"] .nav-secondary,
+[data-theme="light"] .nav-cta,
+[data-theme="light"] .nav-menu-label,
+[data-theme="light"] .pf-go,
+[data-theme="light"] .carousel-btn,
+[data-theme="light"] .pathfinder-visual-caption,
+[data-theme="light"] .step-num,
+[data-theme="light"] .card-block-eyebrow,
+[data-theme="light"] .footer-links {
+  font-family: var(--font-mono-light);
+}
