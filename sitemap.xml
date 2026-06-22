@@ -16,9 +16,9 @@
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://lilbird.life/assessment.html</loc>
+    <loc>https://lilbird.life/about-luke.html</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.85</priority>
   </url>
   <url>
     <loc>https://lilbird.life/am-i-ready-for-coaching.html</loc>
@@ -26,9 +26,49 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://lilbird.life/about-luke.html</loc>
+    <loc>https://lilbird.life/assessment.html</loc>
     <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://lilbird.life/articles/</loc>
+    <changefreq>weekly</changefreq>
     <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://lilbird.life/articles/feeling-stuck-in-your-late-twenties.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://lilbird.life/articles/on-paper-my-life-looks-fine.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://lilbird.life/articles/career-change-at-30.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://lilbird.life/articles/coaching-vs-therapy.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://lilbird.life/articles/how-to-make-a-big-decision.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://lilbird.life/articles/what-is-an-identity-crisis-in-your-twenties.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://lilbird.life/articles/stuck-between-two-paths.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
   </url>
   <url>
     <loc>https://lilbird.life/articles/how-do-you-know-youre-ready-for-life-coaching.html</loc>
