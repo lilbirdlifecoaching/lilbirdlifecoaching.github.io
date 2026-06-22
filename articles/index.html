@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Honest writing for people in transition — quarter-life crisis, career change, identity, and getting unstuck. From Luke Haythorpe at lil' bird coaching." />
+  <meta name="keywords" content="life coaching blog, quarter life crisis, career change, feeling stuck, identity, life transitions, lil bird coaching" />
+  <link rel="canonical" href="https://lilbird.life/articles/" />
+  <meta property="og:title" content="The lil' bird journal — writing for people in transition" />
+  <meta property="og:description" content="Honest writing for people in transition — quarter-life crisis, career change, identity, getting unstuck." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://lilbird.life/articles/" />
+  <meta property="og:image" content="https://lilbird.life/bird-logo.png" />
+  <meta name="robots" content="index, follow" />
+  <title>The lil' bird journal — writing for people in transition</title>
+  <link rel="icon" type="image/png" href="/bird-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --gold: #F5C842; --gold-dim: #c9a130; --gold-faint: rgba(245,200,66,0.07); --gold-line: rgba(245,200,66,0.18);
+      --dark: #1a1c23; --dark-mid: #22242e; --dark-card: #272a35; --text-main: #f0ead8; --text-muted: #9a9282;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--dark); color: var(--text-main); font-family: 'DM Sans', sans-serif; font-weight: 300; line-height: 1.75; }
+    nav { position: sticky; top: 0; z-index: 20; padding: 1.1rem 2rem; display: flex; align-items: center; justify-content: space-between; background: rgba(26,28,35,0.96); border-bottom: 1px solid var(--gold-line); backdrop-filter: blur(12px); }
+    .nav-logo { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; color: var(--gold); font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.05rem; }
+    .nav-logo img { width: 32px; height: 32px; border-radius: 8px; }
+    .nav-cta { font-family: 'DM Mono', monospace; font-size: 0.64rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dark); background: var(--gold); padding: 0.6rem 1.1rem; border-radius: 3px; text-decoration: none; }
+    .nav-cta:hover { background: #fff; }
+    .hero { max-width: 900px; margin: 0 auto; padding: 4rem 2rem 2.5rem; }
+    .hero-eyebrow { font-family: 'DM Mono', monospace; font-size: 0.64rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold-dim); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.75rem; }
+    .hero-eyebrow::before { content: ''; width: 24px; height: 1px; background: var(--gold-dim); display: inline-block; }
+    .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(2.2rem, 5vw, 3.2rem); font-weight: 400; line-height: 1.1; margin-bottom: 1.25rem; }
+    .hero h1 em { font-style: italic; color: var(--gold); }
+    .hero p { font-size: 1.1rem; color: var(--text-muted); max-width: 560px; }
+    .posts { max-width: 900px; margin: 0 auto; padding: 1rem 2rem 4rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .post-card { background: var(--dark-card); border: 1px solid rgba(245,200,66,0.08); border-radius: 8px; padding: 1.75rem; text-decoration: none; display: flex; flex-direction: column; transition: border-color 0.2s, background 0.2s, transform 0.2s; }
+    .post-card:hover { border-color: rgba(245,200,66,0.2); background: #2e3140; transform: translateY(-2px); }
+    .post-card.featured { grid-column: 1 / -1; background: linear-gradient(135deg, var(--dark-mid) 0%, #1e2232 100%); border-color: var(--gold-line); }
+    .post-cat { font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-dim); margin-bottom: 0.75rem; }
+    .post-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 400; color: var(--text-main); line-height: 1.25; margin-bottom: 0.6rem; }
+    .post-card.featured .post-title { font-size: 1.7rem; }
+    .post-desc { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.1rem; flex: 1; }
+    .post-meta { font-family: 'DM Mono', monospace; font-size: 0.64rem; letter-spacing: 0.1em; color: var(--gold-dim); }
+    footer { border-top: 1px solid rgba(245,200,66,0.1); padding: 1.75rem; text-align: center; font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.08em; color: #6b6760; }
+    footer a { color: var(--gold-dim); text-decoration: none; }
+    @media (max-width: 680px) {
+      nav { padding: 1rem 1.25rem; } .hero { padding: 2.5rem 1.25rem 1.5rem; }
+      .posts { grid-template-columns: 1fr; padding: 1rem 1.25rem 3rem; }
+      .post-card.featured .post-title { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="nav-logo"><img src="/bird-logo.png" alt="" /> lil' bird</a>
+    <a href="https://calendly.com/lilbirdlifecoaching/30min" class="nav-cta">Free discovery call</a>
+  </nav>
+  <header class="hero">
+    <p class="hero-eyebrow">lil' bird · journal</p>
+    <h1>Writing for people <em>in transition.</em></h1>
+    <p>Honest reads on the stuck, foggy, in-between seasons — quarter-life crisis, career change, identity, and finding the next step that's actually yours. No fluff, no five-year fantasy plans.</p>
+  </header>
+  <main class="posts">
+      <a class="post-card featured" href="/articles/feeling-stuck-in-your-late-twenties.html">
+        <span class="post-cat">Transitions</span>
+        <h2 class="post-title">Feeling Stuck in Your Late Twenties? Why It Happens and How to Move</h2>
+        <p class="post-desc">Over half of young adults hit a quarter-life crisis. Why it happens — and the three kinds of "stuck" that need different answers.</p>
+        <span class="post-meta">8 min read →</span>
+      </a>
+      <a class="post-card" href="/articles/on-paper-my-life-looks-fine.html">
+        <span class="post-cat">Identity</span>
+        <h2 class="post-title">"On Paper My Life Looks Fine, But It Doesn't Feel Like Mine"</h2>
+        <p class="post-desc">When your life looks good outside but feels off inside, you're not ungrateful. You're picking up a real signal. Here's what it means.</p>
+        <span class="post-meta">7 min read →</span>
+      </a>
+      <a class="post-card" href="/articles/career-change-at-30.html">
+        <span class="post-cat">Career</span>
+        <h2 class="post-title">Career Change at 30: How to Decide Without Blowing Up Your Life</h2>
+        <p class="post-desc">The honest math nobody does, and why you can test a new direction instead of leaping off a cliff.</p>
+        <span class="post-meta">8 min read →</span>
+      </a>
+      <a class="post-card" href="/articles/coaching-vs-therapy.html">
+        <span class="post-cat">Coaching</span>
+        <h2 class="post-title">Coaching vs Therapy: Which One Do You Actually Need Right Now?</h2>
+        <p class="post-desc">A jargon-free breakdown of the difference — and an honest note on when coaching is the wrong tool.</p>
+        <span class="post-meta">7 min read →</span>
+      </a>
+      <a class="post-card" href="/articles/how-to-make-a-big-decision.html">
+        <span class="post-cat">Decisions</span>
+        <h2 class="post-title">How to Make a Big Decision When You Can't Stop Overthinking It</h2>
+        <p class="post-desc">Why more analysis stopped helping a while ago — and how to get your gut and your reasoning in the same room.</p>
+        <span class="post-meta">7 min read →</span>
+      </a>
+      <a class="post-card" href="/articles/what-is-an-identity-crisis-in-your-twenties.html">
+        <span class="post-cat">Identity</span>
+        <h2 class="post-title">What Is an Identity Crisis in Your Twenties (and How to Work Through One)</h2>
+        <p class="post-desc">It's not a breakdown. It's the gap between the self you were handed and the self you're choosing.</p>
+        <span class="post-meta">8 min read →</span>
+      </a>
+      <a class="post-card" href="/articles/stuck-between-two-paths.html">
+        <span class="post-cat">Decisions</span>
+        <h2 class="post-title">Stuck Between Two Paths? A Simple Way to Find Clarity</h2>
+        <p class="post-desc">When two options look equal on paper, you're really choosing which part of yourself to trust. Three questions that cut deeper.</p>
+        <span class="post-meta">6 min read →</span>
+      </a>
+      <a class="post-card" href="/articles/how-do-you-know-youre-ready-for-life-coaching.html">
+        <span class="post-cat">Coaching</span>
+        <h2 class="post-title">How Do You Know You're Ready for Life Coaching?</h2>
+        <p class="post-desc">The real signs you're ready — and the honest counter-signs that mean something else might serve you better first.</p>
+        <span class="post-meta">6 min read →</span>
+      </a>
+  </main>
+  <footer>
+    <a href="/">lilbird.life</a> &nbsp;·&nbsp; <a href="/about-luke.html">About Luke</a> &nbsp;·&nbsp; <a href="mailto:hello@lilbird.life">hello@lilbird.life</a> &nbsp;·&nbsp; <a href="/privacy.html">Privacy</a>
+  </footer>
+</body>
+</html>
