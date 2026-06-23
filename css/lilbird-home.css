@@ -1,4 +1,5 @@
 /* lil' bird homepage layout & components (semantic tokens) */
+@import url('lilbird-testimonials.css');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
@@ -544,7 +545,6 @@ body.js-reveal-ready .reveal.visible { opacity: 1; transform: translateY(0); }
   position: relative;
   z-index: 2;
 }
-#testimonials.story-section { max-width: min(1180px, 100vw); }
 #pathfinder.story-section { max-width: 1060px; }
 #meet-luke.story-section { max-width: 920px; }
 .section-label {
@@ -662,110 +662,6 @@ body.js-reveal-ready .reveal.visible { opacity: 1; transform: translateY(0); }
 }
 
 /* Testimonials carousel */
-.testimonial-carousel { margin: 2.5rem 0; position: relative; }
-.carousel-viewport { overflow: hidden; width: 100%; }
-.carousel-track {
-  display: flex;
-  gap: 1.25rem;
-  transition: transform 0.5s var(--ease-out);
-  will-change: transform;
-}
-.testimonial-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 1.5rem 1.25rem;
-  flex: 0 0 100%;
-  min-width: 100%;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 1.25rem;
-  min-height: 200px;
-  transition: border-color 0.3s, transform 0.3s;
-}
-@media (min-width: 640px) {
-  .testimonial-card {
-    flex: 0 0 calc((100% - 1.25rem) / 2);
-    min-width: calc((100% - 1.25rem) / 2);
-  }
-}
-@media (min-width: 960px) {
-  .testimonial-card {
-    flex: 0 0 calc((100% - 2 * 1.25rem) / 3);
-    min-width: calc((100% - 2 * 1.25rem) / 3);
-  }
-}
-@media (min-width: 1240px) {
-  .testimonial-card {
-    flex: 0 0 calc((100% - 3 * 1.25rem) / 4);
-    min-width: calc((100% - 3 * 1.25rem) / 4);
-  }
-}
-[data-theme="light"] .testimonial-card {
-  border-width: 2px;
-  border-color: var(--c-ink);
-  box-shadow: 3px 3px 0 rgba(17, 17, 17, 0.06);
-}
-.testimonial-card:hover { border-color: var(--border-strong); transform: translateY(-2px); }
-.testimonial-quote {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 1rem;
-  line-height: 1.75;
-  color: var(--text);
-  flex: 1;
-}
-.testimonial-quote::before {
-  content: '\201C';
-  color: var(--text-accent);
-  font-size: 1.6rem;
-  line-height: 0;
-  vertical-align: -0.35em;
-  margin-right: 0.1em;
-}
-.testimonial-author { display: flex; align-items: center; gap: 0.85rem; }
-.testimonial-face {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--border);
-}
-.testimonial-name { font-weight: 500; font-size: 0.88rem; }
-.testimonial-role { font-size: 0.75rem; color: var(--text-muted); }
-.carousel-controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 1.75rem;
-}
-.carousel-btn {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  color: var(--text-accent-dim);
-  cursor: pointer;
-  transition: var(--transition);
-}
-.carousel-btn:hover:not(:disabled) { border-color: var(--text-accent); color: var(--text-accent); }
-.carousel-btn:disabled { opacity: 0.35; cursor: default; }
-.carousel-dots { display: flex; gap: 0.45rem; }
-.carousel-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  border: none;
-  background: var(--border);
-  cursor: pointer;
-  padding: 0;
-}
-.carousel-dot.active { background: var(--text-accent); transform: scale(1.15); }
-
 /* Luke section */
 .luke-grid {
   display: grid;
@@ -1447,11 +1343,5 @@ footer, .site-footer {
     flex-direction: column;
     gap: 1.25rem;
     padding: 1rem 1.25rem 1.5rem;
-  }
-}
-@media (max-width: 640px) {
-  .testimonial-card {
-    flex: 0 0 100%;
-    min-width: 100%;
   }
 }
