@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- lilbird deep-profile build: v7.0.9-20260528-single-email-gate -->
+<!-- lilbird deep-profile build: v7.1.0-20260528-phase2-conversion -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1112,6 +1112,62 @@
   #screen-chat { position: relative; }
   #screen-chat .chat-screen { position: relative; z-index: 1; }
 
+  .gate-trust {
+    display: flex; flex-wrap: wrap; gap: 0.65rem 1.25rem;
+    margin: 1.25rem 0 0.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .gate-plain-lead {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--text-main);
+    line-height: 1.45;
+    margin: 0 0 1.25rem;
+    max-width: 36rem;
+  }
+  .gate-locked-teaser {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px dashed rgba(245,200,66,0.18);
+  }
+  .gate-locked-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 0.5rem;
+  }
+  .gate-locked-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    line-height: 1.55;
+  }
+  .gate-locked-list li::before { content: '✦ '; color: var(--gold-dim); opacity: 0.7; }
+  .result-share-row { margin: 1rem 0 0.5rem; }
+  .btn-copy-summary {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: transparent;
+    border: 1px solid rgba(245,200,66,0.28);
+    color: var(--gold-dim);
+    border-radius: 6px;
+    padding: 0.5rem 0.85rem;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-copy-summary:hover { border-color: var(--gold); color: var(--gold); }
+
   /* ─── v6.0 — RESULT: plain-language archetype hero + technical sub ── */
   .result-archetype-plain {
     font-family: 'Playfair Display', serif;
@@ -2118,7 +2174,7 @@
     <div class="btn-row">
       <button class="btn btn-gold" onclick="startChat()">Begin → 🐦</button>
     </div>
-    <p class="intro-note" id="intro-timing-note">Full path: about 25–35 minutes (<strong>27</strong> questions, then Life Canvas). Shorter path: ~12 focused questions. Honesty beats speed.</p>
+    <p class="intro-note" id="intro-timing-note">Full path: about 25–35 minutes (<strong>27</strong> questions, then a short life-conditions check-in). Shorter path: ~12 focused questions. Honesty beats speed.</p>
   </div>
 </div>
 
@@ -2185,7 +2241,7 @@
     <p>I'm reading you clearly enough that we could stop here for a solid Nest — or keep going for the deepest cut. No wrong answer. Some people love closure; some love thoroughness.</p>
     <div class="btn-row" style="flex-wrap:wrap;">
       <button type="button" class="btn btn-gold" onclick="confirmEarlyExit(false)">Keep going — I want the deep version</button>
-      <button type="button" class="btn btn-outline" onclick="confirmEarlyExit(true)">Jump to Life Canvas →</button>
+      <button type="button" class="btn btn-outline" onclick="confirmEarlyExit(true)">Jump to conditions check-in →</button>
     </div>
   </div>
 </div>
@@ -2230,7 +2286,7 @@
     <h2>The season<br><em>you're in.</em></h2>
 
     <div class="canvas-intro">
-      <p>Your personality tells us <em>who you are.</em> The Life Canvas tells us <em>the conditions you're operating in right now.</em> Both matter — and together they tell a much more honest story.</p>
+      <p>Your personality tells us <em>who you are.</em> The conditions check-in tells us <em>what you're operating under right now.</em> Both matter — and together they tell a much more honest story.</p>
       <p style="margin-top:0.75rem;">Five areas. Five sliders. No right answers. This is just for you.</p>
     </div>
 
@@ -2343,10 +2399,10 @@
 
     <!-- Main preview content -->
     <div id="preview-content" style="display:none;">
-      <p class="eyebrow">before I commit · a quick check</p>
-      <h2>Does this<br><em>land?</em></h2>
+      <p class="eyebrow">before your full read · optional</p>
+      <h2>Quick check<br><em>before we finish.</em></h2>
       <p class="preview-instruction">
-        Here's my first-pass read of you. <strong>Tell me where I'm warm, off, or only half-right</strong> — and I'll factor that into your full Nest. The corrections get equal weight to anything you typed.
+        Here's our first-pass read. <strong>If something's clearly off, say so below</strong> — we'll factor it in. If it's close enough, just continue. No need to perfect this.
       </p>
 
       <div class="preview-dual" id="preview-dual"></div>
@@ -2363,8 +2419,8 @@
       </div>
 
       <div class="preview-cta-row">
-        <button class="btn btn-gold" onclick="submitPreviewToFinal()">Read me my full Nest →</button>
-        <button class="btn btn-outline" onclick="skipPreviewToFinal()">Skip — just give me the Nest</button>
+        <button class="btn btn-gold" onclick="submitPreviewToFinal()">Looks right — finish my read →</button>
+        <button class="btn btn-outline" onclick="skipPreviewToFinal()">Skip check — finish my read</button>
         <span class="preview-cta-meta" id="preview-cta-meta">0 marked</span>
       </div>
     </div>
@@ -2378,10 +2434,19 @@
 ══════════════════════════════════════ -->
 <div class="screen" id="screen-landing">
   <div class="inner" style="text-align:center;padding-top:6rem;">
-    <p class="eyebrow" style="justify-content:center;">almost there</p>
-    <h2>Your story is<br><em>being read.</em></h2>
-    <p style="max-width:420px;margin:1.5rem auto;">Give it up to a minute — the AI is working through everything you wrote and building something specific to you.</p>
-    <p style="font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.12em;color:var(--gold-dim);margin-top:2rem;text-transform:uppercase;">Saving your read: <span id="nest-id" style="color:var(--gold);">generating…</span></p>
+    <div id="landing-loading">
+      <p class="eyebrow" style="justify-content:center;">almost there</p>
+      <h2>Your story is<br><em>being read.</em></h2>
+      <p style="max-width:420px;margin:1.5rem auto;">Give it up to a minute — the AI is working through everything you wrote and building something specific to you.</p>
+      <p style="font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.12em;color:var(--gold-dim);margin-top:2rem;text-transform:uppercase;">Saving your read: <span id="nest-id" style="color:var(--gold);">generating…</span></p>
+    </div>
+    <div id="landing-error" class="preview-error" style="display:none;">
+      <p>We couldn't finish reading your story right now. Your answers are saved — nothing was lost.</p>
+      <p style="color:var(--text-muted);font-size:0.9rem;margin-top:0.75rem;">This is usually temporary. Try again in a moment.</p>
+      <div class="btn-row" style="justify-content:center;">
+        <button class="btn btn-gold" type="button" onclick="retryAnalysis()">Try again →</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -2392,7 +2457,8 @@
 <div class="screen" id="screen-snapshot">
   <div class="inner">
     <p class="eyebrow">your inner compass is ready</p>
-    <h2>Here's a taste.<br><em>One step to your full read.</em></h2>
+    <h2>Here's what we found.<br><em>Email to open the rest.</em></h2>
+    <p class="gate-plain-lead" id="gate-plain-lead"></p>
 
     <div class="gate-hook" id="gate-hook">
       <div class="snap-badge">
@@ -2406,6 +2472,22 @@
           <p style="color:var(--text-muted);font-style:italic;">Your read is loading…</p>
         </div>
       </div>
+    </div>
+
+    <div class="gate-locked-teaser" id="gate-locked-teaser">
+      <p class="gate-locked-label">In your full saved read</p>
+      <ul class="gate-locked-list" id="gate-locked-list">
+        <li>Complete personality read + life conditions scores</li>
+        <li>Where you're stuck and what to remember</li>
+        <li>A clear next step — talk, Solo, or light touch</li>
+        <li>A private link to return anytime</li>
+      </ul>
+    </div>
+
+    <div class="gate-trust" aria-label="Privacy and cost">
+      <span>Confidential</span>
+      <span>Free — no card</span>
+      <span>Your answers stay in your Nest only</span>
     </div>
 
     <div class="email-gate" id="email-gate">
@@ -2499,7 +2581,7 @@
         <p id="result-archetype-plain-desc" class="result-archetype-plain-desc" style="display:none;"></p>
       </div>
       <div class="result-gap-callout" id="result-gap-callout" style="display:none;">
-        <p class="result-gap-kicker">The bend between natural wiring and right now</p>
+        <p class="result-gap-kicker">Natural wiring vs. how you're showing up now</p>
         <p class="result-gap-body" id="result-gap-body"></p>
       </div>
       <div class="result-hero-snapshot" id="result-hero-snapshot"></div>
@@ -2512,22 +2594,26 @@
         <span class="confidence-summary-note" id="result-confidence-note"></span>
       </div>
 
+      <div class="nest-next-card" id="nest-next-card" style="display:none;">
+        <p class="nest-next-tier" id="nest-next-tier"></p>
+        <h3 id="nest-next-headline"></h3>
+        <p class="nest-next-body" id="nest-next-body"></p>
+        <div class="nest-next-actions" id="nest-next-actions"></div>
+      </div>
+
+      <div class="result-share-row">
+        <button type="button" class="btn-copy-summary" id="btn-copy-summary" onclick="copyReadSummary()">Copy summary to share</button>
+      </div>
+
       <div class="strain-bend-wrap" id="strain-bend-wrap">
-        <p class="strain-bend-kicker">How far you're bent out of shape</p>
-        <p style="font-size:0.82rem;color:var(--text-muted);margin:0 0 0.75rem;line-height:1.45;">Not letters — just strain. Higher bar ≈ more tension between how you're moving and what actually fits you.</p>
+        <p class="strain-bend-kicker">How much strain you're carrying</p>
+        <p style="font-size:0.82rem;color:var(--text-muted);margin:0 0 0.75rem;line-height:1.45;">Not type labels — just tension between how you're moving and what actually fits you.</p>
         <div class="strain-bend-labels">
           <div>Natural wiring<br><strong id="strain-bend-natural">—</strong></div>
           <div style="text-align:right;">Showing up now<br><strong id="strain-bend-now">—</strong></div>
         </div>
         <div class="strain-bend-track"><div class="strain-bend-fill" id="strain-bend-fill" style="width:22%"></div></div>
         <p class="strain-bend-caption" id="strain-bend-caption"></p>
-      </div>
-
-      <div class="nest-next-card" id="nest-next-card" style="display:none;">
-        <p class="nest-next-tier" id="nest-next-tier"></p>
-        <h3 id="nest-next-headline"></h3>
-        <p class="nest-next-body" id="nest-next-body"></p>
-        <div class="nest-next-actions" id="nest-next-actions"></div>
       </div>
 
       <div class="saturday-opt" id="saturday-opt-box">
@@ -2731,7 +2817,7 @@
         <!-- SAVED READ LINK -->
         <div class="sidebar-card">
           <p class="sidebar-card-eyebrow">your link</p>
-          <p class="sidebar-card-body" style="margin-bottom:0.75rem;">Bookmark this URL or use the link we emailed you. Your read and Life Canvas history stay here.</p>
+          <p class="sidebar-card-body" style="margin-bottom:0.75rem;">Bookmark this URL or use the link we emailed you. Your read and score history stay here.</p>
           <p class="nest-id" id="result-nest-id" style="font-size:0.72rem;margin-bottom:1rem;word-break:break-all;"></p>
           <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
             <button class="btn btn-outline" onclick="copyNestLink()" style="flex:1;justify-content:center;">Copy link</button>
@@ -2779,7 +2865,7 @@
 // ═══════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════
-const DEEP_PROFILE_BUILD = 'v7.0.9-20260528-single-email-gate';
+const DEEP_PROFILE_BUILD = 'v7.1.0-20260528-phase2-conversion';
 /** Default: email unlock for ads/lead gen. Add ?paywall=1 to URL to restore pay-what-you-want flow. */
 const INNER_COMPASS_PAYWALL = (function(){
   try{ return new URLSearchParams(window.location.search).get('paywall') === '1'; }catch(_){ return false; }
@@ -3379,6 +3465,11 @@ function skipPreviewToFinal(){
 // AI ANALYSIS
 // ═══════════════════════════════════════
 async function runAnalysis(){
+  const landingLoading = document.getElementById('landing-loading');
+  const landingError = document.getElementById('landing-error');
+  if(landingLoading) landingLoading.style.display = 'block';
+  if(landingError) landingError.style.display = 'none';
+
   const responses=collectResponses();
   nestId=generateNestId();
   document.getElementById('nest-id').textContent=nestId;
@@ -3417,8 +3508,12 @@ async function runAnalysis(){
     if(launchToken){ _postCourseLink(nestId).catch(err => console.warn('Course link unhandled:', err)); }
     _linkToNestIfLoggedIn(nestId).catch(err => console.warn('Nest link unhandled:', err));
   }catch(e){
-    console.error('Analysis error — using fallback:', e.message);
-    profileData=getFallbackProfile();
+    console.error('Analysis error:', e.message);
+    profileData = null;
+    document.getElementById('loadingOverlay').classList.remove('active');
+    if(landingLoading) landingLoading.style.display = 'none';
+    if(landingError) landingError.style.display = 'block';
+    return;
   }
   document.getElementById('loadingOverlay').classList.remove('active');
 
@@ -3434,11 +3529,26 @@ async function runAnalysis(){
   goTo('screen-snapshot');
 }
 
+function retryAnalysis(){
+  runAnalysis();
+}
+
 // ═══════════════════════════════════════
 // UNLOCK GATE — hook preview + single email
 // ═══════════════════════════════════════
 function populateGateHook(profile){
   if(!profile) return;
+  const leadEl = document.getElementById('gate-plain-lead');
+  if(leadEl){
+    const lead = (profile.archetypePlainDescription || profile.likelyCoreArchetypePlainDescription || '').trim();
+    if(lead){
+      leadEl.textContent = lead;
+      leadEl.style.display = 'block';
+    }else{
+      leadEl.style.display = 'none';
+      leadEl.textContent = '';
+    }
+  }
   const row = document.getElementById('snap-types-row');
   const nowLine = [profile.mbti, profile.enneagram].filter(Boolean).join(' · ');
   const baseLine = [profile.likelyCoreMbti, profile.likelyCoreEnneagram].filter(Boolean).join(' · ');
@@ -3481,8 +3591,15 @@ function populateGateHook(profile){
   }
   const prev=document.getElementById('gate-hook-preview');
   if(prev && profile.whoYouAre){
-    const paras=profile.whoYouAre.split(/\n\n/).slice(0,1);
-    prev.innerHTML=paras.map(p=>`<p>${p}</p>`).join('');
+    const paras=profile.whoYouAre.split(/\n\n/).filter(Boolean).slice(0,2);
+    let html = paras.map(p=>`<p>${p}</p>`).join('');
+    if(profile.stuckPlaces){
+      const stuckBit = profile.stuckPlaces.split(/\n\n/).filter(Boolean)[0];
+      if(stuckBit){
+        html += `<p class="gate-stuck-hint" style="margin-top:0.85rem;font-size:0.88rem;color:var(--gold-dim);font-style:italic;">${stuckBit}</p>`;
+      }
+    }
+    prev.innerHTML = html;
   }
 }
 
@@ -4333,24 +4450,33 @@ function renderResults(profile){
   renderCanvasHistory();
 
   renderStrainBend(profile);
-  var SOLO_NEST_URL = 'https://lilbird.life/solo/';
   var nxc = document.getElementById('nest-next-card');
   if(nxc){
     nxc.style.display = 'block';
     var ns = profile.nestNextSteps || {};
     var tierEl = document.getElementById('nest-next-tier');
-    if(tierEl) tierEl.textContent = (ns.tier === 'anchor' ? 'Next beat · deeper support' : ns.tier === 'bridge' ? 'Next beat · bridge' : 'Next beat · light touch');
-    document.getElementById('nest-next-headline').textContent = ns.headline || 'Keep walking with Lil\' Bird';
-    document.getElementById('nest-next-body').textContent = ns.body || 'The Solo experience is in beta — same world as this Nest, with more tools and pace when you\'re ready.';
+    if(tierEl) tierEl.textContent = (ns.tier === 'anchor' ? 'Your next move · talk first' : ns.tier === 'bridge' ? 'Your next move · bridge the gap' : 'Your next move · light touch');
+    document.getElementById('nest-next-headline').textContent = ns.headline || 'What to do with this read';
+    document.getElementById('nest-next-body').textContent = ns.body || 'A free discovery call is the easiest way to talk through what landed — no pitch, just honesty about fit and next steps.';
     var act = document.getElementById('nest-next-actions');
     act.innerHTML = '';
-    var soloA = document.createElement('a');
-    soloA.className = 'primary';
-    soloA.href = SOLO_NEST_URL;
-    soloA.target = '_blank';
-    soloA.rel = 'noopener';
-    soloA.textContent = 'Solo course (beta) →';
-    act.appendChild(soloA);
+    function appendNestCta(cta, isPrimary){
+      if(!cta) return;
+      var href = cta.url || cta.href;
+      if(!href || !cta.label) return;
+      var a = document.createElement('a');
+      a.className = isPrimary ? 'primary' : 'secondary';
+      a.href = href;
+      if(/^https?:/i.test(href)){ a.target = '_blank'; a.rel = 'noopener'; }
+      a.textContent = cta.label;
+      act.appendChild(a);
+    }
+    appendNestCta(ns.primaryCta, true);
+    appendNestCta(ns.secondaryCta, false);
+    if(!act.children.length){
+      appendNestCta({ label: 'Free discovery call →', url: 'https://calendly.com/lilbirdlifecoaching/30min' }, true);
+      appendNestCta({ label: 'First Flight — from $149 →', url: 'https://calendly.com/lilbirdlifecoaching/first-flight-session' }, false);
+    }
   }
   bindSaturdayOptIn();
 
@@ -4367,6 +4493,35 @@ function setSection(id,content){
   const el=document.getElementById(id);
   if(!el||!content) return;
   el.innerHTML=`<p>${content.replace(/\n\n/g,'</p><p>')}</p>`;
+}
+
+function copyReadSummary(){
+  if(!profileData) return;
+  const p = profileData;
+  const lines = [
+    "My Inner Compass read — lil' bird",
+    '',
+    p.archetypePlain || p.archetype || '',
+    p.archetypePlainDescription || '',
+    '',
+    (p.whoYouAre || '').split(/\n\n/).filter(Boolean)[0] || '',
+    '',
+    p.nestNextSteps && p.nestNextSteps.headline ? ('Next: ' + p.nestNextSteps.headline) : '',
+    nestId ? ('https://lilbird.life/deep-profile.html?nest=' + nestId) : '',
+  ].filter(function(s){ return s && String(s).trim(); }).join('\n');
+  const btn = document.getElementById('btn-copy-summary');
+  function flashCopied(){
+    if(btn){ btn.textContent = 'Copied ✓'; setTimeout(function(){ btn.textContent = 'Copy summary to share'; }, 2200); }
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(lines).then(flashCopied).catch(function(){
+      window.prompt('Copy your summary:', lines);
+      flashCopied();
+    });
+  }else{
+    window.prompt('Copy your summary:', lines);
+    flashCopied();
+  }
 }
 
 // ═══════════════════════════════════════
@@ -4544,12 +4699,11 @@ function getFallbackProfile(){
     idealVersusPresent:'The life you want probably has more room — mentally, temporally, relationally — than the one you\'re gritting through.\n\nNaming that gap without shame is how the Nest stops being a label and starts being a compass.',
     partnerDynamicReady:true,
     nestNextSteps: {
-      headline: 'Your next move in the Lil\' Bird world',
-      body: 'You\'re carrying a real gap between how you\'re wired and how you\'re showing up. That\'s not failure — it\'s data. A structured next step can help you bridge it without burning out.',
-      primaryCta: { label: 'Explore 1:1 coaching', href: 'https://lilbird.life/coaching', kind: 'coaching' },
-      secondaryCta: { label: 'Solo course (beta)', href: 'https://lilbird.life/solo/', kind: 'solo' },
+      headline: 'Worth a real conversation',
+      body: 'There\'s a gap between how you\'re wired and how you\'re showing up — that\'s data, not failure. A free discovery call is the straightest way to talk it through: fit, cost, and one honest next step.',
+      primaryCta: { label: 'Free discovery call →', url: 'https://calendly.com/lilbirdlifecoaching/30min' },
+      secondaryCta: { label: 'First Flight — from $149 →', url: 'https://calendly.com/lilbirdlifecoaching/first-flight-session' },
       tier: 'bridge',
-      badge: 'Next chapter'
     },
   };
 }
@@ -4630,8 +4784,8 @@ function selectAssessmentPath(p){
   const note = document.getElementById('intro-timing-note');
   if(note){
     note.innerHTML = p === 'know'
-      ? 'Shorter path: <strong>12</strong> focused questions, then Life Canvas — same Nest journey, less repetition.'
-      : 'Full path: about 25–35 minutes — <strong>27</strong> questions, then Life Canvas. Honesty beats speed.';
+      ? 'Shorter path: <strong>12</strong> focused questions, then the conditions check-in — same journey, less repetition.'
+      : 'Full path: about 25–35 minutes — <strong>27</strong> questions, then the conditions check-in. Honesty beats speed.';
   }
 }
 
