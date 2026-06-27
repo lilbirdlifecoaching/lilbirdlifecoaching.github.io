@@ -632,20 +632,7 @@
   .no-speech .mic-btn { display: none; }
   .no-speech .mic-hint { display: none; }
 
-  /* PARTNER DYNAMIC */
-  .partner-section {
-    background: var(--dark-mid);
-    border: 1px solid rgba(245,200,66,0.12);
-    border-radius: 12px;
-    padding: 1.75rem 2rem;
-    margin: 2.5rem 0;
-  }
-  .partner-section h3 {
-    color: var(--text-main);
-    font-family: 'Playfair Display', serif;
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
-  }
+  /* PARTNER DYNAMIC — inputs (section chrome in share-hero block above) */
   .partner-section p { font-size: 0.9rem; margin-bottom: 1rem; }
   .partner-input { margin-bottom: 1rem; }
   .partner-label {
@@ -671,23 +658,6 @@
   .partner-input input:focus, .partner-input select:focus { outline: none; border-color: rgba(245,200,66,0.4); }
   .partner-input input::placeholder { color: rgba(240,234,216,0.3); }
   .partner-input select option { background: var(--dark-card); }
-  .partner-result {
-    background: var(--dark-card);
-    border: 1px solid var(--dark-border);
-    border-radius: 10px;
-    padding: 1.5rem;
-    margin-top: 1.5rem;
-    display: none;
-  }
-  .partner-result h4 {
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    font-size: 1.1rem;
-    color: var(--gold);
-    margin-bottom: 1rem;
-  }
-  .partner-result p { font-size: 0.92rem; color: var(--text-main); line-height: 1.7; margin-bottom: 0.85rem; }
-  .partner-result p:last-child { margin-bottom: 0; }
 
   /* EXTRA RESULT SECTIONS */
   .result-section p { color: var(--text-main); font-size: 1rem; line-height: 1.8; margin-bottom: 1rem; }
@@ -1152,21 +1122,256 @@
     line-height: 1.55;
   }
   .gate-locked-list li::before { content: '✦ '; color: var(--gold-dim); opacity: 0.7; }
-  .result-share-row { margin: 1rem 0 0.5rem; }
+  /* ─── Share hero + partner polish ───────────────────────── */
+  .share-hero-card {
+    position: relative;
+    margin: 1.5rem 0 1rem;
+    padding: 1.35rem 1.4rem 1.25rem;
+    border-radius: 16px;
+    background:
+      radial-gradient(ellipse 80% 60% at 10% 0%, rgba(245,200,66,0.14), transparent 55%),
+      radial-gradient(ellipse 70% 50% at 95% 100%, rgba(90,180,240,0.12), transparent 50%),
+      linear-gradient(145deg, rgba(30,32,38,0.95), rgba(18,19,24,0.98));
+    border: 1px solid rgba(245,200,66,0.22);
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+  .share-hero-card::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 17px;
+    padding: 1px;
+    background: linear-gradient(120deg, rgba(245,200,66,0.55), rgba(74,222,168,0.35), rgba(90,180,240,0.4), rgba(245,200,66,0.45));
+    background-size: 200% 200%;
+    animation: shareBorderShift 6s ease infinite;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0.75;
+  }
+  @keyframes shareBorderShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  .share-hero-kicker {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin: 0 0 0.35rem;
+    opacity: 0.9;
+  }
+  .share-hero-title {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.35rem;
+    color: var(--text-main);
+    margin: 0 0 0.4rem;
+    line-height: 1.2;
+  }
+  .share-hero-body {
+    font-size: 0.86rem;
+    color: var(--text-muted);
+    margin: 0 0 1rem;
+    line-height: 1.5;
+    max-width: 36rem;
+  }
+  .share-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    align-items: center;
+  }
+  .btn-share-glow {
+    position: relative;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 600;
+    box-shadow: 0 0 24px rgba(245,200,66,0.25);
+    animation: sharePulse 2.8s ease-in-out infinite;
+  }
+  @keyframes sharePulse {
+    0%, 100% { box-shadow: 0 0 18px rgba(245,200,66,0.2); }
+    50% { box-shadow: 0 0 32px rgba(245,200,66,0.42); }
+  }
   .btn-copy-summary {
     font-family: 'DM Mono', monospace;
     font-size: 0.62rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    background: transparent;
-    border: 1px solid rgba(245,200,66,0.28);
-    color: var(--gold-dim);
-    border-radius: 6px;
-    padding: 0.5rem 0.85rem;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: var(--text-muted);
+    border-radius: 8px;
+    padding: 0.55rem 0.9rem;
     cursor: pointer;
-    transition: border-color 0.2s, color 0.2s;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
   }
-  .btn-copy-summary:hover { border-color: var(--gold); color: var(--gold); }
+  .btn-copy-summary:hover { border-color: rgba(245,200,66,0.35); color: var(--gold-dim); background: rgba(245,200,66,0.06); }
+
+  .whats-next-panel {
+    margin: 2.5rem 0 1rem;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.02);
+    overflow: hidden;
+  }
+  .whats-next-panel > summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 1rem 1.25rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    user-select: none;
+    transition: color 0.2s, background 0.2s;
+  }
+  .whats-next-panel > summary::-webkit-details-marker { display: none; }
+  .whats-next-panel > summary::after {
+    content: '+';
+    font-size: 1.1rem;
+    color: var(--gold-dim);
+    transition: transform 0.25s;
+  }
+  .whats-next-panel[open] > summary { color: var(--gold-dim); background: rgba(245,200,66,0.04); }
+  .whats-next-panel[open] > summary::after { transform: rotate(45deg); }
+  .whats-next-inner { padding: 0 1.25rem 1.25rem; }
+
+  .read-accordion {
+    margin-bottom: 0.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.015);
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .read-accordion[open] { border-color: rgba(245,200,66,0.14); }
+  .read-accordion > summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 0.85rem 1rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    user-select: none;
+  }
+  .read-accordion > summary::-webkit-details-marker { display: none; }
+  .read-accordion > summary::after {
+    content: '↓';
+    font-size: 0.75rem;
+    opacity: 0.5;
+    transition: transform 0.25s;
+  }
+  .read-accordion[open] > summary::after { transform: rotate(180deg); }
+  .read-accordion--hero { border-color: rgba(245,200,66,0.2); background: linear-gradient(135deg, rgba(245,200,66,0.06), transparent); }
+  .read-accordion--hero > summary { color: var(--gold); font-size: 0.65rem; }
+  .read-accordion-body { padding: 0 1rem 1.1rem; }
+  .read-accordion-body p { color: var(--text-main); font-size: 1rem; line-height: 1.8; margin-bottom: 1rem; }
+
+  .partner-section {
+    position: relative;
+    background:
+      radial-gradient(ellipse 60% 80% at 0% 0%, rgba(201,74,173,0.12), transparent 55%),
+      radial-gradient(ellipse 50% 60% at 100% 100%, rgba(90,180,240,0.1), transparent 50%),
+      var(--dark-mid);
+    border: 1px solid rgba(201,74,173,0.22);
+    border-radius: 16px;
+    padding: 1.75rem 2rem;
+    margin: 2.5rem 0;
+    box-shadow: 0 10px 36px rgba(0,0,0,0.28);
+  }
+  .partner-section-icon {
+    font-size: 1.6rem;
+    margin-bottom: 0.35rem;
+    display: block;
+    filter: drop-shadow(0 0 12px rgba(201,74,173,0.4));
+  }
+  .partner-section h3 {
+    color: var(--text-main);
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(90deg, #f5c842, #e8a0d8, #5ab4f0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .partner-result {
+    background: rgba(10,11,14,0.55);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 1.25rem;
+    margin-top: 1.5rem;
+    display: none;
+  }
+  .partner-result h4 {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.25rem;
+    color: var(--gold);
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  .partner-block {
+    border-radius: 10px;
+    padding: 0.9rem 1rem;
+    margin-bottom: 0.75rem;
+    border-left: 3px solid;
+    background: rgba(255,255,255,0.03);
+  }
+  .partner-block:last-of-type { margin-bottom: 0; }
+  .partner-block--summary { border-color: #f5c842; background: rgba(245,200,66,0.06); }
+  .partner-block--them { border-color: #4adea8; background: rgba(74,222,168,0.05); }
+  .partner-block--you { border-color: #5ab4f0; background: rgba(90,180,240,0.05); }
+  .partner-block--watch { border-color: #e8734a; background: rgba(232,115,74,0.06); }
+  .partner-block--invite { border-color: #c94aad; background: rgba(201,74,173,0.06); }
+  .partner-block-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 0.45rem;
+    opacity: 0.9;
+  }
+  .partner-block p { font-size: 0.92rem; color: var(--text-main); line-height: 1.7; margin: 0; }
+  .partner-share-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(245,200,66,0.12);
+  }
+  .partner-share-hint {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin: 0 0 0.65rem;
+    line-height: 1.5;
+    width: 100%;
+  }
+  #partner-btn.partner-btn-ready {
+    background: linear-gradient(135deg, rgba(201,74,173,0.25), rgba(90,180,240,0.2));
+    border-color: rgba(201,74,173,0.45);
+    color: #f0d4f8;
+  }
 
   /* ─── v6.0 — RESULT: plain-language archetype hero + technical sub ── */
   .result-archetype-plain {
@@ -1797,7 +2002,19 @@
     padding: 0.15rem 1.25rem 0.45rem;
     max-width: 100vw;
   }
-  body.dp-in-chat .depth-meter-strip { display: flex; }
+  body.dp-in-chat .depth-meter-strip { display: flex; flex-wrap: wrap; }
+  .chat-progress-pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 0.2rem 0.55rem;
+    border-radius: 100px;
+    border: 1px solid rgba(245,200,66,0.18);
+    background: rgba(245,200,66,0.05);
+    white-space: nowrap;
+  }
   .depth-meter-eyebrow {
     font-family: 'DM Mono', monospace;
     font-size: 0.55rem;
@@ -1833,19 +2050,36 @@
     right: max(1rem, env(safe-area-inset-right));
     bottom: max(1rem, env(safe-area-inset-bottom));
     max-width: min(340px, calc(100vw - 2rem));
-    background: var(--dark-mid);
-    border: 1px solid rgba(157,191,138,0.35);
-    border-radius: 12px;
-    padding: 0.85rem 1rem 0.75rem;
+    background:
+      linear-gradient(145deg, rgba(22,28,24,0.98), rgba(18,19,24,0.98));
+    border: 1px solid rgba(157,191,138,0.45);
+    border-radius: 14px;
+    padding: 0.85rem 2.25rem 0.75rem 1rem;
     font-size: 0.88rem;
     line-height: 1.45;
     color: var(--text-main);
-    box-shadow: 0 8px 28px rgba(0,0,0,0.4);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.45), 0 0 24px rgba(157,191,138,0.12);
     z-index: 60;
     transform: translateX(120%);
     transition: transform 0.45s cubic-bezier(0.22,1,0.36,1);
   }
   .evidence-toast.is-show { transform: translateX(0); }
+  .evidence-toast-dismiss {
+    position: absolute;
+    top: 0.45rem;
+    right: 0.45rem;
+    width: 1.65rem;
+    height: 1.65rem;
+    border: none;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.06);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+  .evidence-toast-dismiss:hover { background: rgba(232,115,74,0.2); color: #f0a090; }
   .evidence-toast-actions { display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap; }
   .evidence-toast-actions button {
     font-family: 'DM Sans', sans-serif;
@@ -1917,11 +2151,99 @@
   }
   .peak-svg-wrap svg { width: 100%; height: auto; display: block; }
 
+  .slider-pulse-kicker {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin: 0 0 0.35rem;
+  }
+
+  .canvas-hero-card {
+    margin: 0 0 1.75rem;
+    padding: 1.25rem 1.35rem;
+    border-radius: 14px;
+    border: 1px solid rgba(90,180,240,0.22);
+    background:
+      radial-gradient(ellipse 70% 60% at 0% 0%, rgba(90,180,240,0.12), transparent 55%),
+      radial-gradient(ellipse 60% 50% at 100% 100%, rgba(74,222,168,0.08), transparent 50%),
+      rgba(255,255,255,0.02);
+  }
+  .canvas-hero-kicker {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #5ab4f0;
+    margin: 0 0 0.35rem;
+  }
+  .canvas-hero-score {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.5rem;
+    color: var(--text-main);
+    margin: 0 0 0.5rem;
+  }
+  .canvas-hero-dims {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0.65rem 0 0.75rem;
+  }
+  .canvas-hero-dim {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .canvas-hero-body {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  .insight-cards-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+    margin: 0 0 1.75rem;
+  }
+  .insight-card {
+    border-radius: 12px;
+    padding: 1rem 1.1rem;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.02);
+  }
+  .insight-card--gap { border-color: rgba(232,115,74,0.25); background: rgba(232,115,74,0.04); }
+  .insight-card--canvas { border-color: rgba(90,180,240,0.22); background: rgba(90,180,240,0.04); }
+  .insight-card--remember { border-color: rgba(245,200,66,0.2); background: rgba(245,200,66,0.04); }
+  .insight-card-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 0.45rem;
+    opacity: 0.85;
+  }
+  .insight-card p {
+    font-size: 0.86rem;
+    line-height: 1.55;
+    color: var(--text-main);
+    margin: 0;
+  }
+
   .strain-bend-wrap {
     margin: 1.5rem 0 2rem;
     padding: 1.25rem 1.35rem;
-    background: rgba(255,255,255,0.02);
-    border: 1px solid rgba(245,200,66,0.12);
+    background:
+      radial-gradient(ellipse 70% 80% at 0% 50%, rgba(232,115,74,0.1), transparent 55%),
+      radial-gradient(ellipse 60% 70% at 100% 50%, rgba(157,191,138,0.08), transparent 50%),
+      rgba(255,255,255,0.02);
+    border: 1px solid rgba(232,115,74,0.22);
     border-radius: 14px;
     max-width: 520px;
   }
@@ -1930,13 +2252,13 @@
     font-size: 0.58rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--gold-dim);
+    color: var(--ember);
     margin: 0 0 0.5rem;
   }
   .strain-bend-labels { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: 0.65rem; font-size: 0.82rem; color: var(--text-muted); }
   .strain-bend-labels strong { display: block; color: var(--text-main); font-weight: 500; margin-top: 0.2rem; font-family: 'Playfair Display', serif; font-style: italic; }
   .strain-bend-track { height: 8px; border-radius: 6px; background: rgba(255,255,255,0.06); overflow: hidden; margin-bottom: 0.75rem; }
-  .strain-bend-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, rgba(157,191,138,0.5), var(--ember)); transition: width 0.8s cubic-bezier(0.22,1,0.36,1); }
+  .strain-bend-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, #4adea8, #f5c842, #e8734a); transition: width 0.8s cubic-bezier(0.22,1,0.36,1); box-shadow: 0 0 12px rgba(232,115,74,0.35); }
   .strain-bend-caption { font-size: 0.88rem; line-height: 1.55; color: var(--text-muted); margin: 0; }
   .nest-next-card {
     margin: 1.5rem 0 2rem;
@@ -2112,6 +2434,7 @@
 
 <div class="progress-bar-wrap">
   <div class="depth-meter-strip" id="depth-meter-strip" aria-live="polite">
+    <span class="chat-progress-pill" id="chat-progress-pill">Opening · 1 of 27</span>
     <span class="depth-meter-eyebrow">Depth</span>
     <span class="depth-meter-label" id="depth-meter-label">Surface</span>
     <div class="depth-meter-track"><div class="depth-meter-fill" id="depth-meter-fill" style="width:8%"></div></div>
@@ -2192,6 +2515,7 @@
   </div>
 
   <div class="evidence-toast" id="evidence-toast" role="status">
+    <button type="button" class="evidence-toast-dismiss" id="evidence-toast-dismiss" aria-label="Dismiss" onclick="dismissEvidenceToast()">✕</button>
     <span class="evidence-toast-kicker">Picking up</span>
     <span id="evidence-toast-body"></span>
     <div class="evidence-toast-actions" id="evidence-toast-actions"></div>
@@ -2252,6 +2576,22 @@
     <p id="pair-instruction">Which line lands closest? Gut first — no wrong answer.</p>
     <div class="pair-these-grid" id="pair-these-rows"></div>
     <button type="button" class="btn btn-gold" style="width:100%;justify-content:center;" id="pair-done-btn" onclick="closePairThese()" disabled>Confirm →</button>
+  </div>
+</div>
+
+<div class="dp-modal-overlay" id="modal-slider-pulse" role="dialog" aria-modal="true" aria-labelledby="slider-pulse-title">
+  <div class="dp-modal" style="max-width:440px;">
+    <p class="slider-pulse-kicker" id="slider-pulse-kicker">Quick pulse</p>
+    <h3 id="slider-pulse-title">One slider — gut first</h3>
+    <p id="slider-pulse-hint" style="font-size:0.88rem;color:var(--text-muted);margin-bottom:1rem;line-height:1.5;">No right answer. This sharpens your read — takes five seconds.</p>
+    <div class="canvas-slider-wrap" style="margin-bottom:0.5rem;">
+      <div class="canvas-slider-labels"><span id="slider-pulse-left">Left</span><span id="slider-pulse-right">Right</span></div>
+      <input type="range" class="canvas-slider" id="slider-pulse-range" min="0" max="100" value="50" oninput="updateSliderPulseDisplay()">
+      <div class="canvas-score-display" id="slider-pulse-score">50</div>
+    </div>
+    <div class="btn-row" style="margin-top:1rem;">
+      <button type="button" class="btn btn-gold" onclick="saveSliderPulse()">Save pulse →</button>
+    </div>
   </div>
 </div>
 
@@ -2594,15 +2934,14 @@
         <span class="confidence-summary-note" id="result-confidence-note"></span>
       </div>
 
-      <div class="nest-next-card" id="nest-next-card" style="display:none;">
-        <p class="nest-next-tier" id="nest-next-tier"></p>
-        <h3 id="nest-next-headline"></h3>
-        <p class="nest-next-body" id="nest-next-body"></p>
-        <div class="nest-next-actions" id="nest-next-actions"></div>
-      </div>
-
-      <div class="result-share-row">
-        <button type="button" class="btn-copy-summary" id="btn-copy-summary" onclick="copyReadSummary()">Copy summary to share</button>
+      <div class="share-hero-card" id="share-hero-card">
+        <p class="share-hero-kicker">pass it on</p>
+        <h2 class="share-hero-title">Your read is worth sharing</h2>
+        <p class="share-hero-body">Send the headline to a friend — or share your saved link. Your full private read stays yours unless you choose to send the link.</p>
+        <div class="share-hero-actions">
+          <button type="button" class="btn btn-gold btn-share-glow" id="btn-share-read" onclick="shareMyRead()">Share my read</button>
+          <button type="button" class="btn-copy-summary" id="btn-copy-summary" onclick="copyReadSummary()">Copy text</button>
+        </div>
       </div>
 
       <div class="strain-bend-wrap" id="strain-bend-wrap">
@@ -2615,15 +2954,6 @@
         <div class="strain-bend-track"><div class="strain-bend-fill" id="strain-bend-fill" style="width:22%"></div></div>
         <p class="strain-bend-caption" id="strain-bend-caption"></p>
       </div>
-
-      <div class="saturday-opt" id="saturday-opt-box">
-        <label><input type="checkbox" id="saturday-opt-in"> <span><strong>Saturday pulse</strong> — one short email with a link back to this read for a 2-minute check-in. Low noise. Turn it off anytime.</span></label>
-        <p class="saturday-opt-hint" id="saturday-opt-hint">Saves as soon as you check or uncheck — uses the email you used to unlock this read.</p>
-        <div class="saturday-email-capture" id="saturday-email-capture">
-          <input type="email" id="saturday-email-inline" placeholder="your@email.com" autocomplete="email" aria-label="Email for Saturday pulse">
-          <button type="button" id="saturday-email-save">Save &amp; turn on Saturday pulse</button>
-        </div>
-      </div>
     </div>
 
     <!-- DASHBOARD LAYOUT — profile + sidebar -->
@@ -2632,69 +2962,91 @@
       <!-- MAIN PROFILE COLUMN -->
       <div class="dashboard-main">
 
+        <div class="insight-cards-row" id="insight-cards-row" style="display:none;">
+          <div class="insight-card insight-card--gap" id="insight-card-gap">
+            <p class="insight-card-label" style="color:var(--ember);">Wiring gap</p>
+            <p id="insight-gap-text"></p>
+          </div>
+          <div class="insight-card insight-card--canvas" id="insight-card-canvas">
+            <p class="insight-card-label" style="color:#5ab4f0;">Life season</p>
+            <p id="insight-canvas-text"></p>
+          </div>
+          <div class="insight-card insight-card--remember" id="insight-card-remember">
+            <p class="insight-card-label" style="color:var(--gold-dim);">Remember</p>
+            <p id="insight-remember-text"></p>
+          </div>
+        </div>
+
+        <div class="canvas-hero-card" id="canvas-hero-main" style="display:none;">
+          <p class="canvas-hero-kicker">Your life canvas · this season</p>
+          <p class="canvas-hero-score" id="canvas-hero-score">—</p>
+          <div class="canvas-hero-dims" id="canvas-hero-dims"></div>
+          <p class="canvas-hero-body" id="canvas-hero-body"></p>
+        </div>
+
         <div class="nest-box result-duality" id="result-duality-wrap" style="display:none;">
           <p class="result-section-label">where you are · where you're from</p>
           <div id="result-duality-body"></div>
         </div>
 
-        <div class="result-section" id="result-showing-wrap" style="display:none;">
-          <p class="result-section-label">how you're showing up (now)</p>
-          <div id="result-showing-up"></div>
-        </div>
+        <details class="read-accordion read-accordion--hero" id="result-showing-wrap" open>
+          <summary>how you're showing up (now)</summary>
+          <div class="read-accordion-body"><div id="result-showing-up"></div></div>
+        </details>
 
-        <div class="result-section">
-          <p class="result-section-label">who you are</p>
-          <div id="result-who"></div>
-        </div>
+        <details class="read-accordion read-accordion--hero" open>
+          <summary>who you are</summary>
+          <div class="read-accordion-body"><div id="result-who"></div></div>
+        </details>
 
-        <div class="result-section">
-          <p class="result-section-label">your likely baseline wiring</p>
-          <div id="result-wired"></div>
-        </div>
+        <details class="read-accordion">
+          <summary>your likely baseline wiring</summary>
+          <div class="read-accordion-body"><div id="result-wired"></div></div>
+        </details>
 
-        <div class="result-section">
-          <p class="result-section-label" id="result-wing-title">your enneagram wings</p>
-          <div id="result-wing"></div>
-        </div>
+        <details class="read-accordion">
+          <summary id="result-wing-title">your enneagram wings</summary>
+          <div class="read-accordion-body"><div id="result-wing"></div></div>
+        </details>
 
-        <div class="result-section" id="result-subtype-section">
-          <p class="result-section-label">your subtype</p>
-          <div id="result-subtype"></div>
-        </div>
+        <details class="read-accordion" id="result-subtype-section">
+          <summary>your subtype</summary>
+          <div class="read-accordion-body"><div id="result-subtype"></div></div>
+        </details>
 
-        <div class="result-section">
-          <p class="result-section-label">your gift — and its shadow</p>
-          <div id="result-wound"></div>
-        </div>
+        <details class="read-accordion">
+          <summary>your gift — and its shadow</summary>
+          <div class="read-accordion-body"><div id="result-wound"></div></div>
+        </details>
 
-        <div class="result-section">
-          <p class="result-section-label">your attachment style</p>
-          <div id="result-attachment"></div>
-        </div>
+        <details class="read-accordion">
+          <summary>your attachment style</summary>
+          <div class="read-accordion-body"><div id="result-attachment"></div></div>
+        </details>
 
-        <div class="result-section" id="result-health-section">
-          <p class="result-section-label">right now</p>
-          <div id="result-health"></div>
-        </div>
+        <details class="read-accordion" id="result-health-section">
+          <summary>right now</summary>
+          <div class="read-accordion-body"><div id="result-health"></div></div>
+        </details>
 
-        <div class="result-section" id="result-ideal-wrap" style="display:none;">
-          <p class="result-section-label">ideal life · present reality</p>
-          <div id="result-ideal-present"></div>
-        </div>
+        <details class="read-accordion" id="result-ideal-wrap">
+          <summary>ideal life · present reality</summary>
+          <div class="read-accordion-body"><div id="result-ideal-present"></div></div>
+        </details>
 
         <div id="result-quote">
           <blockquote>"Clarity changes everything."</blockquote>
         </div>
 
-        <div class="result-section">
-          <p class="result-section-label">things to remember</p>
-          <div id="result-remember"></div>
-        </div>
+        <details class="read-accordion">
+          <summary>things to remember</summary>
+          <div class="read-accordion-body"><div id="result-remember"></div></div>
+        </details>
 
-        <div class="result-section">
-          <p class="result-section-label">where you get stuck</p>
-          <div id="result-stuck"></div>
-        </div>
+        <details class="read-accordion">
+          <summary>where you get stuck</summary>
+          <div class="read-accordion-body"><div id="result-stuck"></div></div>
+        </details>
 
         <div class="role-reflection" id="result-role" style="display:none;">
           <p class="role-reflection-label">your work life — a gentle reflection</p>
@@ -2703,8 +3055,9 @@
 
         <!-- Partner dynamic -->
         <div class="partner-section" id="partner-section" style="display:none;">
-          <h3>How do you work with someone you know? 🪺</h3>
-          <p>Put in what you know about someone in your life — a partner, colleague, friend — and we'll read the dynamic.</p>
+          <span class="partner-section-icon" aria-hidden="true">✨</span>
+          <h3>How do you work with someone you know?</h3>
+          <p>Put in what you know about someone in your life — a partner, colleague, friend — and we'll read the dynamic. Then share it with them if it lands.</p>
           <div class="partner-input">
             <label class="partner-label">Who is this person to you?</label>
             <select id="partner-relationship">
@@ -2723,9 +3076,46 @@
             <label class="partner-label">Describe them in a few words</label>
             <input type="text" id="partner-description" placeholder="e.g. very calm, hates conflict, always thinking about others...">
           </div>
-          <button class="btn btn-outline" id="partner-btn" onclick="generatePartnerDynamic()" style="margin-top:0.5rem;">See the dynamic →</button>
+          <button class="btn btn-outline partner-btn-ready" id="partner-btn" onclick="generatePartnerDynamic()" style="margin-top:0.5rem;">See the dynamic →</button>
           <div class="partner-result" id="partner-result"></div>
         </div>
+
+        <details class="whats-next-panel" id="whats-next-panel">
+          <summary>What's next — coaching, pulse &amp; your link</summary>
+          <div class="whats-next-inner">
+            <div class="nest-next-card" id="nest-next-card" style="display:none;">
+              <p class="nest-next-tier" id="nest-next-tier"></p>
+              <h3 id="nest-next-headline"></h3>
+              <p class="nest-next-body" id="nest-next-body"></p>
+              <div class="nest-next-actions" id="nest-next-actions"></div>
+            </div>
+
+            <div class="saturday-opt" id="saturday-opt-box" style="margin-top:1rem;">
+              <label><input type="checkbox" id="saturday-opt-in"> <span><strong>Saturday pulse</strong> — one short email with a link back to this read for a 2-minute check-in. Low noise. Turn it off anytime.</span></label>
+              <p class="saturday-opt-hint" id="saturday-opt-hint">Saves as soon as you check or uncheck — uses the email you used to unlock this read.</p>
+              <div class="saturday-email-capture" id="saturday-email-capture">
+                <input type="email" id="saturday-email-inline" placeholder="your@email.com" autocomplete="email" aria-label="Email for Saturday pulse">
+                <button type="button" id="saturday-email-save">Save &amp; turn on Saturday pulse</button>
+              </div>
+            </div>
+
+            <div class="sidebar-card sidebar-card-ember" style="margin-top:1rem;">
+              <p class="sidebar-card-eyebrow" style="color:var(--ember);">ready to go deeper?</p>
+              <h3 class="sidebar-card-title">Book a First Flight</h3>
+              <p class="sidebar-card-body">A one-to-one session with Luke that takes everything in your read and turns it into a real conversation — and a real next step.</p>
+              <p class="sidebar-code">Use code <strong>IMREADY</strong> for a fixed price of $149</p>
+              <a href="https://calendly.com/lilbirdlifecoaching/first-flight-session" target="_blank" class="btn btn-gold" style="width:100%;justify-content:center;margin-top:1rem;">Book now →</a>
+            </div>
+
+            <div class="sidebar-card" style="margin-top:0.75rem;">
+              <p class="sidebar-card-eyebrow">self-guided course</p>
+              <h3 class="sidebar-card-title">Life Change Sessions: Solo</h3>
+              <p class="sidebar-card-body">Six sessions. Your pace. The same depth as working with a coach — in a format you can return to whenever you're ready. <strong>Now live</strong> (beta).</p>
+              <p class="sidebar-code">Use code <strong>SOLO50</strong> for 50% off</p>
+              <a href="https://lilbird.life/solo/" target="_blank" rel="noopener" class="btn btn-outline" style="width:100%;justify-content:center;margin-top:1rem;">Open Solo →</a>
+            </div>
+          </div>
+        </details>
 
       </div>
 
@@ -2796,23 +3186,7 @@
           </div>
         </div>
 
-        <!-- COACHING CTA -->
-        <div class="sidebar-card sidebar-card-ember">
-          <p class="sidebar-card-eyebrow" style="color:var(--ember);">ready to go deeper?</p>
-          <h3 class="sidebar-card-title">Book a First Flight</h3>
-          <p class="sidebar-card-body">A one-to-one session with Luke that takes everything in your read and turns it into a real conversation — and a real next step.</p>
-          <p class="sidebar-code">Use code <strong>IMREADY</strong> for a fixed price of $149</p>
-          <a href="https://calendly.com/lilbirdlifecoaching/first-flight-session" target="_blank" class="btn btn-gold" style="width:100%;justify-content:center;margin-top:1rem;">Book now →</a>
-        </div>
-
-        <!-- SOLO COURSE -->
-        <div class="sidebar-card">
-          <p class="sidebar-card-eyebrow">self-guided course</p>
-          <h3 class="sidebar-card-title">Life Change Sessions: Solo</h3>
-          <p class="sidebar-card-body">Six sessions. Your pace. The same depth as working with a coach — in a format you can return to whenever you're ready. <strong>Now live</strong> (beta).</p>
-          <p class="sidebar-code">Use code <strong>SOLO50</strong> for 50% off</p>
-          <a href="https://lilbird.life/solo/" target="_blank" rel="noopener" class="btn btn-outline" style="width:100%;justify-content:center;margin-top:1rem;">Open Solo →</a>
-        </div>
+        <!-- COACHING + SOLO moved to What's next panel (read-first) -->
 
         <!-- SAVED READ LINK -->
         <div class="sidebar-card">
@@ -2865,7 +3239,7 @@
 // ═══════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════
-const DEEP_PROFILE_BUILD = 'v7.1.0-20260528-phase2-conversion';
+const DEEP_PROFILE_BUILD = 'v7.3.0-20260528-phase-bc';
 /** Default: email unlock for ads/lead gen. Add ?paywall=1 to URL to restore pay-what-you-want flow. */
 const INNER_COMPASS_PAYWALL = (function(){
   try{ return new URLSearchParams(window.location.search).get('paywall') === '1'; }catch(_){ return false; }
@@ -4371,39 +4745,33 @@ function renderResults(profile){
   if(dualityWrap) dualityWrap.style.display='none';
 
   const showWrap=document.getElementById('result-showing-wrap');
-  if(showWrap){
-    if(profile.howYoureShowingUp&&profile.howYoureShowingUp.trim()){
-      showWrap.style.display='block';
-      setSection('result-showing-up', profile.howYoureShowingUp);
-    }else showWrap.style.display='none';
+  if(profile.howYoureShowingUp&&profile.howYoureShowingUp.trim()){
+    syncReadAccordion('result-showing-up', profile.howYoureShowingUp, true);
+  }else if(showWrap){
+    showWrap.style.display='none';
   }
 
   const idealWrap=document.getElementById('result-ideal-wrap');
-  if(idealWrap){
-    if(profile.idealVersusPresent&&profile.idealVersusPresent.trim()){
-      idealWrap.style.display='block';
-      setSection('result-ideal-present', profile.idealVersusPresent);
-    }else idealWrap.style.display='none';
+  if(profile.idealVersusPresent&&profile.idealVersusPresent.trim()){
+    syncReadAccordion('result-ideal-present', profile.idealVersusPresent, false);
+  }else if(idealWrap){
+    idealWrap.style.display='none';
   }
 
-  setSection('result-who',       profile.whoYouAre);
-  setSection('result-wired',     profile.howWired);
-  setSection('result-wing',      profile.wingProfile || profile.wing);
-  setSection('result-subtype',   profile.subtypeProfile);
-  setSection('result-wound',     profile.coreWoundAndGift);
-  setSection('result-attachment',profile.attachmentDetail);
-  setSection('result-remember',  profile.thingsToRemember);
-  setSection('result-stuck',     profile.stuckPlaces);
+  syncReadAccordion('result-who', profile.whoYouAre, true);
+  syncReadAccordion('result-wired', profile.howWired, false);
+  syncReadAccordion('result-wing', profile.wingProfile || profile.wing, false);
+  syncReadAccordion('result-subtype', profile.subtypeProfile, false);
+  syncReadAccordion('result-wound', profile.coreWoundAndGift, false);
+  syncReadAccordion('result-attachment', profile.attachmentDetail, false);
+  syncReadAccordion('result-remember', profile.thingsToRemember, false);
+  syncReadAccordion('result-stuck', profile.stuckPlaces, false);
 
-  // v5.2 — healthReflection retired; hide its block if worker doesn't send it
   const healthSection=document.getElementById('result-health-section');
-  if(healthSection){
-    if(profile.healthReflection&&profile.healthReflection.trim()){
-      healthSection.style.display='block';
-      setSection('result-health', profile.healthReflection);
-    }else{
-      healthSection.style.display='none';
-    }
+  if(profile.healthReflection&&profile.healthReflection.trim()){
+    syncReadAccordion('result-health', profile.healthReflection, false);
+  }else if(healthSection){
+    healthSection.style.display='none';
   }
 
   // Wing title — baseline wings only in copy; label clarifies when expression ≠ baseline
@@ -4450,6 +4818,8 @@ function renderResults(profile){
   renderCanvasHistory();
 
   renderStrainBend(profile);
+  renderCanvasHeroMain(profile);
+  renderInsightCards(profile);
   var nxc = document.getElementById('nest-next-card');
   if(nxc){
     nxc.style.display = 'block';
@@ -4495,32 +4865,179 @@ function setSection(id,content){
   el.innerHTML=`<p>${content.replace(/\n\n/g,'</p><p>')}</p>`;
 }
 
-function copyReadSummary(){
-  if(!profileData) return;
+function syncReadAccordion(innerId, content, open){
+  const inner = document.getElementById(innerId);
+  if(!inner) return;
+  const det = inner.closest('details');
+  const text = (content || '').trim();
+  if(!text){
+    if(det) det.style.display = 'none';
+    inner.innerHTML = '';
+    return;
+  }
+  if(det){
+    det.style.display = '';
+    if(open) det.open = true;
+  }
+  setSection(innerId, content);
+}
+
+function buildReadShareText(){
+  if(!profileData) return '';
   const p = profileData;
+  const hero = p.archetypePlain || p.archetype || 'My Inner Compass read';
+  const desc = p.archetypePlainDescription || p.archetypeSub || '';
+  const types = [p.mbti, p.enneagram].filter(Boolean).join(' · ');
+  const baseTypes = [p.likelyCoreMbti, p.likelyCoreEnneagram].filter(Boolean).join(' · ');
+  const opener = (p.whoYouAre || '').split(/\n\n/).filter(Boolean)[0] || '';
   const lines = [
     "My Inner Compass read — lil' bird",
     '',
-    p.archetypePlain || p.archetype || '',
-    p.archetypePlainDescription || '',
+    hero,
+    desc,
+    types ? ('Showing up now: ' + types) : '',
+    baseTypes && baseTypes !== types ? ('Natural wiring: ' + baseTypes) : '',
+    opener,
     '',
-    (p.whoYouAre || '').split(/\n\n/).filter(Boolean)[0] || '',
+    nestId ? ('Open my saved read: https://lilbird.life/deep-profile.html?nest=' + nestId) : 'https://lilbird.life/deep-profile.html',
+  ].filter(function(s){ return s && String(s).trim(); });
+  return lines.join('\n');
+}
+
+function _relationshipLabel(val){
+  const map = {
+    partner: 'my partner',
+    friend: 'a close friend',
+    colleague: 'a colleague',
+    family: 'a family member',
+    manager: 'my manager or leader',
+  };
+  return map[val] || 'someone close to me';
+}
+
+function buildPartnerShareText(dynamic, relationship){
+  if(!dynamic) return '';
+  const rel = _relationshipLabel(relationship || lastPartnerRelationship);
+  const lines = [
+    "A relational read from lil' bird — shared with you",
     '',
-    p.nestNextSteps && p.nestNextSteps.headline ? ('Next: ' + p.nestNextSteps.headline) : '',
-    nestId ? ('https://lilbird.life/deep-profile.html?nest=' + nestId) : '',
-  ].filter(function(s){ return s && String(s).trim(); }).join('\n');
-  const btn = document.getElementById('btn-copy-summary');
-  function flashCopied(){
-    if(btn){ btn.textContent = 'Copied ✓'; setTimeout(function(){ btn.textContent = 'Copy summary to share'; }, 2200); }
+    "Someone who cares about you (" + rel + ") explored how you two work together. This isn't a label — it's a conversation starter.",
+    '',
+    dynamic.pairingTitle || 'Our dynamic',
+    '',
+    (dynamic.dynamicSummary || '').trim(),
+    '',
+    dynamic.theyBringToYou ? ('How they hope they show up for you:\n' + dynamic.theyBringToYou.trim()) : '',
+    dynamic.youBringToThem ? ('What they see you offering them:\n' + dynamic.youBringToThem.trim()) : '',
+    dynamic.watchOutFor ? ('Worth watching together:\n' + dynamic.watchOutFor.trim()) : '',
+    dynamic.growthInvitation ? ('The invitation:\n' + dynamic.growthInvitation.trim()) : '',
+    dynamic.promptToShare ? ('\n' + dynamic.promptToShare.trim()) : '',
+    '',
+    'Take your own Inner Compass read: https://lilbird.life/deep-profile.html',
+  ].filter(function(s){ return s && String(s).trim(); });
+  return lines.join('\n\n');
+}
+
+function _flashShareButton(btn, okLabel, resetLabel){
+  if(!btn) return;
+  btn.textContent = okLabel;
+  setTimeout(function(){ btn.textContent = resetLabel; }, 2400);
+}
+
+async function shareOrCopyText(opts){
+  const text = (opts && opts.text) ? String(opts.text) : '';
+  const title = (opts && opts.title) ? String(opts.title) : "lil' bird";
+  const url = (opts && opts.url) ? String(opts.url) : '';
+  const btn = opts && opts.btn;
+
+  if(navigator.share){
+    try{
+      const sharePayload = { title, text };
+      if(url) sharePayload.url = url;
+      await navigator.share(sharePayload);
+      _flashShareButton(btn, 'Shared ✓', opts.resetLabel || 'Share');
+      return true;
+    }catch(err){
+      if(err && err.name === 'AbortError') return false;
+    }
   }
+
+  const clipboardText = url ? (text + '\n\n' + url) : text;
   if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(lines).then(flashCopied).catch(function(){
+    try{
+      await navigator.clipboard.writeText(clipboardText);
+      _flashShareButton(btn, 'Copied ✓', opts.resetLabel || 'Copy');
+      return true;
+    }catch(_){
+      window.prompt('Copy this to share:', clipboardText);
+      return true;
+    }
+  }
+  window.prompt('Copy this to share:', clipboardText);
+  return true;
+}
+
+function shareMyRead(){
+  if(!profileData) return;
+  const text = buildReadShareText();
+  const url = nestId ? ('https://lilbird.life/deep-profile.html?nest=' + nestId) : 'https://lilbird.life/deep-profile.html';
+  const bodyWithoutUrl = text.replace(/\nhttps?:\/\/[^\n]+$/, '').trim();
+  shareOrCopyText({
+    title: "My Inner Compass read — lil' bird",
+    text: bodyWithoutUrl,
+    url,
+    btn: document.getElementById('btn-share-read'),
+    resetLabel: 'Share my read',
+  });
+}
+
+function copyReadSummary(){
+  if(!profileData) return;
+  const lines = buildReadShareText();
+  const btn = document.getElementById('btn-copy-summary');
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(lines).then(function(){
+      _flashShareButton(btn, 'Copied ✓', 'Copy text');
+    }).catch(function(){
       window.prompt('Copy your summary:', lines);
-      flashCopied();
+      _flashShareButton(btn, 'Copied ✓', 'Copy text');
     });
   }else{
     window.prompt('Copy your summary:', lines);
-    flashCopied();
+    _flashShareButton(btn, 'Copied ✓', 'Copy text');
+  }
+}
+
+function sharePartnerDynamic(){
+  if(!lastPartnerDynamic){
+    alert('Generate the dynamic first, then share.');
+    return;
+  }
+  const text = buildPartnerShareText(lastPartnerDynamic, lastPartnerRelationship);
+  shareOrCopyText({
+    title: (lastPartnerDynamic.pairingTitle || 'Our dynamic') + " — lil' bird",
+    text: text.replace(/\nhttps?:\/\/[^\n]+$/, '').trim(),
+    url: 'https://lilbird.life/deep-profile.html',
+    btn: document.getElementById('btn-share-partner'),
+    resetLabel: 'Share with them',
+  });
+}
+
+function copyPartnerDynamic(){
+  if(!lastPartnerDynamic){
+    alert('Generate the dynamic first, then copy.');
+    return;
+  }
+  const text = buildPartnerShareText(lastPartnerDynamic, lastPartnerRelationship);
+  const btn = document.getElementById('btn-copy-partner');
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){
+      _flashShareButton(btn, 'Copied ✓', 'Copy for them');
+    }).catch(function(){
+      window.prompt('Copy for them:', text);
+    });
+  }else{
+    window.prompt('Copy for them:', text);
   }
 }
 
@@ -4621,7 +5138,7 @@ function clearAndRestart(){
   currentQIndex = 0;
   earlyExitToCanvas = false;
   earlyReadPromptShown = false;
-  pairTheseLog = { tiebreakers: [], evidencePulses: [] };
+  pairTheseLog = { tiebreakers: [], evidencePulses: [], sliderPulses: [] };
   peakPlungeData = null;
   midReadDepthCache = 12;
   window._peakPts = null;
@@ -4792,11 +5309,155 @@ function selectAssessmentPath(p){
 // ── STATE ──────────────────────────────
 let assessmentPath = 'full';
 let userDeclaredTypes = { mbti:'', enneagram:'', attachment:'' };
-let pairTheseLog = { tiebreakers: [], evidencePulses: [] };
+let pairTheseLog = { tiebreakers: [], evidencePulses: [], sliderPulses: [] };
+let lastPartnerDynamic = null;
+let lastPartnerRelationship = 'partner';
 let peakPlungeData = null;
 let earlyExitToCanvas = false;
 let midReadDepthCache = 12;
 let earlyReadPromptShown = false;
+let _sliderPulseDef = null;
+let _sliderPulseResolve = null;
+
+const CHAPTER_NAMES = {
+  q01: 'Opening', q02: 'Opening', q03: 'Opening',
+  q04: 'Wiring', q05: 'Wiring', q06: 'Wiring',
+  q07: 'Relationships', q08: 'Relationships', q09: 'Relationships',
+  q10: 'Drives', q11: 'Drives', q12: 'Drives',
+  q13: 'Tangle', q14: 'Tangle', q15: 'Tangle',
+  q16: 'Forward', q17: 'Forward', q18: 'Forward', q19: 'Forward',
+  q20: 'Baseline', q21: 'Baseline', q22: 'Baseline',
+  q23: 'Baseline', q24: 'Baseline', q25: 'Baseline', q26: 'Baseline', q27: 'Baseline',
+};
+
+const SLIDER_PULSES_FULL = [
+  { afterId: 'q06', id: 'pulse-recharge', dimension: 'ei', question: 'After a full day around people, I usually…', left: 'Crave quiet alone', right: 'Want more connection' },
+  { afterId: 'q11', id: 'pulse-social', dimension: 'ei', question: 'My ideal birthday energy is…', left: 'Just me or one person', right: 'A full room of people' },
+  { afterId: 'q12', id: 'pulse-want', dimension: 'heart-head', question: 'The want I hide is usually about…', left: 'Clarity, control, competence', right: 'Love, belonging, being known' },
+  { afterId: 'q18', id: 'pulse-risk', dimension: 'gut', question: 'If I knew it would work, I\'d lean…', left: 'Careful and incremental', right: 'Bold and all-in' },
+  { afterId: 'q21', id: 'pulse-decide', dimension: 'tf', question: 'A decision I respect usually starts with…', left: 'Facts, logic, scenarios', right: 'Gut, values, key people' },
+  { afterId: 'q24', id: 'pulse-pace', dimension: 'enneagram-37', question: 'At my best, my week feels…', left: 'Steady depth on fewer things', right: 'Varied threads and possibility' },
+  { afterId: 'q27', id: 'pulse-boredom', dimension: 'enneagram', question: 'Repetitive or boring work makes me…', left: 'Restless and checked out', right: 'Oddly satisfied by routine' },
+];
+
+const SLIDER_PULSES_KNOW = [
+  { afterId: 'q04', id: 'pulse-recharge', dimension: 'ei', question: 'After a demanding day, I usually…', left: 'Need quiet alone', right: 'Want more people time' },
+  { afterId: 'q10', id: 'pulse-want', dimension: 'heart-head', question: 'When I\'m frustrated, it\'s usually because…', left: 'Something\'s inefficient or unfair', right: 'Someone feels distant or unseen' },
+  { afterId: 'q16', id: 'pulse-risk', dimension: 'gut', question: 'Given a free Saturday, I\'d rather…', left: 'Restore and go slow', right: 'Pack it with plans' },
+  { afterId: 'q21', id: 'pulse-decide', dimension: 'tf', question: 'I trust a decision when…', left: 'The logic lines up', right: 'It feels right in my body' },
+];
+
+function chapterLabelForQuestion(qid){
+  return CHAPTER_NAMES[qid] || 'Nest';
+}
+
+function updateChatProgressPill(idx){
+  const pill = document.getElementById('chat-progress-pill');
+  const AQ = getActiveQuestions();
+  if(!pill || !AQ.length) return;
+  const q = AQ[idx];
+  const ch = q ? chapterLabelForQuestion(q.id) : 'Nest';
+  pill.textContent = ch + ' · ' + (idx + 1) + ' of ' + AQ.length;
+}
+
+function updateSliderPulseDisplay(){
+  const r = document.getElementById('slider-pulse-range');
+  const s = document.getElementById('slider-pulse-score');
+  if(r && s) s.textContent = r.value;
+}
+
+function openSliderPulseModal(def){
+  _sliderPulseDef = def;
+  const modal = document.getElementById('modal-slider-pulse');
+  if(!modal) return Promise.resolve();
+  document.getElementById('slider-pulse-title').textContent = def.question;
+  document.getElementById('slider-pulse-left').textContent = def.left;
+  document.getElementById('slider-pulse-right').textContent = def.right;
+  const range = document.getElementById('slider-pulse-range');
+  if(range){ range.value = '50'; updateSliderPulseDisplay(); }
+  modal.classList.add('is-open');
+  return new Promise(function(resolve){ _sliderPulseResolve = resolve; });
+}
+
+function saveSliderPulse(){
+  const def = _sliderPulseDef;
+  const range = document.getElementById('slider-pulse-range');
+  const modal = document.getElementById('modal-slider-pulse');
+  if(def && range){
+    if(!pairTheseLog.sliderPulses) pairTheseLog.sliderPulses = [];
+    pairTheseLog.sliderPulses.push({
+      id: def.id,
+      dimension: def.dimension,
+      value: parseInt(range.value, 10),
+      left: def.left,
+      right: def.right,
+      afterId: def.afterId,
+      at: Date.now(),
+    });
+  }
+  if(modal) modal.classList.remove('is-open');
+  _sliderPulseDef = null;
+  if(_sliderPulseResolve){ _sliderPulseResolve(); _sliderPulseResolve = null; }
+}
+
+async function maybeRunSliderPulse(justAnsweredId){
+  const defs = assessmentPath === 'know' ? SLIDER_PULSES_KNOW : SLIDER_PULSES_FULL;
+  const def = defs.find(function(d){ return d.afterId === justAnsweredId; });
+  if(!def) return;
+  if(pairTheseLog.sliderPulses && pairTheseLog.sliderPulses.some(function(s){ return s.id === def.id; })) return;
+  try { await openSliderPulseModal(def); } catch(e){}
+}
+
+function renderInsightCards(profile){
+  const row = document.getElementById('insight-cards-row');
+  if(!row || !profile) return;
+  const gapEl = document.getElementById('insight-gap-text');
+  const canvasEl = document.getElementById('insight-canvas-text');
+  const remEl = document.getElementById('insight-remember-text');
+  const gap = (profile.expressionVersusCoreSummary || '').trim();
+  const syn = (profile.canvasSynthesis || '').trim();
+  const remember = (profile.thingsToRemember || '').split(/\n\n/).filter(Boolean)[0] || '';
+  var shown = 0;
+  if(gapEl && gap){ gapEl.textContent = gap.length > 180 ? gap.slice(0, 177) + '…' : gap; shown++; }
+  else if(gapEl) gapEl.textContent = '';
+  if(canvasEl && syn){ canvasEl.textContent = syn.length > 160 ? syn.slice(0, 157) + '…' : syn; shown++; }
+  else if(canvasEl) canvasEl.textContent = '';
+  if(remEl && remember){ remEl.textContent = remember.length > 140 ? remember.slice(0, 137) + '…' : remember; shown++; }
+  else if(remEl) remEl.textContent = '';
+  row.style.display = shown ? 'grid' : 'none';
+}
+
+function renderCanvasHeroMain(profile){
+  const wrap = document.getElementById('canvas-hero-main');
+  if(!wrap) return;
+  const cs = canvasScores || profile.canvasScores || {};
+  const dims = [
+    { key: 'why', label: 'WHY', color: '#F5C842' },
+    { key: 'who', label: 'WHO', color: '#4adea8' },
+    { key: 'where', label: 'WHERE', color: '#5ab4f0' },
+    { key: 'what', label: 'WHAT', color: '#e8734a' },
+    { key: 'how', label: 'HOW', color: '#c94aad' },
+  ];
+  const vals = dims.map(function(d){ return typeof cs[d.key] === 'number' ? cs[d.key] : 50; });
+  const overall = Math.round(vals.reduce(function(a,b){ return a+b; }, 0) / vals.length);
+  const syn = (profile.canvasSynthesis || '').trim();
+  if(!syn && overall === 50 && vals.every(function(v){ return v === 50; })){
+    wrap.style.display = 'none';
+    return;
+  }
+  wrap.style.display = 'block';
+  var scoreEl = document.getElementById('canvas-hero-score');
+  if(scoreEl) scoreEl.textContent = 'Season overall: ' + overall + '/100';
+  var dimsEl = document.getElementById('canvas-hero-dims');
+  if(dimsEl){
+    dimsEl.innerHTML = dims.map(function(d, i){
+      return '<span class="canvas-hero-dim" style="color:' + d.color + ';border-color:' + d.color + '33">' + d.label + ' ' + vals[i] + '</span>';
+    }).join('');
+  }
+  var bodyEl = document.getElementById('canvas-hero-body');
+  if(bodyEl) bodyEl.textContent = syn || 'Your conditions check-in shapes how your wiring shows up right now — see the full canvas in the sidebar.';
+}
+
 let chatAnswers = {};
 let currentQIndex = 0;
 let chatMicActive = false;
@@ -4811,24 +5472,24 @@ const CHIPS_BY_QUESTION = {
     "Money / what's coming",
     "A relationship that's wobbly",
     "Work I'm dragging through",
+    "A project I'm excited about",
     "Something about my body",
-    "A grief I don't know what to do with",
     "What I want my life to look like",
   ],
   q02: [
     "How tired I actually am",
-    "How lonely it's been",
-    "That a relationship isn't working",
     "That I've outgrown what I'm doing",
+    "That a relationship isn't working",
+    "That I'm performing fine at work",
     "How much I'm masking",
-    "That I'm scared",
+    "That I'm bored more than sad",
   ],
   q03: [
     "Somewhere quieter, simpler",
     "I made the brave move",
     "I let go of what I needed to",
     "Honestly — I'm not sure yet",
-    "The same place but lighter",
+    "A busier chapter, but on my terms",
     "A whole new chapter",
   ],
   q04: [
@@ -4836,8 +5497,8 @@ const CHIPS_BY_QUESTION = {
     "Slow start, late night",
     "Caretaking until I'm empty",
     "All work, no edges",
-    "Holding it together for everyone",
-    "Surviving more than living",
+    "Meetings and people all day",
+    "Structured blocks, then collapse",
   ],
   q05: [
     "Mapped out options first, then chose",
@@ -4853,7 +5514,7 @@ const CHIPS_BY_QUESTION = {
     "Movement, no talking",
     "More people, different ones",
     "A long shower and bed",
-    "Honestly — to disappear",
+    "Out somewhere lively to reset",
   ],
   q07: [
     "They take forever to decide",
@@ -4885,7 +5546,7 @@ const CHIPS_BY_QUESTION = {
     "Held it in until I cried",
     "Cut someone off",
     "Got cuttingly direct",
-    "Left the room and processed alone",
+    "Fixed the problem and moved on",
   ],
   q11: [
     "Just my closest few people, slow day",
@@ -4901,7 +5562,7 @@ const CHIPS_BY_QUESTION = {
     "To rest without guilt",
     "To do something risky",
     "To be loved without earning it",
-    "To matter to someone",
+    "To win / prove / achieve something",
   ],
   q13: [
     "Scrolling instead of resting",
@@ -4909,7 +5570,7 @@ const CHIPS_BY_QUESTION = {
     "Drinking more than I should",
     "Staying in something that's done",
     "Avoiding the hard conversation",
-    "Working when I should stop",
+    "Overworking when I should stop",
   ],
   q14: [
     "I'm warm but I disappear",
@@ -4917,7 +5578,7 @@ const CHIPS_BY_QUESTION = {
     "I'm funny but guarded",
     "I'm steady but slow to open up",
     "I'm intense but loyal",
-    "I'm thoughtful but distant",
+    "I'm direct but misunderstood",
   ],
   q15: [
     "I always pick the same kind of person",
@@ -4933,7 +5594,7 @@ const CHIPS_BY_QUESTION = {
     "See one person, properly",
     "Get out of the city",
     "Sleep, then read",
-    "Honestly — get jobs done",
+    "Social plans back to back",
   ],
   q17: [
     "Reading or writing",
@@ -4965,7 +5626,7 @@ const CHIPS_BY_QUESTION = {
     "Deep conversation with someone close",
     "Cook, music, low light",
     "A bath and a book",
-    "Out in nature, no agenda",
+    "Out with friends to decompress",
   ],
   q21: [
     "I imagine it forward in scenarios",
@@ -4981,7 +5642,7 @@ const CHIPS_BY_QUESTION = {
     "Same shape, less pressure",
     "Doing my own work, my way",
     "Honest relationships, fewer obligations",
-    "Somewhere that feels like mine",
+    "More ambition, bigger stage",
   ],
   q23: [
     "Bolder, funnier, more myself",
@@ -5067,7 +5728,7 @@ function startChat() {
   chatAnswers = {};
   earlyExitToCanvas = false;
   earlyReadPromptShown = false;
-  pairTheseLog = { tiebreakers: [], evidencePulses: [] };
+  pairTheseLog = { tiebreakers: [], evidencePulses: [], sliderPulses: [] };
   peakPlungeData = null;
   midReadDepthCache = 12;
   window._peakPts = null;
@@ -5087,6 +5748,7 @@ function startChat() {
   }
   updateDepthMeter(12);
   renderChatQuestion(0);
+  updateChatProgressPill(0);
   goTo('screen-chat');
 }
 
@@ -5134,6 +5796,7 @@ function renderChatQuestion(idx) {
   const pb = document.getElementById('progressBar');
   if(pb) pb.style.width = pct + '%';
   updateDepthMeter(midReadDepthCache);
+  updateChatProgressPill(idx);
 }
 
 // ── SEND ANSWER ────────────────────────
@@ -5202,6 +5865,13 @@ function savePeakPlunge(){
   if(peakPlungeDoneResolve){ peakPlungeDoneResolve(); peakPlungeDoneResolve = null; }
 }
 
+function dismissEvidenceToast(){
+  const toast = document.getElementById('evidence-toast');
+  const tact = document.getElementById('evidence-toast-actions');
+  if(toast) toast.classList.remove('is-show');
+  if(tact) tact.innerHTML = '';
+}
+
 function showEvidenceToast(mid){
   if(!mid || !mid.evidenceLine) return;
   const toast = document.getElementById('evidence-toast');
@@ -5213,17 +5883,14 @@ function showEvidenceToast(mid){
     tact.innerHTML = '<button type="button" data-ev="yes">That lands</button><button type="button" data-ev="no">Not quite</button>';
   }
   toast.classList.add('is-show');
-  var hideEv = setTimeout(hideToast, 9500);
   function hideToast(){
-    toast.classList.remove('is-show');
-    if(tact) tact.innerHTML = '';
+    dismissEvidenceToast();
   }
   if(tact){
     tact.querySelectorAll('button').forEach(function(btn){
       btn.onclick = function(){
         if(!pairTheseLog.evidencePulses) pairTheseLog.evidencePulses = [];
         pairTheseLog.evidencePulses.push({ line: mid.evidenceLine, resonate: btn.getAttribute('data-ev') === 'yes', at: Date.now() });
-        clearTimeout(hideEv);
         hideToast();
       };
     });
@@ -5275,6 +5942,18 @@ async function runMidChapterPulse(chaptersComplete){
           window._earlyReadResolve = resolve;
         });
       }
+    }else if(mid.finishEarlyEligible && !earlyReadPromptShown && !earlyExitToCanvas){
+      earlyReadPromptShown = true;
+      const modal = document.getElementById('modal-early-read');
+      const title = document.getElementById('early-read-title');
+      if(title) title.textContent = 'Solid read already — skip ahead?';
+      if(modal){
+        modal.classList.add('is-open');
+        await new Promise(function(resolve){
+          window._earlyReadResolve = resolve;
+        });
+      }
+      if(title) title.textContent = 'Think we\'ve got enough?';
     }
   }catch(e){
     console.warn('mid-read', e);
@@ -5387,8 +6066,13 @@ async function sendChatAnswer() {
   // Show thinking dots
   if(thinkingEl) thinkingEl.classList.add('active');
 
-  // Get acknowledgment from AI
-  const ack = await getAcknowledgment(q.text, answer, AQ[currentQIndex + 1]?.text);
+  // Get acknowledgment from AI (skip on shorter know-type path for pace)
+  var ack = null;
+  if(assessmentPath === 'know'){
+    await sleep(180);
+  }else{
+    ack = await getAcknowledgment(q.text, answer, AQ[currentQIndex + 1]?.text);
+  }
 
   // Hide thinking
   if(thinkingEl) thinkingEl.classList.remove('active');
@@ -5408,6 +6092,9 @@ async function sendChatAnswer() {
     await sleep(800);
   }
 
+  if(earlyExitToCanvas) return;
+
+  try { await maybeRunSliderPulse(q.id); } catch(e){}
   if(earlyExitToCanvas) return;
 
   const idxDone = currentQIndex;
@@ -5493,7 +6180,7 @@ function collectChatResponses() {
     canvasScores,
     canvasTexts,
     peakPlunge: peakPlungeData || undefined,
-    pairTheseLog: (pairTheseLog.tiebreakers && pairTheseLog.tiebreakers.length) || (pairTheseLog.evidencePulses && pairTheseLog.evidencePulses.length)
+    pairTheseLog: (pairTheseLog.tiebreakers && pairTheseLog.tiebreakers.length) || (pairTheseLog.evidencePulses && pairTheseLog.evidencePulses.length) || (pairTheseLog.sliderPulses && pairTheseLog.sliderPulses.length)
       ? pairTheseLog
       : undefined,
   };
@@ -6189,12 +6876,46 @@ function stopMic(){
 // ═══════════════════════════════════════
 // PARTNER DYNAMIC
 // ═══════════════════════════════════════
+function _escapeHtml(s){
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function _partnerBlock(mod, label, color, body){
+  if(!body) return '';
+  return '<div class="partner-block partner-block--' + mod + '">' +
+    '<p class="partner-block-label" style="color:' + color + '">' + label + '</p>' +
+    '<p>' + _escapeHtml(body).replace(/\n\n/g, '</p><p>') + '</p></div>';
+}
+
+function renderPartnerDynamicResult(dynamic){
+  const blocks = [
+    _partnerBlock('summary', 'The dynamic', '#f5c842', dynamic.dynamicSummary),
+    _partnerBlock('them', 'What they bring to you', '#4adea8', dynamic.theyBringToYou),
+    _partnerBlock('you', 'What you bring to them', '#5ab4f0', dynamic.youBringToThem),
+    _partnerBlock('watch', 'Watch out for', '#e8734a', dynamic.watchOutFor),
+    _partnerBlock('invite', 'The invitation', '#c94aad', dynamic.growthInvitation),
+  ].filter(Boolean).join('');
+  const prompt = dynamic.promptToShare
+    ? '<p style="font-style:italic;color:var(--gold-dim);font-size:0.88rem;margin-top:0.75rem;">' + _escapeHtml(dynamic.promptToShare) + '</p>'
+    : '';
+  return (
+    '<h4>' + _escapeHtml(dynamic.pairingTitle || 'Your Dynamic') + '</h4>' +
+    blocks + prompt +
+    '<div class="partner-share-row">' +
+      '<p class="partner-share-hint">Send this to them as a conversation starter — framed for their eyes, not your private nest link.</p>' +
+      '<button type="button" class="btn btn-gold btn-share-glow" id="btn-share-partner" onclick="sharePartnerDynamic()">Share with them</button>' +
+      '<button type="button" class="btn btn-outline" id="btn-copy-partner" onclick="copyPartnerDynamic()">Copy for them</button>' +
+    '</div>'
+  );
+}
+
 async function generatePartnerDynamic(){
   if(!profileData) return;
 
   const rel   = document.getElementById('partner-relationship')?.value || 'partner';
   const types = document.getElementById('partner-types')?.value?.trim() || '';
   const desc  = document.getElementById('partner-description')?.value?.trim() || '';
+  lastPartnerRelationship = rel;
 
   if(!types && !desc){
     alert('Tell us a little about this person first — even just their Enneagram type or a brief description.');
@@ -6216,18 +6937,12 @@ async function generatePartnerDynamic(){
     });
     if(!r.ok) throw new Error('Failed');
     const dynamic = await r.json();
+    lastPartnerDynamic = dynamic;
 
     if(result){
       result.style.display = 'block';
-      result.innerHTML = `
-        <h4>${dynamic.pairingTitle || 'Your Dynamic'}</h4>
-        <p>${dynamic.dynamicSummary || ''}</p>
-        <p><strong style="color:var(--gold-dim);font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;">What they bring to you</strong><br>${dynamic.theyBringToYou || ''}</p>
-        <p><strong style="color:var(--gold-dim);font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;">What you bring to them</strong><br>${dynamic.youBringToThem || ''}</p>
-        <p><strong style="color:var(--gold-dim);font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;">Watch out for</strong><br>${dynamic.watchOutFor || ''}</p>
-        <p><strong style="color:var(--gold-dim);font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;">The invitation</strong><br>${dynamic.growthInvitation || ''}</p>
-        ${dynamic.promptToShare ? `<p style="font-style:italic;color:var(--gold-dim);font-size:0.88rem;">${dynamic.promptToShare}</p>` : ''}
-      `;
+      result.innerHTML = renderPartnerDynamicResult(dynamic);
+      result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }catch(e){
     if(result){ result.style.display='block'; result.innerHTML='<p style="color:var(--ember);">Something went wrong. Try again in a moment.</p>'; }
