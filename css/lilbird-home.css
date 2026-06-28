@@ -196,6 +196,13 @@ body.js-reveal-ready .reveal.visible { opacity: 1; transform: translateY(0); }
 }
 [data-theme="light"] .nav-bird { border-radius: 50%; border: 2px solid var(--c-ink); }
 .nav-wordmark {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  line-height: 1.15;
+  max-width: min(220px, 42vw);
+}
+.nav-wordmark-brand {
   font-family: var(--font-serif);
   font-style: italic;
   font-size: 1.1rem;
@@ -203,7 +210,18 @@ body.js-reveal-ready .reveal.visible { opacity: 1; transform: translateY(0); }
   letter-spacing: 0.02em;
   transition: color 0.35s ease;
 }
-[data-theme="light"] .nav-wordmark { color: var(--c-ink); }
+.nav-wordmark-tag {
+  font-family: var(--font-mono);
+  font-style: normal;
+  font-size: 0.48rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 400;
+  transition: color 0.35s ease;
+}
+[data-theme="light"] .nav-wordmark-brand { color: var(--c-ink); }
+[data-theme="light"] .nav-wordmark-tag { color: #5a5348; }
 .nav-actions { display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap; justify-content: flex-end; }
 .nav-secondary, .nav-nest {
   font-family: var(--font-mono);
@@ -420,18 +438,21 @@ body.js-reveal-ready .reveal.visible { opacity: 1; transform: translateY(0); }
 }
 .hero-illus-wrap {
   position: absolute;
-  top: 0;
-  right: -60px;
+  top: -7vh;
+  right: -40px;
   bottom: 0;
-  width: 58%;
+  width: 62%;
+  height: 108%;
   pointer-events: none;
+  overflow: visible;
 }
 .hero-balloons-bg {
   position: absolute;
-  inset: -5% -10%;
+  inset: -22% -12% 0 -28%;
   background-image: url('/images/hero/hero-balloons.png');
-  background-size: cover;
-  background-position: center top;
+  background-size: auto 92%;
+  background-repeat: no-repeat;
+  background-position: 74% 2%;
   opacity: 0.45;
 }
 .hero-kids {
@@ -453,7 +474,7 @@ body.js-reveal-ready .reveal.visible { opacity: 1; transform: translateY(0); }
 .hero-art-light-fade {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to right, var(--bg) 25%, rgba(245, 242, 235, 0.75) 45%, rgba(245, 242, 235, 0.2) 68%, transparent 100%);
+  background: linear-gradient(to right, var(--bg) 8%, rgba(245, 242, 235, 0.88) 28%, rgba(245, 242, 235, 0.35) 52%, transparent 78%);
 }
 .hero::before {
   content: '';
@@ -1289,8 +1310,8 @@ footer, .site-footer {
   .nav-menu-btn { display: none; }
 }
 @media (max-width: 1240px) {
-  .hero-illus-wrap { width: 52%; right: -40px; }
-  .hero-balloons-bg { opacity: 0.38; }
+  .hero-illus-wrap { width: 54%; right: -32px; top: -5vh; }
+  .hero-balloons-bg { opacity: 0.38; background-size: auto 88%; }
 }
 @media (max-width: 960px) {
   .pathfinder-layout { grid-template-columns: 1fr; gap: 2rem; }
@@ -1336,7 +1357,9 @@ footer, .site-footer {
 @media (max-width: 480px) {
   .nav-bar { padding: 0.75rem 1rem; }
   .pricing-grid { grid-template-columns: 1fr; }
-  .nav-wordmark { font-size: 1rem; }
+  .nav-wordmark { max-width: min(200px, 50vw); }
+  .nav-wordmark-brand { font-size: 1rem; }
+  .nav-wordmark-tag { font-size: 0.44rem; letter-spacing: 0.06em; }
   .nav-bird { width: 34px; height: 34px; }
   .site-nav.menu-open .nav-menu-panel {
     display: flex;
