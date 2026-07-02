@@ -313,6 +313,7 @@
     .chat-textarea:focus { border-color: var(--session-col); }
     .chat-textarea::placeholder { color: var(--text-muted); }
     .btn-send { width: 44px; height: 44px; background: var(--session-col); border: none; border-radius: 12px; color: var(--dark); font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: opacity 0.2s, transform 0.15s; }
+    .chat-ready-hint { text-align: center; font-size: 0.72rem; color: var(--text-muted); opacity: 0.5; padding: 0.4rem 1rem 0.6rem; margin: 0; letter-spacing: 0.01em; }
     .btn-send:hover:not(:disabled) { opacity: 0.85; transform: scale(1.05); }
     .btn-send:disabled { opacity: 0.35; cursor: default; transform: none; }
 
@@ -554,6 +555,7 @@
             <button type="button" class="btn-mic no-speech-hide" id="chat-mic" title="Speak your answer" aria-label="Speak your answer">🎤</button>
             <button class="btn-send" id="btn-send" disabled>↑</button>
           </div>
+          <p class="chat-ready-hint">Ready to wrap up this session? Just say so.</p>
           <div class="tool-embed-wrap" id="tool-embed-wrap">
             <div class="tool-embed-header">
               <span class="tool-embed-title" id="tool-embed-title">Tool</span>
