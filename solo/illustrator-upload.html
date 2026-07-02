@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Illustration Upload · lil' bird</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --dark: #1e2028; --card: #23262f; --text: #f0ece4;
+    --dim: rgba(240,236,228,0.65); --muted: rgba(240,236,228,0.38);
+    --gold: #F5C842; --ember: #e8734a;
+    --border: rgba(255,255,255,0.08);
+    --font-d: 'Playfair Display', serif;
+    --font-b: 'DM Sans', sans-serif;
+    --font-m: 'DM Mono', monospace;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--dark); color: var(--text); font-family: var(--font-b); min-height: 100vh; }
+  body { display: flex; flex-direction: column; align-items: center; padding: 3rem 1.25rem; gap: 0; }
+
+  /* ── Auth gate ── */
+  .auth-gate { width: 100%; max-width: 380px; text-align: center; }
+  .bird { font-size: 1.6rem; margin-bottom: 1rem; opacity: 0.55; }
+  .auth-gate h1 { font-family: var(--font-d); font-size: 1.35rem; font-weight: 400; font-style: italic; margin-bottom: 0.4rem; }
+  .auth-gate p { font-size: 0.82rem; color: var(--dim); margin-bottom: 1.5rem; }
+  .field { width: 100%; display: flex; flex-direction: column; gap: 0.4rem; text-align: left; margin-bottom: 1rem; }
+  .field label { font-family: var(--font-m); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+  .field input { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 0.75rem 1rem; color: var(--text); font-family: var(--font-b); font-size: 0.9rem; outline: none; transition: border-color 0.2s; }
+  .field input:focus { border-color: rgba(245,200,66,0.4); }
+  .btn { width: 100%; background: var(--gold); color: var(--dark); border: none; border-radius: 10px; padding: 0.85rem; font-family: var(--font-m); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 500; cursor: pointer; transition: opacity 0.2s; }
+  .btn:hover:not(:disabled) { opacity: 0.85; }
+  .btn:disabled { opacity: 0.4; cursor: default; }
+  .auth-error { font-size: 0.8rem; color: var(--ember); margin-top: 0.5rem; min-height: 1.2rem; text-align: center; }
+
+  /* ── Main portal ── */
+  .portal { display: none; width: 100%; max-width: 520px; }
+  .portal.visible { display: block; }
+  .portal-header { text-align: center; margin-bottom: 2rem; }
+  .portal-header h1 { font-family: var(--font-d); font-size: 1.4rem; font-weight: 400; font-style: italic; }
+  .portal-header p { font-size: 0.82rem; color: var(--dim); margin-top: 0.3rem; }
+
+  .person-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; }
+  .pc-label { font-family: var(--font-m); font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.25rem; }
+  .pc-name { font-size: 1rem; font-weight: 500; margin-bottom: 0.2rem; }
+  .pc-email { font-size: 0.8rem; color: var(--dim); }
+  .pc-photo { margin-top: 1rem; }
+  .pc-photo img { width: 100%; max-height: 240px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border); }
+  .pc-photo-err { font-size: 0.78rem; color: var(--ember); margin-top: 0.4rem; }
+
+  .upload-section { margin-top: 1.5rem; }
+  .upload-section h2 { font-family: var(--font-d); font-size: 1rem; font-weight: 400; font-style: italic; margin-bottom: 0.75rem; }
+  .drop-zone {
+    border: 2px dashed var(--border); border-radius: 16px; padding: 2.5rem 1.5rem;
+    text-align: center; cursor: pointer; position: relative;
+    background: var(--card); transition: border-color 0.2s, background 0.2s;
+  }
+  .drop-zone:hover, .drop-zone.over { border-color: var(--gold); background: rgba(245,200,66,0.04); }
+  .drop-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .drop-icon { font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.45; }
+  .drop-label { font-family: var(--font-m); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+  .drop-hint { font-size: 0.75rem; color: var(--muted); margin-top: 0.3rem; }
+
+  .illus-preview { display: none; margin-top: 1rem; }
+  .illus-preview.visible { display: block; }
+  .illus-preview img { width: 100%; border-radius: 12px; border: 1px solid var(--border); }
+  .illus-preview .change-link { font-family: var(--font-m); font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: none; border: none; cursor: pointer; text-decoration: underline; display: block; margin: 0.4rem auto 0; text-align: center; }
+
+  .submit-row { margin-top: 1.5rem; }
+  .status { font-size: 0.82rem; color: var(--dim); text-align: center; margin-top: 0.75rem; min-height: 1.2rem; }
+  .status.err { color: var(--ember); }
+
+  .success-card { display: none; background: var(--card); border: 1px solid rgba(245,200,66,0.25); border-radius: 16px; padding: 2rem; text-align: center; margin-top: 1rem; }
+  .success-card.visible { display: block; }
+  .success-card .icon { font-size: 2rem; margin-bottom: 0.75rem; }
+  .success-card h2 { font-family: var(--font-d); font-size: 1.15rem; font-weight: 400; font-style: italic; margin-bottom: 0.4rem; }
+  .success-card p { font-size: 0.82rem; color: var(--dim); line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<!-- AUTH GATE -->
+<div class="auth-gate" id="auth-gate">
+  <div class="bird">🪶</div>
+  <h1>Illustrator portal</h1>
+  <p>Enter the password to upload an illustration.</p>
+  <div class="field">
+    <label>Password</label>
+    <input type="password" id="pwd-input" placeholder="••••••••" autocomplete="current-password" />
+  </div>
+  <button class="btn" id="btn-auth">Continue →</button>
+  <div class="auth-error" id="auth-error"></div>
+</div>
+
+<!-- MAIN PORTAL -->
+<div class="portal" id="portal">
+  <div class="portal-header">
+    <div class="bird">🪶</div>
+    <h1>Upload illustration</h1>
+    <p>Upload the finished illustrated portrait below.</p>
+  </div>
+
+  <!-- Person info loaded from URL param -->
+  <div class="person-card" id="person-card" style="display:none">
+    <div class="pc-label">Uploading for</div>
+    <div class="pc-name" id="pc-name">—</div>
+    <div class="pc-email" id="pc-email"></div>
+    <div class="pc-photo" id="pc-photo"></div>
+  </div>
+
+  <div id="no-user-warn" style="display:none;font-size:0.82rem;color:var(--ember);margin-bottom:1rem;">
+    No user_id in the URL. Copy the upload link from the illustration request email.
+  </div>
+
+  <div class="upload-section">
+    <h2>Finished illustration</h2>
+    <div class="drop-zone" id="drop-zone">
+      <input type="file" id="illus-input" accept="image/*" />
+      <div class="drop-icon">🖼️</div>
+      <div class="drop-label">Choose illustration file</div>
+      <div class="drop-hint">PNG recommended · drag & drop or click</div>
+    </div>
+    <div class="illus-preview" id="illus-preview">
+      <img id="illus-preview-img" src="" alt="Illustration preview" />
+      <button class="change-link" id="btn-change-illus">Choose a different file</button>
+    </div>
+  </div>
+
+  <div class="submit-row">
+    <button class="btn" id="btn-submit" disabled>Send illustration →</button>
+    <div class="status" id="status"></div>
+  </div>
+
+  <div class="success-card" id="success-card">
+    <div class="icon">✦</div>
+    <h2>Done.</h2>
+    <p>The illustration has been saved and the user has been notified by email. Their Full Flight Plan will show the illustration automatically.</p>
+  </div>
+</div>
+
+<script>
+const WORKER = 'https://worker-solo.cwwq46sn7m.workers.dev';
+const SB_URL = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
+// Service key NOT used client-side — upload goes through the worker
+const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
+
+const params  = new URLSearchParams(window.location.search);
+const userId  = params.get('user_id') || '';
+
+let password      = '';
+let illustFile    = null;
+
+// ── Auth ──────────────────────────────────────────────────
+const authGate  = document.getElementById('auth-gate');
+const portal    = document.getElementById('portal');
+const pwdInput  = document.getElementById('pwd-input');
+const btnAuth   = document.getElementById('btn-auth');
+const authError = document.getElementById('auth-error');
+
+pwdInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') btnAuth.click(); });
+
+btnAuth.addEventListener('click', async function() {
+  const pwd = pwdInput.value.trim();
+  if (!pwd) { authError.textContent = 'Enter the password.'; return; }
+  btnAuth.disabled = true;
+  btnAuth.textContent = 'Checking…';
+  authError.textContent = '';
+
+  // Validate password via a quick ping to the worker
+  try {
+    const r = await fetch(WORKER + '/illustrator-complete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ portal_password: pwd, user_id: '_check_', illustration_url: '_check_' })
+    });
+    // A 403 means wrong password; a 400 (missing fields) means it passed auth
+    if (r.status === 403) {
+      authError.textContent = 'Incorrect password.';
+      btnAuth.disabled = false;
+      btnAuth.textContent = 'Continue →';
+      return;
+    }
+    // Any other response (400, 200) = authenticated
+    password = pwd;
+    authGate.style.display = 'none';
+    portal.classList.add('visible');
+    loadUserInfo();
+  } catch (err) {
+    authError.textContent = 'Could not reach server — check your connection.';
+    btnAuth.disabled = false;
+    btnAuth.textContent = 'Continue →';
+  }
+});
+
+// ── Load user info ────────────────────────────────────────
+async function loadUserInfo() {
+  if (!userId) {
+    document.getElementById('no-user-warn').style.display = 'block';
+    return;
+  }
+  try {
+    const r = await fetch(
+      SB_URL + '/rest/v1/course_users?id=eq.' + userId + '&select=full_name,email',
+      { headers: { apikey: SB_ANON, Authorization: 'Bearer ' + SB_ANON } }
+    );
+    const rows = r.ok ? await r.json() : [];
+    const user = rows?.[0];
+    if (user) {
+      document.getElementById('pc-name').textContent  = user.full_name || '(no name)';
+      document.getElementById('pc-email').textContent = user.email || '';
+    }
+    // Load their childhood photo
+    const pr = await fetch(
+      SB_URL + '/rest/v1/tool_outputs?user_id=eq.' + userId + '&tool_name=eq.childhood_photo&select=output_data',
+      { headers: { apikey: SB_ANON, Authorization: 'Bearer ' + SB_ANON } }
+    );
+    const prows = pr.ok ? await pr.json() : [];
+    const photoUrl = prows?.[0]?.output_data?.photo_url;
+    if (photoUrl) {
+      document.getElementById('pc-photo').innerHTML = '<img src="' + photoUrl + '" alt="Childhood photo" />';
+    } else {
+      document.getElementById('pc-photo').innerHTML = '<p style="font-size:0.78rem;color:var(--muted);margin-top:0.5rem">Childhood photo not yet uploaded.</p>';
+    }
+    document.getElementById('person-card').style.display = 'block';
+  } catch (e) {
+    console.warn('User load failed:', e);
+  }
+}
+
+// ── File handling ─────────────────────────────────────────
+const dropZone    = document.getElementById('drop-zone');
+const illustInput = document.getElementById('illus-input');
+const preview     = document.getElementById('illus-preview');
+const previewImg  = document.getElementById('illus-preview-img');
+const btnChange   = document.getElementById('btn-change-illus');
+const btnSubmit   = document.getElementById('btn-submit');
+const statusEl    = document.getElementById('status');
+
+function handleIllusFile(file) {
+  if (!file || !file.type.startsWith('image/')) {
+    setStatus('Please choose an image file.', true); return;
+  }
+  illustFile = file;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    previewImg.src = e.target.result;
+    dropZone.style.display = 'none';
+    preview.classList.add('visible');
+    btnSubmit.disabled = false;
+    setStatus('');
+  };
+  reader.readAsDataURL(file);
+}
+
+illustInput.addEventListener('change', function() { if (illustInput.files[0]) handleIllusFile(illustInput.files[0]); });
+dropZone.addEventListener('dragover', function(e) { e.preventDefault(); dropZone.classList.add('over'); });
+dropZone.addEventListener('dragleave', function() { dropZone.classList.remove('over'); });
+dropZone.addEventListener('drop', function(e) {
+  e.preventDefault(); dropZone.classList.remove('over');
+  if (e.dataTransfer.files[0]) handleIllusFile(e.dataTransfer.files[0]);
+});
+btnChange.addEventListener('click', function() {
+  illustFile = null;
+  previewImg.src = '';
+  preview.classList.remove('visible');
+  dropZone.style.display = '';
+  illustInput.value = '';
+  btnSubmit.disabled = true;
+  setStatus('');
+});
+
+// ── Submit ────────────────────────────────────────────────
+btnSubmit.addEventListener('click', async function() {
+  if (!illustFile) { setStatus('Choose an illustration file first.', true); return; }
+  if (!userId)     { setStatus('No user_id — copy the link from the email.', true); return; }
+  if (!password)   { setStatus('Not authenticated.', true); return; }
+
+  btnSubmit.disabled = true;
+  btnSubmit.textContent = 'Uploading…';
+  setStatus('Uploading illustration…');
+
+  try {
+    // Send image as base64 to worker — worker stores in Supabase Storage with service key
+    const base64 = await fileToBase64(illustFile);
+    const r = await fetch(WORKER + '/illustrator-upload-image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        portal_password: password,
+        user_id: userId,
+        image_base64: base64,
+        mime_type: illustFile.type,
+        ext: illustFile.name.split('.').pop().toLowerCase() || 'png',
+      })
+    });
+    const result = await r.json();
+    if (!r.ok || !result.illustration_url) throw new Error(result.error || 'Upload failed');
+
+    setStatus('Saving and notifying user…');
+
+    // Call illustrator-complete to update DB + email user
+    const cr = await fetch(WORKER + '/illustrator-complete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ portal_password: password, user_id: userId, illustration_url: result.illustration_url })
+    });
+    const cres = await cr.json();
+    if (!cr.ok) throw new Error(cres.error || 'Complete step failed');
+
+    setStatus('');
+    document.querySelector('.upload-section').style.display = 'none';
+    document.querySelector('.submit-row').style.display = 'none';
+    document.getElementById('success-card').classList.add('visible');
+
+  } catch (err) {
+    console.error('Submit error:', err);
+    setStatus('Something went wrong — ' + (err.message || 'try again.'), true);
+    btnSubmit.disabled = false;
+    btnSubmit.textContent = 'Send illustration →';
+  }
+});
+
+function fileToBase64(file) {
+  return new Promise(function(resolve, reject) {
+    var reader = new FileReader();
+    reader.onload  = function(e) { resolve(e.target.result.split(',')[1]); };
+    reader.onerror = function()  { reject(new Error('File read failed')); };
+    reader.readAsDataURL(file);
+  });
+}
+
+function setStatus(msg, isErr) {
+  statusEl.textContent = msg || '';
+  statusEl.className = 'status' + (isErr ? ' err' : '');
+}
+</script>
+</body>
+</html>
