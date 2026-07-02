@@ -59,7 +59,10 @@
     #view-session {
       width: 100%;
       max-width: 100%;
-      overflow-x: clip;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
 
     #view-loading { align-items: center; justify-content: center; gap: 1.5rem; }
@@ -206,12 +209,22 @@
       width: 100%;
       min-width: 0;
       margin: 0 auto;
-      padding: 3rem 2rem;
-      align-items: start;
+      padding: 2rem;
+      align-items: stretch;
       gap: 2rem;
       box-sizing: border-box;
+      overflow: hidden;
     }
-    .session-info { padding-right: 0; position: sticky; top: 100px; min-width: 0; max-width: 100%; }
+    .session-info {
+      padding-right: 0.5rem;
+      min-width: 0;
+      max-width: 100%;
+      overflow-y: auto;
+      padding-bottom: 2rem;
+    }
+    .session-info::-webkit-scrollbar { width: 3px; }
+    .session-info::-webkit-scrollbar-track { background: transparent; }
+    .session-info::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.07); border-radius: 2px; }
     .session-tag-label { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--session-col); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
     .session-tag-label::before { content: ''; width: 20px; height: 1px; background: var(--session-col); display: inline-block; }
     .session-info h1 { font-family: var(--font-display); font-size: clamp(1.8rem, 3.5vw, 2.5rem); font-weight: 400; font-style: italic; line-height: 1.15; margin-bottom: 1rem; }
@@ -243,10 +256,11 @@
     .session-chat-col {
       display: flex;
       flex-direction: column;
-      min-height: calc(100vh - 200px);
       min-width: 0;
+      min-height: 0;
       width: 100%;
       max-width: 100%;
+      padding-bottom: 2rem;
     }
     .chat-container {
       flex: 1;
@@ -256,7 +270,7 @@
       border: 1px solid var(--session-border);
       border-radius: 28px;
       overflow: hidden;
-      min-height: 580px;
+      min-height: 0;
       min-width: 0;
       max-width: 100%;
     }
@@ -313,7 +327,6 @@
     .chat-textarea:focus { border-color: var(--session-col); }
     .chat-textarea::placeholder { color: var(--text-muted); }
     .btn-send { width: 44px; height: 44px; background: var(--session-col); border: none; border-radius: 12px; color: var(--dark); font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: opacity 0.2s, transform 0.15s; }
-    .chat-ready-hint { text-align: center; font-size: 0.72rem; color: var(--text-muted); opacity: 0.5; padding: 0.4rem 1rem 0.6rem; margin: 0; letter-spacing: 0.01em; }
     .btn-send:hover:not(:disabled) { opacity: 0.85; transform: scale(1.05); }
     .btn-send:disabled { opacity: 0.35; cursor: default; transform: none; }
 
@@ -398,7 +411,7 @@
     .snap-bar-val { color: var(--session-col); }
     .snap-bar-track { height: 3px; background: rgba(255,255,255,0.07); border-radius: 2px; overflow: hidden; }
     .snap-bar-fill { height: 100%; border-radius: 2px; background: var(--session-col); }
-    .snap-mini-svg { width: 100%; display: block; margin-bottom: 6px; }
+    .snap-mini-svg { width: 100%; max-width: 90px; display: block; margin: 0 auto 6px; }
     .snap-glow-legend { display: flex; justify-content: space-between; font-size: 0.62rem; color: rgba(240,236,228,0.4); margin-bottom: 6px; font-family: var(--font-mono); letter-spacing: 0.06em; }
     .snap-delta-up { color: #9dbf8a; }
     .snap-delta-down { color: #e8734a; }
@@ -438,9 +451,10 @@
       .nav-user { display: none; }
       .session-nav { padding: 0.875rem 1rem; }
       .session-nav-label { display: none; }
-      .session-main { grid-template-columns: 1fr; padding: 0; gap: 0; }
+      .session-main { grid-template-columns: 1fr; padding: 0; gap: 0; overflow: visible; }
+      #view-session { height: auto; overflow: visible; }
       .session-info { display: none; }
-      .session-chat-col { min-height: calc(100vh - 60px); padding: 0; }
+      .session-chat-col { min-height: calc(100vh - 60px); padding: 0; min-height: 0; }
       .chat-container { min-height: calc(100vh - 60px); border-radius: 0; border-left: none; border-right: none; border-bottom: none; }
       .chat-header { padding: 1rem; }
       .chat-messages { padding: 1rem; }
@@ -555,7 +569,6 @@
             <button type="button" class="btn-mic no-speech-hide" id="chat-mic" title="Speak your answer" aria-label="Speak your answer">🎤</button>
             <button class="btn-send" id="btn-send" disabled>↑</button>
           </div>
-          <p class="chat-ready-hint">Ready to wrap up this session? Just say so.</p>
           <div class="tool-embed-wrap" id="tool-embed-wrap">
             <div class="tool-embed-header">
               <span class="tool-embed-title" id="tool-embed-title">Tool</span>
@@ -1321,25 +1334,40 @@
     }
 
     function buildGlowMapCompareSvg(nowScores, thenScores, compareSession) {
-      var w = 280, h = 72, cx = 140, cy = 36, r = 30, n = GLOW_MAP_AXES.length;
+      // Square viewport so radar chart renders correctly (was 280x72 — too squished)
+      var s = 120, cx = 60, cy = 60, r = 44, n = GLOW_MAP_AXES.length;
       function polyPoints(scores) {
         return GLOW_MAP_AXES.map(function (key, i) {
           var angle = (i / n) * Math.PI * 2 - Math.PI / 2;
-          var val = (scores[key] || 5) / 10;
+          var val = Math.max(0, Math.min(10, scores[key] || 5)) / 10;
           var x = cx + r * val * Math.cos(angle);
           var y = cy + r * val * Math.sin(angle);
-          return Math.round(x) + ',' + Math.round(y);
+          return x.toFixed(1) + ',' + y.toFixed(1);
         }).join(' ');
       }
+      // Grid rings
+      var rings = '';
+      [0.25, 0.5, 0.75, 1].forEach(function(pct) {
+        var pts = GLOW_MAP_AXES.map(function(_, i) {
+          var angle = (i / n) * Math.PI * 2 - Math.PI / 2;
+          return (cx + r * pct * Math.cos(angle)).toFixed(1) + ',' + (cy + r * pct * Math.sin(angle)).toFixed(1);
+        }).join(' ');
+        rings += '<polygon points="' + pts + '" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.8"/>';
+      });
+      // Axis lines
+      var axes = GLOW_MAP_AXES.map(function(_, i) {
+        var angle = (i / n) * Math.PI * 2 - Math.PI / 2;
+        return '<line x1="' + cx + '" y1="' + cy + '" x2="' + (cx + r * Math.cos(angle)).toFixed(1) + '" y2="' + (cy + r * Math.sin(angle)).toFixed(1) + '" stroke="rgba(255,255,255,0.05)" stroke-width="0.8"/>';
+      }).join('');
       var svg =
-        '<svg class="snap-mini-svg" viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">' +
-        '<polyline points="' + polyPoints(thenScores) + '" fill="rgba(160,152,128,0.08)" stroke="rgba(160,152,128,0.55)" stroke-width="1.5" stroke-linejoin="round"/>' +
-        '<polyline points="' + polyPoints(nowScores) + '" fill="rgba(126,184,201,0.12)" stroke="#7eb8c9" stroke-width="2" stroke-linejoin="round"/>' +
+        '<svg class="snap-mini-svg" viewBox="0 0 ' + s + ' ' + s + '" xmlns="http://www.w3.org/2000/svg">' +
+        rings + axes +
+        (thenScores ? '<polygon points="' + polyPoints(thenScores) + '" fill="rgba(160,152,128,0.12)" stroke="rgba(160,152,128,0.5)" stroke-width="1.5" stroke-linejoin="round"/>' : '') +
+        '<polygon points="' + polyPoints(nowScores) + '" fill="rgba(126,184,201,0.15)" stroke="#7eb8c9" stroke-width="2" stroke-linejoin="round"/>' +
         '</svg>';
-      svg +=
-        '<div class="snap-glow-legend"><span>Session ' +
-        compareSession +
-        '</span><span style="color:#7eb8c9">Now</span></div>';
+      if (thenScores) {
+        svg += '<div class="snap-glow-legend"><span>Session ' + compareSession + '</span><span style="color:#7eb8c9">Now</span></div>';
+      }
       return svg;
     }
 
@@ -1356,8 +1384,9 @@
       }
       var card = msgs.querySelector('.tool-card[data-key="' + toolKey + '"]');
       var target = card ? card.closest('.tool-card-msg') || card : null;
-      if (target && target.scrollIntoView) {
-        target.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      if (target) {
+        var cRect = msgs.getBoundingClientRect(), tRect = target.getBoundingClientRect();
+        msgs.scrollTop = msgs.scrollTop + (tRect.top - cRect.top) - 80;
       } else {
         scrollChatToBottom();
       }
@@ -1429,7 +1458,16 @@
           if (frame.contentWindow) frame.contentWindow.scrollTo(0, 0);
         } catch (e) {}
       };
-      frame.src = toolInfo.file + '?uid=' + (currentUser ? currentUser.id : '') + '&session=' + (activeSession ? activeSession.number : 0) + '&token=' + encodeURIComponent(token) + '&embed=1';
+      // Pass existing scores so the tool can pre-populate instead of resetting
+      var toolSrc = toolInfo.file + '?uid=' + (currentUser ? currentUser.id : '') + '&session=' + (activeSession ? activeSession.number : 0) + '&token=' + encodeURIComponent(token) + '&embed=1';
+      if (toolKey === 'glow-map' && activeSession) {
+        var gmKey = getDbKey('glow-map', activeSession.number);
+        var existingGm = toolOutputsCache[gmKey];
+        if (existingGm && existingGm.scores) {
+          toolSrc += '&preload=' + encodeURIComponent(JSON.stringify(existingGm.scores));
+        }
+      }
+      frame.src = toolSrc;
       wrap.classList.add('active');
     }
 
