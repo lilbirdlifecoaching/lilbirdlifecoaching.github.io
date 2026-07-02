@@ -54,6 +54,7 @@
     .btn-save:hover { opacity: 0.85; }
     .btn-back2 { background: none; border: 1px solid var(--session-border); border-radius: 8px; padding: 0.75rem 1.25rem; color: var(--session-col); font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; text-decoration: none; display: inline-block; transition: background 0.2s; }
     .btn-back2:hover { background: var(--session-dim); }
+    #last-saved-note { transition: opacity 0.3s; }
   </style>
 </head>
 <body>
@@ -66,6 +67,7 @@
   <h1>Glow Map</h1>
   <p class="intro" id="intro-copy">Score each area of your life from 1–10. Where is energy flowing? Where is it dim? The shape that emerges tells you something your words might not.</p>
   <p class="intro" id="compare-note" style="display:none;margin-top:-1rem;font-size:0.8rem;color:var(--session-col);">Faded shape = Session 2 · Solid = today</p>
+  <p id="last-saved-note" style="display:none;font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:1.5rem;"></p>
 
   <div class="chart-wrap">
     <svg id="glow-svg" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg"></svg>
@@ -83,11 +85,10 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="embed-supabase.js"></script>
 <script>
   function goBack() {
     if (window.parent !== window) {
-      window.parent.postMessage({ type: 'tool-cancel' }, '*');
+      window.parent.postMessage({ type: 'tool-close' }, '*');
     } else {
       history.back();
     }
@@ -222,7 +223,7 @@
     if (!currentUser) return;
     const toolName = sessionNum === 2 ? 'glow_map_s2' : sessionNum === 4 ? 'glow_map_s4' : 'glow_map_s7';
     try {
-      await sb.from('tool_outputs').upsert({ user_id: currentUser.id, tool_name: toolName, output_data: { scores }, updated_at: new Date().toISOString() }, { onConflict: 'user_id,tool_name' });
+      const now = new Date().toISOString(); await sb.from('tool_outputs').upsert({ user_id: currentUser.id, tool_name: toolName, output_data: { scores, saved_at: now }, updated_at: now }, { onConflict: 'user_id,tool_name' });
     } catch {}
   }
 
@@ -230,10 +231,12 @@
     await autoSave();
     const s = document.getElementById('save-status');
     s.classList.add('visible');
-    if (window.parent !== window && window.LilbirdEmbed) {
-      LilbirdEmbed.finishEmbedSave('glow-map', { scores: { ...scores } });
-    } else if (window.parent !== window) {
-      setTimeout(function() { window.parent.postMessage('tool-close', '*'); }, 1800);
+    if (window.parent !== window) {
+      // Send save data to parent so it can update the chat card immediately
+      window.parent.postMessage({ type: 'tool-save', toolKey: 'glow-map', data: { scores: { ...scores } } }, '*');
+      setTimeout(function() {
+        window.parent.postMessage({ type: 'tool-close' }, '*');
+      }, 600);
     } else {
       setTimeout(() => s.classList.remove('visible'), 2500);
     }
@@ -242,6 +245,14 @@
   (async () => {
     const params = new URLSearchParams(window.location.search);
     const urlUid = params.get('uid');
+
+    // Read ?preload= scores passed from parent (existing scores — skip DB round-trip)
+    const preloadParam = params.get('preload');
+    let preloadScores = null;
+    if (preloadParam) {
+      try { preloadScores = JSON.parse(decodeURIComponent(preloadParam)); } catch(e) {}
+    }
+
     if (urlUid) {
       currentUser = { id: urlUid };
       if (_token) { try { await sb.auth.setSession({ access_token: _token, refresh_token: '' }); } catch(e) {} }
@@ -251,11 +262,30 @@
         if (session?.user) currentUser = session.user;
       } catch(e) {}
     }
-    if (currentUser) {
+
+    if (preloadScores && Object.keys(preloadScores).length) {
+      // Use preloaded scores — no DB fetch needed for current scores
+      scores = { ...scores, ...preloadScores };
+    } else if (currentUser) {
+      // Fetch from Supabase
       const toolName = sessionNum === 2 ? 'glow_map_s2' : sessionNum === 4 ? 'glow_map_s4' : 'glow_map_s7';
-      const { data } = await sb.from('tool_outputs').select('output_data').eq('user_id', currentUser.id).eq('tool_name', toolName).maybeSingle();
-      if (data?.output_data?.scores) scores = { ...scores, ...data.output_data.scores };
-      if (showCompare) {
+      try {
+        const { data } = await sb.from('tool_outputs').select('output_data').eq('user_id', currentUser.id).eq('tool_name', toolName).maybeSingle();
+        if (data?.output_data?.scores) scores = { ...scores, ...data.output_data.scores };
+        // Show last completed date
+        if (data?.output_data?.saved_at) {
+          const d = new Date(data.output_data.saved_at);
+          const note = document.getElementById('last-saved-note');
+          if (note) {
+            note.textContent = 'Last saved ' + d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
+            note.style.display = 'block';
+          }
+        }
+      } catch(e) {}
+    }
+
+    if (currentUser && showCompare) {
+      try {
         const { data: s2 } = await sb.from('tool_outputs').select('output_data').eq('user_id', currentUser.id).eq('tool_name', 'glow_map_s2').maybeSingle();
         if (s2?.output_data?.scores) {
           compareScores = { ...s2.output_data.scores };
@@ -264,8 +294,9 @@
           var intro = document.getElementById('intro-copy');
           if (intro) intro.textContent = 'Score where you are now. The faded shape is your Session 2 map — see what brightened or dimmed.';
         }
-      }
+      } catch(e) {}
     }
+
     buildSliders();
     drawChart();
   })();
