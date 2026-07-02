@@ -1569,7 +1569,7 @@
         el.appendChild(wrap);
       }
       if (toolMatch && role==='assistant') { var tk=toolMatch[1], ti=TOOL_MAP[tk]; if (ti) setTimeout(function(){renderToolCard(tk,ti,el);}, cleanContent?400:0); }
-      if (/\[COMPLETE\]/.test(msgContent) && role==='assistant') { setTimeout(function(){ var p=document.getElementById('complete-panel'); if(p) p.classList.add('visible'); },600); }
+      if (/\[COMPLETE\]/.test(msgContent) && role==='assistant') { var _sStatus = activeSession && sessionData.find(function(s){return s.session_number===activeSession.number;})?.status; if (_sStatus !== 'complete') { setTimeout(function(){ var p=document.getElementById('complete-panel'); if(p) p.classList.add('visible'); },600); } }
       if (scrollMode !== false) el.scrollTop = el.scrollHeight;
     }
 
@@ -1910,6 +1910,9 @@
 
     async function completeSession() {
       if (!activeSession) return;
+      // Don't re-run completion if session is already marked complete in DB
+      const alreadyDone = sessionData.find(s => s.session_number === activeSession.number)?.status === 'complete';
+      if (alreadyDone) { showView('view-dashboard'); return; }
       const btn=document.getElementById('btn-complete');
       btn.disabled=true; btn.textContent='Saving your session...';
       const withTimeout=(p,ms)=>Promise.race([p,new Promise(r=>setTimeout(()=>r(null),ms))]);
