@@ -2449,10 +2449,10 @@
 ══════════════════════════════════════ -->
 <div class="screen active" id="screen-intro">
   <div class="inner">
-    <p class="eyebrow">The Inner Compass</p>
-    <h1>Who are you <em>really?</em></h1>
-    <p class="intro-lead">Inner Compass is a guided read on your wiring: patterns, strengths, what drains you, and where you're headed. Built for people in transition who want words for what they've been circling.</p>
-    <p class="intro-mechanic">Not multiple choice. A conversation. Your answers shape the read; what comes back should feel specific to you, not a generic quiz label.</p>
+    <p class="eyebrow">Where are you now?</p>
+    <h1>What's really going on <em>inside?</em></h1>
+    <p class="intro-lead">A guided read on the season you're in — your wiring, what's draining you, and the gap between who you are and how you're showing up. Built for people who want clarity, not another quiz label.</p>
+    <p class="intro-mechanic">Not multiple choice. A conversation. Your answers shape the read; what comes back should feel specific to you.</p>
     <div class="intro-features">
       <div class="intro-feature">
         <div class="intro-icon">✦</div>
@@ -2572,8 +2572,8 @@
 
 <div class="dp-modal-overlay" id="modal-pair-these" role="dialog" aria-modal="true">
   <div class="dp-modal">
-    <h3 id="pair-title">Quick tie-breaker</h3>
-    <p id="pair-instruction">Which line lands closest? Gut first — no wrong answer.</p>
+    <h3 id="pair-title">Which line lands?</h3>
+    <p id="pair-instruction">Pick the one that sounds most like you — gut first.</p>
     <div class="pair-these-grid" id="pair-these-rows"></div>
     <button type="button" class="btn btn-gold" style="width:100%;justify-content:center;" id="pair-done-btn" onclick="closePairThese()" disabled>Confirm →</button>
   </div>
@@ -2595,39 +2595,18 @@
   </div>
 </div>
 
-<div class="dp-modal-overlay" id="modal-peak-plunge" role="dialog" aria-modal="true">
-  <div class="dp-modal" style="max-width:480px;">
-    <h3>Peak &amp; Plunge</h3>
-    <p>Optional — tap the curve at each decade to mark a high or low. Messy is fine; we're reading shape, not polish.</p>
-    <div class="peak-svg-wrap" id="peak-svg-wrap">
-      <svg id="peak-svg" viewBox="0 0 400 180" xmlns="http://www.w3.org/2000/svg">
-        <line x1="40" y1="90" x2="360" y2="90" stroke="rgba(245,200,66,0.35)" stroke-width="2"/>
-        <text x="40" y="105" fill="rgba(240,236,228,0.45)" font-size="10" font-family="DM Mono,monospace">20s</text>
-        <text x="120" y="105" fill="rgba(240,236,228,0.45)" font-size="10" font-family="DM Mono,monospace">30s</text>
-        <text x="200" y="105" fill="rgba(240,236,228,0.45)" font-size="10" font-family="DM Mono,monospace">40s</text>
-        <text x="280" y="105" fill="rgba(240,236,228,0.45)" font-size="10" font-family="DM Mono,monospace">50s+</text>
-        <polyline id="peak-line" fill="none" stroke="#9dbf8a" stroke-width="2.5" points=""/>
-      </svg>
-    </div>
-    <div class="btn-row">
-      <button type="button" class="btn btn-outline" onclick="skipPeakPlunge()">Skip — I'll stick to words</button>
-      <button type="button" class="btn btn-gold" onclick="savePeakPlunge()">Save curve →</button>
-    </div>
-  </div>
-</div>
-
 
 <!-- ══════════════════════════════════════
      LIFE CANVAS — INTRO + 5 DIMENSIONS
 ══════════════════════════════════════ -->
 <div class="screen" id="screen-canvas">
   <div class="inner">
-    <p class="eyebrow">the life canvas</p>
+    <p class="eyebrow">where you are now</p>
     <h2>The season<br><em>you're in.</em></h2>
 
     <div class="canvas-intro">
-      <p>Your personality tells us <em>who you are.</em> The conditions check-in tells us <em>what you're operating under right now.</em> Both matter — and together they tell a much more honest story.</p>
-      <p style="margin-top:0.75rem;">Five areas. Five sliders. No right answers. This is just for you.</p>
+      <p>Your story tells us <em>who you are.</em> This check-in tells us <em>what you're operating under right now.</em> Both matter — together they show where you actually are.</p>
+      <p style="margin-top:0.75rem;">Five sliders. No right answers. Drag to where you are today — takes about two minutes.</p>
     </div>
 
     <!-- WHY -->
@@ -2643,7 +2622,6 @@
         <div class="canvas-score-display" id="score-why">50</div>
         <div class="canvas-score-label">out of 100</div>
       </div>
-      <textarea class="canvas-dim-textarea" id="canvas-why-text" placeholder="Describe it in your own words — even a few sentences helps..."></textarea>
     </div>
 
     <!-- WHO -->
@@ -2659,7 +2637,6 @@
         <div class="canvas-score-display" id="score-who">50</div>
         <div class="canvas-score-label">out of 100</div>
       </div>
-      <textarea class="canvas-dim-textarea" id="canvas-who-text" placeholder="Tell us about your people..."></textarea>
     </div>
 
     <!-- WHERE -->
@@ -2675,7 +2652,6 @@
         <div class="canvas-score-display" id="score-where">50</div>
         <div class="canvas-score-label">out of 100</div>
       </div>
-      <textarea class="canvas-dim-textarea" id="canvas-where-text" placeholder="Describe your place..."></textarea>
     </div>
 
     <!-- WHAT -->
@@ -2691,7 +2667,6 @@
         <div class="canvas-score-display" id="score-what">50</div>
         <div class="canvas-score-label">out of 100</div>
       </div>
-      <textarea class="canvas-dim-textarea" id="canvas-what-text" placeholder="Describe where you actually are..."></textarea>
     </div>
 
     <!-- HOW -->
@@ -2707,7 +2682,11 @@
         <div class="canvas-score-display" id="score-how">50</div>
         <div class="canvas-score-label">out of 100</div>
       </div>
-      <textarea class="canvas-dim-textarea" id="canvas-how-text" placeholder="Be honest. This is just for you."></textarea>
+    </div>
+
+    <div class="canvas-season-note" style="margin-top:1.5rem;">
+      <p style="font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:0.5rem;">Optional — anything else about this season?</p>
+      <textarea class="canvas-dim-textarea" id="canvas-season-note" placeholder="One paragraph if something doesn't fit the sliders — or skip this and continue."></textarea>
     </div>
 
     <div class="btn-row" style="margin-top:1rem;">
@@ -2866,7 +2845,7 @@
       <p class="offer-codes-title">🎁 your discount codes — save these</p>
       <div class="offer-item">
         <span class="offer-code">IMREADY</span>
-        <p class="offer-desc">Fixed price $149 for your first <a href="https://calendly.com/lilbirdlifecoaching/first-flight-session" target="_blank">First Flight coaching session →</a></p>
+        <p class="offer-desc">Fixed price $149 for your first <a href="/first-flight/book.html?code=IMREADY" target="_blank">First Flight coaching session →</a></p>
       </div>
       <div class="offer-item">
         <span class="offer-code">SOLO50</span>
@@ -3104,7 +3083,7 @@
               <h3 class="sidebar-card-title">Book a First Flight</h3>
               <p class="sidebar-card-body">A one-to-one session with Luke that takes everything in your read and turns it into a real conversation — and a real next step.</p>
               <p class="sidebar-code">Use code <strong>IMREADY</strong> for a fixed price of $149</p>
-              <a href="https://calendly.com/lilbirdlifecoaching/first-flight-session" target="_blank" class="btn btn-gold" style="width:100%;justify-content:center;margin-top:1rem;">Book now →</a>
+              <a href="/first-flight/book.html?code=IMREADY" target="_blank" class="btn btn-gold" style="width:100%;justify-content:center;margin-top:1rem;">Book now →</a>
             </div>
 
             <div class="sidebar-card" style="margin-top:0.75rem;">
@@ -3239,7 +3218,7 @@
 // ═══════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════
-const DEEP_PROFILE_BUILD = 'v7.3.0-20260528-phase-bc';
+const DEEP_PROFILE_BUILD = 'v7.4.0-20260528-flow-trim';
 /** Default: email unlock for ads/lead gen. Add ?paywall=1 to URL to restore pay-what-you-want flow. */
 const INNER_COMPASS_PAYWALL = (function(){
   try{ return new URLSearchParams(window.location.search).get('paywall') === '1'; }catch(_){ return false; }
@@ -3544,7 +3523,7 @@ async function processPayment(){
       if(SHEETS_URL && profileData) logToSheet({ event: 'promo_unlock', email: emailVal, paid: 'yes', amount: 0, promoCode: 'promo' });
       try{
         // Store profile in KV first so Nest link works
-        await fetch(`${WORKER_URL}/store-profile`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nestId,profile:profileData,canvasScores,canvasHistory:[],assessmentMode: assessmentPath === 'know' ? 'know-type' : 'full',peakPlunge: peakPlungeData,pairTheseLog})});
+        await fetch(`${WORKER_URL}/store-profile`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nestId,profile:profileData,canvasScores,canvasHistory:[],assessmentMode: assessmentPath === 'know' ? 'know-type' : 'full',pairTheseLog})});
         if(launchToken){ _postCourseLink(nestId).catch(err => console.warn('Course link unhandled:', err)); }
         _linkToNestIfLoggedIn(nestId).catch(err => console.warn('Nest link unhandled:', err));
         // Then send email (which also marks as paid in KV)
@@ -3861,7 +3840,6 @@ async function runAnalysis(){
       previewRead:previewReadForFinal,
       assessmentMode: assessmentPath === 'know' ? 'know-type' : 'full',
       userDeclaredTypes: assessmentPath === 'know' ? userDeclaredTypes : undefined,
-      peakPlunge: responses.peakPlunge,
       pairTheseLog: responses.pairTheseLog,
     };
     const r=await fetch(`${WORKER_URL}/analyze`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(analyzePayload)});
@@ -3878,7 +3856,7 @@ async function runAnalysis(){
       console.error('Profile JSON parse error:', parseErr.message, 'Raw:', raw.slice(0,300));
       throw new Error('Profile parsing failed');
     }
-    await fetch(`${WORKER_URL}/store-profile`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nestId,profile:profileData,canvasScores,canvasHistory:[],assessmentMode: assessmentPath === 'know' ? 'know-type' : 'full',peakPlunge: peakPlungeData,pairTheseLog})});
+    await fetch(`${WORKER_URL}/store-profile`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nestId,profile:profileData,canvasScores,canvasHistory:[],assessmentMode: assessmentPath === 'know' ? 'know-type' : 'full',pairTheseLog})});
     if(launchToken){ _postCourseLink(nestId).catch(err => console.warn('Course link unhandled:', err)); }
     _linkToNestIfLoggedIn(nestId).catch(err => console.warn('Nest link unhandled:', err));
   }catch(e){
@@ -4091,7 +4069,6 @@ async function unlockFullRead(){
         canvasHistory:canvasHistory || [],
         email:emailVal,
         assessmentMode: assessmentPath === 'know' ? 'know-type' : 'full',
-        peakPlunge: peakPlungeData,
         pairTheseLog,
       }),
     });
@@ -4845,7 +4822,7 @@ function renderResults(profile){
     appendNestCta(ns.secondaryCta, false);
     if(!act.children.length){
       appendNestCta({ label: 'Free discovery call →', url: 'https://calendly.com/lilbirdlifecoaching/30min' }, true);
-      appendNestCta({ label: 'First Flight — from $149 →', url: 'https://calendly.com/lilbirdlifecoaching/first-flight-session' }, false);
+      appendNestCta({ label: 'First Flight — from $149 →', url: '/first-flight/book.html?code=IMREADY' }, false);
     }
   }
   bindSaturdayOptIn();
@@ -5139,12 +5116,8 @@ function clearAndRestart(){
   earlyExitToCanvas = false;
   earlyReadPromptShown = false;
   pairTheseLog = { tiebreakers: [], evidencePulses: [], sliderPulses: [] };
-  peakPlungeData = null;
   midReadDepthCache = 12;
-  window._peakPts = null;
   userDeclaredTypes = { mbti:'', enneagram:'', attachment:'' };
-  const peakSvg = document.getElementById('peak-svg');
-  if(peakSvg) peakSvg.dataset.bound = '';
   selectAssessmentPath('full');
   ['know-mbti','know-enneagram','know-attachment'].forEach(function(id){
     var el = document.getElementById(id);
@@ -5219,7 +5192,7 @@ function getFallbackProfile(){
       headline: 'Worth a real conversation',
       body: 'There\'s a gap between how you\'re wired and how you\'re showing up — that\'s data, not failure. A free discovery call is the straightest way to talk it through: fit, cost, and one honest next step.',
       primaryCta: { label: 'Free discovery call →', url: 'https://calendly.com/lilbirdlifecoaching/30min' },
-      secondaryCta: { label: 'First Flight — from $149 →', url: 'https://calendly.com/lilbirdlifecoaching/first-flight-session' },
+      secondaryCta: { label: 'First Flight — from $149 →', url: '/first-flight/book.html?code=IMREADY' },
       tier: 'bridge',
     },
   };
@@ -5312,7 +5285,6 @@ let userDeclaredTypes = { mbti:'', enneagram:'', attachment:'' };
 let pairTheseLog = { tiebreakers: [], evidencePulses: [], sliderPulses: [] };
 let lastPartnerDynamic = null;
 let lastPartnerRelationship = 'partner';
-let peakPlungeData = null;
 let earlyExitToCanvas = false;
 let midReadDepthCache = 12;
 let earlyReadPromptShown = false;
@@ -5729,9 +5701,7 @@ function startChat() {
   earlyExitToCanvas = false;
   earlyReadPromptShown = false;
   pairTheseLog = { tiebreakers: [], evidencePulses: [], sliderPulses: [] };
-  peakPlungeData = null;
   midReadDepthCache = 12;
-  window._peakPts = null;
   var rh = document.getElementById('intro-retake-hint');
   if(rh) rh.hidden = true;
   if(assessmentPath === 'know'){
@@ -5811,59 +5781,6 @@ function updateDepthMeter(score){
   if(fill) fill.style.width = s + '%';
 }
 
-let peakPlungeDoneResolve = null;
-function openPeakPlungeModal(){
-  const el = document.getElementById('modal-peak-plunge');
-  if(el) el.classList.add('is-open');
-  initPeakPlungeSvg();
-  return new Promise(function(resolve){ peakPlungeDoneResolve = resolve; });
-}
-
-function initPeakPlungeSvg(){
-  const svg = document.getElementById('peak-svg');
-  if(!svg || svg.dataset.bound) return;
-  svg.dataset.bound = '1';
-  const xs = [60, 140, 220, 300];
-  const pts = peakPlungeData && peakPlungeData.length ? peakPlungeData : xs.map(function(x){ return { x:x, y:90 }; });
-  window._peakPts = pts;
-  svg.addEventListener('click', function(ev){
-    const rect = svg.getBoundingClientRect();
-    const mx = (ev.clientX - rect.left) / rect.width * 400;
-    let best = 0;
-    let dist = 9999;
-    for(let i=0;i<xs.length;i++){
-      const d = Math.abs(mx - xs[i]);
-      if(d < dist){ dist = d; best = i; }
-    }
-    const my = Math.max(30, Math.min(150, (ev.clientY - rect.top) / rect.height * 180));
-    window._peakPts[best] = { x: xs[best], y: my };
-    drawPeakLine();
-  });
-  drawPeakLine();
-}
-
-function drawPeakLine(){
-  const line = document.getElementById('peak-line');
-  if(!line || !window._peakPts) return;
-  const pts = window._peakPts;
-  const s = pts.map(function(p){ return p.x + ',' + p.y; }).join(' ');
-  line.setAttribute('points', s);
-}
-
-function skipPeakPlunge(){
-  peakPlungeData = [];
-  const el = document.getElementById('modal-peak-plunge');
-  if(el) el.classList.remove('is-open');
-  if(el && el.querySelector('#peak-svg')) el.querySelector('#peak-svg').dataset.bound = '';
-  if(peakPlungeDoneResolve){ peakPlungeDoneResolve(); peakPlungeDoneResolve = null; }
-}
-
-function savePeakPlunge(){
-  peakPlungeData = (window._peakPts || []).map(function(p){ return { x:p.x, y:p.y }; });
-  const el = document.getElementById('modal-peak-plunge');
-  if(el) el.classList.remove('is-open');
-  if(peakPlungeDoneResolve){ peakPlungeDoneResolve(); peakPlungeDoneResolve = null; }
-}
 
 function dismissEvidenceToast(){
   const toast = document.getElementById('evidence-toast');
@@ -5913,24 +5830,12 @@ async function runMidChapterPulse(chaptersComplete){
     var hasPair = mid.pairThese && mid.pairThese.choices && mid.pairThese.choices.length >= 2;
     var hasEvidence = !!mid.evidenceLine;
 
-    // Evidence card + tie-breaker at once caused the toast timer to expire during the modal.
-    // No tie-breaker: toast first (same as before). With tie-breaker: toast only after the modal closes.
-    if(!hasPair && hasEvidence){
-      showEvidenceToast(mid);
-    }
-
-    if(mid.firstHunch && mid.firstHunch.line){
-      const h = document.createElement('div');
-      h.className = 'chat-bubble';
-      h.innerHTML = '<div class="chat-bubble-content chat-ack"><p><strong>Early hunch:</strong> '+mid.firstHunch.line+'</p></div>';
-      const messagesEl = document.getElementById('chat-messages');
-      if(messagesEl){ messagesEl.appendChild(h); h.scrollIntoView({behavior:'smooth',block:'nearest'}); }
-      await sleep(600);
-    }
+    // Stagger: pick-a-line modal first, pause, then the "picking up" mirror — never stack in one beat.
     if(hasPair){
       await openPairThese(mid.pairThese);
+      await sleep(900);
     }
-    if(hasPair && hasEvidence){
+    if(hasEvidence){
       showEvidenceToast(mid);
     }
     if(mid.earlyReadEligible && !earlyReadPromptShown && !earlyExitToCanvas){
@@ -6063,34 +5968,7 @@ async function sendChatAnswer() {
     return;
   }
 
-  // Show thinking dots
-  if(thinkingEl) thinkingEl.classList.add('active');
-
-  // Get acknowledgment from AI (skip on shorter know-type path for pace)
-  var ack = null;
-  if(assessmentPath === 'know'){
-    await sleep(180);
-  }else{
-    ack = await getAcknowledgment(q.text, answer, AQ[currentQIndex + 1]?.text);
-  }
-
-  // Hide thinking
-  if(thinkingEl) thinkingEl.classList.remove('active');
-
-  // Show acknowledgment bubble
-  if(ack) {
-    const ackBubble = document.createElement('div');
-    ackBubble.className = 'chat-bubble';
-    ackBubble.innerHTML = `
-      <div class="chat-avatar"><img src="bird-logo.png" alt="" width="44" height="44" style="border-radius:10px;object-fit:contain;background:rgba(30,32,40,0.5);padding:2px"></div>
-      <div class="chat-bubble-content chat-ack">
-        <p>${ack}</p>
-      </div>
-    `;
-    messagesEl.appendChild(ackBubble);
-    ackBubble.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    await sleep(800);
-  }
+  await sleep(220);
 
   if(earlyExitToCanvas) return;
 
@@ -6115,11 +5993,6 @@ async function sendChatAnswer() {
   if(earlyExitToCanvas) return;
 
   const nextIdx = idxDone + 1;
-  const nextQ = aq[nextIdx];
-  if(assessmentPath === 'full' && nextQ && nextQ.id === 'q23' && peakPlungeData === null){
-    await openPeakPlungeModal();
-  }
-
   currentQIndex++;
   renderChatQuestion(currentQIndex);
 }
@@ -6179,7 +6052,6 @@ function collectChatResponses() {
     ch7h: chatAnswers.q27 || '',
     canvasScores,
     canvasTexts,
-    peakPlunge: peakPlungeData || undefined,
     pairTheseLog: (pairTheseLog.tiebreakers && pairTheseLog.tiebreakers.length) || (pairTheseLog.evidencePulses && pairTheseLog.evidencePulses.length) || (pairTheseLog.sliderPulses && pairTheseLog.sliderPulses.length)
       ? pairTheseLog
       : undefined,
@@ -6216,7 +6088,7 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 // LIFE CANVAS
 // ═══════════════════════════════════════
 let canvasScores = { why:50, who:50, where:50, what:50, how:50 };
-let canvasTexts  = { why:'', who:'', where:'', what:'', how:'' };
+let canvasTexts  = { why:'', who:'', where:'', what:'', how:'', seasonNote:'' };
 
 function updateSlider(sliderId, scoreId) {
   const val = document.getElementById(sliderId)?.value || 50;
@@ -6237,10 +6109,13 @@ function updateSlider(sliderId, scoreId) {
 function collectCanvasData() {
   ['why','who','where','what','how'].forEach(dim => {
     const slider = document.getElementById('canvas-'+dim);
-    const text   = document.getElementById('canvas-'+dim+'-text');
-    if(slider) canvasScores[dim] = parseInt(slider.value);
-    if(text)   canvasTexts[dim]  = text.value.trim();
+    if(slider) canvasScores[dim] = parseInt(slider.value, 10);
   });
+  const noteEl = document.getElementById('canvas-season-note');
+  canvasTexts = {
+    why:'', who:'', where:'', what:'', how:'',
+    seasonNote: (noteEl && noteEl.value) ? noteEl.value.trim() : '',
+  };
 }
 
 function submitCanvas() {
