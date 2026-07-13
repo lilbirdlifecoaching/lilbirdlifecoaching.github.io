@@ -38,7 +38,12 @@
       if (!trigger) return;
       e.preventDefault();
       var url = trigger.getAttribute('data-url');
-      if (!url || !(global.lbChatSafe && global.lbChatSafe.isAllowedCalendlyUrl(url))) return;
+      if (!url || !(global.lbChatSafe && global.lbChatSafe.isAllowedBookingUrl(url))) return;
+      // Intensive enrol is a site page — navigate (do not iframe Calendly-style).
+      if (global.lbChatSafe.isAllowedSiteBookingUrl(url)) {
+        global.location.href = url;
+        return;
+      }
       if (global.LbFirstFlight && global.LbFirstFlight.isFirstFlightUrl(url)) {
         global.LbFirstFlight.openModal();
         return;
