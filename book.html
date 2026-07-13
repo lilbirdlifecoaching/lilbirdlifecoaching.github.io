@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="/css/lilbird-theme-chrome.css" />
 
   <!-- ═══════════ SEO META TAGS ═══════════ -->
-  <meta name="description" content="Book life coaching with Luke Haythorpe: First Flight (2 hours), Life Change Intensive, monthly sessions, or a free discovery call. Bay Area &amp; Melbourne, in person and online." />
+  <meta name="description" content="Book life coaching with Luke Haythorpe: First Flight (2 hours), Life Change Intensive, ad hoc coaching, or a free discovery call. Bay Area &amp; Melbourne, in person and online." />
   <meta name="keywords" content="life coach, life coaching, life transitions coach, coach for millennials, career change coach, leadership coach, executive pastor coaching, startup coaching, Luke Haythorpe, lil bird coaching, GiANT Worldwide, clarity coaching, identity coaching" />
   <meta name="author" content="Luke Haythorpe" />
   <meta name="robots" content="index, follow" />
@@ -25,12 +25,12 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://lilbird.life/book.html" />
   <meta property="og:title" content="Book a Session — lil' bird coaching" />
-  <meta property="og:description" content="Book First Flight, the Life Change Intensive, monthly coaching, or a free discovery call with Luke Haythorpe." />
+  <meta property="og:description" content="Book First Flight, the Life Change Intensive, coaching, or a free discovery call with Luke Haythorpe." />
   <meta property="og:image" content="https://lilbird.life/bird-logo.png" />
   <meta property="og:site_name" content="lil’ bird coaching" />
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="Book a Session — lil' bird coaching" />
-  <meta name="twitter:description" content="Book First Flight, the Life Change Intensive, monthly coaching, or a free discovery call with Luke Haythorpe." />
+  <meta name="twitter:description" content="Book First Flight, the Life Change Intensive, coaching, or a free discovery call with Luke Haythorpe." />
   <meta name="twitter:image" content="https://lilbird.life/bird-logo.png" />
   <script type="application/ld+json">
   {
@@ -294,12 +294,34 @@
       display: none !important;
     }
 
-    #booking-panel-intensive {
+    #booking-panel-intensive,
+    #booking-panel-coaching {
       position: absolute;
       inset: 0;
       z-index: 2;
       overflow-y: auto;
     }
+
+    .coaching-pay-panel {
+      background: linear-gradient(165deg, #2f3340 0%, var(--dark-card) 45%, #252830 100%);
+      border: 1px solid rgba(245, 200, 66, 0.28);
+      border-radius: 6px;
+      padding: 2rem 1.75rem;
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+    .coaching-pay-panel h2 {
+      font-family: 'Playfair Display', serif;
+      font-weight: 400;
+      font-size: 1.75rem;
+      margin-bottom: 0.75rem;
+      color: var(--text-main);
+    }
+    .coaching-pay-panel h2 em { font-style: italic; color: var(--gold); }
+    .coaching-pay-panel p { color: var(--text-muted); line-height: 1.7; margin-bottom: 1rem; font-size: 0.95rem; }
 
     /* Loading state */
     .calendly-loading {
@@ -481,7 +503,7 @@
       </p>
 
       <div class="pricing-mini reveal reveal-delay-2">
-        <p><strong>Discovery</strong> — free · <strong>First Flight</strong> — $149 with code IMREADY (usually $299) · <strong>Solo</strong> — $197 · <strong>Intensive</strong> — on the call</p>
+        <p><strong>Discovery</strong> — free · <strong>First Flight</strong> — $149 with code IMREADY (usually $299) · <strong>Coaching</strong> — $249 · <strong>Solo</strong> — $197 · <strong>Intensive</strong> — on the call</p>
       </div>
 
       <!-- Session type selector -->
@@ -501,10 +523,10 @@
           <p class="opt-tag">in person · full program · on the call</p>
           <p class="opt-desc">Eight in-person sessions through the full arc. Scope and investment are covered on a discovery call first — then enrol on lilbird.life when you're ready.</p>
         </div>
-        <div class="session-option" data-url="https://calendly.com/lilbirdlifecoaching/coaching" onclick="switchSession(this)">
-          <p class="opt-name">Monthly Coaching</p>
-          <p class="opt-tag">flexible · recurring or once-off</p>
-          <p class="opt-desc">A regular thinking partner, or one good conversation when something specific needs working through. Recurring or once-off. No pressure to commit beyond what you need.</p>
+        <div class="session-option" id="coaching" data-url="/coaching/book.html" onclick="switchSession(this)">
+          <p class="opt-name">Coaching</p>
+          <p class="opt-tag">$249 · ad hoc · when you need it</p>
+          <p class="opt-desc">A thinking partner for one good conversation when something specific needs working through — no monthly plan, no pressure to commit beyond this session.</p>
         </div>
       </div>
 
@@ -550,6 +572,19 @@
         </ol>
         <div class="intensive-cta-wrap">
           <a class="intensive-cta" href="/intensive/enrol.html">Start enrolment →</a>
+        </div>
+      </div>
+      <div id="booking-panel-coaching" class="coaching-pay-panel booking-panel-hidden">
+        <p class="section-label" style="margin-bottom:1rem;">coaching · $249</p>
+        <h2>Pay securely, then <em>pick your time.</em></h2>
+        <p>Ad hoc 1-to-1 with Luke — $249 for one session. You'll pay on lilbird.life via Stripe, then book on Cal.com (no second payment).</p>
+        <ol class="intensive-steps">
+          <li>1. Enter your name &amp; email</li>
+          <li>2. Pay $249 via secure Stripe checkout</li>
+          <li>3. Choose your session time on Cal.com</li>
+        </ol>
+        <div class="intensive-cta-wrap">
+          <a class="intensive-cta" href="/coaching/book.html">Continue to payment →</a>
         </div>
       </div>
     </div>
@@ -605,14 +640,26 @@
       document.getElementById('cal-loading').classList.add('hidden');
     }, 4000);
 
+    function hideAllBookingPanels() {
+      document.getElementById('booking-panel-calendly').classList.add('booking-panel-hidden');
+      document.getElementById('booking-panel-intensive').classList.add('booking-panel-hidden');
+      document.getElementById('booking-panel-coaching').classList.add('booking-panel-hidden');
+    }
+
     function switchToIntensiveEnrol(el) {
       document.querySelectorAll('.session-option').forEach(function (o) { o.classList.remove('active'); });
       el.classList.add('active');
       if (window.LbFirstFlight && window.LbFirstFlight.closeModal) {
         window.LbFirstFlight.closeModal();
       }
-      document.getElementById('booking-panel-calendly').classList.add('booking-panel-hidden');
+      hideAllBookingPanels();
       document.getElementById('booking-panel-intensive').classList.remove('booking-panel-hidden');
+    }
+
+    function switchToCoaching(el) {
+      document.querySelectorAll('.session-option').forEach(function (o) { o.classList.remove('active'); });
+      el.classList.add('active');
+      window.location.href = '/coaching/book.html';
     }
 
     function switchToFirstFlight(el) {
@@ -630,12 +677,16 @@
         switchToFirstFlight(el);
         return;
       }
+      if (el.id === 'coaching') {
+        switchToCoaching(el);
+        return;
+      }
       switchCalendly(el);
     }
 
-    // Switch session type (Calendly embed)
+    // Switch session type (Calendly embed — discovery)
     function switchCalendly(el) {
-      document.getElementById('booking-panel-intensive').classList.add('booking-panel-hidden');
+      hideAllBookingPanels();
       document.getElementById('booking-panel-calendly').classList.remove('booking-panel-hidden');
       document.querySelectorAll('.session-option').forEach(o => o.classList.remove('active'));
       el.classList.add('active');
@@ -660,8 +711,6 @@
 
     const SESSION_DEEP_LINKS = {
       discovery: 'https://calendly.com/lilbirdlifecoaching/30min',
-      coaching: 'https://calendly.com/lilbirdlifecoaching/coaching',
-      monthly: 'https://calendly.com/lilbirdlifecoaching/coaching',
     };
 
     function sessionOptionFromDeepLink() {
@@ -673,6 +722,9 @@
       }
       if (key === 'first-flight' || key === 'firstflight' || key === 'ff') {
         return document.getElementById('first-flight');
+      }
+      if (key === 'coaching' || key === 'monthly') {
+        return document.getElementById('coaching');
       }
       const url = SESSION_DEEP_LINKS[key];
       if (!url) return null;

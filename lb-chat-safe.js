@@ -25,6 +25,17 @@
     }
   }
 
+  /** Luke's Cal.com booking links only. */
+  function isAllowedCalUrl(url) {
+    try {
+      var u = new URL(url);
+      if (u.protocol !== 'https:' || u.hostname !== 'cal.com') return false;
+      return u.pathname.toLowerCase().indexOf('/luke-haythorpe/') === 0;
+    } catch (e) {
+      return false;
+    }
+  }
+
   /** Site booking pages allowed in chat CTAs (e.g. Intensive enrolment). */
   function isAllowedSiteBookingUrl(url) {
     try {
@@ -32,15 +43,15 @@
       if (u.protocol !== 'https:') return false;
       if (u.hostname !== 'lilbird.life' && u.hostname !== 'www.lilbird.life') return false;
       var path = u.pathname.replace(/\/+$/, '') || '/';
-      return path === '/intensive/enrol.html' || path === '/first-flight/book.html';
+      return path === '/intensive/enrol.html' || path === '/first-flight/book.html' || path === '/coaching/book.html';
     } catch (e) {
       return false;
     }
   }
 
-  /** Calendly or whitelisted lilbird.life booking links. */
+  /** Calendly, Cal.com (Luke), or whitelisted lilbird.life booking links. */
   function isAllowedBookingUrl(url) {
-    return isAllowedCalendlyUrl(url) || isAllowedSiteBookingUrl(url);
+    return isAllowedCalendlyUrl(url) || isAllowedCalUrl(url) || isAllowedSiteBookingUrl(url);
   }
 
   /**
@@ -98,6 +109,7 @@
   w.lbChatSafe = {
     escapeHtml: escapeHtml,
     isAllowedCalendlyUrl: isAllowedCalendlyUrl,
+    isAllowedCalUrl: isAllowedCalUrl,
     isAllowedSiteBookingUrl: isAllowedSiteBookingUrl,
     isAllowedBookingUrl: isAllowedBookingUrl,
     sanitizeAssistantHtml: sanitizeAssistantHtml,
