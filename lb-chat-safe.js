@@ -32,7 +32,7 @@
       if (u.protocol !== 'https:') return false;
       if (u.hostname !== 'lilbird.life' && u.hostname !== 'www.lilbird.life') return false;
       var path = u.pathname.replace(/\/+$/, '') || '/';
-      return path === '/intensive/enrol.html';
+      return path === '/intensive/enrol.html' || path === '/first-flight/book.html';
     } catch (e) {
       return false;
     }

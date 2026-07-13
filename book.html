@@ -491,7 +491,7 @@
           <p class="opt-tag">free · 30 minutes · start here</p>
           <p class="opt-desc">Not sure if this is for you? That's exactly what this call is for. We'll spend 30 minutes getting honest about where you are and whether we're the right fit. No script, no pitch. If we're not the right match, we'll tell you. Our bias is always you.</p>
         </div>
-        <div class="session-option" data-url="https://calendly.com/lilbirdlifecoaching/first-flight-session" onclick="switchSession(this)">
+        <div class="session-option" id="first-flight" data-url="/first-flight/book.html?code=IMREADY" onclick="switchSession(this)">
           <p class="opt-name">The First Flight</p>
           <p class="opt-tag">$149 with IMREADY · usually $299 · 2 hours</p>
           <p class="opt-desc">One 2-hour conversation: your story mapped, what's really going on named, one next move to take. No commitment beyond that session.</p>
@@ -605,12 +605,6 @@
       document.getElementById('cal-loading').classList.add('hidden');
     }, 4000);
 
-    function showFirstFlightOffer() {
-      if (window.LbFirstFlight && window.LbFirstFlight.openModal) {
-        window.LbFirstFlight.openModal();
-      }
-    }
-
     function switchToIntensiveEnrol(el) {
       document.querySelectorAll('.session-option').forEach(function (o) { o.classList.remove('active'); });
       el.classList.add('active');
@@ -621,9 +615,19 @@
       document.getElementById('booking-panel-intensive').classList.remove('booking-panel-hidden');
     }
 
+    function switchToFirstFlight(el) {
+      document.querySelectorAll('.session-option').forEach(function (o) { o.classList.remove('active'); });
+      el.classList.add('active');
+      window.location.href = '/first-flight/book.html?code=IMREADY';
+    }
+
     function switchSession(el) {
       if (el.id === 'intensive') {
         switchToIntensiveEnrol(el);
+        return;
+      }
+      if (el.id === 'first-flight') {
+        switchToFirstFlight(el);
         return;
       }
       switchCalendly(el);
@@ -636,9 +640,6 @@
       document.querySelectorAll('.session-option').forEach(o => o.classList.remove('active'));
       el.classList.add('active');
       const url = el.dataset.url;
-      if (url && url.indexOf('first-flight-session') !== -1) {
-        showFirstFlightOffer();
-      }
       const widget = document.getElementById('calendly-widget');
       // Show loading again
       document.getElementById('cal-loading').classList.remove('hidden');
@@ -669,6 +670,9 @@
       const key = (params.get('session') || hash || '').toLowerCase();
       if (key === 'intensive') {
         return document.getElementById('intensive');
+      }
+      if (key === 'first-flight' || key === 'firstflight' || key === 'ff') {
+        return document.getElementById('first-flight');
       }
       const url = SESSION_DEEP_LINKS[key];
       if (!url) return null;

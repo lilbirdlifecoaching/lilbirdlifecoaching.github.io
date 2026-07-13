@@ -477,18 +477,18 @@
 <script>
 
 // ── CONFIG ────────────────────────────────────────────────────────────────────
-// Calendly: configure coupon FIRST_FLIGHT_COUPON_CODE for a fixed checkout price
-// of FIRST_FLIGHT_QUIZ_PRICE_USD (vs list FIRST_FLIGHT_LIST_USD), or totals will disagree with this page.
+// Stripe First Flight price: coupon FIRST_FLIGHT_COUPON_CODE (-$150 → $149 list FIRST_FLIGHT_LIST_USD)
+// Price id lives on worker env STRIPE_FIRST_FLIGHT_PRICE_ID.
 const SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwaLXyQoERqfQ0Dlj0lGCN0TTy-m9aS2GiUmm5l5mOtTbysX5A2gJ5HZPEb9z9mEAvnQg/exec';
 const ASSESSMENT_WORKER_URL = 'https://lilbird-assessment.cwwq46sn7m.workers.dev';
 const BEEHIIV_PUB_ID = 'pub_53a4cafc-9b30-41d5-bd5e-4dc0026b4308';
 
 const FREE_CALL_URL   = 'https://calendly.com/lilbirdlifecoaching/30min';
-const PAID_CALL_URL   = 'https://calendly.com/lilbirdlifecoaching/first-flight-session';
+const PAID_CALL_URL   = '/first-flight/book.html?code=IMREADY';
 const SOLO_COURSE_URL = 'https://lilbird.life/solo/';
-/** List price for First Flight (must match Calendly base / strikethrough). */
+/** List price for First Flight (must match Stripe base / strikethrough). */
 const FIRST_FLIGHT_LIST_USD = 299;
-/** Fixed quiz-completion checkout price (set same fixed amount on the Calendly coupon). */
+/** Quiz-completion checkout price with IMREADY (−$150). */
 const FIRST_FLIGHT_QUIZ_PRICE_USD = 149;
 const FIRST_FLIGHT_COUPON_CODE = 'IMREADY';
 
@@ -812,7 +812,7 @@ function showResult() {
       '<span class="quiz-offer-price">$' + saleP + '</span>' +
       '<span class="quiz-offer-was">$' + listP + '</span></div>' +
       '<div class="quiz-offer-save">Save $' + saveP + ' · about ' + pctApprox + '% off list</div>' +
-      '<p class="quiz-offer-note">Use code <strong>' + FIRST_FLIGHT_COUPON_CODE + '</strong> at Calendly checkout. Tap <strong>Book First Flight</strong> for the copy button and booking link.</p>' +
+      '<p class="quiz-offer-note">Code <strong>' + FIRST_FLIGHT_COUPON_CODE + '</strong> is applied on the secure payment page. Tap <strong>Book First Flight</strong> to continue.</p>' +
       '</div>' +
       '<button class="btn-cta" onclick="openModal()">Book First Flight — $' + saleP + ' with code →</button>' +
       '<button class="btn-cta-ghost" onclick="retake()">Retake quiz</button>' +
