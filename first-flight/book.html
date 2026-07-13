@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book First Flight · lil' bird</title>
+  <meta name="description" content="Secure your First Flight — a 2-hour intro coaching session with Luke. Pay on-site, then pick your time on Cal.com." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./first-flight.css?v=1" />
+  <script src="https://js.stripe.com/v3/"></script>
+  <!-- Google Tag Manager -->
+  <script src="/lilbird-gtm-id.js"></script>
+  <script src="/lilbird-gtm.js"></script>
+</head>
+<body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NG8ZFNX2" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <header class="top-bar">
+    <a class="wordmark" href="/">lil' bird</a>
+    <div class="top-bar-actions">
+      <a class="back" href="/book.html">← back to booking</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <p class="eyebrow">first flight · 2 hours · 1-to-1</p>
+    <h1>Pay here, then <em>book your time.</em></h1>
+    <p class="lead">
+      One focused 2-hour session: your story mapped, what's really going on named, one next move to take.
+      List price <strong>$299</strong> — with code <strong>IMREADY</strong> you pay <strong>$149</strong>.
+      After payment you'll pick your slot on Cal.com (no second payment there).
+    </p>
+
+    <div class="steps-strip" id="steps-strip">
+      <span class="step-pill active" data-step="1">1 · Your details</span>
+      <span class="step-pill" data-step="2">2 · Payment</span>
+      <span class="step-pill" data-step="3">3 · Book time</span>
+    </div>
+
+    <section class="card" id="section-details">
+      <h2>Your details</h2>
+      <p class="fine-print" style="margin-top:0;margin-bottom:1rem;">
+        Use the email you'll check for confirmation. We'll unlock your Nest with this address after payment — no password needed now.
+      </p>
+
+      <form id="form-book">
+        <label for="buyer-name">Name</label>
+        <input id="buyer-name" type="text" autocomplete="name" required placeholder="Your name" />
+
+        <label for="buyer-email">Email</label>
+        <input id="buyer-email" type="email" autocomplete="email" required placeholder="you@example.com" />
+
+        <div class="promo-block">
+          <label for="promo-input">Promo code</label>
+          <p class="promo-hint">IMREADY takes $150 off (to $149). You can also add a code in the Stripe payment step.</p>
+          <div class="promo-input-wrap">
+            <input id="promo-input" type="text" class="promo-input" placeholder="Enter your code" autocomplete="off" />
+            <button type="button" class="btn btn-outline btn-apply-promo" id="btn-apply-promo">Apply code</button>
+          </div>
+          <p id="promo-message" class="promo-message" aria-live="polite"></p>
+        </div>
+
+        <p id="form-error" class="form-error"></p>
+
+        <div class="btn-row">
+          <button id="btn-continue" class="btn btn-gold" type="submit">Continue to secure payment →</button>
+          <a class="btn btn-outline" href="mailto:hello@lilbird.life">Questions first?</a>
+        </div>
+        <p class="fine-print">Payment opens in a secure Stripe window. Afterward you'll book your 2-hour session on Cal.com.</p>
+      </form>
+    </section>
+  </main>
+
+  <div id="checkout-modal" class="checkout-modal" role="dialog" aria-modal="true" aria-labelledby="checkout-title">
+    <div class="checkout-panel">
+      <div class="checkout-head">
+        <div>
+          <h3 id="checkout-title">Complete payment</h3>
+          <p id="checkout-promo-note" class="checkout-promo-note">Have a promo code? Use “Add promotion code” below if you did not apply one already.</p>
+        </div>
+        <button type="button" class="checkout-close" id="checkout-modal-close" aria-label="Close">&times;</button>
+      </div>
+      <div id="checkout-loading" class="checkout-loading">Opening secure checkout…</div>
+      <div id="checkout-mount"></div>
+    </div>
+  </div>
+
+  <script src="./first-flight-book.js?v=1"></script>
+</body>
+</html>
