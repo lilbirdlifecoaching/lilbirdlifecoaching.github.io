@@ -888,7 +888,7 @@
             <p>Fill in your workbook before your session. It saves privately to your device.</p>
             <div class="btn-row">
               <a class="btn btn-gold" href="${workbookHref('first-flight-standalone.html')}">Open workbook</a>
-              <a class="btn btn-outline" href="https://calendly.com/lilbirdlifecoaching/first-flight-session">View booking</a>
+              <a class="btn btn-outline" href="https://cal.com/luke-haythorpe/first-flight-intro-session" target="_blank" rel="noopener">View booking</a>
             </div>
           </article>`;
       }
@@ -898,7 +898,7 @@
           <p class="eyebrow">1-to-1 coaching</p>
           <h3>First Flight session</h3>
           <p>A single session with Luke. Take your Inner Compass read and turn it into a real conversation.</p>
-          <div class="btn-row"><a class="btn btn-ember" href="https://calendly.com/lilbirdlifecoaching/first-flight-session">Book now — $149 →</a></div>
+          <div class="btn-row"><a class="btn btn-ember" href="/first-flight/book.html?code=IMREADY">Book now — $149 →</a></div>
         </article>`;
     }
 
@@ -1015,7 +1015,7 @@
         <h4>First Flight booked</h4>
         <p>Session date/time placeholder. Confirm from your Calendly email and complete your workbook first.</p>
         <a class="btn btn-outline full" href="${workbookHref('first-flight-standalone.html')}">Open workbook</a>
-        <a class="btn btn-outline full" href="https://calendly.com/lilbirdlifecoaching/first-flight-session">View booking</a>`;
+        <a class="btn btn-outline full" href="https://cal.com/luke-haythorpe/first-flight-intro-session" target="_blank" rel="noopener">View booking</a>`;
       return;
     }
     if (hasSoloCourseAccess()) {
@@ -1031,7 +1031,7 @@
       <p class="sidebar-eyebrow">first flight</p>
       <h4>Book a First Flight</h4>
       <p>One focused session with Luke to turn insight into a real next step.</p>
-      <a class="btn btn-ember full" href="https://calendly.com/lilbirdlifecoaching/first-flight-session">Book now — $149 →</a>`;
+      <a class="btn btn-ember full" href="/first-flight/book.html?code=IMREADY">Book now — $149 →</a>`;
   }
 
   function escapeHtml(str) {
