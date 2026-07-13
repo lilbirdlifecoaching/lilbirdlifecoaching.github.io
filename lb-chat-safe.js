@@ -1,5 +1,5 @@
 /**
- * Shared client helpers for lil' bird chat: XSS-safe assistant HTML and Calendly embed allowlist.
+ * Shared client helpers for lil' bird chat: XSS-safe assistant HTML and booking URL allowlist.
  * Load before inline chat on index.html or before chat.js on other pages.
  */
 (function (w) {
@@ -23,6 +23,24 @@
     } catch (e) {
       return false;
     }
+  }
+
+  /** Site booking pages allowed in chat CTAs (e.g. Intensive enrolment). */
+  function isAllowedSiteBookingUrl(url) {
+    try {
+      var u = new URL(url, 'https://lilbird.life');
+      if (u.protocol !== 'https:') return false;
+      if (u.hostname !== 'lilbird.life' && u.hostname !== 'www.lilbird.life') return false;
+      var path = u.pathname.replace(/\/+$/, '') || '/';
+      return path === '/intensive/enrol.html';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /** Calendly or whitelisted lilbird.life booking links. */
+  function isAllowedBookingUrl(url) {
+    return isAllowedCalendlyUrl(url) || isAllowedSiteBookingUrl(url);
   }
 
   /**
@@ -51,7 +69,7 @@
       var dm = /\bdata-url="([^"]*)"/i.exec(attrs);
       if (!dm) return full;
       var url = dm[1];
-      if (!isAllowedCalendlyUrl(url)) return full;
+      if (!isAllowedBookingUrl(url)) return full;
       var text = String(inner).replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
       return ph('BOOK', { url: url, text: text || 'Book' });
     });
@@ -80,6 +98,8 @@
   w.lbChatSafe = {
     escapeHtml: escapeHtml,
     isAllowedCalendlyUrl: isAllowedCalendlyUrl,
+    isAllowedSiteBookingUrl: isAllowedSiteBookingUrl,
+    isAllowedBookingUrl: isAllowedBookingUrl,
     sanitizeAssistantHtml: sanitizeAssistantHtml,
   };
 })(typeof window !== 'undefined' ? window : this);

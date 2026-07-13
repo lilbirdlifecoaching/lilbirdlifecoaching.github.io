@@ -4,7 +4,7 @@
   if (document.getElementById('lb-chat-btn')) return;
   var WORKER = 'https://lilbird-chat.cwwq46sn7m.workers.dev/';
   var FF_URL = 'https://calendly.com/lilbirdlifecoaching/first-flight-session';
-  var LCS_URL = 'https://calendly.com/lilbirdlifecoaching/packages/141b4b4c-dca7-46e5-9314-a8fc55f4320f';
+  var LCS_URL = 'https://lilbird.life/intensive/enrol.html';
   var DISC_URL = 'https://calendly.com/lilbirdlifecoaching/30min';
 
   if (!window.lbChatSafe) {
@@ -27,6 +27,20 @@
           return false;
         }
       }
+      function isAllowedSiteBookingUrl(url) {
+        try {
+          var u = new URL(url, 'https://lilbird.life');
+          if (u.protocol !== 'https:') return false;
+          if (u.hostname !== 'lilbird.life' && u.hostname !== 'www.lilbird.life') return false;
+          var path = u.pathname.replace(/\/+$/, '') || '/';
+          return path === '/intensive/enrol.html';
+        } catch (e) {
+          return false;
+        }
+      }
+      function isAllowedBookingUrl(url) {
+        return isAllowedCalendlyUrl(url) || isAllowedSiteBookingUrl(url);
+      }
       function sanitizeAssistantHtml(raw) {
         var placeholders = [];
         function ph(type, payload) {
@@ -44,7 +58,7 @@
           var dm = /\bdata-url="([^"]*)"/i.exec(attrs);
           if (!dm) return full;
           var url = dm[1];
-          if (!isAllowedCalendlyUrl(url)) return full;
+          if (!isAllowedBookingUrl(url)) return full;
           var text = String(inner).replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
           return ph('BOOK', { url: url, text: text || 'Book' });
         });
@@ -71,6 +85,8 @@
       w.lbChatSafe = {
         escapeHtml: escapeHtml,
         isAllowedCalendlyUrl: isAllowedCalendlyUrl,
+        isAllowedSiteBookingUrl: isAllowedSiteBookingUrl,
+        isAllowedBookingUrl: isAllowedBookingUrl,
         sanitizeAssistantHtml: sanitizeAssistantHtml,
       };
     })(window);
@@ -216,6 +232,15 @@
 
   // Intercept ANY click on a booking button or Calendly link inside chat
   msgsEl.addEventListener('click', function(e) {
+    var trigger = e.target.closest('.lb-book-trigger');
+    if (trigger) {
+      e.preventDefault();
+      var bu = trigger.getAttribute('data-url');
+      if (!bu || !Safe.isAllowedBookingUrl(bu)) return;
+      if (Safe.isAllowedSiteBookingUrl(bu)) { window.location.href = bu; return; }
+      openCal(bu, bu.indexOf('first-flight') !== -1);
+      return;
+    }
     var t = e.target.closest('[data-cal-url]');
     if (t) { e.preventDefault(); var cu = t.getAttribute('data-cal-url'); if (!cu || !Safe.isAllowedCalendlyUrl(cu)) return; openCal(cu, t.getAttribute('data-ff') === '1'); return; }
     // Also catch plain calendly links
@@ -262,12 +287,15 @@
     var wrap = document.createElement('div'); wrap.className = 'lb-opts'; wrap.style.marginTop = '.75rem';
     [
       { label: 'Book a First Flight — $149 with code IMREADY', url: FF_URL, ff: true },
-      { label: 'Book Life Change Sessions', url: LCS_URL, ff: false },
+      { label: 'Start Life Change Intensive enrolment', url: LCS_URL, ff: false, site: true },
       { label: 'Book a free Discovery Call first', url: DISC_URL, ff: false },
     ].forEach(function(o) {
       var btn = document.createElement('button'); btn.className = 'lb-opt';
       btn.textContent = o.label;
-      btn.addEventListener('click', function() { openCal(o.url, o.ff); });
+      btn.addEventListener('click', function() {
+        if (o.site) { window.location.href = o.url; return; }
+        openCal(o.url, o.ff);
+      });
       wrap.appendChild(btn);
     });
     var disc = document.createElement('span'); disc.className = 'lb-disc';
