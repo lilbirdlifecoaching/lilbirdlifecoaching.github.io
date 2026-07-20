@@ -906,6 +906,20 @@
       const soloUnlocked = hasSoloCourseAccess();
       if (soloUnlocked) {
         const p = progressSummary();
+        if (p.pct >= 100) {
+          return `
+          <article class="product-card">
+            <span class="status-badge">complete</span>
+            <p class="eyebrow">self-guided course</p>
+            <h3>Life Change Sessions: Solo</h3>
+            <p>8/8 sessions · your Full Flight Plan is ready when you are.</p>
+            <div class="progress"><div class="progress-fill" style="width:100%"></div></div>
+            <div class="btn-row">
+              <a class="btn btn-gold" href="/solo/?view=plan">Your Flight Plan →</a>
+              <a class="btn btn-outline" href="/solo/?view=sessions">Revisit sessions</a>
+            </div>
+          </article>`;
+        }
         return `
           <article class="product-card">
             <p class="eyebrow">self-guided course</p>
@@ -1020,6 +1034,15 @@
     }
     if (hasSoloCourseAccess()) {
       const p = progressSummary();
+      if (p.pct >= 100) {
+        el.innerHTML = `
+        <p class="sidebar-eyebrow">session context</p>
+        <h4>Solo complete</h4>
+        <p>Your plan and takeaways live on the Solo dashboard.</p>
+        <a class="btn btn-outline full" href="/solo/?view=plan">Open your plan →</a>
+        <a class="btn btn-outline full" href="/solo/?view=sessions">Revisit sessions</a>`;
+        return;
+      }
       el.innerHTML = `
         <p class="sidebar-eyebrow">session context</p>
         <h4>Solo next step</h4>
