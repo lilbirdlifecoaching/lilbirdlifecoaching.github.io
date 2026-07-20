@@ -1233,22 +1233,72 @@
     }
   });
 
+  function clearAuthParamsFromUrl() {
+    try {
+      window.history.replaceState({}, '', window.location.pathname);
+    } catch (e) {}
+  }
+
+  function readAuthHashParams() {
+    const raw = (window.location.hash || '').replace(/^#/, '');
+    if (!raw) return null;
+    return new URLSearchParams(raw);
+  }
+
+  function showAuthLinkError(message) {
+    showAuth();
+    if (!loginError) return;
+    loginError.style.color = '';
+    loginError.textContent = message;
+  }
+
+  // Magic / confirm / recovery links land with either:
+  //   ?code=…          (PKCE — Nest "Email me a sign-in link")
+  //   #access_token=…  (implicit — often Supabase dashboard "Send magic link")
+  //   #error=…         (expired / already used)
   async function handleEmailConfirmCallback() {
+    const hashParams = readAuthHashParams();
+    if (hashParams) {
+      const hashError = hashParams.get('error');
+      const hashDesc = hashParams.get('error_description');
+      if (hashError) {
+        clearAuthParamsFromUrl();
+        const detail = hashDesc ? decodeURIComponent(hashDesc.replace(/\+/g, ' ')) : '';
+        showAuthLinkError(
+          detail ||
+            'That sign-in link is invalid or has expired. Request a new one from Nest (Email me a sign-in link).'
+        );
+        return null;
+      }
+
+      const accessToken = hashParams.get('access_token');
+      const refreshToken = hashParams.get('refresh_token');
+      if (accessToken && refreshToken) {
+        const { data, error } = await sb.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken
+        });
+        clearAuthParamsFromUrl();
+        if (error) {
+          showAuthLinkError(error.message || 'Could not complete sign-in from that link. Request a new one.');
+          return null;
+        }
+        return data.session?.user || null;
+      }
+    }
+
     const params = new URLSearchParams(window.location.search);
     const authCode = params.get('code');
     if (!authCode) return null;
 
     const { data, error } = await sb.auth.exchangeCodeForSession(authCode);
+    clearAuthParamsFromUrl();
     if (error) {
-      showAuth();
-      loginError.textContent =
-        'That confirmation link did not work (expired or already used). Try logging in, or use Resend confirmation below.';
+      showAuthLinkError(
+        'That sign-in link did not work (expired, already used, or opened in a different browser). Request a new one from Nest.'
+      );
       return null;
     }
-
-    try {
-      window.history.replaceState({}, '', window.location.pathname);
-    } catch (e) {}
 
     return data.session?.user || null;
   }
