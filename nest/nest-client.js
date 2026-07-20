@@ -306,7 +306,7 @@
       const hasNewIdentity = Array.isArray(identities) && identities.length > 0;
 
       if (data.session?.user) {
-        await sendNestWelcomeEmail(email, name || email);
+        await sendNestWelcomeEmail(email, name || email, data.session.user.id);
         await showDashboard(data.session.user);
         return;
       }
@@ -315,7 +315,7 @@
       if (data.user && hasNewIdentity) {
         const signIn = await sb.auth.signInWithPassword({ email, password });
         if (signIn.data.session?.user) {
-          await sendNestWelcomeEmail(email, name || email);
+          await sendNestWelcomeEmail(email, name || email, signIn.data.session.user.id);
           await showDashboard(signIn.data.session.user);
           return;
         }
@@ -351,7 +351,7 @@
     }
   });
 
-  async function sendNestWelcomeEmail(email, name) {
+  async function sendNestWelcomeEmail(email, name, userId) {
     if (!NEST_WELCOME_EMAIL_ENDPOINT) return;
     try {
       await fetch(NEST_WELCOME_EMAIL_ENDPOINT, {
@@ -360,6 +360,7 @@
         body: JSON.stringify({
           email,
           name,
+          user_id: userId || undefined,
           subject: 'Your Nest is ready',
           steps: ['Log in', 'See your products', 'Complete next steps']
         })
