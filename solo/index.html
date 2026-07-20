@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- solo shell build: v1.8-tool-save-pipeline-20260528 -->
+<!-- solo shell build: v1.9-solo-complete-dashboard-20260720 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -160,6 +160,49 @@
     .btn-deep-snap-cta { background: none; border: 1px solid var(--gold); border-radius: 6px; padding: 0.55rem 1.1rem; font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); cursor: pointer; transition: background 0.2s, color 0.2s; text-decoration: none; display: inline-block; }
     .btn-deep-snap-cta:hover { background: var(--gold); color: var(--dark); }
     a.btn-deep-snap-cta { margin-top: 0.85rem; }
+    .complete-hero { background: var(--dark-card); border: 1px solid rgba(122,158,126,0.28); border-radius: 20px; padding: 1.5rem 1.75rem; margin-bottom: 1.5rem; animation: fadeUp 0.5s ease both; }
+    .complete-hero-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 1.25rem; flex-wrap: wrap; }
+    .complete-badge { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.25rem 0.6rem; border-radius: 99px; background: rgba(122,158,126,0.15); color: #7a9e7e; border: 1px solid rgba(122,158,126,0.25); display: inline-block; margin-bottom: 0.65rem; }
+    .complete-hero h3 { font-family: var(--font-display); font-size: clamp(1.35rem, 3vw, 1.75rem); font-weight: 400; font-style: italic; line-height: 1.25; margin: 0 0 0.65rem; }
+    .complete-hero p { color: var(--text-dim); font-size: 0.9rem; line-height: 1.65; max-width: 520px; margin: 0; }
+    .complete-hero-stat { text-align: right; flex-shrink: 0; }
+    .complete-hero-stat strong { font-family: var(--font-display); font-size: 1.75rem; font-weight: 500; color: var(--text); display: block; line-height: 1; }
+    .complete-hero-stat span { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-top: 0.35rem; display: block; }
+    .complete-tabs { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 1.25rem; animation: fadeUp 0.5s 0.05s ease both; }
+    .complete-tab { background: var(--dark-card); border: 1px solid rgba(255,255,255,0.08); border-radius: 99px; padding: 0.45rem 0.95rem; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); cursor: pointer; transition: border-color 0.2s, color 0.2s, background 0.2s; }
+    .complete-tab:hover { border-color: var(--gold-border); color: var(--gold); }
+    .complete-tab.active { background: var(--gold-dim); border-color: var(--gold-border); color: var(--gold); }
+    .complete-panel { animation: fadeUp 0.45s ease both; }
+    .flight-plan-block { background: var(--dark-card); border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 1.5rem 1.75rem; }
+    .flight-plan-label { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.75rem; }
+    .flight-plan-north { font-family: var(--font-display); font-size: 1.35rem; font-weight: 400; font-style: italic; line-height: 1.35; margin-bottom: 1.1rem; }
+    .flight-plan-commit { display: flex; gap: 0.65rem; align-items: flex-start; margin-bottom: 0.65rem; font-size: 0.88rem; color: var(--text-dim); line-height: 1.55; }
+    .flight-plan-commit-pill { font-family: var(--font-mono); font-size: 0.55rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.2rem 0.5rem; border-radius: 99px; background: rgba(255,255,255,0.04); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.08); flex-shrink: 0; margin-top: 0.15rem; }
+    .flight-plan-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 1.1rem 0; }
+    .flight-plan-takeaway-label { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.45rem; }
+    .flight-plan-takeaway { font-family: var(--font-display); font-size: 0.95rem; font-style: italic; color: var(--text-dim); border-left: 2px solid var(--gold-border); padding-left: 0.85rem; line-height: 1.55; margin-bottom: 1.1rem; }
+    .flight-plan-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .btn-flight-plan { background: none; border: 1px solid var(--gold); border-radius: 6px; padding: 0.55rem 1rem; font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); cursor: pointer; transition: background 0.2s, color 0.2s; }
+    .btn-flight-plan:hover { background: var(--gold); color: var(--dark); }
+    .flight-plan-empty { color: var(--text-dim); font-size: 0.88rem; line-height: 1.65; margin-bottom: 1rem; }
+    .takeaway-row { display: flex; gap: 0.85rem; align-items: flex-start; padding: 0.85rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .takeaway-row:last-child { border-bottom: none; }
+    .takeaway-session-pill { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.25rem 0.5rem; border-radius: 99px; background: rgba(255,255,255,0.04); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.08); flex-shrink: 0; }
+    .takeaway-session-title { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 0.25rem; }
+    .takeaway-text { font-size: 0.88rem; color: var(--text); line-height: 1.55; }
+    .takeaway-muted { font-size: 0.82rem; color: var(--text-muted); font-style: italic; }
+    .sessions-archive { background: var(--dark-card); border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; overflow: hidden; }
+    .sessions-archive > summary { list-style: none; cursor: pointer; padding: 1.1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; font-family: var(--font-display); font-size: 1.05rem; }
+    .sessions-archive > summary::-webkit-details-marker { display: none; }
+    .sessions-archive-count { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); padding: 0.2rem 0.55rem; border-radius: 99px; border: 1px solid rgba(255,255,255,0.08); }
+    .sessions-archive-list { border-top: 1px solid rgba(255,255,255,0.06); padding: 0.35rem 0.75rem 0.75rem; }
+    .session-archive-row { display: flex; align-items: center; gap: 0.85rem; padding: 0.75rem 0.65rem; border-radius: 12px; cursor: pointer; transition: background 0.2s; }
+    .session-archive-row:hover { background: var(--dark-hover); }
+    .session-archive-num { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); width: 2rem; flex-shrink: 0; }
+    .session-archive-body { flex: 1; min-width: 0; }
+    .session-archive-title { font-size: 0.9rem; font-weight: 500; margin-bottom: 0.2rem; }
+    .session-archive-snippet { font-size: 0.78rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .session-archive-open { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); flex-shrink: 0; }
     .purchase-gate { background: linear-gradient(135deg, var(--dark-card), var(--dark-mid)); border: 1px solid var(--gold-border); border-radius: 32px; padding: 3rem 2rem; text-align: center; margin-top: 1rem; animation: fadeUp 0.5s 0.2s ease both; }
     .purchase-gate .bird-glyph { font-size: 2.5rem; display: block; margin-bottom: 1.25rem; }
     .purchase-gate h3 { font-family: var(--font-display); font-size: 1.6rem; font-weight: 400; font-style: italic; margin-bottom: 0.75rem; }
@@ -669,7 +712,8 @@
 
     let currentUser = null, userProfile = null, sessionData = [], activePromo = null;
     let activeSession = null, chatMsgs = [], isTyping = false, exchangeCount = 0;
-    let sessionContext = {}, toolOutputsCache = {};
+    let sessionContext = {}, toolOutputsCache = {}, sessionMemoriesCache = {};
+    let completeDashTab = 'plan';
     // Bridge to the lil' bird Deep Profile (Cloudflare Worker, KV-backed):
     //   1. Solo course writes a single-use launch token to deep_profile_launches
     //      when the user clicks "Take the Deep Profile" inside Session 3.
@@ -733,6 +777,7 @@
         userProfile = profile || null;
         await loadSessionProgress();
         await loadToolOutputs();
+        if (isCourseComplete()) await loadSessionMemories();
         // Force a fresh deep-profile read on each full dashboard load so a
         // user who just completed the assessment sees their card immediately.
         deepProfileState = { loaded: false, nestId: null, profile: null };
@@ -762,6 +807,140 @@
         var result = await sb.from('tool_outputs').select('tool_name, output_data').eq('user_id', currentUser.id);
         if (result.data) { toolOutputsCache = {}; result.data.forEach(row => { toolOutputsCache[row.tool_name] = row.output_data; }); }
       } catch(e) { toolOutputsCache = {}; }
+    }
+
+    async function loadSessionMemories() {
+      if (!currentUser) return;
+      try {
+        var result = await sb.from('ai_memory').select('session_number, summary, key_words, messages').eq('user_id', currentUser.id);
+        sessionMemoriesCache = {};
+        (result.data || []).forEach(function (row) { sessionMemoriesCache[row.session_number] = row; });
+      } catch (e) { sessionMemoriesCache = {}; }
+    }
+
+    function isCourseComplete() {
+      return sessionData.filter(function (s) { return s.status === 'complete'; }).length >= 8;
+    }
+
+    function getCompleteViewFromUrl() {
+      var v = new URLSearchParams(window.location.search).get('view');
+      if (v === 'takeaways' || v === 'sessions' || v === 'plan') return v;
+      return 'plan';
+    }
+
+    function setCompleteDashTab(tab) {
+      completeDashTab = tab;
+      try {
+        var url = new URL(window.location.href);
+        url.searchParams.set('view', tab);
+        history.replaceState(null, '', url.pathname + url.search);
+      } catch (e) {}
+    }
+
+    function parseTakeHomeFromSummary(summary) {
+      if (!summary) return '';
+      var idx = summary.indexOf('Take-home:');
+      if (idx >= 0) return summary.slice(idx + 'Take-home:'.length).trim();
+      return '';
+    }
+
+    function getSessionTakeHome(sessionNumber) {
+      var mem = sessionMemoriesCache[sessionNumber];
+      if (mem) {
+        var fromSummary = parseTakeHomeFromSummary(mem.summary);
+        if (fromSummary) return fromSummary;
+        if (mem.messages && mem.messages.length) {
+          var fromMsg = extractActionFromMessages(mem.messages);
+          if (fromMsg) return fromMsg;
+        }
+      }
+      return extractActionFromSessionTools(sessionNumber) || '';
+    }
+
+    function getFlightPlanData() {
+      return toolOutputsCache['full_flight_plan'] || null;
+    }
+
+    function renderCompleteHero() {
+      return '<div class="complete-hero"><div class="complete-hero-top"><div><span class="complete-badge">Course complete</span><h3>You finished all eight sessions.</h3><p>Your Full Flight Plan is the home base now — come back here for actions and takeaways. Sessions stay available if you want to revisit.</p></div><div class="complete-hero-stat"><strong>8/8</strong><span>sessions complete</span></div></div></div>';
+    }
+
+    function renderFlightPlanPanel() {
+      var d = getFlightPlanData();
+      var html = '<div class="flight-plan-block"><div class="flight-plan-label">Full Flight Plan</div>';
+      if (!d || !d.north_star) {
+        html += '<p class="flight-plan-empty">Your plan lives in the Full Flight Plan tool — open it to write or update your north star, commitments, and first action.</p>';
+        html += '<div class="flight-plan-actions"><button type="button" class="btn-flight-plan" id="btn-open-flight-plan-tool">Open Full Flight Plan tool</button></div></div>';
+        return html;
+      }
+      html += '<div class="flight-plan-north">' + escapeHtml(d.north_star) + '</div>';
+      var commits = (d.commitments || []).filter(function (c) { return c && String(c).trim(); });
+      commits.slice(0, 4).forEach(function (c, i) {
+        html += '<div class="flight-plan-commit"><span class="flight-plan-commit-pill">' + (i + 1) + '</span><span>' + escapeHtml(String(c).trim()) + '</span></div>';
+      });
+      if (d.first_action) {
+        html += '<div class="flight-plan-commit"><span class="flight-plan-commit-pill">Next</span><span>' + escapeHtml(d.first_action) + '</span></div>';
+      }
+      var takeaway = (d.obstacle_response && String(d.obstacle_response).trim()) || (d.obstacle && String(d.obstacle).trim()) || '';
+      if (takeaway) {
+        html += '<div class="flight-plan-divider"></div><div class="flight-plan-takeaway-label">Treasured takeaway</div><div class="flight-plan-takeaway">' + escapeHtml(takeaway) + '</div>';
+      }
+      html += '<div class="flight-plan-actions"><button type="button" class="btn-flight-plan" id="btn-open-flight-plan-tool">Open Full Flight Plan tool</button></div></div>';
+      return html;
+    }
+
+    function renderTakeawaysPanel() {
+      var html = '<div class="flight-plan-block"><div class="flight-plan-label">Session takeaways</div>';
+      SESSIONS.forEach(function (session) {
+        var home = getSessionTakeHome(session.number);
+        var pill = session.number === 0 ? 'S0' : 'S' + session.number;
+        html += '<div class="takeaway-row"><span class="takeaway-session-pill">' + pill + '</span><div><div class="takeaway-session-title">' + escapeHtml(session.title) + '</div>';
+        html += home ? '<div class="takeaway-text">' + escapeHtml(home) + '</div>' : '<div class="takeaway-muted">Reopen this session to see your take-home.</div>';
+        html += '</div></div>';
+      });
+      html += '</div>';
+      return html;
+    }
+
+    function renderSessionsPanel() {
+      var openAttr = completeDashTab === 'sessions' ? ' open' : '';
+      var html = '<details class="sessions-archive"' + openAttr + '><summary><span>All sessions</span><span class="sessions-archive-count">8 complete</span></summary><div class="sessions-archive-list">';
+      SESSIONS.forEach(function (session) {
+        var home = getSessionTakeHome(session.number);
+        var num = session.number === 0 ? '00' : String(session.number).padStart(2, '0');
+        html += '<div class="session-archive-row" data-session="' + session.number + '"><span class="session-archive-num">' + num + '</span><div class="session-archive-body"><div class="session-archive-title">' + escapeHtml(session.title) + '</div>';
+        html += '<div class="session-archive-snippet">' + escapeHtml(home || session.teaser) + '</div></div><span class="session-archive-open">Open</span></div>';
+      });
+      html += '</div></details>';
+      return html;
+    }
+
+    function renderCompleteTabsBar(activeTab) {
+      var tabs = [{ id: 'plan', label: 'Your plan' }, { id: 'takeaways', label: 'Takeaways' }, { id: 'sessions', label: 'Sessions' }];
+      var html = '<div class="complete-tabs" role="tablist">';
+      tabs.forEach(function (t) {
+        html += '<button type="button" class="complete-tab' + (activeTab === t.id ? ' active' : '') + '" data-complete-tab="' + t.id + '" role="tab">' + t.label + '</button>';
+      });
+      html += '</div>';
+      return html;
+    }
+
+    function bindCompleteDashboard() {
+      document.querySelectorAll('[data-complete-tab]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          setCompleteDashTab(btn.getAttribute('data-complete-tab'));
+          renderDashboard();
+        });
+      });
+      var openPlan = document.getElementById('btn-open-flight-plan-tool');
+      if (openPlan) {
+        openPlan.addEventListener('click', function () {
+          window.open('tools/tool-full-flight-plan.html?uid=' + currentUser.id + '&session=7', '_blank');
+        });
+      }
+      document.querySelectorAll('.session-archive-row').forEach(function (row) {
+        row.addEventListener('click', function () { openSession(parseInt(row.getAttribute('data-session'), 10)); });
+      });
     }
 
     function parseAssessmentProfile(payload) {
@@ -885,6 +1064,25 @@
       document.getElementById('dash-subtext').textContent = 'Pick up where you left off. The work you do between sessions matters as much as the sessions themselves.';
       const completed = sessionData.filter(s => s.status === 'complete').length;
       document.getElementById('dash-progress').style.display = 'block';
+      if (isCourseComplete()) {
+        document.getElementById('dash-subtext').style.display = 'none';
+        document.querySelector('.progress-label').textContent = 'Course complete';
+        document.getElementById('progress-count').textContent = '8 of 8 sessions';
+        document.getElementById('progress-fill').style.width = '100%';
+        completeDashTab = getCompleteViewFromUrl();
+        let html = renderCompleteHero();
+        html += renderCompleteTabsBar(completeDashTab);
+        html += '<div class="complete-panel">';
+        if (completeDashTab === 'plan') html += renderFlightPlanPanel();
+        else if (completeDashTab === 'takeaways') html += renderTakeawaysPanel();
+        else html += renderSessionsPanel();
+        html += '</div>';
+        content.innerHTML = html;
+        bindCompleteDashboard();
+        return;
+      }
+      document.getElementById('dash-subtext').style.display = '';
+      document.querySelector('.progress-label').textContent = 'Course progress';
       document.getElementById('progress-count').textContent = completed + ' of 8 sessions';
       document.getElementById('progress-fill').style.width = ((completed / 8) * 100) + '%';
       let html = renderDeepProfileCard();
@@ -1956,6 +2154,7 @@
         btn.textContent='Mark complete & continue →'; btn.disabled=false;
         await loadSessionProgress();
         await loadToolOutputs();
+        if (isCourseComplete()) await loadSessionMemories();
         showView('view-dashboard');
         await refreshDeepProfileForDashboard();
       } catch(err) { console.error('Complete error:',err); btn.disabled=false; btn.textContent='Mark complete & continue →'; }
