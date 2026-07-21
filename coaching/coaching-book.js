@@ -187,6 +187,12 @@
       promoInput.value = urlPromo.trim();
       applyPromoFromInput();
     }
+    const emailEl = document.getElementById('buyer-email');
+    const nameEl = document.getElementById('buyer-name');
+    const urlEmail = (params.get('email') || '').trim();
+    const urlName = (params.get('name') || '').trim();
+    if (emailEl && urlEmail && !emailEl.value) emailEl.value = urlEmail;
+    if (nameEl && urlName && !nameEl.value) nameEl.value = urlName;
   }
 
   init();
