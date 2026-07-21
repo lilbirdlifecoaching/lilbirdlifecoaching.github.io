@@ -903,6 +903,19 @@
         </article>`;
     }
 
+    if (key === 'coaching') {
+      const email = encodeURIComponent(currentUser?.email || '');
+      const name = encodeURIComponent(courseProfile?.full_name || currentUser?.user_metadata?.full_name || '');
+      const href = `/coaching/book.html?from=nest${email ? `&email=${email}` : ''}${name ? `&name=${name}` : ''}`;
+      return `
+        <article class="product-card">
+          <p class="eyebrow">1-to-1 coaching</p>
+          <h3>Coaching session</h3>
+          <p>One focused session when something specific needs working through — no package required.</p>
+          <div class="btn-row"><a class="btn btn-ember" href="${href}">Book coaching — $249 →</a></div>
+        </article>`;
+    }
+
     if (key === 'solo_course') {
       const soloUnlocked = hasSoloCourseAccess();
       if (soloUnlocked) {
@@ -971,6 +984,7 @@
     productsPane.innerHTML = `<div class="product-grid">
       ${cardProduct('inner_compass')}
       ${cardProduct('first_flight')}
+      ${cardProduct('coaching')}
       ${cardProduct('solo_course')}
       ${cardProduct('life_change_intensive')}
     </div>`;
