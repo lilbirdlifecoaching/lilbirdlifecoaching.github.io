@@ -1,5 +1,5 @@
 /**
- * Injects sun/moon toggle + theme chrome on marketing pages that use simple <nav>.
+ * Injects sun/moon toggle + theme chrome on marketing / booking pages.
  * Homepage uses built-in toggle markup.
  */
 (function (global) {
@@ -18,6 +18,15 @@
     '</span></span>' +
     '<span class="theme-toggle-label">Night</span></button>';
 
+  function findChromeAnchor() {
+    return (
+      document.querySelector('nav.site-nav') ||
+      document.querySelector('nav') ||
+      document.querySelector('header.top-bar') ||
+      document.querySelector('.top-bar')
+    );
+  }
+
   function ensureChrome() {
     if (!document.getElementById('theme-wipe')) {
       var wipe = document.createElement('div');
@@ -32,9 +41,9 @@
       stripe.setAttribute('aria-hidden', 'true');
       stripe.innerHTML =
         '<span class="cs-c"></span><span class="cs-m"></span><span class="cs-y"></span><span class="cs-k"></span>';
-      var nav = document.querySelector('nav.site-nav') || document.querySelector('nav');
-      if (nav && nav.parentNode) {
-        nav.parentNode.insertBefore(stripe, nav);
+      var anchor = findChromeAnchor();
+      if (anchor && anchor.parentNode) {
+        anchor.parentNode.insertBefore(stripe, anchor);
       } else {
         document.body.insertBefore(stripe, document.body.firstChild);
       }
@@ -56,16 +65,24 @@
   function injectToggle() {
     if (document.getElementById('theme-toggle')) return;
     var nav = document.querySelector('nav');
-    if (!nav) return;
-    var host =
-      nav.querySelector('.nav-actions') ||
-      nav.querySelector('div[style*="display:flex"]') ||
-      nav;
+    var topBar = document.querySelector('header.top-bar') || document.querySelector('.top-bar');
+    var host = null;
+    if (nav) {
+      host =
+        nav.querySelector('.nav-actions') ||
+        nav.querySelector('div[style*="display:flex"]') ||
+        nav;
+    } else if (topBar) {
+      host = topBar.querySelector('.top-bar-actions') || topBar;
+    }
+    if (!host) return;
     var wrap = document.createElement('div');
     wrap.className = 'lilbird-theme-toggle-wrap';
     wrap.style.cssText = 'display:inline-flex;align-items:center;';
     wrap.innerHTML = TOGGLE_HTML;
-    if (host === nav) {
+    if (host.classList && host.classList.contains('top-bar-actions')) {
+      host.insertBefore(wrap, host.firstChild);
+    } else if (host === nav || (host.classList && host.classList.contains('top-bar'))) {
       host.appendChild(wrap);
     } else {
       host.insertBefore(wrap, host.firstChild);
