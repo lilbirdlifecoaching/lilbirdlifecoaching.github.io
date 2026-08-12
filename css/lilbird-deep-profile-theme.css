@@ -1,0 +1,196 @@
+/* lil' bird — Inner Compass / deep-profile day/night
+   Load AFTER deep-profile inline <style>. Keeps --dark for gold button text. */
+
+html[data-theme="light"] {
+  --text-main: #1e2028;
+  --text-muted: #5c574e;
+  --dark-mid: #efeae0;
+  --dark-card: #ffffff;
+  --dark-border: rgba(30, 32, 40, 0.12);
+  --gold-faint: rgba(201, 161, 48, 0.1);
+  --ember-faint: rgba(232, 115, 74, 0.1);
+  color-scheme: light;
+}
+
+html[data-theme="light"],
+html[data-theme="light"] body {
+  background: #f5f2eb;
+  color: var(--text-main);
+}
+
+html[data-theme="light"] .site-top {
+  background: rgba(245, 242, 235, 0.96);
+  border-bottom-color: var(--dark-border);
+  backdrop-filter: blur(10px);
+}
+
+html[data-theme="light"] .nav-back-nest {
+  border-color: rgba(201, 161, 48, 0.4);
+}
+
+html[data-theme="light"] #loadingOverlay {
+  background: rgba(245, 242, 235, 0.94);
+}
+
+html[data-theme="light"] .chapter-card,
+html[data-theme="light"] .snap-preview,
+html[data-theme="light"] .teaser-content,
+html[data-theme="light"] .stripe-wrap,
+html[data-theme="light"] .preview-obs-card,
+html[data-theme="light"] .chat-bubble-content,
+html[data-theme="light"] .canvas-history-modal-panel,
+html[data-theme="light"] .sidebar-card,
+html[data-theme="light"] .read-accordion,
+html[data-theme="light"] .know-card,
+html[data-theme="light"] .stat-pill,
+html[data-theme="light"] .result-section,
+html[data-theme="light"] .canvas-dim-card {
+  background: var(--dark-card);
+  border-color: var(--dark-border);
+  box-shadow: 0 1px 0 rgba(30, 32, 40, 0.04);
+}
+
+html[data-theme="light"] .email-capture,
+html[data-theme="light"] .preview-dual,
+html[data-theme="light"] .nest-box,
+html[data-theme="light"] .chat-textarea,
+html[data-theme="light"] .preview-obs-note,
+html[data-theme="light"] .preview-extra-textarea,
+html[data-theme="light"] .canvas-dim-textarea,
+html[data-theme="light"] .partner-input select,
+html[data-theme="light"] .email-row input,
+html[data-theme="light"] textarea,
+html[data-theme="light"] input[type="text"],
+html[data-theme="light"] input[type="email"] {
+  background: #fff;
+  border-color: rgba(30, 32, 40, 0.14);
+  color: var(--text-main);
+}
+
+html[data-theme="light"] .chat-textarea::placeholder,
+html[data-theme="light"] .canvas-dim-textarea::placeholder {
+  color: rgba(30, 32, 40, 0.35);
+}
+
+html[data-theme="light"] .btn-gold,
+html[data-theme="light"] .chat-send-btn,
+html[data-theme="light"] .snap-type-pill,
+html[data-theme="light"] .nest-next-actions a.primary,
+html[data-theme="light"] .offer-code {
+  color: #1e2028;
+}
+
+html[data-theme="light"] .chat-send-btn:hover {
+  background: #fff8e0;
+  color: #1e2028;
+}
+
+html[data-theme="light"] .btn-outline {
+  border-color: rgba(30, 32, 40, 0.18);
+  color: var(--text-muted);
+}
+
+html[data-theme="light"] .btn-outline:hover {
+  border-color: rgba(201, 161, 48, 0.55);
+  color: #9a7a18;
+}
+
+html[data-theme="light"] .pay-btn {
+  background: var(--dark-card);
+  border-color: var(--dark-border);
+  color: var(--text-main);
+}
+
+html[data-theme="light"] .preview-reasoning,
+html[data-theme="light"] .chat-ack {
+  background: rgba(245, 200, 66, 0.08);
+  border-color: rgba(201, 161, 48, 0.22);
+}
+
+html[data-theme="light"] .chat-mic-btn {
+  background: var(--dark-card);
+  border-color: rgba(30, 32, 40, 0.12);
+  color: var(--text-muted);
+}
+
+html[data-theme="light"] .depth-meter-strip,
+html[data-theme="light"] .chat-progress-pill,
+html[data-theme="light"] .depth-meter-eyebrow,
+html[data-theme="light"] .depth-meter-label {
+  color: var(--text-muted);
+}
+
+html[data-theme="light"] .depth-meter-track {
+  background: rgba(30, 32, 40, 0.1);
+}
+
+html[data-theme="light"] .page-footer {
+  border-top-color: var(--dark-border);
+}
+
+html[data-theme="light"] .page-footer a {
+  color: #9a7a18;
+}
+
+html[data-theme="light"] .canvas-dimension,
+html[data-theme="light"] .canvas-intro,
+html[data-theme="light"] .stat-box,
+html[data-theme="light"] .result-header,
+html[data-theme="light"] #result-quote,
+html[data-theme="light"] .result-cta,
+html[data-theme="light"] .preview-cta-row {
+  border-color: var(--dark-border);
+}
+
+html[data-theme="light"] #result-quote {
+  background: var(--dark-card);
+}
+
+html[data-theme="light"] .teaser-overlay {
+  background: linear-gradient(to bottom, rgba(245, 242, 235, 0.15), rgba(245, 242, 235, 0.92));
+}
+
+html[data-theme="light"] .canvas-history-modal {
+  background: rgba(30, 32, 40, 0.35);
+}
+
+html[data-theme="light"] .canvas-history-view-tab {
+  border-color: rgba(30, 32, 40, 0.1);
+  color: var(--text-muted);
+}
+
+html[data-theme="light"] .canvas-history-view-tab.active {
+  color: #9a7a18;
+  background: rgba(245, 200, 66, 0.14);
+}
+
+html[data-theme="light"] .snap-badge {
+  background: var(--gold-faint);
+  border-color: var(--dark-border);
+}
+
+html[data-theme="light"] .intro-icon,
+html[data-theme="light"] .know-fields,
+html[data-theme="light"] .option-chip,
+html[data-theme="light"] .chip,
+html[data-theme="light"] .partner-input select option {
+  background: rgba(30, 32, 40, 0.04);
+  border-color: rgba(30, 32, 40, 0.1);
+  color: var(--text-main);
+}
+
+/* Soften dark-tinted result / strain cards */
+html[data-theme="light"] .strain-bend-card,
+html[data-theme="light"] .growth-edge-card,
+html[data-theme="light"] .shadow-card {
+  background: linear-gradient(145deg, rgba(245, 200, 66, 0.08) 0%, #fff 70%);
+  border-color: var(--dark-border);
+}
+
+html[data-theme="light"] .particle-drift {
+  opacity: 0.35;
+}
+
+html[data-theme="light"] .nav-actions .theme-toggle {
+  flex-shrink: 0;
+}
