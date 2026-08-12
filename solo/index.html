@@ -1,9 +1,21 @@
 <!DOCTYPE html>
-<!-- solo shell build: v1.9-solo-complete-dashboard-20260720 -->
+<!-- solo shell build: v1.10-day-night-theme-20260812 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>
+    (function(){
+      var k='lilbird-theme', s=null;
+      try{s=localStorage.getItem(k);}catch(e){}
+      var t=(s==='light'||s==='dark')?s:(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+      document.documentElement.setAttribute('data-theme', t);
+      document.documentElement.style.colorScheme=t;
+    })();
+  </script>
+  <meta name="theme-color" content="#1e2028" />
+  <link rel="stylesheet" href="/css/lilbird-tokens.css" />
+  <link rel="stylesheet" href="/css/lilbird-theme-chrome.css" />
   <title>Life Change Sessions: Solo · lil' bird</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -523,6 +535,7 @@
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes pulse { 0%, 100% { opacity: 0.3; transform: scale(0.85); } 50% { opacity: 1; transform: scale(1); } }
   </style>
+  <link rel="stylesheet" href="/css/lilbird-solo-theme.css" />
   <!-- Google Tag Manager -->
   <script src="/lilbird-gtm-id.js"></script>
   <script src="/lilbird-gtm.js"></script>
@@ -537,6 +550,17 @@
   </div>
 
   <div id="view-auth" class="view">
+    <div class="solo-auth-theme-wrap">
+      <button type="button" class="theme-toggle" aria-pressed="false" aria-label="Switch appearance">
+        <span class="theme-toggle-track" aria-hidden="true">
+          <span class="theme-toggle-thumb">
+            <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"/><g stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></g></svg>
+            <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5z"/></svg>
+          </span>
+        </span>
+        <span class="theme-toggle-label">Night</span>
+      </button>
+    </div>
     <div class="auth-wrap">
       <div class="auth-logo">
         <div class="bird-mark">🪶</div>
@@ -570,6 +594,15 @@
     <nav class="dash-nav">
       <div class="nav-brand"><div class="nav-bird">🪶</div><div class="nav-title">lil' bird</div></div>
       <div class="nav-right">
+        <button type="button" class="theme-toggle" aria-pressed="false" aria-label="Switch appearance">
+          <span class="theme-toggle-track" aria-hidden="true">
+            <span class="theme-toggle-thumb">
+              <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"/><g stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></g></svg>
+              <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5z"/></svg>
+            </span>
+          </span>
+          <span class="theme-toggle-label">Night</span>
+        </button>
         <a href="/nest/" id="nav-back-nest" class="lilbird-nav-nest" hidden>← your Nest</a>
         <span class="nav-user" id="nav-user-email"></span>
         <button class="btn-ghost" id="btn-signout">Sign out</button>
@@ -2323,5 +2356,7 @@
       micBtn.addEventListener('click', () => { active ? stop() : start(); });
     })();
   </script>
+  <script src="/js/lilbird-theme.js"></script>
+  <script src="/js/lilbird-theme-nav.js"></script>
 </body>
 </html>
