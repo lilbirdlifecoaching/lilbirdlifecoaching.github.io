@@ -1,0 +1,74 @@
+/* lil' bird — day/night overrides for /articles/ (hub + posts)
+   Load AFTER each page's inline <style>. Keeps --dark for gold CTA text. */
+
+html[data-theme="light"] {
+  --text-main: #1e2028;
+  --text-muted: #5c574e;
+  --dark-mid: #efeae0;
+  --dark-card: #ffffff;
+  --gold-faint: rgba(201, 161, 48, 0.1);
+  --gold-line: rgba(201, 161, 48, 0.28);
+  color-scheme: light;
+}
+
+html[data-theme="light"] body {
+  background: #f5f2eb;
+  color: var(--text-main);
+}
+
+html[data-theme="light"] nav {
+  background: rgba(245, 242, 235, 0.94);
+  border-bottom-color: var(--gold-line);
+}
+
+html[data-theme="light"] .post-card {
+  background: var(--dark-card);
+  border-color: rgba(30, 32, 40, 0.08);
+  box-shadow: 0 1px 0 rgba(30, 32, 40, 0.04);
+}
+
+html[data-theme="light"] .post-card:hover {
+  background: #fff;
+  border-color: rgba(201, 161, 48, 0.35);
+}
+
+html[data-theme="light"] .post-card.featured {
+  background: linear-gradient(135deg, #efeae0 0%, #f7f4ee 100%);
+  border-color: var(--gold-line);
+}
+
+html[data-theme="light"] .stat-box {
+  background: var(--dark-card);
+  border-color: var(--gold-line);
+}
+
+html[data-theme="light"] .article-cta {
+  background: linear-gradient(135deg, #efeae0 0%, #f7f4ee 100%);
+  border-color: var(--gold-line);
+}
+
+html[data-theme="light"] .article-cta::before {
+  background: radial-gradient(circle, rgba(201, 161, 48, 0.12) 0%, transparent 70%);
+}
+
+html[data-theme="light"] footer {
+  border-top-color: rgba(30, 32, 40, 0.08);
+  color: #6b6760;
+}
+
+html[data-theme="light"] blockquote {
+  background: var(--gold-faint);
+}
+
+html[data-theme="light"] .article-meta {
+  border-bottom-color: var(--gold-line);
+}
+
+html[data-theme="light"] hr.sec {
+  border-top-color: rgba(30, 32, 40, 0.1);
+}
+
+/* Toggle sits in nav; keep gold CTA readable */
+html[data-theme="light"] .nav-cta {
+  color: #1e2028;
+}
