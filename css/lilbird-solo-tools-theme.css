@@ -1,0 +1,51 @@
+/* lil' bird — Solo course tool iframes + shared dark-tool pages
+   Remaps common tokens when html[data-theme=light]. Keeps --dark for gold CTAs. */
+
+html[data-theme="light"] {
+  --text: #1e2028;
+  --text-dim: rgba(30, 32, 40, 0.58);
+  --text-muted: rgba(30, 32, 40, 0.35);
+  --text-main: #1e2028;
+  --dark-mid: #efeae0;
+  --dark-card: #ffffff;
+  --dark-hover: #f3efe6;
+  --gold-dim: rgba(201, 161, 48, 0.12);
+  --gold-border: rgba(201, 161, 48, 0.28);
+  --gold-line: rgba(201, 161, 48, 0.28);
+  --gold-faint: rgba(201, 161, 48, 0.1);
+  --glow-dim: rgba(126, 184, 201, 0.14);
+  --glow-border: rgba(90, 140, 155, 0.35);
+  --session-dim: rgba(201, 161, 48, 0.1);
+  --session-border: rgba(201, 161, 48, 0.28);
+  color-scheme: light;
+}
+
+html[data-theme="light"],
+html[data-theme="light"] body {
+  background: #f5f2eb !important;
+  color: var(--text);
+}
+
+html[data-theme="light"] input,
+html[data-theme="light"] textarea,
+html[data-theme="light"] select {
+  background: #fff;
+  color: var(--text);
+  border-color: rgba(30, 32, 40, 0.14);
+}
+
+html[data-theme="light"] .card,
+html[data-theme="light"] .panel,
+html[data-theme="light"] .tool-card,
+html[data-theme="light"] .slider-row,
+html[data-theme="light"] .done-card,
+html[data-theme="light"] .cta-card,
+html[data-theme="light"] .chart-wrap,
+html[data-theme="light"] .action-card {
+  background: var(--dark-card);
+  border-color: rgba(30, 32, 40, 0.1);
+}
+
+html[data-theme="light"] .nav {
+  background: rgba(245, 242, 235, 0.94);
+}

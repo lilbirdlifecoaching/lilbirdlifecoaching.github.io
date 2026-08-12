@@ -1,0 +1,151 @@
+/* lil' bird — Solo shell day/night (load after solo inline styles)
+   Keeps --dark for gold button text. */
+
+html[data-theme="light"] {
+  --text: #1e2028;
+  --text-dim: rgba(30, 32, 40, 0.58);
+  --text-muted: rgba(30, 32, 40, 0.38);
+  --dark-mid: #efeae0;
+  --dark-card: #ffffff;
+  --dark-hover: #f3efe6;
+  --gold-dim: rgba(201, 161, 48, 0.14);
+  --gold-border: rgba(201, 161, 48, 0.28);
+  --mist: rgba(30, 32, 40, 0.04);
+  --session-dim: rgba(201, 161, 48, 0.1);
+  --session-border: rgba(201, 161, 48, 0.28);
+  color-scheme: light;
+}
+
+html[data-theme="light"],
+html[data-theme="light"] body {
+  background: #f5f2eb;
+  color: var(--text);
+}
+
+html[data-theme="light"] body::before {
+  opacity: 0.25;
+}
+
+.solo-auth-theme-wrap {
+  position: fixed;
+  top: 1rem;
+  right: 1.25rem;
+  z-index: 120;
+}
+
+html[data-theme="light"] .auth-card,
+html[data-theme="light"] .session-card,
+html[data-theme="light"] .gate-card,
+html[data-theme="light"] .complete-hero,
+html[data-theme="light"] .flight-plan-block,
+html[data-theme="light"] .sessions-archive,
+html[data-theme="light"] .checkout-modal-inner,
+html[data-theme="light"] .complete-panel,
+html[data-theme="light"] .video-coming-soon {
+  background: var(--dark-card);
+  border-color: var(--gold-border);
+  box-shadow: 0 1px 0 rgba(30, 32, 40, 0.04);
+}
+
+html[data-theme="light"] .auth-tabs {
+  border-bottom-color: var(--gold-border);
+}
+
+html[data-theme="light"] .form-group input,
+html[data-theme="light"] .promo-input,
+html[data-theme="light"] #chat-input,
+html[data-theme="light"] .chat-input {
+  background: #fff;
+  border-color: rgba(30, 32, 40, 0.12);
+  color: var(--text);
+}
+
+html[data-theme="light"] .dash-nav,
+html[data-theme="light"] .session-nav {
+  background: rgba(245, 242, 235, 0.94);
+  border-bottom-color: var(--gold-border);
+  backdrop-filter: blur(12px);
+}
+
+html[data-theme="light"] .btn-ghost {
+  border-color: var(--gold-border);
+  color: var(--text-dim);
+}
+
+html[data-theme="light"] .btn-primary,
+html[data-theme="light"] .btn-purchase,
+html[data-theme="light"] .btn-complete,
+html[data-theme="light"] .btn-send {
+  color: #1e2028;
+}
+
+html[data-theme="light"] .session-card.available:hover,
+html[data-theme="light"] .session-card.in-progress:hover,
+html[data-theme="light"] .session-archive-row:hover {
+  background: var(--dark-hover);
+}
+
+html[data-theme="light"] .complete-tab {
+  background: var(--dark-card);
+  border-color: rgba(30, 32, 40, 0.1);
+  color: var(--text-dim);
+}
+
+html[data-theme="light"] .complete-tab.active {
+  background: var(--gold-dim);
+  border-color: var(--gold-border);
+  color: #9a7a18;
+}
+
+html[data-theme="light"] .purchase-gate {
+  background: linear-gradient(135deg, #fff, #efeae0);
+  border-color: var(--gold-border);
+}
+
+html[data-theme="light"] .btn-apply-promo {
+  background: var(--dark-hover);
+  border-color: rgba(30, 32, 40, 0.1);
+  color: var(--text-dim);
+}
+
+html[data-theme="light"] .msg.assistant .msg-bubble,
+html[data-theme="light"] .typing-dots {
+  background: #fff;
+  border-color: rgba(30, 32, 40, 0.08);
+}
+
+html[data-theme="light"] .msg.user .msg-avatar {
+  background: var(--dark-hover);
+  border-color: rgba(30, 32, 40, 0.1);
+}
+
+html[data-theme="light"] .tool-embed-wrap,
+html[data-theme="light"] .tool-embed-frame {
+  background: #f5f2eb;
+}
+
+html[data-theme="light"] .tool-embed-header {
+  background: var(--dark-card);
+  border-bottom-color: var(--gold-border);
+}
+
+html[data-theme="light"] .checkout-modal {
+  background: rgba(30, 32, 40, 0.4);
+}
+
+html[data-theme="light"] .progress-track {
+  background: rgba(30, 32, 40, 0.08);
+}
+
+html[data-theme="light"] .deep-snapshot {
+  border-color: var(--gold-border);
+}
+
+html[data-theme="light"] .deep-snapshot.empty {
+  background: var(--dark-card);
+}
+
+html[data-theme="light"] .pill-locked {
+  background: rgba(30, 32, 40, 0.06);
+  border-color: rgba(30, 32, 40, 0.1);
+}

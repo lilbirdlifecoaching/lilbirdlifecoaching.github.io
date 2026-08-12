@@ -1,0 +1,58 @@
+/* lil' bird — public /tools/glow-map.html day/night */
+
+html[data-theme="light"] {
+  --text: #1e2028;
+  --text-dim: rgba(30, 32, 40, 0.58);
+  --text-muted: rgba(30, 32, 40, 0.38);
+  --dark-mid: #efeae0;
+  --dark-card: #ffffff;
+  --glow-dim: rgba(126, 184, 201, 0.14);
+  --glow-border: rgba(90, 140, 155, 0.35);
+  color-scheme: light;
+}
+
+html[data-theme="light"],
+html[data-theme="light"] body {
+  background: #f5f2eb;
+  color: var(--text);
+}
+
+html[data-theme="light"] body::before {
+  opacity: 0.2;
+}
+
+html[data-theme="light"] .nav {
+  background: linear-gradient(to bottom, rgba(245, 242, 235, 0.96), rgba(245, 242, 235, 0.4), transparent);
+}
+
+html[data-theme="light"] .slider-row,
+html[data-theme="light"] .chart-wrap,
+html[data-theme="light"] .done-card,
+html[data-theme="light"] .cta-card,
+html[data-theme="light"] .action-card {
+  background: var(--dark-card);
+  border-color: rgba(30, 32, 40, 0.1);
+  box-shadow: 0 1px 0 rgba(30, 32, 40, 0.04);
+}
+
+html[data-theme="light"] .cta-card.featured {
+  border-color: rgba(201, 161, 48, 0.35);
+}
+
+html[data-theme="light"] .btn-gold {
+  color: #1e2028;
+}
+
+html[data-theme="light"] .btn-outline {
+  border-color: var(--glow-border);
+  color: #3d6a75;
+}
+
+html[data-theme="light"] .site-footer {
+  border-top-color: rgba(30, 32, 40, 0.08);
+  color: #6b6760;
+}
+
+html[data-theme="light"] input[type="range"] {
+  background: rgba(30, 32, 40, 0.1);
+}
