@@ -1,0 +1,183 @@
+/* lil' bird — Nest day/night (load after nest-styles.css)
+   Keeps --dark for gold button text. */
+
+html[data-theme="light"] {
+  --text-main: #1e2028;
+  --text-muted: #5c574e;
+  --dark-mid: #efeae0;
+  --dark-card: #ffffff;
+  --dark-border: rgba(30, 32, 40, 0.1);
+  --gold-faint: rgba(201, 161, 48, 0.1);
+  color-scheme: light;
+}
+
+html[data-theme="light"],
+html[data-theme="light"] body {
+  background: #f5f2eb;
+  color: var(--text-main);
+}
+
+/* Auth */
+html[data-theme="light"] .auth-card {
+  background: var(--dark-card);
+  border-color: var(--dark-border);
+  box-shadow: 0 8px 28px rgba(30, 32, 40, 0.06);
+}
+
+html[data-theme="light"] .auth-tab {
+  border-color: rgba(30, 32, 40, 0.12);
+  color: var(--text-muted);
+}
+
+html[data-theme="light"] .auth-tab.active {
+  color: #9a7a18;
+  border-color: rgba(201, 161, 48, 0.45);
+}
+
+html[data-theme="light"] .auth-form input,
+html[data-theme="light"] #chat-input {
+  background: #fff;
+  border-color: rgba(30, 32, 40, 0.14);
+  color: var(--text-main);
+}
+
+html[data-theme="light"] .auth-form input:focus,
+html[data-theme="light"] #chat-input:focus {
+  border-color: rgba(201, 161, 48, 0.55);
+}
+
+html[data-theme="light"] .nest-auth-theme-wrap {
+  position: fixed;
+  top: 1rem;
+  right: 1.25rem;
+  z-index: 35;
+}
+
+/* Dashboard chrome */
+html[data-theme="light"] .top-nav {
+  background: rgba(245, 242, 235, 0.94);
+  border-bottom-color: var(--dark-border);
+  backdrop-filter: blur(10px);
+}
+
+html[data-theme="light"] .avatar {
+  background: var(--dark-card);
+  border-color: var(--dark-border);
+  color: var(--text-muted);
+}
+
+html[data-theme="light"] .dash-tab {
+  background: var(--dark-mid);
+  border-color: rgba(30, 32, 40, 0.1);
+  color: var(--text-muted);
+}
+
+html[data-theme="light"] .dash-tab.active {
+  color: #9a7a18;
+  border-color: rgba(201, 161, 48, 0.4);
+  background: #fff;
+}
+
+html[data-theme="light"] .next-steps-banner {
+  background: rgba(245, 200, 66, 0.1);
+  border-color: rgba(201, 161, 48, 0.28);
+}
+
+html[data-theme="light"] .product-card,
+html[data-theme="light"] .sidebar-card,
+html[data-theme="light"] .chat-shell {
+  background: var(--dark-card);
+  border-color: rgba(30, 32, 40, 0.1);
+  box-shadow: 0 1px 0 rgba(30, 32, 40, 0.04);
+}
+
+html[data-theme="light"] .product-card.locked,
+html[data-theme="light"] .locked {
+  background: var(--dark-mid);
+  border-color: rgba(30, 32, 40, 0.08);
+  opacity: 0.9;
+}
+
+html[data-theme="light"] .lock-pill,
+html[data-theme="light"] .tag {
+  border-color: rgba(30, 32, 40, 0.12);
+  color: var(--text-muted);
+}
+
+html[data-theme="light"] .progress {
+  background: rgba(30, 32, 40, 0.08);
+}
+
+html[data-theme="light"] .btn-outline {
+  border-color: rgba(30, 32, 40, 0.16);
+  color: var(--text-main);
+  background: transparent;
+}
+
+html[data-theme="light"] .btn-gold {
+  color: #1e2028;
+}
+
+html[data-theme="light"] .sidebar-card.ember {
+  border-color: rgba(232, 115, 74, 0.28);
+  background: rgba(232, 115, 74, 0.06);
+}
+
+html[data-theme="light"] .sidebar-card.hint {
+  background: var(--dark-mid);
+}
+
+html[data-theme="light"] .lci-session-list {
+  border-color: rgba(30, 32, 40, 0.1);
+}
+
+html[data-theme="light"] .lci-session-row {
+  border-bottom-color: rgba(30, 32, 40, 0.06);
+}
+
+html[data-theme="light"] .lci-session-row.is-next {
+  background: rgba(245, 200, 66, 0.12);
+}
+
+html[data-theme="light"] .chat-messages {
+  background: var(--dark-mid);
+}
+
+html[data-theme="light"] .chat-head {
+  border-bottom-color: var(--dark-border);
+}
+
+html[data-theme="light"] .chat-input-row {
+  border-top-color: var(--dark-border);
+}
+
+html[data-theme="light"] .msg.bot {
+  background: #fff;
+  border-color: rgba(30, 32, 40, 0.08);
+}
+
+html[data-theme="light"] .msg.user {
+  background: rgba(245, 200, 66, 0.16);
+  border-color: rgba(201, 161, 48, 0.35);
+  color: var(--text-main);
+}
+
+html[data-theme="light"] .dash-error {
+  background: rgba(232, 115, 74, 0.1);
+  border-color: rgba(232, 115, 74, 0.35);
+}
+
+html[data-theme="light"] .ic-snapshot-card,
+html[data-theme="light"] .ic-snap-card {
+  background: var(--dark-card);
+  border-color: var(--dark-border);
+}
+
+html[data-theme="light"] .status-badge {
+  border-color: rgba(122, 158, 126, 0.4);
+}
+
+html[data-theme="light"] .status-badge.pending {
+  border-color: rgba(201, 161, 48, 0.45);
+  color: #9a7a18;
+}
