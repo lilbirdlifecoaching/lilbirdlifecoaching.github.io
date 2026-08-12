@@ -3,12 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>
+    (function(){
+      var k='lilbird-theme', s=null;
+      try{s=localStorage.getItem(k);}catch(e){}
+      var t=(s==='light'||s==='dark')?s:(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+      document.documentElement.setAttribute('data-theme', t);
+      document.documentElement.style.colorScheme=t;
+    })();
+  </script>
+  <meta name="theme-color" content="#1e2028" />
+  <link rel="stylesheet" href="/css/lilbird-tokens.css" />
+  <link rel="stylesheet" href="/css/lilbird-theme-chrome.css" />
   <title>Enrol · Life Change Intensive · lil' bird</title>
   <meta name="description" content="Read the agreement, create your Nest account, and secure your place on the Life Change Intensive with lil' bird coaching." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./intensive-enrol.css?v=3" />
+  <link rel="stylesheet" href="/css/lilbird-booking-theme.css" />
   <script src="https://js.stripe.com/v3/"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/lilbird-auth-bridge.js"></script>
@@ -127,5 +140,7 @@
   </div>
 
   <script src="./intensive-enrol.js?v=4"></script>
+<script src="/js/lilbird-theme.js"></script>
+<script src="/js/lilbird-theme-nav.js"></script>
 </body>
 </html>
