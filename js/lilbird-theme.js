@@ -38,8 +38,8 @@
       if (dark && light) img.src = theme === 'light' ? light : dark;
     });
 
-    var toggle = document.getElementById('theme-toggle');
-    if (toggle) {
+    var toggles = document.querySelectorAll('.theme-toggle');
+    toggles.forEach(function (toggle) {
       var label = toggle.querySelector('.theme-toggle-label');
       if (label) label.textContent = theme === 'light' ? 'Day' : 'Night';
       toggle.setAttribute('aria-pressed', theme === 'light' ? 'true' : 'false');
@@ -47,7 +47,7 @@
         'aria-label',
         theme === 'light' ? 'Switch to night mode' : 'Switch to day mode'
       );
-    }
+    });
 
     if (opts.animate && !global.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       var wipe = document.getElementById('theme-wipe');
@@ -81,8 +81,11 @@
 
   function boot() {
     applyTheme(resolveTheme(), { animate: false });
-    var btn = document.getElementById('theme-toggle');
-    if (btn) btn.addEventListener('click', toggleTheme);
+    document.querySelectorAll('.theme-toggle').forEach(function (btn) {
+      if (btn.getAttribute('data-theme-wired') === '1') return;
+      btn.setAttribute('data-theme-wired', '1');
+      btn.addEventListener('click', toggleTheme);
+    });
   }
 
   global.LilbirdTheme = {

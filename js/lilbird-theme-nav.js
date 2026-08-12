@@ -63,12 +63,13 @@
   }
 
   function injectToggle() {
-    if (document.getElementById('theme-toggle')) return;
+    if (document.querySelector('.theme-toggle')) return;
     var nav = document.querySelector('nav');
     var topBar = document.querySelector('header.top-bar') || document.querySelector('.top-bar');
     var host = null;
     if (nav) {
       host =
+        nav.querySelector('.nav-user') ||
         nav.querySelector('.nav-actions') ||
         nav.querySelector('div[style*="display:flex"]') ||
         nav;
@@ -80,7 +81,7 @@
     wrap.className = 'lilbird-theme-toggle-wrap';
     wrap.style.cssText = 'display:inline-flex;align-items:center;';
     wrap.innerHTML = TOGGLE_HTML;
-    if (host.classList && host.classList.contains('top-bar-actions')) {
+    if (host.classList && (host.classList.contains('top-bar-actions') || host.classList.contains('nav-user'))) {
       host.insertBefore(wrap, host.firstChild);
     } else if (host === nav || (host.classList && host.classList.contains('top-bar'))) {
       host.appendChild(wrap);
@@ -93,8 +94,8 @@
     ensureChrome();
     wireLogos();
     injectToggle();
-    if (global.LilbirdTheme && typeof global.LilbirdTheme.boot === 'function') {
-      global.LilbirdTheme.boot();
+    if (global.LilbirdTheme) {
+      if (typeof global.LilbirdTheme.boot === 'function') global.LilbirdTheme.boot();
     }
   }
 
