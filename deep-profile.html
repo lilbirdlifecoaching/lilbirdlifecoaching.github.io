@@ -1,9 +1,21 @@
 <!DOCTYPE html>
-<!-- lilbird deep-profile build: v7.1.0-20260528-phase2-conversion -->
+<!-- lilbird deep-profile build: v7.5.0-20260812-day-night-theme -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+  (function(){
+    var k='lilbird-theme', s=null;
+    try{s=localStorage.getItem(k);}catch(e){}
+    var t=(s==='light'||s==='dark')?s:(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+    document.documentElement.setAttribute('data-theme', t);
+    document.documentElement.style.colorScheme=t;
+  })();
+</script>
+<meta name="theme-color" content="#1e2028">
+<link rel="stylesheet" href="/css/lilbird-tokens.css" />
+<link rel="stylesheet" href="/css/lilbird-theme-chrome.css" />
 <title>Inner Compass — personality read | lil' bird</title>
 <meta name="description" content="Inner Compass: a story-first personality read (MBTI, Enneagram, attachment) through conversation, not multiple choice. By Luke Haythorpe. Words for what you've been circling.">
 <meta name="keywords" content="Inner Compass, deep profile, personality assessment, MBTI, Enneagram, attachment style, Luke Haythorpe, life coach, self discovery, lil bird">
@@ -2404,6 +2416,7 @@
     .email-row input { min-width: 0; }
   }
 </style>
+<link rel="stylesheet" href="/css/lilbird-deep-profile-theme.css" />
   <!-- Google Tag Manager -->
   <script src="/lilbird-gtm-id.js"></script>
   <script src="/lilbird-gtm.js"></script>
@@ -2427,6 +2440,15 @@
     <span class="nav-wordmark">lil' bird</span>
   </a>
   <div class="nav-actions">
+    <button type="button" class="theme-toggle" aria-pressed="false" aria-label="Switch appearance">
+      <span class="theme-toggle-track" aria-hidden="true">
+        <span class="theme-toggle-thumb">
+          <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"/><g stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></g></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5z"/></svg>
+        </span>
+      </span>
+      <span class="theme-toggle-label">Night</span>
+    </button>
     <a href="/nest/" class="nav-back nav-back-nest lilbird-nav-nest" id="nav-back-nest" hidden>← back to your Nest</a>
     <a href="https://lilbird.life/" class="nav-back">← back to home</a>
   </div>
@@ -3196,6 +3218,8 @@
   <p>lil' bird life coaching · <a href="index.html">lilbird.life</a> · <a href="mailto:hello@lilbird.life">hello@lilbird.life</a> · <a href="privacy.html">Privacy</a> · <a href="mailto:hello@lilbird.life" id="footer-feedback-link">Site feedback</a></p>
 </footer>
 
+<script src="/js/lilbird-theme.js"></script>
+<script src="/js/lilbird-theme-nav.js"></script>
 <script src="/lilbird-auth-bridge.js"></script>
 <script src="/lilbird-nest-nav.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -3218,7 +3242,7 @@
 // ═══════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════
-const DEEP_PROFILE_BUILD = 'v7.4.0-20260528-flow-trim';
+const DEEP_PROFILE_BUILD = 'v7.5.0-20260812-day-night-theme';
 /** Default: email unlock for ads/lead gen. Add ?paywall=1 to URL to restore pay-what-you-want flow. */
 const INNER_COMPASS_PAYWALL = (function(){
   try{ return new URLSearchParams(window.location.search).get('paywall') === '1'; }catch(_){ return false; }
