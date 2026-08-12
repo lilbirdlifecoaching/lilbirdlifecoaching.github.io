@@ -1,0 +1,105 @@
+/* lil' bird — Relationship Dynamic day/night
+   Load AFTER relationship-dynamic inline <style>. Keeps --dark for gold accents. */
+
+html[data-theme="light"] {
+  --text-main: #1e2028;
+  --text-muted: #5c574e;
+  --dark-mid: #efeae0;
+  --dark-card: #ffffff;
+  --dark-border: rgba(30, 32, 40, 0.12);
+  --gold-faint: rgba(201, 161, 48, 0.1);
+  color-scheme: light;
+}
+
+html[data-theme="light"],
+html[data-theme="light"] body {
+  background: #f5f2eb;
+  color: var(--text-main);
+}
+
+html[data-theme="light"] body::before {
+  opacity: 0.28;
+}
+
+html[data-theme="light"] .site-nav {
+  border-bottom-color: var(--dark-border);
+  background: rgba(245, 242, 235, 0.92);
+  backdrop-filter: blur(8px);
+}
+
+html[data-theme="light"] .nav-link {
+  border-color: rgba(30, 32, 40, 0.14);
+  color: var(--text-muted);
+}
+
+html[data-theme="light"] .nav-link:hover {
+  color: #9a7a18;
+  border-color: rgba(201, 161, 48, 0.45);
+}
+
+html[data-theme="light"] .nav-link-nest {
+  color: #9a7a18;
+  border-color: rgba(201, 161, 48, 0.4);
+}
+
+html[data-theme="light"] .card {
+  background: #fff;
+  border-color: var(--dark-border);
+  box-shadow: 0 1px 0 rgba(30, 32, 40, 0.04);
+}
+
+html[data-theme="light"] .dynamic-result {
+  background: var(--dark-card);
+  border-color: var(--dark-border);
+  box-shadow: 0 1px 0 rgba(30, 32, 40, 0.04);
+}
+
+html[data-theme="light"] .field input,
+html[data-theme="light"] .field select,
+html[data-theme="light"] .field textarea {
+  background: #fff;
+  border-color: rgba(30, 32, 40, 0.14);
+  color: var(--text-main);
+}
+
+html[data-theme="light"] .field input::placeholder,
+html[data-theme="light"] .field textarea::placeholder {
+  color: rgba(30, 32, 40, 0.35);
+}
+
+html[data-theme="light"] .field select option {
+  background: #fff;
+  color: var(--text-main);
+}
+
+html[data-theme="light"] .nest-loaded {
+  background: var(--gold-faint);
+  border-color: var(--dark-border);
+}
+
+html[data-theme="light"] .btn-primary {
+  border-color: rgba(201, 161, 48, 0.45);
+  color: #9a7a18;
+}
+
+html[data-theme="light"] .btn-primary:hover:not(:disabled) {
+  background: var(--gold-faint);
+  border-color: rgba(201, 161, 48, 0.65);
+  color: #7a6010;
+}
+
+html[data-theme="light"] .result-share {
+  border-top-color: var(--dark-border);
+}
+
+html[data-theme="light"] .site-footer {
+  border-top-color: var(--dark-border);
+}
+
+html[data-theme="light"] .site-footer a {
+  color: #9a7a18;
+}
+
+html[data-theme="light"] .site-nav-actions .theme-toggle {
+  flex-shrink: 0;
+}
