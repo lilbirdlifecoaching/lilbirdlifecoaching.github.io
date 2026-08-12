@@ -72,6 +72,7 @@
         nav.querySelector('.nav-user') ||
         nav.querySelector('.nav-right') ||
         nav.querySelector('.nav-actions') ||
+        nav.querySelector('.site-nav-actions') ||
         nav.querySelector('div[style*="display:flex"]') ||
         nav;
     } else if (topBar) {
