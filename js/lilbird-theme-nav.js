@@ -70,6 +70,7 @@
     if (nav) {
       host =
         nav.querySelector('.nav-user') ||
+        nav.querySelector('.nav-right') ||
         nav.querySelector('.nav-actions') ||
         nav.querySelector('div[style*="display:flex"]') ||
         nav;
@@ -81,7 +82,7 @@
     wrap.className = 'lilbird-theme-toggle-wrap';
     wrap.style.cssText = 'display:inline-flex;align-items:center;';
     wrap.innerHTML = TOGGLE_HTML;
-    if (host.classList && (host.classList.contains('top-bar-actions') || host.classList.contains('nav-user'))) {
+    if (host.classList && (host.classList.contains('top-bar-actions') || host.classList.contains('nav-user') || host.classList.contains('nav-right'))) {
       host.insertBefore(wrap, host.firstChild);
     } else if (host === nav || (host.classList && host.classList.contains('top-bar'))) {
       host.appendChild(wrap);
