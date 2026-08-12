@@ -3,6 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <script>
+    (function(){
+      var k='lilbird-theme', s=null;
+      try{s=localStorage.getItem(k);}catch(e){}
+      var t=(s==='light'||s==='dark')?s:(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+      document.documentElement.setAttribute('data-theme', t);
+      document.documentElement.style.colorScheme=t;
+    })();
+  </script>
+  <meta name="theme-color" content="#1e2028" />
   <title>Nurture & Prune Matrix · lil' bird</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -454,6 +464,7 @@
       .save-section { flex-direction: column; align-items: flex-start; }
     }
   </style>
+  <link rel="stylesheet" href="/css/lilbird-solo-tools-theme.css" />
 </head>
 
 <body>
