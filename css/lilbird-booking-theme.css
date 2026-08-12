@@ -1,0 +1,100 @@
+/* lil' bird — day/night for booking flows (first-flight, coaching, intensive)
+   Load AFTER page booking CSS. Keeps --dark for gold/ember button text. */
+
+html[data-theme="light"] {
+  --text-main: #1e2028;
+  --text-muted: #5c574e;
+  --dark-mid: #efeae0;
+  --dark-card: #ffffff;
+  --dark-border: rgba(30, 32, 40, 0.1);
+  color-scheme: light;
+}
+
+html[data-theme="light"],
+html[data-theme="light"] body {
+  background: #f5f2eb;
+  color: var(--text-main);
+}
+
+html[data-theme="light"] .top-bar {
+  background: rgba(245, 242, 235, 0.94);
+  border-bottom-color: var(--dark-border);
+  backdrop-filter: blur(10px);
+}
+
+html[data-theme="light"] .card,
+html[data-theme="light"] .checkout-panel {
+  background: var(--dark-card);
+  border-color: var(--dark-border);
+  box-shadow: 0 1px 0 rgba(30, 32, 40, 0.04);
+}
+
+html[data-theme="light"] .step-pill {
+  border-color: rgba(30, 32, 40, 0.12);
+  color: var(--text-muted);
+  background: transparent;
+}
+
+html[data-theme="light"] .step-pill.active {
+  border-color: rgba(201, 161, 48, 0.45);
+  color: #9a7a18;
+  background: rgba(245, 200, 66, 0.14);
+}
+
+html[data-theme="light"] input[type="text"],
+html[data-theme="light"] input[type="email"],
+html[data-theme="light"] input[type="password"],
+html[data-theme="light"] .promo-input {
+  background: #fff;
+  border-color: rgba(30, 32, 40, 0.14);
+  color: var(--text-main);
+}
+
+html[data-theme="light"] input:focus,
+html[data-theme="light"] .promo-input:focus {
+  border-color: rgba(201, 161, 48, 0.55);
+}
+
+html[data-theme="light"] .btn-outline {
+  border-color: rgba(30, 32, 40, 0.18);
+  color: var(--text-main);
+  background: transparent;
+}
+
+html[data-theme="light"] .btn-gold {
+  color: #1e2028;
+}
+
+html[data-theme="light"] .btn-ember {
+  color: #1e2028;
+}
+
+html[data-theme="light"] .logged-in-banner {
+  background: rgba(157, 191, 138, 0.12);
+  border-color: rgba(157, 191, 138, 0.35);
+}
+
+html[data-theme="light"] .contract-pdf-wrap,
+html[data-theme="light"] .contract-box,
+html[data-theme="light"] .promo-block {
+  background: var(--dark-mid);
+  border-color: var(--dark-border);
+}
+
+html[data-theme="light"] .checkout-modal {
+  background: rgba(30, 32, 40, 0.45);
+}
+
+html[data-theme="light"] .checkout-head,
+html[data-theme="light"] .checkout-close {
+  border-color: var(--dark-border);
+}
+
+html[data-theme="light"] .cal-embed-wrap {
+  background: #efeae0;
+  border-color: var(--dark-border);
+}
+
+html[data-theme="light"] .top-bar a.back-nest {
+  border-color: rgba(201, 161, 48, 0.4);
+}
