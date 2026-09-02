@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- lilbird deep-profile build: v7.5.0-20260812-day-night-theme -->
+<!-- lilbird deep-profile build: v7.5.1-20260812-maintenance-hardening -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3242,7 +3242,7 @@
 // ═══════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════
-const DEEP_PROFILE_BUILD = 'v7.5.0-20260812-day-night-theme';
+const DEEP_PROFILE_BUILD = 'v7.5.1-20260812-maintenance-hardening';
 /** Default: email unlock for ads/lead gen. Add ?paywall=1 to URL to restore pay-what-you-want flow. */
 const INNER_COMPASS_PAYWALL = (function(){
   try{ return new URLSearchParams(window.location.search).get('paywall') === '1'; }catch(_){ return false; }
@@ -4863,7 +4863,8 @@ function renderResults(profile){
 function setSection(id,content){
   const el=document.getElementById(id);
   if(!el||!content) return;
-  el.innerHTML=`<p>${content.replace(/\n\n/g,'</p><p>')}</p>`;
+  const safe = _escHtml(content).replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>');
+  el.innerHTML=`<p>${safe}</p>`;
 }
 
 function syncReadAccordion(innerId, content, open){
@@ -5095,7 +5096,17 @@ function logToSheet(opts){
 // ═══════════════════════════════════════
 // UTILITIES
 // ═══════════════════════════════════════
-function generateNestId(){ return 'nest-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7); }
+function generateNestId(){
+  try{
+    if(typeof crypto!=='undefined' && crypto.randomUUID){
+      return 'nest-'+crypto.randomUUID();
+    }
+  }catch(_){}
+  var a=new Uint8Array(16);
+  if(typeof crypto!=='undefined' && crypto.getRandomValues) crypto.getRandomValues(a);
+  else for(var i=0;i<a.length;i++) a[i]=Math.floor(Math.random()*256);
+  return 'nest-'+Array.from(a,function(b){return b.toString(16).padStart(2,'0');}).join('');
+}
 
 function copyNestLink(){
   const link=nestId?`https://lilbird.life/deep-profile.html?nest=${nestId}`:window.location.href;
