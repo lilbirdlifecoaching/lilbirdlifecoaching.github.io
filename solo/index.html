@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- solo shell build: v1.10-day-night-theme-20260812 -->
+<!-- solo shell build: v1.11-maintenance-hardening-20260812 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -14,6 +14,7 @@
     })();
   </script>
   <meta name="theme-color" content="#1e2028" />
+  <meta name="robots" content="noindex, nofollow" />
   <link rel="stylesheet" href="/css/lilbird-tokens.css" />
   <link rel="stylesheet" href="/css/lilbird-theme-chrome.css" />
   <title>Life Change Sessions: Solo · lil' bird</title>
@@ -687,7 +688,7 @@
   <script>
     const SUPABASE_URL  = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
-    const SOLO_SHELL_BUILD = 'v1.8-tool-save-pipeline-20260528';
+    const SOLO_SHELL_BUILD = 'v1.11-maintenance-hardening-20260812';
     const WORKER_URL    = 'https://worker-solo.cwwq46sn7m.workers.dev';
     console.info("lil' bird Solo shell", SOLO_SHELL_BUILD, '| worker:', WORKER_URL);
     // Stripe publishable key — safe to ship in client code.
@@ -1796,7 +1797,8 @@
       if (cleanContent) {
         var wrap = document.createElement('div'); wrap.className = 'msg ' + role;
         var emoji = (activeSession && activeSession.emoji) ? activeSession.emoji : '🪶';
-        wrap.innerHTML = '<div class="msg-avatar">' + (role==='assistant'?emoji:'✦') + '</div><div class="msg-bubble">' + cleanContent.replace(/\n/g,'<br>') + '</div>';
+        var safeHtml = escapeHtml(cleanContent).replace(/\n/g,'<br>');
+        wrap.innerHTML = '<div class="msg-avatar">' + (role==='assistant'?emoji:'✦') + '</div><div class="msg-bubble">' + safeHtml + '</div>';
         el.appendChild(wrap);
       }
       if (toolMatch && role==='assistant') { var tk=toolMatch[1], ti=TOOL_MAP[tk]; if (ti) setTimeout(function(){renderToolCard(tk,ti,el);}, cleanContent?400:0); }
@@ -1821,9 +1823,9 @@
       if (k === 'soar-steady') {
         var items = data.items||[], soar=items.filter(i=>i.zone==='soar').slice(0,2), steady=items.filter(i=>i.zone==='steady').slice(0,2);
         var total=items.filter(i=>i.zone==='soar'||i.zone==='steady').length, soarPct=total?Math.round((items.filter(i=>i.zone==='soar').length/total)*100):0;
-        soar.forEach(i=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-soar">Soar ▲</span><span class="snap-text">'+i.text+'</span></div>';});
+        soar.forEach(i=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-soar">Soar ▲</span><span class="snap-text">'+escapeSnapText(i.text)+'</span></div>';});
         if(soar.length&&steady.length) html+='<div class="snap-divider"></div>';
-        steady.forEach(i=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-steady">Steady ▼</span><span class="snap-text">'+i.text+'</span></div>';});
+        steady.forEach(i=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-steady">Steady ▼</span><span class="snap-text">'+escapeSnapText(i.text)+'</span></div>';});
         if(total>0) html+='<div class="snap-bar-wrap" style="margin-top:8px"><div class="snap-bar-label"><span>Energy split</span><span class="snap-bar-val">'+soarPct+'% Soar</span></div><div class="snap-bar-track"><div class="snap-bar-fill" style="width:'+soarPct+'%"></div></div></div>';
       }
       else if (k === 'peak-plunge') {
@@ -1886,9 +1888,9 @@
       }
       else if (k === 'shadows-sparks') {
         var shadows=(data.shadows||[]).slice(0,2),sparks=(data.sparks||[]).slice(0,2);
-        shadows.forEach(s=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-shadow">Shadow</span><span class="snap-text">'+s.text+'</span></div>';});
+        shadows.forEach(s=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-shadow">Shadow</span><span class="snap-text">'+escapeSnapText(s.text)+'</span></div>';});
         if(shadows.length&&sparks.length) html+='<div class="snap-divider"></div>';
-        sparks.forEach(s=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-spark">Spark</span><span class="snap-text">'+s.text+'</span></div>';});
+        sparks.forEach(s=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-spark">Spark</span><span class="snap-text">'+escapeSnapText(s.text)+'</span></div>';});
       }
       else if (k === 'courage-compass') {
         var dirs=[{key:'dir-north',label:'North',cls:'snap-badge-north'},{key:'dir-east',label:'East',cls:'snap-badge-plunge'}];
@@ -1950,9 +1952,9 @@
       }
       else if (k === 'roots-feathers') {
         var roots=(data.roots||[]).slice(0,2),feathers=(data.feathers||[]).slice(0,2);
-        roots.forEach(r=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-peak">Root</span><span class="snap-text">'+r.text+'</span></div>';});
+        roots.forEach(r=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-peak">Root</span><span class="snap-text">'+escapeSnapText(r.text)+'</span></div>';});
         if(roots.length&&feathers.length) html+='<div class="snap-divider"></div>';
-        feathers.forEach(f=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-plunge">Release</span><span class="snap-text">'+f.text+'</span></div>';});
+        feathers.forEach(f=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-plunge">Release</span><span class="snap-text">'+escapeSnapText(f.text)+'</span></div>';});
         // Reflection fallback so the snapshot isn't empty when the user only journaled.
         if (!html && data.reflection) {
           html+='<div class="snap-row"><span class="snap-text" style="font-style:italic;color:rgba(240,236,228,0.55)">"'+String(data.reflection).slice(0,140)+(String(data.reflection).length>140?'…':'')+'"</span></div>';
