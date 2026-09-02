@@ -1,4 +1,11 @@
 User-agent: *
 Allow: /
 
+# Auth walls / paid shells — keep out of search indexes
+Disallow: /nest/
+Disallow: /solo/
+Disallow: /intensive/enrol
+Disallow: /first-flight/booked
+Disallow: /coaching/booked
+
 Sitemap: https://lilbird.life/sitemap.xml
