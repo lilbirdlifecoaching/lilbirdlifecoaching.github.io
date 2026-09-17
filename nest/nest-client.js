@@ -948,7 +948,7 @@
           <span class="lock-pill"><i class="ti ti-lock"></i> not yet unlocked</span>
           <p class="eyebrow">self-guided course</p>
           <h3>Life Change Sessions: Solo</h3>
-          <p>Eight sessions at your own pace. An AI coaching guide that actually listens.</p>
+          <p>Eight sessions at your own pace. An AI coaching guide that helps you see yourself again.</p>
           <div class="btn-row"><a class="btn btn-ember" href="/solo/">Unlock — $197 →</a></div>
         </article>`;
     }
