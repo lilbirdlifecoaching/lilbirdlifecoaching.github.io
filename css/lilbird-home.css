@@ -717,7 +717,7 @@ body.js-reveal-ready .reveal.visible { opacity: 1; transform: translateY(0); }
 .recognition-item:hover { background: var(--bg-card-hover); }
 .recognition-item:hover::before { opacity: 1; width: 5px; }
 
-/* Shared hover language: vivid gold wash + distinct patterns per cell */
+/* Night only: vivid gold patterns on hover. Day keeps soft yellow washes. */
 .recognition-item::after {
   content: '';
   position: absolute;
@@ -726,98 +726,64 @@ body.js-reveal-ready .reveal.visible { opacity: 1; transform: translateY(0); }
   pointer-events: none;
   transition: opacity 0.3s ease;
 }
-.recognition-item:hover::after { opacity: 1; }
+[data-theme="dark"] .recognition-item:hover::after { opacity: 1; }
 .recognition-item > * { position: relative; z-index: 1; }
 
-/* Cell 1 — solid vivid gold */
-.recognition-item:nth-child(1)::before { background: #F5C842; }
-.recognition-item:nth-child(1)::after {
-  background: rgba(245, 200, 66, 0.42);
-}
-[data-theme="dark"] .recognition-item:nth-child(1)::after {
-  background: rgba(245, 200, 66, 0.62);
-}
-[data-theme="dark"] .recognition-item:nth-child(1):hover {
-  background: #3a3420;
-}
-[data-theme="light"] .recognition-item:nth-child(1):hover {
-  background: #ffe566;
-}
-
-/* Cell 2 — diagonal stripes */
-.recognition-item:nth-child(2)::before { background: #F5C842; }
-.recognition-item:nth-child(2)::after {
-  background:
-    repeating-linear-gradient(
-      -45deg,
-      rgba(245, 200, 66, 0.75) 0 5px,
-      rgba(245, 200, 66, 0.12) 5px 13px
-    );
-}
-[data-theme="dark"] .recognition-item:nth-child(2)::after {
-  background:
-    repeating-linear-gradient(
-      -45deg,
-      rgba(245, 200, 66, 0.9) 0 5px,
-      rgba(245, 200, 66, 0.18) 5px 13px
-    );
-}
-[data-theme="dark"] .recognition-item:nth-child(2):hover {
-  background: #2f2a18;
-}
-[data-theme="light"] .recognition-item:nth-child(2):hover {
-  background: #fff1b8;
-}
-
-/* Cell 3 — soft mesh dots */
-.recognition-item:nth-child(3)::before { background: #F5C842; }
-.recognition-item:nth-child(3)::after {
-  background-color: rgba(245, 200, 66, 0.28);
-  background-image:
-    radial-gradient(circle, rgba(245, 200, 66, 0.95) 1.4px, transparent 1.5px);
-  background-size: 12px 12px;
-}
-[data-theme="dark"] .recognition-item:nth-child(3)::after {
-  background-color: rgba(245, 200, 66, 0.35);
-  background-image:
-    radial-gradient(circle, #F5C842 1.6px, transparent 1.7px);
-  background-size: 11px 11px;
-}
-[data-theme="dark"] .recognition-item:nth-child(3):hover {
-  background: #2f2a18;
-}
-[data-theme="light"] .recognition-item:nth-child(3):hover {
-  background: #fff6c9;
-}
-
-/* Cell 4 — horizontal hatch */
-.recognition-item:nth-child(4)::before { background: #F5C842; }
-.recognition-item:nth-child(4)::after {
-  background:
-    repeating-linear-gradient(
-      0deg,
-      rgba(245, 200, 66, 0.7) 0 3px,
-      transparent 3px 9px
-    );
-}
-[data-theme="dark"] .recognition-item:nth-child(4)::after {
-  background:
-    repeating-linear-gradient(
-      0deg,
-      rgba(245, 200, 66, 0.88) 0 3px,
-      rgba(245, 200, 66, 0.12) 3px 9px
-    );
-}
-[data-theme="dark"] .recognition-item:nth-child(4):hover {
-  background: #2f2a18;
-}
-[data-theme="light"] .recognition-item:nth-child(4):hover {
-  background: #ffef9a;
-}
+/* Day — soft yellow hover colors (no patterns) */
+[data-theme="light"] .recognition-item:nth-child(1):hover { background: #ffe566; }
+[data-theme="light"] .recognition-item:nth-child(2):hover { background: #fff1b8; }
+[data-theme="light"] .recognition-item:nth-child(3):hover { background: #fff6c9; }
+[data-theme="light"] .recognition-item:nth-child(4):hover { background: #ffef9a; }
 [data-theme="light"] .recognition-item:nth-child(4) { background: var(--bg-card); }
 [data-theme="light"] .recognition-item:nth-child(4) .recognition-text { color: inherit; }
 [data-theme="light"] .recognition-item::before { width: 4px; opacity: 0.7; }
 [data-theme="light"] .recognition-item:hover::before { width: 6px; opacity: 1; }
+
+/* Night — patterned gold washes (kept soft so quote text stays readable) */
+.recognition-item:nth-child(1)::before { background: #F5C842; }
+[data-theme="dark"] .recognition-item:nth-child(1)::after {
+  background: rgba(245, 200, 66, 0.28);
+}
+[data-theme="dark"] .recognition-item:nth-child(1):hover {
+  background: #2c291c;
+}
+
+.recognition-item:nth-child(2)::before { background: #F5C842; }
+[data-theme="dark"] .recognition-item:nth-child(2)::after {
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      rgba(245, 200, 66, 0.42) 0 5px,
+      rgba(245, 200, 66, 0.06) 5px 13px
+    );
+}
+[data-theme="dark"] .recognition-item:nth-child(2):hover {
+  background: #26231a;
+}
+
+.recognition-item:nth-child(3)::before { background: #F5C842; }
+[data-theme="dark"] .recognition-item:nth-child(3)::after {
+  background-color: rgba(245, 200, 66, 0.14);
+  background-image:
+    radial-gradient(circle, rgba(245, 200, 66, 0.55) 1.4px, transparent 1.6px);
+  background-size: 12px 12px;
+}
+[data-theme="dark"] .recognition-item:nth-child(3):hover {
+  background: #26231a;
+}
+
+.recognition-item:nth-child(4)::before { background: #F5C842; }
+[data-theme="dark"] .recognition-item:nth-child(4)::after {
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(245, 200, 66, 0.38) 0 3px,
+      rgba(245, 200, 66, 0.05) 3px 9px
+    );
+}
+[data-theme="dark"] .recognition-item:nth-child(4):hover {
+  background: #26231a;
+}
 
 a.recognition-item {
   display: flex;
@@ -832,21 +798,32 @@ a.recognition-item {
   font-style: italic;
   font-size: 1.15rem;
   line-height: 1.6;
+  margin: 0;
 }
 .recognition-read {
+  display: inline-block;
   font-family: var(--font-mono);
-  font-size: 0.55rem;
-  letter-spacing: 0.16em;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--text-accent-dim);
-  margin-top: 1.15rem;
-  opacity: 0.45;
-  transition: opacity 0.3s ease, letter-spacing 0.3s ease;
+  margin-top: 1rem;
+  opacity: 0.72;
+  transition: opacity 0.25s ease, color 0.25s ease;
 }
 a.recognition-item:hover .recognition-read,
 a.recognition-item:focus-visible .recognition-read {
-  opacity: 0.95;
-  letter-spacing: 0.2em;
+  opacity: 1;
+  color: var(--text-accent);
+}
+[data-theme="light"] .recognition-read {
+  color: var(--c-ink);
+  opacity: 0.45;
+}
+[data-theme="light"] a.recognition-item:hover .recognition-read,
+[data-theme="light"] a.recognition-item:focus-visible .recognition-read {
+  opacity: 0.75;
+  color: var(--c-ink);
 }
 
 /* Quote ticker under Luke — horizontal marquee */
