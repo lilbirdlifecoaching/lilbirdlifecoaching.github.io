@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- lilbird homepage build: v1.3.0-20260917-trust-first-scroll -->
+<!-- lilbird homepage build: v1.3.1-20260917-hero-swap-trust-boxes -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -48,14 +48,21 @@
       var t=(s==='light'||s==='dark')?s:'light';
       document.documentElement.setAttribute('data-theme', t);
       document.documentElement.style.colorScheme=t;
+      document.addEventListener('DOMContentLoaded', function(){
+        var key = t === 'dark' ? 'night' : 'day';
+        var h = document.getElementById('hero-headline');
+        var p = document.getElementById('hero-sub');
+        if (h && h.getAttribute('data-' + key)) h.innerHTML = h.getAttribute('data-' + key);
+        if (p && p.getAttribute('data-' + key)) p.textContent = p.getAttribute('data-' + key);
+      });
     })();
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/css/lilbird-tokens.css" />
-  <link rel="stylesheet" href="/css/lilbird-home.css" />
-  <link rel="stylesheet" href="/css/lilbird-chat.css" />
+  <link rel="stylesheet" href="/css/lilbird-tokens.css?v=20260917b" />
+  <link rel="stylesheet" href="/css/lilbird-home.css?v=20260917b" />
+  <link rel="stylesheet" href="/css/lilbird-chat.css?v=20260917b" />
   <!-- Google Tag Manager -->
   <script src="/lilbird-gtm-id.js"></script>
   <script src="/lilbird-gtm.js"></script>
@@ -146,19 +153,16 @@
       </div>
     </div>
     <div class="hero-inner">
-    <h1 class="hero-headline hero-headline-day reveal reveal-delay-1">
+    <h1 class="hero-headline reveal reveal-delay-1" id="hero-headline"
+        data-day="Explore the things that<br/><em>make you, you.</em>"
+        data-night="Are you ready for Sunday night<br/><em>to feel good again?</em>">
       Explore the things that<br/>
       <em>make you, you.</em>
     </h1>
-    <h1 class="hero-headline hero-headline-night reveal reveal-delay-1">
-      Are you ready for Sunday night<br/>
-      <em>to feel good again?</em>
-    </h1>
-    <p class="hero-sub hero-sub-day reveal reveal-delay-2">
+    <p class="hero-sub reveal reveal-delay-2" id="hero-sub"
+       data-day="Know yourself, build a life full of healthy relationships and a career that feels like yours."
+       data-night="You feel it before you can name it — the same inner argument on repeat. From the outside your life looks fine. From the inside it doesn't quite feel like yours.">
       Know yourself, build a life full of healthy relationships and a career that feels like yours.
-    </p>
-    <p class="hero-sub hero-sub-night reveal reveal-delay-2">
-      You feel it before you can name it — the same inner argument on repeat. From the outside your life looks fine. From the inside it doesn't quite feel like yours.
     </p>
     <div class="hero-actions reveal reveal-delay-3">
       <a href="/deep-profile.html" class="btn-primary">
@@ -226,20 +230,20 @@
     <h2 class="story-headline reveal reveal-delay-1">
       Safety first.<br/><em>Then the real work.</em>
     </h2>
-    <div class="trust-grid reveal reveal-delay-2">
-      <div class="trust-item">
+    <div class="recognition-grid trust-grid reveal reveal-delay-2" role="list">
+      <div class="recognition-item trust-item" role="listitem">
         <p class="trust-title">Confidential</p>
         <p class="trust-text">What's said in session stays in session.</p>
       </div>
-      <div class="trust-item">
+      <div class="recognition-item trust-item" role="listitem">
         <p class="trust-title">Your data, your Nest</p>
         <p class="trust-text">Assessment answers are yours — see our <a href="/privacy.html" class="inline-link">privacy policy</a>.</p>
       </div>
-      <div class="trust-item">
+      <div class="recognition-item trust-item" role="listitem">
         <p class="trust-title">GiANT Worldwide certified</p>
         <p class="trust-text">Life and leadership coaching with a real methodology.</p>
       </div>
-      <div class="trust-item">
+      <div class="recognition-item trust-item" role="listitem">
         <p class="trust-title">Coaching ≠ therapy</p>
         <p class="trust-text">Forward-looking clarity work — we'll tell you if you need a clinician instead.</p>
       </div>
@@ -715,9 +719,9 @@
 </div>
 <script src="/first-flight-booking.js"></script>
 <script src="/lb-chat-safe.js"></script>
-<script src="/js/lilbird-theme.js"></script>
+<script src="/js/lilbird-theme.js?v=20260917b"></script>
 <script src="/js/lilbird-carousel.js"></script>
-<script src="/js/lilbird-home.js"></script>
+<script src="/js/lilbird-home.js?v=20260917b"></script>
 <script src="/js/lilbird-chat.js"></script>
 </body>
 </html>
