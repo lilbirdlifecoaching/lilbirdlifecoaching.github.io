@@ -41,6 +41,8 @@ html[data-theme="light"] .flight-plan-block,
 html[data-theme="light"] .sessions-archive,
 html[data-theme="light"] .checkout-modal-inner,
 html[data-theme="light"] .complete-panel,
+html[data-theme="light"] #complete-panel,
+html[data-theme="light"] .complete-dash-panel,
 html[data-theme="light"] .video-coming-soon {
   background: var(--dark-card);
   border-color: var(--gold-border);
