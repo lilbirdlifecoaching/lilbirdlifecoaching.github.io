@@ -1341,7 +1341,7 @@
       'birdsong':        { file: 'tools/tool-birdsong.html',        icon: '🎵', name: 'Birdsong Scale',            hint: 'Map your energy states and design your week.' },
       'forest':          { file: 'tools/tool-forest.html',          icon: '🌲', name: 'Forest of Connections',     hint: 'Map the people in your relational landscape.' },
       'full-flight-plan':{ file: 'tools/tool-full-flight-plan.html',icon: '🪶', name: 'Full Flight Plan',          hint: 'Build your plan. In your words.' },
-      'childhood-photo': { file: 'tools/tool-childhood-photo.html', icon: '🖼️', name: 'Younger You',                hint: 'Upload a photo of you between 4 and 8 — for your Full Flight Plan.' },
+      'childhood-photo': { file: 'tools/tool-childhood-photo.html', icon: '🖼️', name: 'Younger You',                hint: 'Upload a photo of you between 4 and 8 — for your Nest and Full Flight Plan.' },
     };
     var openedTools = {};
     var sessionTakeHome = '';
@@ -2004,7 +2004,7 @@
       else if (k === 'childhood-photo') {
         if (data.photo_url) {
           html +=
-            '<div class="snap-row"><span class="snap-badge snap-badge-soar">Photo</span><span class="snap-text">Younger-you portrait saved for your Full Flight Plan</span></div>';
+            '<div class="snap-row"><span class="snap-badge snap-badge-soar">Photo</span><span class="snap-text">Younger-you photo saved to your Nest and Full Flight Plan</span></div>';
         }
       }
 
