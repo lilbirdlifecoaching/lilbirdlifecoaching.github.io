@@ -2,12 +2,15 @@
    Keeps --dark for gold button text. */
 
 html[data-theme="light"] {
-  --text-main: #1e2028;
-  --text-muted: #5c574e;
+  --text-main: #18181c;
+  --text-muted: #3a3832;
+  --gold: #b8860b;
+  --gold-dim: #8a6a12;
   --dark-mid: #efeae0;
   --dark-card: #ffffff;
-  --dark-border: rgba(30, 32, 40, 0.1);
-  --gold-faint: rgba(201, 161, 48, 0.1);
+  --dark-border: rgba(30, 32, 40, 0.12);
+  --gold-faint: rgba(184, 134, 11, 0.12);
+  --green: #3d6b42;
   color-scheme: light;
 }
 
@@ -30,20 +33,25 @@ html[data-theme="light"] .auth-tab {
 }
 
 html[data-theme="light"] .auth-tab.active {
-  color: #9a7a18;
-  border-color: rgba(201, 161, 48, 0.45);
+  color: var(--gold-dim);
+  border-color: rgba(184, 134, 11, 0.45);
 }
 
 html[data-theme="light"] .auth-form input,
 html[data-theme="light"] #chat-input {
   background: #fff;
-  border-color: rgba(30, 32, 40, 0.14);
+  border-color: rgba(30, 32, 40, 0.16);
   color: var(--text-main);
 }
 
 html[data-theme="light"] .auth-form input:focus,
 html[data-theme="light"] #chat-input:focus {
-  border-color: rgba(201, 161, 48, 0.55);
+  border-color: rgba(184, 134, 11, 0.55);
+}
+
+html[data-theme="light"] .auth-form input::placeholder,
+html[data-theme="light"] #chat-input::placeholder {
+  color: rgba(30, 32, 40, 0.42);
 }
 
 html[data-theme="light"] .nest-auth-theme-wrap {
@@ -55,7 +63,7 @@ html[data-theme="light"] .nest-auth-theme-wrap {
 
 /* Dashboard chrome */
 html[data-theme="light"] .top-nav {
-  background: rgba(245, 242, 235, 0.94);
+  background: rgba(245, 242, 235, 0.96);
   border-bottom-color: var(--dark-border);
   backdrop-filter: blur(10px);
 }
@@ -68,59 +76,89 @@ html[data-theme="light"] .avatar {
 
 html[data-theme="light"] .dash-tab {
   background: var(--dark-mid);
-  border-color: rgba(30, 32, 40, 0.1);
+  border-color: rgba(30, 32, 40, 0.12);
   color: var(--text-muted);
 }
 
 html[data-theme="light"] .dash-tab.active {
-  color: #9a7a18;
-  border-color: rgba(201, 161, 48, 0.4);
+  color: var(--gold-dim);
+  border-color: rgba(184, 134, 11, 0.45);
   background: #fff;
 }
 
 html[data-theme="light"] .next-steps-banner {
-  background: rgba(245, 200, 66, 0.1);
-  border-color: rgba(201, 161, 48, 0.28);
+  background: rgba(245, 200, 66, 0.14);
+  border-color: rgba(184, 134, 11, 0.32);
+}
+
+html[data-theme="light"] .steps-list li {
+  color: var(--gold-dim);
 }
 
 html[data-theme="light"] .product-card,
 html[data-theme="light"] .sidebar-card,
 html[data-theme="light"] .chat-shell {
   background: var(--dark-card);
-  border-color: rgba(30, 32, 40, 0.1);
+  border-color: rgba(30, 32, 40, 0.12);
   box-shadow: 0 1px 0 rgba(30, 32, 40, 0.04);
+}
+
+html[data-theme="light"] .product-card h3,
+html[data-theme="light"] .sidebar-card h4,
+html[data-theme="light"] .auth-card h1,
+html[data-theme="light"] .ic-snap-headline {
+  color: var(--text-main);
+}
+
+html[data-theme="light"] .product-card p,
+html[data-theme="light"] .sidebar-card p,
+html[data-theme="light"] .ic-snap-blurb,
+html[data-theme="light"] .ic-snap-kicker,
+html[data-theme="light"] .chat-head p {
+  color: var(--text-muted);
+}
+
+html[data-theme="light"] .eyebrow,
+html[data-theme="light"] .sidebar-eyebrow,
+html[data-theme="light"] .banner-title,
+html[data-theme="light"] .ic-snap-types,
+html[data-theme="light"] .ic-snap-cta,
+html[data-theme="light"] .nav-wordmark {
+  color: var(--gold-dim);
 }
 
 html[data-theme="light"] .product-card.locked,
 html[data-theme="light"] .locked {
   background: var(--dark-mid);
-  border-color: rgba(30, 32, 40, 0.08);
-  opacity: 0.9;
+  border-color: rgba(30, 32, 40, 0.1);
+  opacity: 1;
 }
 
 html[data-theme="light"] .lock-pill,
 html[data-theme="light"] .tag {
-  border-color: rgba(30, 32, 40, 0.12);
+  border-color: rgba(30, 32, 40, 0.14);
   color: var(--text-muted);
+  background: rgba(30, 32, 40, 0.04);
 }
 
 html[data-theme="light"] .progress {
-  background: rgba(30, 32, 40, 0.08);
+  background: rgba(30, 32, 40, 0.1);
 }
 
 html[data-theme="light"] .btn-outline {
-  border-color: rgba(30, 32, 40, 0.16);
+  border-color: rgba(30, 32, 40, 0.2);
   color: var(--text-main);
   background: transparent;
 }
 
 html[data-theme="light"] .btn-gold {
   color: #1e2028;
+  background: #F5C842;
 }
 
 html[data-theme="light"] .sidebar-card.ember {
-  border-color: rgba(232, 115, 74, 0.28);
-  background: rgba(232, 115, 74, 0.06);
+  border-color: rgba(232, 115, 74, 0.32);
+  background: rgba(232, 115, 74, 0.08);
 }
 
 html[data-theme="light"] .sidebar-card.hint {
@@ -128,15 +166,25 @@ html[data-theme="light"] .sidebar-card.hint {
 }
 
 html[data-theme="light"] .lci-session-list {
-  border-color: rgba(30, 32, 40, 0.1);
+  border-color: rgba(30, 32, 40, 0.12);
 }
 
 html[data-theme="light"] .lci-session-row {
-  border-bottom-color: rgba(30, 32, 40, 0.06);
+  border-bottom-color: rgba(30, 32, 40, 0.08);
 }
 
 html[data-theme="light"] .lci-session-row.is-next {
-  background: rgba(245, 200, 66, 0.12);
+  background: rgba(245, 200, 66, 0.16);
+}
+
+html[data-theme="light"] .lci-badge.booked {
+  color: var(--green);
+  border-color: rgba(61, 107, 66, 0.35);
+}
+
+html[data-theme="light"] .lci-badge.next {
+  color: var(--gold-dim);
+  border-color: rgba(184, 134, 11, 0.4);
 }
 
 html[data-theme="light"] .chat-messages {
@@ -153,18 +201,20 @@ html[data-theme="light"] .chat-input-row {
 
 html[data-theme="light"] .msg.bot {
   background: #fff;
-  border-color: rgba(30, 32, 40, 0.08);
+  border-color: rgba(30, 32, 40, 0.1);
+  color: var(--text-main);
 }
 
 html[data-theme="light"] .msg.user {
-  background: rgba(245, 200, 66, 0.16);
-  border-color: rgba(201, 161, 48, 0.35);
+  background: rgba(245, 200, 66, 0.2);
+  border-color: rgba(184, 134, 11, 0.4);
   color: var(--text-main);
 }
 
 html[data-theme="light"] .dash-error {
   background: rgba(232, 115, 74, 0.1);
   border-color: rgba(232, 115, 74, 0.35);
+  color: var(--text-main);
 }
 
 html[data-theme="light"] .ic-snapshot-card,
@@ -173,11 +223,28 @@ html[data-theme="light"] .ic-snap-card {
   border-color: var(--dark-border);
 }
 
+html[data-theme="light"] .ic-snapshot-card .ic-snap-link:hover {
+  background: rgba(184, 134, 11, 0.06);
+}
+
 html[data-theme="light"] .status-badge {
-  border-color: rgba(122, 158, 126, 0.4);
+  border-color: rgba(61, 107, 66, 0.4);
+  color: var(--green);
 }
 
 html[data-theme="light"] .status-badge.pending {
-  border-color: rgba(201, 161, 48, 0.45);
-  color: #9a7a18;
+  border-color: rgba(184, 134, 11, 0.45);
+  color: var(--gold-dim);
+}
+
+html[data-theme="light"] .inner-compass-link-hint code {
+  color: var(--gold-dim);
+}
+
+html[data-theme="light"] .auth-copy,
+html[data-theme="light"] .auth-hint,
+html[data-theme="light"] .auth-note,
+html[data-theme="light"] .dash-loading,
+html[data-theme="light"] .nav-user-name {
+  color: var(--text-muted);
 }
