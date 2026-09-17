@@ -420,16 +420,16 @@
 <div class="screen active" id="screen-intro">
   <span class="intro-tag">✦ coaching fit quiz</span>
   <h1 class="intro-headline">
-    Something is pulling you here.<br/>
+    Something brought you here.<br/>
     Let's find out <em>if now is the moment.</em>
   </h1>
   <p class="intro-body">
-    Seven honest questions from Luke Haythorpe, a life and leadership coach for people in transition. No sales pitch. Just a straight read on whether coaching could help you right now. Want more context first? <a href="/articles/how-do-you-know-youre-ready-for-life-coaching.html" style="color:var(--gold-dim);text-decoration:none;">Read the longer guide →</a>
+    Seven straight questions from Luke Haythorpe, a life and leadership coach for people who feel stuck. No sales pitch. Just a clear read on whether coaching could help you right now. Want more context first? <a href="/articles/how-do-you-know-youre-ready-for-life-coaching.html" style="color:var(--gold-dim);text-decoration:none;">Read the longer guide →</a>
   </p>
   <div class="intro-meta">
     <span class="meta-pill">⏱ ~2 minutes</span>
     <span class="meta-pill">✦ 3 outcomes</span>
-    <span class="meta-pill">honest results</span>
+    <span class="meta-pill">straight answers</span>
   </div>
   <button class="btn-primary" id="btn-start">Find out if I'm ready →</button>
 </div>
@@ -570,7 +570,7 @@ const QUESTIONS = [
 const OBJECTION_RESPONSES = {
   cost: {
     label: "💬 On the cost question",
-    text: "Coaching is an investment, and that's real. The free discovery call is for an honest conversation about what's possible, what it costs, and whether the timing works. No pressure, no pitch."
+    text: "Coaching is an investment, and that's real. The free discovery call is where we talk through what's possible, what it costs, and whether the timing works. No pressure, no pitch."
   },
   threshold: {
     label: "💬 You don't have to be in crisis",
@@ -728,33 +728,33 @@ function showResult() {
     badgeClass   = 'badge-yes';
     badgeText    = '✦ strong fit';
     headline     = name + ', you\'re ready for this.';
-    tagline      = 'You know what you\'re carrying, you\'re willing to be honest about it, and you\'re in a season where real movement is possible. That\'s someone coaching can actually work with.';
+    tagline      = 'You know what you\'re carrying, you\'re willing to name it, and you\'re in a season where real movement is possible. That\'s someone coaching can actually work with.';
     primaryCta   = PAID_CALL_URL;
     primaryLabel = 'Book a First Flight — $149 (code IMREADY) →';
     ghostLabel   = 'Retake quiz';
     sections = [
-      { label: '🌱 What this means', text: 'The gap between where you are and where you want to be is real, and it\'s closeable. You have enough self-awareness and honesty to do real work in coaching.' },
-      { label: '⚡ What coaching could do for you', text: 'Help you hear yourself think. Name what\'s really going on. Stop looping the same argument and pick one next move you\'ll actually take.' },
+      { label: '🌱 What this means', text: 'The gap between where you are and where you want to be is real, and it\'s closeable. You have enough self-awareness to do real work in coaching.' },
+      { label: '⚡ What coaching could do for you', text: 'Help you see yourself again. Name what\'s actually going on so you can move. Stop looping the same argument and pick one next step you\'ll actually take.' },
       { label: '◈ What happens next', html: 'A First Flight is a focused 2-hour coaching session. List price is $' + FIRST_FLIGHT_LIST_USD + '; as a thank-you for finishing this quiz, you can book for <strong>$' + FIRST_FLIGHT_QUIZ_PRICE_USD + '</strong> using the code when you tap Book. It\'s the real session, not a sales call or a taster.' }
     ];
   } else if (pct >= 0.42) {
     badgeClass   = 'badge-maybe';
     badgeText    = '◈ possible fit';
     headline     = name + ', you\'re closer than you think.';
-    tagline      = 'Something real is pulling you here. A few things are still in the way, and that\'s okay. A discovery call is an honest conversation about what\'s actually going on.';
+    tagline      = 'Something real brought you here. A few things are still in the way, and that\'s okay. A discovery call is a straight conversation about what\'s actually going on.';
     primaryCta   = FREE_CALL_URL;
     primaryLabel = 'Book a free discovery call →';
     ghostLabel   = 'Retake quiz';
     sections = [
       { label: '🌱 What this means', text: 'You\'re moving in the right direction; something is shifting and you know it. The question is whether now is the moment, and what\'s in the way.' },
-      { label: '⚡ What a discovery call does', text: 'It\'s 30 minutes. No commitment, no pitch. Enough space to get honest about where you are and whether we\'re the right fit, for both of us.' },
+      { label: '⚡ What a discovery call does', text: 'It\'s 30 minutes. No commitment, no pitch. Enough space to talk about where you are and whether we\'re the right fit, for both of us.' },
       { label: '◈ Zero pressure', text: 'If it\'s not the right time, I\'ll tell you that. A good coaching relationship only works if both people are in.' }
     ];
   } else {
     badgeClass   = 'badge-not-yet';
     badgeText    = '— not quite yet';
     headline     = name + ', the timing might not be right.';
-    tagline      = 'Coaching lands best when you\'re ready to be honest and do the work. It sounds like you\'re still figuring out what you want, and that\'s fine. Keep exploring.';
+    tagline      = 'Coaching lands best when you\'re ready to show up and do the work. It sounds like you\'re still figuring out what you want, and that\'s fine. Keep exploring.';
     primaryCta   = FREE_CALL_URL;
     primaryLabel = 'Still curious? Book a free call →';
     ghostLabel   = 'Retake quiz';
