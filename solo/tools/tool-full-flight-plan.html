@@ -42,10 +42,8 @@
     h1 { font-family: var(--font-display); font-size: clamp(1.8rem, 5vw, 2.5rem); font-weight: 400; font-style: italic; margin-bottom: 0.6rem; line-height: 1.2; }
     .intro { color: var(--text-dim); font-size: 0.88rem; line-height: 1.75; margin-bottom: 2.5rem; }
 
-    /* Portrait: appears once user has uploaded a childhood photo (or once
-       the illustrator has supplied a hand-drawn illustration). Shows above
-       the form as a quiet continuity reminder, and in the preview card as
-       the headline image of the plan. */
+    /* Portrait: childhood photo (or a legacy hand-drawn illustration if one
+       already exists). Shows above the form and in the preview card. */
     .portrait-strip { display: flex; align-items: center; gap: 1rem; padding: 0.85rem 1rem; background: linear-gradient(135deg, rgba(245,200,66,0.06), rgba(245,200,66,0.02)); border: 1px solid var(--gold-border); border-radius: 14px; margin-bottom: 1.5rem; }
     .portrait-strip img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); flex-shrink: 0; background: var(--dark-mid); }
     .portrait-text { display: flex; flex-direction: column; gap: 0.2rem; }
@@ -274,8 +272,7 @@
   const NUM_COMMITMENTS = 5;
   const NUM_SUPPORT     = 4;
 
-  // Render the childhood photo (or illustration, if the illustrator has
-  // delivered one) into the form strip + into the preview card.
+  // Prefer childhood photo; fall back to a legacy illustration if present.
   function renderPortrait() {
     const strip       = document.getElementById('portrait-strip');
     const stripImg    = document.getElementById('portrait-img');
@@ -288,10 +285,10 @@
     prevImg.src  = portraitUrl;
     if (portraitIsIllustration) {
       stripLabel.textContent = 'Younger you · illustrated';
-      stripNote.textContent  = 'Drawn by your illustrator. Sitting at the top of your plan, keeping watch.';
+      stripNote.textContent  = 'A hand-drawn portrait from earlier in the course. Sitting at the top of your plan.';
     } else {
       stripLabel.textContent = 'Younger you';
-      stripNote.textContent  = 'The version of you who started this. Your illustrator will draw them next.';
+      stripNote.textContent  = 'The version of you who started this. Also your Nest picture.';
     }
     strip.style.display = '';
     prev.style.display  = '';
@@ -304,8 +301,8 @@
         .select('illustration_url, childhood_photo_url')
         .eq('id', currentUser.id)
         .maybeSingle();
-      if (data?.illustration_url) { portraitUrl = data.illustration_url; portraitIsIllustration = true; }
-      else if (data?.childhood_photo_url) { portraitUrl = data.childhood_photo_url; portraitIsIllustration = false; }
+      if (data?.childhood_photo_url) { portraitUrl = data.childhood_photo_url; portraitIsIllustration = false; }
+      else if (data?.illustration_url) { portraitUrl = data.illustration_url; portraitIsIllustration = true; }
       renderPortrait();
     } catch (e) { console.warn('Portrait load failed:', e); }
   }

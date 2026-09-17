@@ -116,11 +116,11 @@
 
   <div class="eyebrow">Session 01 · Story</div>
   <h1>Younger you</h1>
-  <p class="intro">A photo of yourself somewhere between four and eight years old. The version of you before you learned to perform. We'll keep them in your Full Flight Plan as a quiet reminder of where this all began.</p>
+  <p class="intro">A photo of yourself somewhere between four and eight years old. The version of you before you learned to perform. We'll keep them on your Nest and in your Full Flight Plan as a reminder of where this all began.</p>
 
   <div class="why-card">
     <div class="why-label">Why this matters</div>
-    <p>At the end of the course, your illustrator turns this photo into a hand-drawn illustration that sits at the top of your Full Flight Plan — alongside the older you who's writing the plan now.</p>
+    <p>This photo becomes your Nest picture and sits at the top of your Full Flight Plan — alongside the older you who's writing the plan now.</p>
     <p>Choose one where you can see their eyes, if you can. Outdoor light is best. Doesn't have to be perfect.</p>
   </div>
 
@@ -150,7 +150,6 @@
 <script>
   const SUPABASE_URL  = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
-  const WORKER_URL    = 'https://worker-solo.cwwq46sn7m.workers.dev';
   const BUCKET        = 'childhood-photos';
   const MAX_BYTES     = 10 * 1024 * 1024;
 
@@ -195,8 +194,8 @@
       + '<div class="saved-state">'
       +   '<img class="saved-thumb" src="' + url + '" alt="Younger you" />'
       +   '<div class="saved-text">'
-      +     '<div class="saved-label">Saved to your nest</div>'
-      +     '<div class="saved-name">Photo ready for the illustrator</div>'
+      +     '<div class="saved-label">Saved to your Nest</div>'
+      +     '<div class="saved-name">Younger you photo</div>'
       +     (date ? '<div class="saved-date">Uploaded ' + date + '</div>' : '')
       +   '</div>'
       +   '<button class="saved-replace" id="btn-replace">Replace</button>'
@@ -293,9 +292,8 @@
 
     try {
       const ext  = fileExt(pendingFile);
-      // Versioned filename so re-uploads bust caches and the illustrator notification
-      // always references the freshest file. Older versions stay in the bucket as a
-      // safety net — Luke can clean up later if he wants.
+      // Versioned filename so re-uploads bust caches. Older versions stay in the
+      // bucket as a safety net — Luke can clean up later if he wants.
       const path = currentUser.id + '/photo-' + Date.now() + '.' + ext;
       const { error: upErr } = await sb.storage.from(BUCKET).upload(path, pendingFile, {
         cacheControl: '3600',
@@ -313,14 +311,6 @@
         .eq('id', currentUser.id);
       if (dbErr) throw dbErr;
 
-      // Fire notification to Luke / the illustrator. Non-blocking — if it fails we
-      // still consider the upload successful, since the file is safe in storage.
-      fetch(WORKER_URL + '/notify-illustrator', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ user_id: currentUser.id, photo_url: photoUrl }),
-      }).catch(() => {});
-
       // Mirror into tool_outputs so the dashboard knows this tool has been completed
       await sb.from('tool_outputs').upsert({
         user_id:     currentUser.id,
@@ -329,7 +319,7 @@
         updated_at:  new Date().toISOString(),
       }, { onConflict: 'user_id,tool_name' });
 
-      setStatus('Saved. Your illustrator gets a heads-up automatically.', 'success');
+      setStatus('Saved. This photo will show on your Nest and Full Flight Plan.', 'success');
       if (window.parent !== window && window.LilbirdEmbed) {
         LilbirdEmbed.finishEmbedSave('childhood-photo', {
           photo_url: photoUrl,
