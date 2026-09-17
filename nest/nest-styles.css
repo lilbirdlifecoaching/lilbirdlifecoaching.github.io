@@ -135,8 +135,33 @@ body.nest-page { line-height: 1.5; }
   padding: 0;
   color: var(--text-muted);
   cursor: pointer;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 .avatar:hover { color: var(--gold); border-color: rgba(245, 200, 66, 0.35); }
+.avatar.has-photo { border-color: rgba(245, 200, 66, 0.45); }
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.younger-you-card .younger-you-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+.younger-you-photo {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(245, 200, 66, 0.55);
+  background: var(--dark-mid);
+  flex-shrink: 0;
+}
+.younger-you-card h3 { margin-bottom: 0.35rem; }
+.younger-you-card p { margin-bottom: 0.75rem; }
 
 .dash-wrap { max-width: 1100px; margin: 0 auto; padding: 1.2rem; }
 .dash-error {

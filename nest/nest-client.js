@@ -455,6 +455,7 @@
         courseProfile?.full_name || currentUser.user_metadata?.full_name || currentUser.email;
 
       document.getElementById('profile-dot').classList.toggle('hidden', !hasInnerCompassComplete());
+      updateNavAvatar();
       renderNextSteps();
       renderProducts();
       renderProfile();
@@ -1001,38 +1002,93 @@
     }
   }
 
-  function renderProfile() {
-    const pane = document.getElementById('pane-profile');
-    if (hasInnerCompassComplete()) {
-      pane.innerHTML = `
-        <article class="product-card ic-snapshot-card ic-snapshot-card--profile">
-          ${renderInnerCompassSnapshotMarkup('profile')}
-        </article>`;
-    } else if (hasInnerCompassAccess()) {
-      pane.innerHTML = `
-        <article class="product-card">
-          <p class="eyebrow">my profile</p>
-          <h3>Inner Compass profile</h3>
-          <span class="status-badge pending">connect your read</span>
-          <p>Paste your results link from email on the Inner Compass card (Products tab), or open your read below.</p>
-          <div class="btn-row">
-            <button type="button" class="btn btn-outline" id="btn-link-inner-compass-profile">Connect my results</button>
-            <a class="btn btn-gold" href="${innerCompassHref()}">Take / open Inner Compass →</a>
+  function youngerYouPhotoUrl() {
+    return courseProfile?.childhood_photo_url || '';
+  }
+
+  function updateNavAvatar() {
+    const btn = document.getElementById('btn-nav-profile');
+    if (!btn) return;
+    const url = youngerYouPhotoUrl();
+    if (url) {
+      btn.classList.add('has-photo');
+      btn.innerHTML = '<img src="' + escapeHtml(url) + '" alt="" width="30" height="30" />';
+    } else {
+      btn.classList.remove('has-photo');
+      btn.innerHTML = '<i class="ti ti-user"></i>';
+    }
+  }
+
+  function renderYoungerYouCard() {
+    const url = youngerYouPhotoUrl();
+    const soloLink = hasSoloCourseAccess()
+      ? '<a class="btn btn-outline" href="/solo/">Open Solo · Younger You →</a>'
+      : '<a class="btn btn-ember" href="/solo/">Unlock Solo to add your photo →</a>';
+    if (url) {
+      return `
+        <article class="product-card younger-you-card">
+          <p class="eyebrow">younger you</p>
+          <div class="younger-you-row">
+            <img class="younger-you-photo" src="${escapeHtml(url)}" alt="Younger you" width="88" height="88" />
+            <div>
+              <h3>Your Nest picture</h3>
+              <p>From Solo Session 1. This is the photo on your Nest and Full Flight Plan.</p>
+              <div class="btn-row">${soloLink}</div>
+            </div>
           </div>
         </article>`;
+    }
+    return `
+      <article class="product-card younger-you-card">
+        <p class="eyebrow">younger you</p>
+        <h3>Add your Nest picture</h3>
+        <p>Upload a photo of you around ages 4–8 in Solo Session 1 (Younger You). It becomes your Nest picture.</p>
+        <div class="btn-row">${soloLink}</div>
+      </article>`;
+  }
+
+  function renderProfile() {
+    const pane = document.getElementById('pane-profile');
+    const youngerCard = renderYoungerYouCard();
+    if (hasInnerCompassComplete()) {
+      pane.innerHTML = `
+        <div class="product-grid">
+          ${youngerCard}
+          <article class="product-card ic-snapshot-card ic-snapshot-card--profile">
+            ${renderInnerCompassSnapshotMarkup('profile')}
+          </article>
+        </div>`;
+    } else if (hasInnerCompassAccess()) {
+      pane.innerHTML = `
+        <div class="product-grid">
+          ${youngerCard}
+          <article class="product-card">
+            <p class="eyebrow">my profile</p>
+            <h3>Inner Compass profile</h3>
+            <span class="status-badge pending">connect your read</span>
+            <p>Paste your results link from email on the Inner Compass card (Products tab), or open your read below.</p>
+            <div class="btn-row">
+              <button type="button" class="btn btn-outline" id="btn-link-inner-compass-profile">Connect my results</button>
+              <a class="btn btn-gold" href="${innerCompassHref()}">Take / open Inner Compass →</a>
+            </div>
+          </article>
+        </div>`;
       const profileLinkBtn = pane.querySelector('#btn-link-inner-compass-profile');
       if (profileLinkBtn) {
         profileLinkBtn.addEventListener('click', () => void linkInnerCompassToAccount(profileLinkBtn));
       }
     } else {
       pane.innerHTML = `
-        <article class="product-card locked">
-          <span class="lock-pill"><i class="ti ti-lock"></i> not yet unlocked</span>
-          <p class="eyebrow">my profile</p>
-          <h3>Inner Compass profile</h3>
-          <p>Take your Inner Compass read first. Your profile will appear here once unlocked.</p>
-          <div class="btn-row"><a class="btn btn-ember" href="/deep-profile.html?from=nest">Take the Inner Compass →</a></div>
-        </article>`;
+        <div class="product-grid">
+          ${youngerCard}
+          <article class="product-card locked">
+            <span class="lock-pill"><i class="ti ti-lock"></i> not yet unlocked</span>
+            <p class="eyebrow">my profile</p>
+            <h3>Inner Compass profile</h3>
+            <p>Take your Inner Compass read first. Your profile will appear here once unlocked.</p>
+            <div class="btn-row"><a class="btn btn-ember" href="/deep-profile.html?from=nest">Take the Inner Compass →</a></div>
+          </article>
+        </div>`;
     }
   }
 
@@ -1105,6 +1161,11 @@
     document.getElementById('sidebar-context-card').innerHTML = '';
     document.getElementById('next-steps-list').innerHTML = '';
     document.getElementById('nav-user-name').textContent = '';
+    const btn = document.getElementById('btn-nav-profile');
+    if (btn) {
+      btn.classList.remove('has-photo');
+      btn.innerHTML = '<i class="ti ti-user"></i>';
+    }
   }
   const tabProducts = document.getElementById('tab-products');
   const tabProfile = document.getElementById('tab-profile');
