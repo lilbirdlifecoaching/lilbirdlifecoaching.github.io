@@ -338,3 +338,66 @@ html[data-theme="light"] .nav-actions .theme-toggle {
 html[data-theme="light"] .read-accordion > summary {
   color: var(--gold-dim);
 }
+
+/* Relational dynamic CTA — dark ink on a vivid happy gradient */
+html[data-theme="light"] #partner-btn.partner-btn-ready,
+html[data-theme="light"] #partner-btn.btn-outline.partner-btn-ready {
+  background: linear-gradient(135deg, #f2a8d8 0%, #7ec8f0 100%);
+  border-color: rgba(30, 32, 40, 0.18);
+  color: #18181c;
+  font-weight: 500;
+  box-shadow: 0 2px 0 rgba(30, 32, 40, 0.08);
+}
+
+html[data-theme="light"] #partner-btn.partner-btn-ready:hover,
+html[data-theme="light"] #partner-btn.btn-outline.partner-btn-ready:hover {
+  color: #18181c;
+  border-color: rgba(30, 32, 40, 0.28);
+  filter: brightness(1.03);
+}
+
+html[data-theme="light"] #partner-btn.partner-btn-ready:disabled {
+  color: #18181c;
+  opacity: 0.85;
+}
+
+/* Natural wiring / Right now — light, shiny day cards (no charcoal wash) */
+html[data-theme="light"] .result-hero-lane {
+  border-color: rgba(30, 32, 40, 0.1);
+  box-shadow: 0 4px 18px rgba(30, 32, 40, 0.05);
+}
+
+html[data-theme="light"] .result-hero-lane--core {
+  background:
+    linear-gradient(160deg, rgba(157, 191, 138, 0.28) 0%, #fffef8 42%, #fff8e8 100%);
+  border-color: rgba(122, 158, 126, 0.35);
+}
+
+html[data-theme="light"] .result-hero-lane--now {
+  background:
+    linear-gradient(160deg, rgba(232, 115, 74, 0.2) 0%, #fffef9 42%, #fff0e8 100%);
+  border-color: rgba(232, 115, 74, 0.32);
+}
+
+html[data-theme="light"] .result-hero-lane-kicker {
+  color: var(--text-main);
+}
+
+html[data-theme="light"] .result-hero-lane-lede,
+html[data-theme="light"] .result-hero-lane-narrative {
+  color: var(--text-muted);
+  opacity: 1;
+}
+
+html[data-theme="light"] .result-hero-lane-chips .ftag {
+  background: #fff;
+  border-color: rgba(30, 32, 40, 0.16);
+  color: var(--text-main);
+  box-shadow: 0 1px 0 rgba(30, 32, 40, 0.04);
+}
+
+html[data-theme="light"] .result-hero-lane-chips .ftag[style*="gold-dim"],
+html[data-theme="light"] .result-hero-lane-chips .ftag.ember {
+  color: var(--gold-dim);
+}
+
