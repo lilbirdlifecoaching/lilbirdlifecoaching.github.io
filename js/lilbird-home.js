@@ -316,6 +316,19 @@
     onScroll();
   }
 
+  function initQuoteTicker() {
+    var track = document.querySelector('.quote-ticker-track');
+    if (!track || track.getAttribute('data-ticker-ready') === '1') return;
+    var items = Array.prototype.slice.call(track.children);
+    if (!items.length) return;
+    items.forEach(function (item) {
+      var clone = item.cloneNode(true);
+      clone.setAttribute('aria-hidden', 'true');
+      track.appendChild(clone);
+    });
+    track.setAttribute('data-ticker-ready', '1');
+  }
+
   function boot() {
     initParticles();
     initReveal();
@@ -325,6 +338,7 @@
     initNavMenu();
     initNavExplore();
     initHeroMotion();
+    initQuoteTicker();
   }
 
   global.LilbirdSite = {
