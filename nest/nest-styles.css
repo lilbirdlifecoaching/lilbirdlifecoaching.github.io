@@ -318,7 +318,7 @@ body.nest-page { line-height: 1.5; }
   margin: 0 0 0.65rem;
   font-size: 0.9rem;
   line-height: 1.55;
-  color: rgba(240, 236, 228, 0.72);
+  color: var(--text-muted);
 }
 .ic-snap-types {
   margin: 0 0 0.75rem;
