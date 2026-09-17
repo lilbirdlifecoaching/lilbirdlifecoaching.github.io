@@ -21,7 +21,8 @@
   function resolveTheme() {
     var stored = getStored();
     if (stored) return stored;
-    return systemPrefersDark() ? 'dark' : 'light';
+    // Site default is day; night is an explicit visitor choice.
+    return 'light';
   }
 
   function applyTheme(theme, opts) {

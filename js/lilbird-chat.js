@@ -4,7 +4,7 @@
 (function (global) {
   var WORKER = 'https://lilbird-chat.cwwq46sn7m.workers.dev/';
   var OPEN_MSG =
-    "Hey. You showed up — that already says something.\n\nI'm here to listen, not lecture. What's going on for you right now?";
+    "Hey. You showed up — that already says something.\n\nI'm here to listen. What's going on for you right now?";
 
   function boot() {
     var btn = document.getElementById('lb-chat-btn');

@@ -173,7 +173,11 @@
     var tiers = layout.querySelectorAll('.pathfinder-tier[data-pathfinder-tier]');
     var visuals = layout.querySelectorAll('.pathfinder-visual');
     var caption = document.getElementById('pathfinder-visual-caption');
-    var captions = ['Still deciding', 'Dip your toe in', 'Dive in — one-on-one'];
+    var captions = [
+      'Act one · Still deciding',
+      'Act two · Dip your toe in',
+      'Act three · Dive in'
+    ];
     var activeIdx = '0';
     var observer = null;
 
@@ -263,6 +267,34 @@
     });
   }
 
+  function initNavExplore() {
+    var wrap = document.querySelector('.nav-dropdown');
+    var btn = document.getElementById('nav-explore-btn');
+    var panel = document.getElementById('nav-explore-panel');
+    if (!wrap || !btn || !panel) return;
+
+    function setOpen(open) {
+      wrap.classList.toggle('is-open', open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (open) panel.removeAttribute('hidden');
+      else panel.setAttribute('hidden', '');
+    }
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      setOpen(panel.hasAttribute('hidden'));
+    });
+    panel.querySelectorAll('a').forEach(function (link) {
+      link.addEventListener('click', function () { setOpen(false); });
+    });
+    document.addEventListener('click', function (e) {
+      if (!wrap.contains(e.target)) setOpen(false);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') setOpen(false);
+    });
+  }
+
   function initHeroMotion() {
     if (global.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     var hero = document.querySelector('.hero');
@@ -291,6 +323,7 @@
     initFooterFeedback();
     initPathfinder();
     initNavMenu();
+    initNavExplore();
     initHeroMotion();
   }
 
