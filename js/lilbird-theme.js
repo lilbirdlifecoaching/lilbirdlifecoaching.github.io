@@ -25,6 +25,20 @@
     return 'light';
   }
 
+  function syncHeroCopy(theme) {
+    var headline = document.getElementById('hero-headline');
+    var sub = document.getElementById('hero-sub');
+    var key = theme === 'dark' ? 'night' : 'day';
+    if (headline) {
+      var h = headline.getAttribute('data-' + key);
+      if (h) headline.innerHTML = h;
+    }
+    if (sub) {
+      var s = sub.getAttribute('data-' + key);
+      if (s) sub.textContent = s;
+    }
+  }
+
   function applyTheme(theme, opts) {
     opts = opts || {};
     root.setAttribute('data-theme', theme);
@@ -49,6 +63,8 @@
         theme === 'light' ? 'Switch to night mode' : 'Switch to day mode'
       );
     });
+
+    syncHeroCopy(theme);
 
     if (opts.animate && !global.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       var wipe = document.getElementById('theme-wipe');
