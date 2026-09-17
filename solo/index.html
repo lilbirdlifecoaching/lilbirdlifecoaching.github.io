@@ -69,7 +69,8 @@
     .view { display: none; position: relative; z-index: 1; min-height: 100vh; width: 100%; max-width: 100%; }
     .view.active { display: flex; flex-direction: column; }
 
-    #view-session {
+    /* Only show session chat when that view is active (do not override .view { display:none }) */
+    #view-session.view.active {
       width: 100%;
       max-width: 100%;
       height: 100vh;
@@ -185,7 +186,7 @@
     .complete-tab { background: var(--dark-card); border: 1px solid rgba(255,255,255,0.08); border-radius: 99px; padding: 0.45rem 0.95rem; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); cursor: pointer; transition: border-color 0.2s, color 0.2s, background 0.2s; }
     .complete-tab:hover { border-color: var(--gold-border); color: var(--gold); }
     .complete-tab.active { background: var(--gold-dim); border-color: var(--gold-border); color: var(--gold); }
-    .complete-panel { animation: fadeUp 0.45s ease both; }
+    .complete-dash-panel { animation: fadeUp 0.45s ease both; }
     .flight-plan-block { background: var(--dark-card); border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 1.5rem 1.75rem; }
     .flight-plan-label { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.75rem; }
     .flight-plan-north { font-family: var(--font-display); font-size: 1.35rem; font-weight: 400; font-style: italic; line-height: 1.35; margin-bottom: 1.1rem; }
@@ -396,10 +397,11 @@
     /* Mic status toast */
     .mic-status-toast { position: fixed; bottom: 6rem; left: 50%; transform: translateX(-50%) translateY(8px); background: rgba(42,45,56,0.96); border: 1px solid rgba(232,115,74,0.35); color: var(--text); font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.06em; padding: 0.65rem 1rem; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 9999; max-width: 88vw; text-align: center; }
     .mic-status-toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
-    .complete-panel { display: none; background: var(--dark-card); border: 1px solid var(--session-border); border-radius: 28px; padding: 2rem; margin-top: 1.25rem; animation: fadeUp 0.5s ease both; text-align: center; }
-    .complete-panel.visible { display: block; }
-    .complete-panel h3 { font-family: var(--font-display); font-size: 1.4rem; font-weight: 400; font-style: italic; margin-bottom: 0.6rem; }
-    .complete-panel p { color: var(--text-dim); font-size: 0.88rem; line-height: 1.7; margin-bottom: 1.5rem; max-width: 380px; margin-left: auto; margin-right: auto; }
+    /* Session "mark complete" panel — scoped by id so it doesn't hide dashboard tabs */
+    #complete-panel { display: none; background: var(--dark-card); border: 1px solid var(--session-border); border-radius: 28px; padding: 2rem; margin-top: 1.25rem; animation: fadeUp 0.5s ease both; text-align: center; }
+    #complete-panel.visible { display: block; }
+    #complete-panel h3 { font-family: var(--font-display); font-size: 1.4rem; font-weight: 400; font-style: italic; margin-bottom: 0.6rem; }
+    #complete-panel p { color: var(--text-dim); font-size: 0.88rem; line-height: 1.7; margin-bottom: 1.5rem; max-width: 380px; margin-left: auto; margin-right: auto; }
     .tools-nudge { display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; margin-bottom: 1.5rem; }
     .tool-nudge-chip { display: inline-flex; align-items: center; gap: 0.4rem; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--session-col); border: 1px solid var(--session-border); border-radius: 20px; padding: 0.3rem 0.75rem; cursor: pointer; transition: background 0.2s; }
     .tool-nudge-chip:hover { background: var(--session-dim); }
@@ -508,7 +510,7 @@
       .session-nav { padding: 0.875rem 1rem; }
       .session-nav-label { display: none; }
       .session-main { grid-template-columns: 1fr; padding: 0; gap: 0; overflow: visible; }
-      #view-session { height: auto; overflow: visible; }
+      #view-session.view.active { height: auto; overflow: visible; }
       .session-info { display: none; }
       .session-chat-col { min-height: calc(100vh - 60px); padding: 0; min-height: 0; }
       .chat-container { min-height: calc(100vh - 60px); border-radius: 0; border-left: none; border-right: none; border-bottom: none; }
@@ -516,7 +518,7 @@
       .chat-messages { padding: 1rem; }
       .chat-input-wrap { padding: 0.75rem 1rem; padding-bottom: max(0.75rem, env(safe-area-inset-bottom)); }
       .chat-textarea { font-size: 16px; }
-      .complete-panel { border-radius: 0; margin-top: 0; border-left: none; border-right: none; }
+      #complete-panel { border-radius: 0; margin-top: 0; border-left: none; border-right: none; }
     }
 
     /* ── Stripe checkout modal ─────────────────────────────── */
@@ -688,7 +690,7 @@
   <script>
     const SUPABASE_URL  = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
-    const SOLO_SHELL_BUILD = 'v1.11-maintenance-hardening-20260812';
+    const SOLO_SHELL_BUILD = 'v1.12-complete-dash-css-fix-20260917';
     const WORKER_URL    = 'https://worker-solo.cwwq46sn7m.workers.dev';
     console.info("lil' bird Solo shell", SOLO_SHELL_BUILD, '| worker:', WORKER_URL);
     // Stripe publishable key — safe to ship in client code.
@@ -1106,7 +1108,7 @@
         completeDashTab = getCompleteViewFromUrl();
         let html = renderCompleteHero();
         html += renderCompleteTabsBar(completeDashTab);
-        html += '<div class="complete-panel">';
+        html += '<div class="complete-dash-panel">';
         if (completeDashTab === 'plan') html += renderFlightPlanPanel();
         else if (completeDashTab === 'takeaways') html += renderTakeawaysPanel();
         else html += renderSessionsPanel();
