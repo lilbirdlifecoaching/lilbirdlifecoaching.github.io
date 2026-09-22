@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- solo shell build: v1.11-maintenance-hardening-20260812 -->
+<!-- solo shell build: v1.13-public-landing-20260922 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -14,10 +14,12 @@
     })();
   </script>
   <meta name="theme-color" content="#1e2028" />
-  <meta name="robots" content="noindex, nofollow" />
+  <meta name="robots" content="index, follow" />
+  <meta name="description" content="Life Change Sessions: Solo — eight self-paced sessions with an AI coaching guide, interactive tools, and a Full Flight Plan. $197 one-time. Lifetime access." />
   <link rel="stylesheet" href="/css/lilbird-tokens.css" />
   <link rel="stylesheet" href="/css/lilbird-theme-chrome.css" />
   <title>Life Change Sessions: Solo · lil' bird</title>
+  <link rel="canonical" href="https://lilbird.life/solo/" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
@@ -537,8 +539,114 @@
     .checkout-error p { color: var(--text-dim); font-size: 0.85rem; line-height: 1.7; margin: 0.5rem 0 0; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes pulse { 0%, 100% { opacity: 0.3; transform: scale(0.85); } 50% { opacity: 1; transform: scale(1); } }
+
+    /* ── Public product landing (logged out) ───────────────── */
+    #view-landing { overflow-y: auto; align-items: stretch; }
+    .solo-landing { width: 100%; max-width: 720px; margin: 0 auto; padding: 1.25rem 1.5rem 4rem; animation: fadeUp 0.55s ease both; }
+    .solo-landing-top {
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      padding: 0.25rem 0 1.75rem; position: sticky; top: 0; z-index: 40;
+      background: linear-gradient(180deg, var(--dark) 70%, transparent);
+      margin: 0 -0.25rem; padding-left: 0.25rem; padding-right: 0.25rem;
+    }
+    .solo-landing-brand { display: flex; align-items: center; gap: 0.65rem; text-decoration: none; color: inherit; }
+    .solo-landing-brand .bird-mark {
+      width: 36px; height: 36px; background: var(--gold); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; font-size: 1.05rem;
+    }
+    .solo-landing-brand-name { font-family: var(--font-display); font-size: 1.05rem; font-weight: 400; }
+    .solo-landing-top-actions { display: flex; align-items: center; gap: 0.75rem; }
+    .solo-landing-signin {
+      font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-dim); background: none; border: 1px solid var(--gold-border); border-radius: 6px;
+      padding: 0.4rem 0.85rem; cursor: pointer; transition: color 0.2s, border-color 0.2s;
+    }
+    .solo-landing-signin:hover { color: var(--gold); border-color: var(--gold); }
+    .solo-landing-hero { padding: 1.5rem 0 2.5rem; }
+    .solo-landing-eyebrow {
+      font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 0.85rem;
+    }
+    .solo-landing-hero h1 {
+      font-family: var(--font-display); font-size: clamp(2rem, 5.5vw, 2.85rem); font-weight: 400;
+      font-style: italic; line-height: 1.15; margin-bottom: 1rem;
+    }
+    .solo-landing-hero h1 em { font-style: normal; color: var(--gold); }
+    .solo-landing-lede {
+      color: var(--text-dim); font-size: 1.05rem; line-height: 1.7; max-width: 34em; margin-bottom: 1.75rem;
+    }
+    .solo-landing-cta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.85rem 1.25rem; margin-bottom: 0.75rem; }
+    .solo-landing-price-inline {
+      font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; color: var(--text-muted);
+    }
+    .solo-landing-price-inline strong { color: var(--gold); font-size: 0.95rem; font-weight: 500; letter-spacing: 0.04em; }
+    .solo-landing-section { padding: 2rem 0; border-top: 1px solid var(--gold-border); }
+    .solo-landing-section h2 {
+      font-family: var(--font-display); font-size: 1.45rem; font-weight: 400; font-style: italic;
+      margin-bottom: 0.5rem;
+    }
+    .solo-landing-section > p {
+      color: var(--text-dim); font-size: 0.92rem; line-height: 1.65; margin-bottom: 1.5rem; max-width: 36em;
+    }
+    .solo-include-list { list-style: none; display: flex; flex-direction: column; gap: 0.85rem; margin: 0; padding: 0; }
+    .solo-include-list li {
+      display: grid; grid-template-columns: 1.5rem 1fr; gap: 0.75rem; align-items: start;
+      font-size: 0.92rem; line-height: 1.55; color: var(--text);
+    }
+    .solo-include-list .mark { color: var(--gold); font-family: var(--font-mono); font-size: 0.75rem; padding-top: 0.15rem; }
+    .solo-include-list strong { font-weight: 500; }
+    .solo-include-list span { color: var(--text-dim); display: block; font-size: 0.85rem; margin-top: 0.15rem; }
+    .solo-arc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.35rem; }
+    .solo-arc-list li {
+      display: grid; grid-template-columns: 2.5rem 1fr; gap: 0.75rem; align-items: baseline;
+      padding: 0.65rem 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-size: 0.9rem;
+    }
+    .solo-arc-list li:last-child { border-bottom: none; }
+    .solo-arc-num { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.08em; color: var(--text-muted); }
+    .solo-arc-title { font-weight: 500; }
+    .solo-arc-teaser { color: var(--text-dim); font-size: 0.82rem; margin-top: 0.15rem; line-height: 1.5; }
+    .solo-landing-buy {
+      background: linear-gradient(135deg, var(--dark-card), var(--dark-mid));
+      border: 1px solid var(--gold-border); border-radius: 24px; padding: 2rem 1.5rem; text-align: center;
+      margin-top: 0.5rem;
+    }
+    .solo-landing-buy .price-amount { font-size: 2.75rem; margin-bottom: 0.25rem; }
+    .solo-landing-buy .price-label { margin-bottom: 1.25rem; display: block; }
+    .solo-landing-buy .btn-purchase { width: 100%; max-width: 280px; }
+    .solo-landing-buy-note {
+      margin-top: 1rem; font-size: 0.8rem; color: var(--text-muted); line-height: 1.55;
+    }
+    .solo-landing-foot {
+      margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--gold-border);
+      text-align: center; font-size: 0.78rem; color: var(--text-muted); line-height: 1.7;
+    }
+    .solo-landing-foot a { color: var(--gold); text-decoration: none; }
+    .auth-back {
+      display: inline-flex; align-items: center; gap: 0.35rem; margin-bottom: 1.25rem;
+      font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-muted); background: none; border: none; cursor: pointer; padding: 0;
+      transition: color 0.2s;
+    }
+    .auth-back:hover { color: var(--gold); }
+    .purchase-includes {
+      list-style: none; margin: 0 auto 1.75rem; padding: 0; max-width: 360px; text-align: left;
+      display: flex; flex-direction: column; gap: 0.45rem;
+    }
+    .purchase-includes li {
+      font-size: 0.82rem; color: var(--text-dim); line-height: 1.45;
+      padding-left: 1.1rem; position: relative;
+    }
+    .purchase-includes li::before {
+      content: '·'; position: absolute; left: 0.15rem; color: var(--gold); font-weight: 700;
+    }
+    @media (max-width: 520px) {
+      .solo-landing { padding: 1rem 1.15rem 3.5rem; }
+      .solo-landing-cta-row { flex-direction: column; align-items: stretch; }
+      .solo-landing-cta-row .btn-purchase { width: 100%; }
+    }
   </style>
-  <link rel="stylesheet" href="/css/lilbird-solo-theme.css" />
+  <link rel="stylesheet" href="/css/lilbird-solo-theme.css?v=20260922a" />
   <!-- Google Tag Manager -->
   <script src="/lilbird-gtm-id.js"></script>
   <script src="/lilbird-gtm.js"></script>
@@ -550,6 +658,100 @@
   <div id="view-loading" class="view active">
     <div class="loading-bird">🪶</div>
     <div class="loading-text">finding your nest...</div>
+  </div>
+
+  <div id="view-landing" class="view">
+    <div class="solo-landing">
+      <div class="solo-landing-top">
+        <a class="solo-landing-brand" href="https://lilbird.life/">
+          <div class="bird-mark">🪶</div>
+          <span class="solo-landing-brand-name">lil' bird</span>
+        </a>
+        <div class="solo-landing-top-actions">
+          <button type="button" class="theme-toggle" aria-pressed="false" aria-label="Switch appearance">
+            <span class="theme-toggle-track" aria-hidden="true">
+              <span class="theme-toggle-thumb">
+                <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"/><g stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></g></svg>
+                <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5z"/></svg>
+              </span>
+            </span>
+            <span class="theme-toggle-label">Night</span>
+          </button>
+          <button type="button" class="solo-landing-signin" id="btn-landing-signin">Sign in</button>
+        </div>
+      </div>
+
+      <header class="solo-landing-hero">
+        <p class="solo-landing-eyebrow">Life Change Sessions · Solo</p>
+        <h1>The curriculum.<br/>Your pace. <em>Real depth.</em></h1>
+        <p class="solo-landing-lede">
+          Eight self-guided sessions with an AI coaching guide that helps you see yourself again — plus tools that keep the work moving, and a Full Flight Plan you walk away with.
+        </p>
+        <div class="solo-landing-cta-row">
+          <button type="button" class="btn-purchase" id="btn-landing-begin">Get Solo — $197 →</button>
+          <span class="solo-landing-price-inline"><strong>$197</strong> · one-time · lifetime access</span>
+        </div>
+      </header>
+
+      <section class="solo-landing-section" aria-labelledby="solo-includes-heading">
+        <h2 id="solo-includes-heading">What's included</h2>
+        <p>Same arc as working with Luke live — built so you can go deep without standing appointments.</p>
+        <ul class="solo-include-list">
+          <li>
+            <span class="mark" aria-hidden="true">01</span>
+            <div><strong>Eight guided sessions</strong><span>Orientation through Full Flight — story, vision, identity, transitions, rhythms, relationships, and your plan.</span></div>
+          </li>
+          <li>
+            <span class="mark" aria-hidden="true">02</span>
+            <div><strong>An AI coaching guide</strong><span>Conversation that follows Luke's method — not a chatbot that cheers from the sidelines.</span></div>
+          </li>
+          <li>
+            <span class="mark" aria-hidden="true">03</span>
+            <div><strong>Interactive tools</strong><span>Glow Map, Peak &amp; Plunge, Courage Compass, Forest of Connections, Younger You, and more — woven into each session.</span></div>
+          </li>
+          <li>
+            <span class="mark" aria-hidden="true">04</span>
+            <div><strong>Your Full Flight Plan</strong><span>A living document that pulls your work together — yours to keep.</span></div>
+          </li>
+          <li>
+            <span class="mark" aria-hidden="true">05</span>
+            <div><strong>Your Nest</strong><span>A private home for progress, takeaways, and the photo of younger you.</span></div>
+          </li>
+        </ul>
+      </section>
+
+      <section class="solo-landing-section" aria-labelledby="solo-arc-heading">
+        <h2 id="solo-arc-heading">The arc</h2>
+        <p>One session at a time. Unlock the next when you're ready.</p>
+        <ol class="solo-arc-list">
+          <li><span class="solo-arc-num">✦</span><div><div class="solo-arc-title">First Flight</div><div class="solo-arc-teaser">Name where you are. Glimpse where you could be.</div></div></li>
+          <li><span class="solo-arc-num">01</span><div><div class="solo-arc-title">Story</div><div class="solo-arc-teaser">Before you take flight, know where you've been.</div></div></li>
+          <li><span class="solo-arc-num">02</span><div><div class="solo-arc-title">Vision &amp; Goals</div><div class="solo-arc-teaser">Clarify where you're going by discovering what matters most.</div></div></li>
+          <li><span class="solo-arc-num">03</span><div><div class="solo-arc-title">Identity &amp; Insight</div><div class="solo-arc-teaser">Know who you are so you can rise with clarity.</div></div></li>
+          <li><span class="solo-arc-num">04</span><div><div class="solo-arc-title">Navigating Transitions</div><div class="solo-arc-teaser">When the path gets foggy — slow down, look inward, choose your next step.</div></div></li>
+          <li><span class="solo-arc-num">05</span><div><div class="solo-arc-title">Life Rhythms &amp; Routines</div><div class="solo-arc-teaser">Design a life that fits how you actually work.</div></div></li>
+          <li><span class="solo-arc-num">06</span><div><div class="solo-arc-title">Relationships &amp; Community</div><div class="solo-arc-teaser">Look at who's in your forest.</div></div></li>
+          <li><span class="solo-arc-num">07</span><div><div class="solo-arc-title">Full Flight</div><div class="solo-arc-teaser">Your story. Your vision. Your plan. All of it — yours.</div></div></li>
+        </ol>
+      </section>
+
+      <section class="solo-landing-section" aria-labelledby="solo-buy-heading">
+        <h2 id="solo-buy-heading">Begin when you're ready</h2>
+        <p>Create an account (or sign in), then checkout. Promo codes work at purchase.</p>
+        <div class="solo-landing-buy">
+          <div class="price-amount">$197</div>
+          <span class="price-label">one-time · lifetime access</span>
+          <button type="button" class="btn-purchase" id="btn-landing-checkout">Create account &amp; buy →</button>
+          <p class="solo-landing-buy-note">Already have access? <button type="button" class="auth-back" id="btn-landing-signin-inline" style="display:inline;margin:0;text-transform:none;letter-spacing:0.02em;font-size:inherit;font-family:inherit;color:var(--gold);">Sign in →</button></p>
+        </div>
+      </section>
+
+      <footer class="solo-landing-foot">
+        Prefer live work with Luke? <a href="/book.html">See formats</a>
+        · <a href="https://lilbird.life/">lilbird.life</a><br/>
+        By continuing you agree to lil' bird's <a href="https://lilbird.life/terms" target="_blank" rel="noopener">terms</a> and <a href="https://lilbird.life/privacy" target="_blank" rel="noopener">privacy policy</a>.
+      </footer>
+    </div>
   </div>
 
   <div id="view-auth" class="view">
@@ -565,6 +767,7 @@
       </button>
     </div>
     <div class="auth-wrap">
+      <button type="button" class="auth-back" id="btn-auth-back">← What is Solo</button>
       <div class="auth-logo">
         <div class="bird-mark">🪶</div>
         <h1>lil' bird</h1>
@@ -690,7 +893,7 @@
   <script>
     const SUPABASE_URL  = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
-    const SOLO_SHELL_BUILD = 'v1.12-complete-dash-css-fix-20260917';
+    const SOLO_SHELL_BUILD = 'v1.13-public-landing-20260922';
     const WORKER_URL    = 'https://worker-solo.cwwq46sn7m.workers.dev';
     console.info("lil' bird Solo shell", SOLO_SHELL_BUILD, '| worker:', WORKER_URL);
     // Stripe publishable key — safe to ship in client code.
@@ -768,16 +971,37 @@
         document.documentElement.scrollLeft = 0;
         document.body.scrollLeft = 0;
       }
+      if (id === 'view-landing' || id === 'view-auth') {
+        window.scrollTo(0, 0);
+      }
+    }
+
+    function selectAuthTab(tab) {
+      const name = tab === 'signup' ? 'signup' : 'signin';
+      document.querySelectorAll('.auth-tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.tab === name);
+      });
+      document.querySelectorAll('.auth-form').forEach(f => {
+        f.classList.toggle('active', f.id === 'form-' + name);
+      });
+    }
+
+    function openAuth(tab) {
+      selectAuthTab(tab || 'signin');
+      showView('view-auth');
     }
 
     document.querySelectorAll('.auth-tab').forEach(tab => {
       tab.addEventListener('click', () => {
-        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-        tab.classList.add('active');
-        document.getElementById('form-' + tab.dataset.tab).classList.add('active');
+        selectAuthTab(tab.dataset.tab);
       });
     });
+
+    document.getElementById('btn-landing-begin').addEventListener('click', () => openAuth('signup'));
+    document.getElementById('btn-landing-checkout').addEventListener('click', () => openAuth('signup'));
+    document.getElementById('btn-landing-signin').addEventListener('click', () => openAuth('signin'));
+    document.getElementById('btn-landing-signin-inline').addEventListener('click', () => openAuth('signin'));
+    document.getElementById('btn-auth-back').addEventListener('click', () => showView('view-landing'));
 
     document.getElementById('form-signin').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -804,7 +1028,7 @@
       } catch (error) { err.textContent = error.message || 'Something went wrong.'; err.classList.add('visible'); btn.disabled = false; btn.textContent = 'Create account →'; }
     });
 
-    document.getElementById('btn-signout').addEventListener('click', async () => { await sb.auth.signOut(); showView('view-auth'); });
+    document.getElementById('btn-signout').addEventListener('click', async () => { await sb.auth.signOut(); showView('view-landing'); });
 
     async function loadDashboard() {
       showView('view-loading');
@@ -820,7 +1044,7 @@
         renderDashboard();
         showView('view-dashboard');
         await handlePostPurchaseReturn();
-      } catch (err) { console.error('Dashboard error:', err); showView('view-auth'); }
+      } catch (err) { console.error('Dashboard error:', err); showView('view-landing'); }
     }
 
     async function loadSessionProgress() {
@@ -1158,7 +1382,7 @@
     }
 
     function renderPurchaseGate() {
-      return '<div class="purchase-gate"><span class="bird-glyph">🪶</span><h3>Ready to begin?</h3><p>Eight sessions. Fully self-paced. An AI coaching guide that helps you see yourself again, plus tools that keep the work moving.</p><div class="purchase-price"><div class="price-amount" id="display-price">'+formatPrice(BASE_PRICE)+'</div><div class="price-label">one-time · lifetime access</div></div><div class="promo-input-wrap"><input class="promo-input" id="promo-input" type="text" placeholder="Have a promo code?" /><button class="btn-apply-promo" id="btn-apply-promo">Apply</button></div><div class="promo-message" id="promo-message"></div><button class="btn-purchase" id="btn-purchase">Begin my journey →</button></div>';
+      return '<div class="purchase-gate"><span class="bird-glyph">🪶</span><h3>Ready to begin?</h3><p>You\'re signed in. Unlock Solo to start the eight sessions — your pace, lifetime access.</p><ul class="purchase-includes"><li>AI coaching guide through every session</li><li>Interactive tools + Full Flight Plan</li><li>Your Nest for progress and takeaways</li></ul><div class="purchase-price"><div class="price-amount" id="display-price">'+formatPrice(BASE_PRICE)+'</div><div class="price-label">one-time · lifetime access</div></div><div class="promo-input-wrap"><input class="promo-input" id="promo-input" type="text" placeholder="Have a promo code?" /><button class="btn-apply-promo" id="btn-apply-promo">Apply</button></div><div class="promo-message" id="promo-message"></div><button class="btn-purchase" id="btn-purchase">Begin my journey →</button></div>';
     }
 
     function bindPurchaseGate() {
@@ -2224,27 +2448,27 @@
     sb.auth.onAuthStateChange(async(event,session)=>{
       if(event==='SIGNED_IN'&&session?.user&&!currentUser){currentUser=session.user;await loadDashboard();}
       else if(event==='TOKEN_REFRESHED'&&session?.user&&currentUser){currentUser=session.user;}
-      else if(event==='SIGNED_OUT'){currentUser=null;userProfile=null;sessionData=[];showView('view-auth');}
+      else if(event==='SIGNED_OUT'){currentUser=null;userProfile=null;sessionData=[];showView('view-landing');}
     });
 
     (async()=>{
       try {
         var tokenRaw=localStorage.getItem('lilbird-solo-auth');
-        if(!tokenRaw){showView('view-auth');return;}
+        if(!tokenRaw){showView('view-landing');return;}
         var tokenData=JSON.parse(tokenRaw), user=tokenData&&tokenData.user;
-        if(!user||!user.id){showView('view-auth');return;}
+        if(!user||!user.id){showView('view-landing');return;}
         var expiresAt=tokenData.expires_at;
         if(expiresAt&&(expiresAt*1000)<Date.now()){
           try {
             var refreshed=await Promise.race([sb.auth.refreshSession(),new Promise(resolve=>setTimeout(()=>resolve(null),3000))]);
             if(refreshed&&refreshed.data&&refreshed.data.user){currentUser=refreshed.data.user;await loadDashboard();}
-            else{localStorage.removeItem('lilbird-solo-auth');showView('view-auth');}
-          } catch(e){localStorage.removeItem('lilbird-solo-auth');showView('view-auth');}
+            else{localStorage.removeItem('lilbird-solo-auth');showView('view-landing');}
+          } catch(e){localStorage.removeItem('lilbird-solo-auth');showView('view-landing');}
           return;
         }
         currentUser={id:user.id,email:user.email};
         await loadDashboard();
-      } catch(e){showView('view-auth');}
+      } catch(e){showView('view-landing');}
     })();
 
     // ── Voice input (Web Speech API) ─────────────────────────────────
