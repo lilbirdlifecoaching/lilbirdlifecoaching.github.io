@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- solo shell build: v1.13-public-landing-20260922 -->
+<!-- solo shell build: v1.14-guest-checkout-20260922 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -640,13 +640,58 @@
     .purchase-includes li::before {
       content: '·'; position: absolute; left: 0.15rem; color: var(--gold); font-weight: 700;
     }
+    .solo-buy-panel {
+      background: linear-gradient(135deg, var(--dark-card), var(--dark-mid));
+      border: 1px solid var(--gold-border); border-radius: 24px; padding: 1.75rem 1.5rem;
+      margin-top: 0.5rem; text-align: left;
+    }
+    .solo-buy-panel .price-row {
+      display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
+      margin-bottom: 1.25rem; flex-wrap: wrap;
+    }
+    .solo-buy-panel .price-amount { font-size: 2.5rem; }
+    .solo-buy-panel .form-group { margin-bottom: 0.85rem; }
+    .solo-buy-panel .promo-row { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
+    .solo-buy-panel .promo-row input { flex: 1; }
+    .solo-buy-panel .btn-purchase { width: 100%; margin-top: 0.75rem; }
+    .solo-buy-panel .solo-buy-hint {
+      margin-top: 1rem; font-size: 0.8rem; color: var(--text-muted); line-height: 1.55; text-align: center;
+    }
+    .solo-buy-error {
+      background: var(--ember-dim); border: 1px solid rgba(232,115,74,0.3); border-radius: 6px;
+      padding: 0.6rem 0.875rem; font-size: 0.82rem; color: var(--ember); display: none; margin-bottom: 0.75rem;
+    }
+    .solo-buy-error.visible { display: block; }
+    #view-post-purchase { align-items: center; justify-content: center; padding: 2rem; }
+    .post-purchase-wrap { width: 100%; max-width: 440px; animation: fadeUp 0.55s ease both; text-align: center; }
+    .post-purchase-wrap .bird-mark {
+      width: 52px; height: 52px; background: var(--gold); border-radius: 14px;
+      display: inline-flex; align-items: center; justify-content: center; margin-bottom: 1.25rem; font-size: 1.5rem;
+    }
+    .post-purchase-wrap h1 {
+      font-family: var(--font-display); font-size: 1.85rem; font-weight: 400; font-style: italic; margin-bottom: 0.75rem;
+    }
+    .post-purchase-wrap .lede { color: var(--text-dim); font-size: 0.95rem; line-height: 1.7; margin-bottom: 1.5rem; }
+    .post-purchase-card {
+      background: var(--dark-card); border: 1px solid var(--gold-border); border-radius: 20px;
+      padding: 1.75rem; text-align: left;
+    }
+    .post-purchase-card .form-group { margin-bottom: 1rem; }
+    .post-purchase-msg {
+      font-size: 0.82rem; font-family: var(--font-mono); margin: 0.75rem 0; min-height: 1.2em; color: var(--text-dim);
+    }
+    .post-purchase-msg.ok { color: #7a9e7e; }
+    .post-purchase-msg.err { color: var(--ember); }
+    .post-purchase-actions { display: flex; flex-direction: column; gap: 0.65rem; margin-top: 0.5rem; }
+    .post-purchase-actions .btn-primary { margin-top: 0; width: 100%; }
+    .post-purchase-actions .btn-ghost { width: 100%; padding: 0.75rem 1rem; text-align: center; }
     @media (max-width: 520px) {
       .solo-landing { padding: 1rem 1.15rem 3.5rem; }
       .solo-landing-cta-row { flex-direction: column; align-items: stretch; }
       .solo-landing-cta-row .btn-purchase { width: 100%; }
     }
   </style>
-  <link rel="stylesheet" href="/css/lilbird-solo-theme.css?v=20260922a" />
+  <link rel="stylesheet" href="/css/lilbird-solo-theme.css?v=20260922b" />
   <!-- Google Tag Manager -->
   <script src="/lilbird-gtm-id.js"></script>
   <script src="/lilbird-gtm.js"></script>
@@ -688,9 +733,10 @@
           Eight self-guided sessions with an AI coaching guide that helps you see yourself again — plus tools that keep the work moving, and a Full Flight Plan you walk away with.
         </p>
         <div class="solo-landing-cta-row">
-          <button type="button" class="btn-purchase" id="btn-landing-begin">Get Solo — $197 →</button>
+          <button type="button" class="btn-purchase" id="btn-landing-begin">Buy Solo — $197 →</button>
           <span class="solo-landing-price-inline"><strong>$197</strong> · one-time · lifetime access</span>
         </div>
+        <p class="solo-landing-price-inline" style="display:block;margin-top:0.5rem;">Pay now — set up access after.</p>
       </header>
 
       <section class="solo-landing-section" aria-labelledby="solo-includes-heading">
@@ -735,14 +781,33 @@
         </ol>
       </section>
 
-      <section class="solo-landing-section" aria-labelledby="solo-buy-heading">
-        <h2 id="solo-buy-heading">Begin when you're ready</h2>
-        <p>Create an account (or sign in), then checkout. Promo codes work at purchase.</p>
-        <div class="solo-landing-buy">
-          <div class="price-amount">$197</div>
-          <span class="price-label">one-time · lifetime access</span>
-          <button type="button" class="btn-purchase" id="btn-landing-checkout">Create account &amp; buy →</button>
-          <p class="solo-landing-buy-note">Already have access? <button type="button" class="auth-back" id="btn-landing-signin-inline" style="display:inline;margin:0;text-transform:none;letter-spacing:0.02em;font-size:inherit;font-family:inherit;color:var(--gold);">Sign in →</button></p>
+      <section class="solo-landing-section" id="solo-buy" aria-labelledby="solo-buy-heading">
+        <h2 id="solo-buy-heading">Buy Solo</h2>
+        <p>Pay first. After checkout you'll set a password with this email to open your sessions. Promo codes work here or in Stripe.</p>
+        <div class="solo-buy-panel">
+          <div class="price-row">
+            <div class="price-amount" id="landing-display-price">$197</div>
+            <span class="price-label">one-time · lifetime access</span>
+          </div>
+          <div class="solo-buy-error" id="landing-buy-error" role="alert"></div>
+          <div class="form-group">
+            <label for="landing-buyer-name">Your name</label>
+            <input id="landing-buyer-name" type="text" autocomplete="name" placeholder="First name" />
+          </div>
+          <div class="form-group">
+            <label for="landing-buyer-email">Email</label>
+            <input id="landing-buyer-email" type="email" autocomplete="email" placeholder="you@example.com" />
+          </div>
+          <div class="form-group">
+            <label for="landing-promo-input">Promo code</label>
+            <div class="promo-row">
+              <input class="promo-input" id="landing-promo-input" type="text" placeholder="Have a promo code?" autocomplete="off" />
+              <button type="button" class="btn-apply-promo" id="btn-landing-apply-promo">Apply</button>
+            </div>
+            <div class="promo-message" id="landing-promo-message"></div>
+          </div>
+          <button type="button" class="btn-purchase" id="btn-landing-pay">Pay $197 →</button>
+          <p class="solo-buy-hint">Already have access? <button type="button" class="auth-back" id="btn-landing-signin-inline" style="display:inline;margin:0;text-transform:none;letter-spacing:0.02em;font-size:inherit;font-family:inherit;color:var(--gold);">Sign in →</button></p>
         </div>
       </section>
 
@@ -751,6 +816,39 @@
         · <a href="https://lilbird.life/">lilbird.life</a><br/>
         By continuing you agree to lil' bird's <a href="https://lilbird.life/terms" target="_blank" rel="noopener">terms</a> and <a href="https://lilbird.life/privacy" target="_blank" rel="noopener">privacy policy</a>.
       </footer>
+    </div>
+  </div>
+
+  <div id="view-post-purchase" class="view">
+    <div class="solo-auth-theme-wrap">
+      <button type="button" class="theme-toggle" aria-pressed="false" aria-label="Switch appearance">
+        <span class="theme-toggle-track" aria-hidden="true">
+          <span class="theme-toggle-thumb">
+            <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"/><g stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></g></svg>
+            <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5z"/></svg>
+          </span>
+        </span>
+        <span class="theme-toggle-label">Night</span>
+      </button>
+    </div>
+    <div class="post-purchase-wrap">
+      <div class="bird-mark">🪶</div>
+      <h1>You're in.</h1>
+      <p class="lede" id="post-purchase-lede">Payment received. Set a password with this email to open your sessions.</p>
+      <div class="post-purchase-card">
+        <div class="form-group">
+          <label for="post-purchase-email">Email</label>
+          <input id="post-purchase-email" type="email" autocomplete="email" readonly />
+        </div>
+        <div class="post-purchase-msg" id="post-purchase-msg" aria-live="polite"></div>
+        <div class="post-purchase-actions">
+          <button type="button" class="btn-primary" id="btn-send-password-link">Email me a set-password link →</button>
+          <button type="button" class="btn-ghost" id="btn-post-purchase-signin">Already have a password? Sign in →</button>
+        </div>
+      </div>
+      <p class="solo-landing-foot" style="border:none;margin-top:1.5rem;padding-top:0;">
+        The set-password link opens your Nest (same login for Solo). Check spam if it doesn't arrive. Questions? <a href="mailto:hello@lilbird.life">hello@lilbird.life</a>
+      </p>
     </div>
   </div>
 
@@ -893,7 +991,7 @@
   <script>
     const SUPABASE_URL  = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
-    const SOLO_SHELL_BUILD = 'v1.13-public-landing-20260922';
+    const SOLO_SHELL_BUILD = 'v1.14-guest-checkout-20260922';
     const WORKER_URL    = 'https://worker-solo.cwwq46sn7m.workers.dev';
     console.info("lil' bird Solo shell", SOLO_SHELL_BUILD, '| worker:', WORKER_URL);
     // Stripe publishable key — safe to ship in client code.
@@ -971,7 +1069,7 @@
         document.documentElement.scrollLeft = 0;
         document.body.scrollLeft = 0;
       }
-      if (id === 'view-landing' || id === 'view-auth') {
+      if (id === 'view-landing' || id === 'view-auth' || id === 'view-post-purchase') {
         window.scrollTo(0, 0);
       }
     }
@@ -991,17 +1089,106 @@
       showView('view-auth');
     }
 
+    function scrollToBuyPanel() {
+      showView('view-landing');
+      requestAnimationFrame(() => {
+        const el = document.getElementById('solo-buy');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const nameInput = document.getElementById('landing-buyer-name');
+        if (nameInput) setTimeout(() => nameInput.focus(), 400);
+      });
+    }
+
     document.querySelectorAll('.auth-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         selectAuthTab(tab.dataset.tab);
       });
     });
 
-    document.getElementById('btn-landing-begin').addEventListener('click', () => openAuth('signup'));
-    document.getElementById('btn-landing-checkout').addEventListener('click', () => openAuth('signup'));
+    document.getElementById('btn-landing-begin').addEventListener('click', scrollToBuyPanel);
     document.getElementById('btn-landing-signin').addEventListener('click', () => openAuth('signin'));
     document.getElementById('btn-landing-signin-inline').addEventListener('click', () => openAuth('signin'));
     document.getElementById('btn-auth-back').addEventListener('click', () => showView('view-landing'));
+    document.getElementById('btn-post-purchase-signin').addEventListener('click', () => {
+      const email = document.getElementById('post-purchase-email').value.trim();
+      if (email) document.getElementById('signin-email').value = email;
+      openAuth('signin');
+    });
+
+    document.getElementById('btn-landing-apply-promo').addEventListener('click', () => {
+      const code = document.getElementById('landing-promo-input').value.trim().toUpperCase();
+      const promo = PROMO_CODES[code];
+      const msgEl = document.getElementById('landing-promo-message');
+      const priceEl = document.getElementById('landing-display-price');
+      const payBtn = document.getElementById('btn-landing-pay');
+      if (promo) {
+        activePromo = { ...promo, code };
+        const amount = formatPrice(BASE_PRICE * (1 - promo.discount));
+        priceEl.textContent = amount;
+        payBtn.textContent = 'Pay ' + amount + ' →';
+        msgEl.textContent = typeof promo.label === 'function' ? promo.label() : promo.label;
+        msgEl.className = 'promo-message promo-success';
+      } else if (code) {
+        activePromo = { code, discount: 0, label: code + ' will be checked at checkout' };
+        priceEl.textContent = formatPrice(BASE_PRICE);
+        payBtn.textContent = 'Pay ' + formatPrice(BASE_PRICE) + ' →';
+        msgEl.textContent = code + ' will be applied at checkout if valid.';
+        msgEl.className = 'promo-message promo-success';
+      } else {
+        activePromo = null;
+        priceEl.textContent = formatPrice(BASE_PRICE);
+        payBtn.textContent = 'Pay ' + formatPrice(BASE_PRICE) + ' →';
+        msgEl.textContent = '';
+        msgEl.className = 'promo-message';
+      }
+    });
+
+    document.getElementById('btn-landing-pay').addEventListener('click', () => {
+      const errEl = document.getElementById('landing-buy-error');
+      errEl.classList.remove('visible');
+      const name = document.getElementById('landing-buyer-name').value.trim();
+      const email = document.getElementById('landing-buyer-email').value.trim().toLowerCase();
+      if (!name) {
+        errEl.textContent = 'Please enter your name.';
+        errEl.classList.add('visible');
+        return;
+      }
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        errEl.textContent = 'Please enter a valid email.';
+        errEl.classList.add('visible');
+        return;
+      }
+      startCheckout({ email, buyer_name: name, guest: true });
+    });
+
+    document.getElementById('btn-send-password-link').addEventListener('click', async () => {
+      const btn = document.getElementById('btn-send-password-link');
+      const msg = document.getElementById('post-purchase-msg');
+      const email = document.getElementById('post-purchase-email').value.trim().toLowerCase();
+      msg.textContent = '';
+      msg.className = 'post-purchase-msg';
+      if (!email) {
+        msg.textContent = 'Missing email — try signing in from the landing page.';
+        msg.className = 'post-purchase-msg err';
+        return;
+      }
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+      try {
+        const { error } = await sb.auth.resetPasswordForEmail(email, {
+          redirectTo: 'https://lilbird.life/nest/',
+        });
+        if (error) throw error;
+        msg.textContent = 'Check your inbox — the link opens your Nest so you can set a password. Then sign in to Solo with the same email.';
+        msg.className = 'post-purchase-msg ok';
+      } catch (e) {
+        msg.textContent = e.message || 'Could not send the link. Try again or email hello@lilbird.life.';
+        msg.className = 'post-purchase-msg err';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Email me a set-password link →';
+      }
+    });
 
     document.getElementById('form-signin').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -1414,11 +1601,11 @@
 
     // ── Stripe Embedded Checkout ─────────────────────────────────────
     // Lifecycle:
-    //   1. POST { user_id, email, promo_code? } → /create-checkout-session
+    //   1. POST { email, user_id?, buyer_name?, promo_code? } → /create-checkout-session
     //   2. Mount stripe.initEmbeddedCheckout({ clientSecret }) into #checkout-mount
     //   3. Stripe handles the payment UI inside the modal
     //   4. On successful payment, Stripe redirects to return_url:
-    //        https://lilbird.life/solo?purchase=success&session_id=...
+    //        https://lilbird.life/solo/?purchase=success&session_id=...
     //      which is detected by handlePostPurchaseReturn() on the next page load.
     let stripeInstance = null;
     let embeddedCheckout = null;
@@ -1433,23 +1620,36 @@
       return stripeInstance;
     }
 
-    async function startCheckout() {
-      const btn = document.getElementById('btn-purchase');
+    async function startCheckout(opts) {
+      const options = opts || {};
+      const guest = !!options.guest || !currentUser;
+      const email = (options.email || currentUser?.email || '').trim().toLowerCase();
+      const buyerName = (options.buyer_name || userProfile?.full_name || '').trim();
+      const userId = (!guest && currentUser?.id) ? currentUser.id : null;
+
+      const btn = document.getElementById(guest ? 'btn-landing-pay' : 'btn-purchase');
       if (btn) { btn.disabled = true; btn.textContent = 'Opening checkout…'; }
 
       openCheckoutModal();
 
       try {
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          throw new Error('A valid email is required to start checkout.');
+        }
+
         const stripe = getStripe();
+
+        const payload = {
+          email: email,
+          promo_code: activePromo ? activePromo.code : null,
+        };
+        if (userId) payload.user_id = userId;
+        if (buyerName) payload.buyer_name = buyerName;
 
         const res = await fetch(WORKER_URL + '/create-checkout-session', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            user_id:    currentUser.id,
-            email:      currentUser.email,
-            promo_code: activePromo ? activePromo.code : null,
-          }),
+          body: JSON.stringify(payload),
         });
 
         if (!res.ok) {
@@ -1469,8 +1669,25 @@
       } catch (err) {
         console.error('Checkout error:', err);
         showCheckoutError(err.message || 'Something went wrong starting checkout.');
+        if (guest) {
+          const errEl = document.getElementById('landing-buy-error');
+          if (errEl) {
+            errEl.textContent = err.message || 'Could not start checkout.';
+            errEl.classList.add('visible');
+          }
+        }
       } finally {
-        if (btn) { btn.disabled = false; btn.textContent = 'Begin my journey →'; }
+        if (btn) {
+          btn.disabled = false;
+          if (guest) {
+            const amount = activePromo && activePromo.discount
+              ? formatPrice(BASE_PRICE * (1 - activePromo.discount))
+              : formatPrice(BASE_PRICE);
+            btn.textContent = 'Pay ' + amount + ' →';
+          } else {
+            btn.textContent = 'Begin my journey →';
+          }
+        }
       }
     }
 
@@ -1505,30 +1722,62 @@
     });
 
     // Detect return from Stripe Checkout (?purchase=success&session_id=...).
-    // The webhook is the source of truth for purchased_at, but it can race the
-    // redirect by 1–3 seconds, so we poll briefly until the profile updates.
+    // Logged-in: poll until purchased_at lands, then dashboard.
+    // Guest: show set-password success view with email from Stripe session.
     async function handlePostPurchaseReturn() {
       const params = new URLSearchParams(window.location.search);
-      if (params.get('purchase') !== 'success') return;
-      if (!currentUser) return;
-
-      for (let attempt = 0; attempt < 6; attempt++) {
-        try {
-          const { data: profile } = await sb.from('course_users').select('*').eq('id', currentUser.id).single();
-          if (profile && profile.purchased_at) {
-            userProfile = profile;
-            break;
-          }
-        } catch (e) { /* retry */ }
-        await new Promise(r => setTimeout(r, 1000));
-      }
+      if (params.get('purchase') !== 'success') return false;
+      const sessionId = params.get('session_id') || '';
 
       const cleanUrl = window.location.pathname + window.location.hash;
       window.history.replaceState({}, document.title, cleanUrl);
 
-      await loadSessionProgress();
-      await loadToolOutputs();
-      renderDashboard();
+      if (currentUser) {
+        for (let attempt = 0; attempt < 6; attempt++) {
+          try {
+            const { data: profile } = await sb.from('course_users').select('*').eq('id', currentUser.id).single();
+            if (profile && profile.purchased_at) {
+              userProfile = profile;
+              break;
+            }
+          } catch (e) { /* retry */ }
+          await new Promise(r => setTimeout(r, 1000));
+        }
+        await loadSessionProgress();
+        await loadToolOutputs();
+        renderDashboard();
+        return true;
+      }
+
+      let email = '';
+      let buyerName = '';
+      if (sessionId) {
+        try {
+          const res = await fetch(WORKER_URL + '/checkout-session-status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ session_id: sessionId }),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            email = (data.email || '').trim().toLowerCase();
+            buyerName = (data.buyer_name || '').trim();
+          }
+        } catch (e) {
+          console.error('checkout-session-status failed:', e);
+        }
+      }
+
+      document.getElementById('post-purchase-email').value = email;
+      const lede = document.getElementById('post-purchase-lede');
+      if (buyerName) {
+        lede.textContent = 'Payment received, ' + buyerName.split(/\s+/)[0] + '. Set a password with this email to open your sessions.';
+      } else {
+        lede.textContent = 'Payment received. Set a password with this email to open your sessions.';
+      }
+      if (email) document.getElementById('signin-email').value = email;
+      showView('view-post-purchase');
+      return true;
     }
 
     async function bypassGate(nextSession) {
@@ -2453,22 +2702,45 @@
 
     (async()=>{
       try {
+        var purchaseParams = new URLSearchParams(window.location.search);
+        var isPurchaseReturn = purchaseParams.get('purchase') === 'success';
+
         var tokenRaw=localStorage.getItem('lilbird-solo-auth');
-        if(!tokenRaw){showView('view-landing');return;}
+        if(!tokenRaw){
+          if (isPurchaseReturn) { await handlePostPurchaseReturn(); }
+          else { showView('view-landing'); }
+          return;
+        }
         var tokenData=JSON.parse(tokenRaw), user=tokenData&&tokenData.user;
-        if(!user||!user.id){showView('view-landing');return;}
+        if(!user||!user.id){
+          if (isPurchaseReturn) { await handlePostPurchaseReturn(); }
+          else { showView('view-landing'); }
+          return;
+        }
         var expiresAt=tokenData.expires_at;
         if(expiresAt&&(expiresAt*1000)<Date.now()){
           try {
             var refreshed=await Promise.race([sb.auth.refreshSession(),new Promise(resolve=>setTimeout(()=>resolve(null),3000))]);
             if(refreshed&&refreshed.data&&refreshed.data.user){currentUser=refreshed.data.user;await loadDashboard();}
-            else{localStorage.removeItem('lilbird-solo-auth');showView('view-landing');}
-          } catch(e){localStorage.removeItem('lilbird-solo-auth');showView('view-landing');}
+            else{
+              localStorage.removeItem('lilbird-solo-auth');
+              if (isPurchaseReturn) { await handlePostPurchaseReturn(); }
+              else { showView('view-landing'); }
+            }
+          } catch(e){
+            localStorage.removeItem('lilbird-solo-auth');
+            if (isPurchaseReturn) { await handlePostPurchaseReturn(); }
+            else { showView('view-landing'); }
+          }
           return;
         }
         currentUser={id:user.id,email:user.email};
         await loadDashboard();
-      } catch(e){showView('view-landing');}
+      } catch(e){
+        var stillPurchase = new URLSearchParams(window.location.search).get('purchase') === 'success';
+        if (stillPurchase) { await handlePostPurchaseReturn(); }
+        else { showView('view-landing'); }
+      }
     })();
 
     // ── Voice input (Web Speech API) ─────────────────────────────────
