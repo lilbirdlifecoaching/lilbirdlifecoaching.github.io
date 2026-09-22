@@ -151,7 +151,9 @@ html[data-theme="light"] .solo-landing-top {
   background: linear-gradient(180deg, #f5f2eb 70%, transparent);
 }
 
-html[data-theme="light"] .solo-landing-buy {
+html[data-theme="light"] .solo-landing-buy,
+html[data-theme="light"] .solo-buy-panel,
+html[data-theme="light"] .post-purchase-card {
   background: linear-gradient(135deg, #fff, #efeae0);
   border-color: var(--gold-border);
 }
