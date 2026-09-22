@@ -147,6 +147,19 @@ html[data-theme="light"] .deep-snapshot.empty {
   background: var(--dark-card);
 }
 
+html[data-theme="light"] .solo-landing-top {
+  background: linear-gradient(180deg, #f5f2eb 70%, transparent);
+}
+
+html[data-theme="light"] .solo-landing-buy {
+  background: linear-gradient(135deg, #fff, #efeae0);
+  border-color: var(--gold-border);
+}
+
+html[data-theme="light"] .solo-arc-list li {
+  border-bottom-color: rgba(30, 32, 40, 0.06);
+}
+
 html[data-theme="light"] .pill-locked {
   background: rgba(30, 32, 40, 0.06);
   border-color: rgba(30, 32, 40, 0.1);
