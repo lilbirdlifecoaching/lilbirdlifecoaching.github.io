@@ -239,6 +239,14 @@ a:hover { text-decoration: underline; }
 
 .arc-title { font-weight: 500; font-size: 0.95rem; }
 
+.arc-more {
+  margin-top: 1.35rem;
+}
+
+.arc-more .btn {
+  width: auto;
+}
+
 .buy-card {
   background: linear-gradient(135deg, var(--dark-card), var(--dark-mid));
   border: 1px solid var(--dark-border);
