@@ -460,7 +460,15 @@
       renderProducts();
       renderProfile();
       renderSidebar();
-    } catch (err) {
+      if (window.LilBirdNestTour) {
+        window.LilBirdNestTour.bindReplayButton();
+        const forceTour = new URLSearchParams(window.location.search).get('tour') === '1';
+        if (forceTour) {
+          window.LilBirdNestTour.startForced();
+        } else {
+          window.LilBirdNestTour.maybeAutoStart();
+        }
+      }
       console.error('Nest hydrateDashboard:', err);
       if (token === dashboardHydrateToken) {
         setDashError('Could not load your Nest. Please refresh the page or try again.');
@@ -853,12 +861,12 @@
       if (hasAccess) {
         if (done) {
           return `
-          <article class="product-card ic-snapshot-card">
+          <article class="product-card ic-snapshot-card" data-product="inner_compass">
             ${renderInnerCompassSnapshotMarkup('dashboard')}
           </article>`;
         }
         return `
-          <article class="product-card">
+          <article class="product-card" data-product="inner_compass">
             <p class="eyebrow">assessment</p>
             <h3>Inner Compass read</h3>
             <span class="status-badge pending">ready to begin</span>
@@ -870,7 +878,7 @@
           </article>`;
       }
       return `
-        <article class="product-card locked">
+        <article class="product-card locked" data-product="inner_compass">
           <span class="lock-pill"><i class="ti ti-lock"></i> not yet unlocked</span>
           <p class="eyebrow">assessment</p>
           <h3>Inner Compass read</h3>
@@ -883,7 +891,7 @@
     if (key === 'first_flight') {
       if (unlocked) {
         return `
-          <article class="product-card">
+          <article class="product-card" data-product="first_flight">
             <p class="eyebrow">1-to-1 coaching</p>
             <h3>First Flight session</h3>
             <span class="status-badge">booked</span>
@@ -895,7 +903,7 @@
           </article>`;
       }
       return `
-        <article class="product-card locked">
+        <article class="product-card locked" data-product="first_flight">
           <span class="lock-pill"><i class="ti ti-lock"></i> not yet unlocked</span>
           <p class="eyebrow">1-to-1 coaching</p>
           <h3>First Flight session</h3>
@@ -909,7 +917,7 @@
       const name = encodeURIComponent(courseProfile?.full_name || currentUser?.user_metadata?.full_name || '');
       const href = `/coaching/book.html?from=nest${email ? `&email=${email}` : ''}${name ? `&name=${name}` : ''}`;
       return `
-        <article class="product-card">
+        <article class="product-card" data-product="coaching">
           <p class="eyebrow">1-to-1 coaching</p>
           <h3>Coaching session</h3>
           <p>One focused session when something specific needs working through — no package required.</p>
@@ -923,7 +931,7 @@
         const p = progressSummary();
         if (p.pct >= 100) {
           return `
-          <article class="product-card">
+          <article class="product-card" data-product="solo_course">
             <span class="status-badge">complete</span>
             <p class="eyebrow">self-guided course</p>
             <h3>Life Change Sessions: Solo</h3>
@@ -936,7 +944,7 @@
           </article>`;
         }
         return `
-          <article class="product-card">
+          <article class="product-card" data-product="solo_course">
             <p class="eyebrow">self-guided course</p>
             <h3>Life Change Sessions: Solo</h3>
             <p>${p.pct}% complete · next up: ${escapeHtml(p.next)}</p>
@@ -945,7 +953,7 @@
           </article>`;
       }
       return `
-        <article class="product-card locked">
+        <article class="product-card locked" data-product="solo_course">
           <span class="lock-pill"><i class="ti ti-lock"></i> not yet unlocked</span>
           <p class="eyebrow">self-guided course</p>
           <h3>Life Change Sessions: Solo</h3>
@@ -957,7 +965,7 @@
     if (key === 'life_change_intensive') {
       if (unlocked) {
         return `
-          <article class="product-card">
+          <article class="product-card" data-product="life_change_intensive">
             <p class="eyebrow">full programme</p>
             <h3>Life Change Intensive</h3>
             <span class="status-badge">active</span>
@@ -966,7 +974,7 @@
           </article>`;
       }
       return `
-        <article class="product-card locked">
+        <article class="product-card locked" data-product="life_change_intensive">
           <span class="lock-pill"><i class="ti ti-lock"></i> not yet unlocked</span>
           <p class="eyebrow">full programme</p>
           <h3>Life Change Intensive</h3>
@@ -1148,6 +1156,7 @@
     const dashGrid = document.getElementById('dash-grid');
     if (dashGrid) dashGrid.classList.toggle('is-ask-tab', name === 'ask');
   }
+  window.__nestSetTab = setTab;
 
   function resetDashboardUi() {
     setTab('products');

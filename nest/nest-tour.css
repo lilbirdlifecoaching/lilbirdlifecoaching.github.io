@@ -1,0 +1,118 @@
+/* Nest lil' bird guided tour */
+.nest-tour-root {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  pointer-events: none;
+}
+.nest-tour-root.hidden {
+  display: none !important;
+}
+.nest-tour-backdrop {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  pointer-events: auto;
+}
+.nest-tour-hole {
+  position: fixed;
+  border-radius: 14px;
+  box-shadow:
+    0 0 0 9999px rgba(12, 14, 20, 0.62),
+    0 0 0 2px rgba(245, 200, 66, 0.55),
+    0 8px 28px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  transition: top 0.2s ease, left 0.2s ease, width 0.2s ease, height 0.2s ease;
+  z-index: 81;
+}
+.nest-tour-card {
+  position: fixed;
+  z-index: 82;
+  pointer-events: auto;
+  background: var(--dark-card, #2a2d38);
+  border: 1px solid rgba(245, 200, 66, 0.28);
+  border-radius: 16px;
+  padding: 1.15rem 1.2rem 1.1rem;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+  max-width: calc(100vw - 24px);
+  animation: nest-tour-in 0.28s ease;
+}
+@keyframes nest-tour-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.nest-tour-bird {
+  font-size: 1.35rem;
+  line-height: 1;
+  margin-bottom: 0.35rem;
+}
+.nest-tour-kicker {
+  font-family: "DM Mono", monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-dim, #c9a130);
+  margin: 0 0 0.35rem;
+}
+.nest-tour-title {
+  font-family: "Playfair Display", serif;
+  font-weight: 400;
+  font-size: 1.35rem;
+  color: var(--text-main, #f0ead8);
+  margin: 0 0 0.45rem;
+  line-height: 1.25;
+}
+.nest-tour-body {
+  color: var(--text-muted, #a09880);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0 0 0.65rem;
+}
+.nest-tour-tip {
+  font-family: "DM Mono", monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: var(--gold, #F5C842);
+  margin: 0 0 0.85rem;
+}
+.nest-tour-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+.nest-tour-progress {
+  font-family: "DM Mono", monospace;
+  font-size: 0.68rem;
+  color: var(--text-muted, #a09880);
+  margin-left: auto;
+  margin-right: 0.25rem;
+}
+.nest-tour-skip {
+  font-size: 0.85rem;
+  padding: 0.45rem 0.75rem;
+}
+#nest-tour-next {
+  font-size: 0.85rem;
+  padding: 0.5rem 0.9rem;
+}
+body.nest-tour-active {
+  overflow: hidden;
+}
+.btn-tour {
+  font-size: 0.78rem;
+  padding: 0.4rem 0.7rem;
+  white-space: nowrap;
+}
+.btn-tour .tour-label-short { display: none; }
+
+@media (max-width: 640px) {
+  .nest-tour-card {
+    left: 12px !important;
+    right: 12px;
+    width: auto !important;
+    max-width: none;
+  }
+  .btn-tour .tour-label-long { display: none; }
+  .btn-tour .tour-label-short { display: inline; }
+}
