@@ -7,6 +7,8 @@
   // Leave empty unless you have a backend endpoint configured.
   const NEST_WELCOME_EMAIL_ENDPOINT = 'https://worker-solo.cwwq46sn7m.workers.dev/nest-welcome-email';
   const LCI_BOOKING_URL = 'https://cal.com/luke-haythorpe/life-change-session';
+  const CHILDHOOD_PHOTO_BUCKET = 'childhood-photos';
+  const CHILDHOOD_PHOTO_MAX_BYTES = 10 * 1024 * 1024;
 
   const { createClient } = supabase;
   const AUTH_STORAGE_KEY = 'lilbird-solo-auth';
@@ -638,6 +640,9 @@
             : 'Book sessions from your Intensive card'
       });
       steps.push({ done: paidDone, text: 'Open Roots & Wings workbook before session one' });
+      if (!youngerYouPhotoUrl()) {
+        steps.push({ done: false, text: 'Add your Nest picture in My profile' });
+      }
     } else {
       steps.push({
         done: innerDone,
@@ -647,11 +652,28 @@
             ? 'Take your Inner Compass assessment'
             : 'Unlock Inner Compass in your Nest'
       });
-      steps.push({ done: hasSolo || hasFirstFlight || hasIntensive, text: 'Your Nest account is active' });
-      steps.push({ done: hasSolo || hasIntensive || hasFirstFlight, text: hasSolo ? 'Continue your Solo journey' : 'Unlock your next product in the Nest' });
       steps.push({
-        done: innerDone,
-        text: innerDone ? 'Profile ready in My profile' : 'Complete Inner Compass to fill My profile'
+        done: hasFirstFlight,
+        text: hasFirstFlight
+          ? 'First Flight booked'
+          : 'Book a First Flight session — $149'
+      });
+      steps.push({
+        done: false,
+        text: 'Or book a coaching session (à la carte) — $249'
+      });
+      steps.push({
+        done: hasIntensive,
+        text: 'Or enrol in the Life Change Intensive'
+      });
+      if (hasSolo) {
+        steps.push({ done: false, text: 'Continue your Solo journey' });
+      }
+      steps.push({
+        done: !!youngerYouPhotoUrl(),
+        text: youngerYouPhotoUrl()
+          ? 'Nest picture added'
+          : 'Add your Nest picture in My profile'
       });
     }
 
@@ -907,8 +929,8 @@
           <span class="lock-pill"><i class="ti ti-lock"></i> not yet unlocked</span>
           <p class="eyebrow">1-to-1 coaching</p>
           <h3>First Flight session</h3>
-          <p>A single session with Luke. Take your Inner Compass read and turn it into a real conversation.</p>
-          <div class="btn-row"><a class="btn btn-ember" href="/first-flight/book.html?code=IMREADY">Book now — $149 →</a></div>
+          <p>Book a single session with Luke from your Nest — take your Inner Compass read and turn it into a real conversation.</p>
+          <div class="btn-row"><a class="btn btn-ember" href="/first-flight/book.html?code=IMREADY">Book First Flight — $149 →</a></div>
         </article>`;
     }
 
@@ -918,9 +940,9 @@
       const href = `/coaching/book.html?from=nest${email ? `&email=${email}` : ''}${name ? `&name=${name}` : ''}`;
       return `
         <article class="product-card" data-product="coaching">
-          <p class="eyebrow">1-to-1 coaching</p>
+          <p class="eyebrow">à la carte</p>
           <h3>Coaching session</h3>
-          <p>One focused session when something specific needs working through — no package required.</p>
+          <p>One focused session when something specific needs working through — book anytime from your Nest, no package required.</p>
           <div class="btn-row"><a class="btn btn-ember" href="${href}">Book coaching — $249 →</a></div>
         </article>`;
     }
@@ -978,7 +1000,7 @@
           <span class="lock-pill"><i class="ti ti-lock"></i> not yet unlocked</span>
           <p class="eyebrow">full programme</p>
           <h3>Life Change Intensive</h3>
-          <p>Eight in-person sessions with Luke. Read the agreement, sign, and pay securely on lilbird.life — then book from your Nest.</p>
+          <p>Eight sessions with Luke. Enrol from your Nest — read the agreement, pay securely, then book session by session here.</p>
           <div class="btn-row">
             <a class="btn btn-ember" href="/intensive/enrol.html?from=nest">Enrol — read agreement &amp; pay →</a>
             <button class="btn btn-outline" data-open-ask>Ask a question</button>
@@ -1014,6 +1036,82 @@
     return courseProfile?.childhood_photo_url || '';
   }
 
+  function childhoodPhotoExt(file) {
+    const fromName = (file.name || '').split('.').pop()?.toLowerCase();
+    if (fromName && fromName.length <= 5) return fromName;
+    const fromType = (file.type || '').split('/')[1];
+    return (fromType || 'jpg').toLowerCase();
+  }
+
+  async function ensureCourseUserRow() {
+    if (!currentUser?.id) throw new Error('Not signed in.');
+    const email = currentUser.email || '';
+    const fullName =
+      courseProfile?.full_name ||
+      currentUser.user_metadata?.full_name ||
+      '';
+    const { error } = await sb.from('course_users').upsert(
+      {
+        id: currentUser.id,
+        email,
+        full_name: fullName || null
+      },
+      { onConflict: 'id' }
+    );
+    if (error) throw error;
+    if (!courseProfile) {
+      courseProfile = { id: currentUser.id, email, full_name: fullName || null };
+    }
+  }
+
+  async function saveYoungerYouPhoto(file) {
+    if (!currentUser?.id) throw new Error('Not signed in.');
+    if (!file || !file.type?.startsWith('image/')) {
+      throw new Error("That doesn't look like an image file.");
+    }
+    if (file.size > CHILDHOOD_PHOTO_MAX_BYTES) {
+      throw new Error('That file is over 10 MB. Try a smaller version.');
+    }
+
+    await ensureCourseUserRow();
+
+    const ext = childhoodPhotoExt(file);
+    const path = currentUser.id + '/photo-' + Date.now() + '.' + ext;
+    const { error: upErr } = await sb.storage.from(CHILDHOOD_PHOTO_BUCKET).upload(path, file, {
+      cacheControl: '3600',
+      contentType: file.type || 'image/jpeg',
+      upsert: false
+    });
+    if (upErr) throw upErr;
+
+    const { data: pub } = sb.storage.from(CHILDHOOD_PHOTO_BUCKET).getPublicUrl(path);
+    const photoUrl = pub?.publicUrl;
+    if (!photoUrl) throw new Error('Could not generate a public URL for the photo.');
+
+    const { error: dbErr } = await sb
+      .from('course_users')
+      .update({ childhood_photo_url: photoUrl })
+      .eq('id', currentUser.id);
+    if (dbErr) throw dbErr;
+
+    try {
+      await sb.from('tool_outputs').upsert(
+        {
+          user_id: currentUser.id,
+          tool_name: 'childhood_photo',
+          output_data: { photo_url: photoUrl, uploaded_at: new Date().toISOString() },
+          updated_at: new Date().toISOString()
+        },
+        { onConflict: 'user_id,tool_name' }
+      );
+    } catch (e) {
+      console.warn('tool_outputs childhood_photo mirror:', e);
+    }
+
+    courseProfile = { ...(courseProfile || {}), childhood_photo_url: photoUrl };
+    return photoUrl;
+  }
+
   function updateNavAvatar() {
     const btn = document.getElementById('btn-nav-profile');
     if (!btn) return;
@@ -1027,31 +1125,124 @@
     }
   }
 
+  function setYoungerYouStatus(msg, kind) {
+    const el = document.getElementById('younger-you-status');
+    if (!el) return;
+    el.textContent = msg || '';
+    el.className = 'younger-you-status' + (msg ? ' visible' : '') + (kind ? ' ' + kind : '');
+  }
+
+  function bindYoungerYouUpload() {
+    const input = document.getElementById('younger-you-file');
+    const saveBtn = document.getElementById('btn-younger-you-save');
+    const clearBtn = document.getElementById('btn-younger-you-clear');
+    const preview = document.getElementById('younger-you-preview');
+    if (!input) return;
+
+    let pendingFile = null;
+
+    function showPending(file) {
+      pendingFile = file;
+      if (preview) {
+        const url = URL.createObjectURL(file);
+        preview.innerHTML =
+          '<img class="younger-you-photo" src="' +
+          url +
+          '" alt="Preview" width="88" height="88" />';
+      }
+      if (saveBtn) {
+        saveBtn.classList.remove('hidden');
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Save Nest picture →';
+      }
+      if (clearBtn) clearBtn.classList.remove('hidden');
+      setYoungerYouStatus('Looks good — save to use this as your Nest picture.', '');
+    }
+
+    input.addEventListener('change', () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) {
+        setYoungerYouStatus("That doesn't look like an image file.", 'error');
+        return;
+      }
+      if (file.size > CHILDHOOD_PHOTO_MAX_BYTES) {
+        setYoungerYouStatus('That file is over 10 MB. Try a smaller version.', 'error');
+        return;
+      }
+      showPending(file);
+    });
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        pendingFile = null;
+        input.value = '';
+        if (saveBtn) saveBtn.classList.add('hidden');
+        clearBtn.classList.add('hidden');
+        setYoungerYouStatus('');
+        renderProfile();
+      });
+    }
+
+    if (saveBtn) {
+      saveBtn.addEventListener('click', async () => {
+        if (!pendingFile) return;
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving…';
+        setYoungerYouStatus('Uploading your photo…', '');
+        try {
+          await saveYoungerYouPhoto(pendingFile);
+          updateNavAvatar();
+          renderNextSteps();
+          renderProfile();
+          setYoungerYouStatus('Saved. This is your Nest picture.', 'success');
+        } catch (err) {
+          console.error('Nest photo upload:', err);
+          setYoungerYouStatus(err.message || 'Something went wrong. Try again.', 'error');
+          saveBtn.disabled = false;
+          saveBtn.textContent = 'Save Nest picture →';
+        }
+      });
+    }
+  }
+
   function renderYoungerYouCard() {
     const url = youngerYouPhotoUrl();
-    const soloLink = hasSoloCourseAccess()
-      ? '<a class="btn btn-outline" href="/solo/">Open Solo · Younger You →</a>'
-      : '<a class="btn btn-ember" href="/solo/">Unlock Solo to add your photo →</a>';
     if (url) {
       return `
         <article class="product-card younger-you-card">
-          <p class="eyebrow">younger you</p>
+          <p class="eyebrow">nest picture</p>
           <div class="younger-you-row">
             <img class="younger-you-photo" src="${escapeHtml(url)}" alt="Younger you" width="88" height="88" />
             <div>
               <h3>Your Nest picture</h3>
-              <p>From Solo Session 1. This is the photo on your Nest and Full Flight Plan.</p>
-              <div class="btn-row">${soloLink}</div>
+              <p>You around ages 4–8. Shows on your Nest${hasSoloCourseAccess() ? ' and Full Flight Plan' : ''}.</p>
+              <div class="btn-row younger-you-actions">
+                <label class="btn btn-outline younger-you-file-label" for="younger-you-file">Replace photo</label>
+                <input id="younger-you-file" class="younger-you-file-input" type="file" accept="image/*" />
+                <button type="button" class="btn btn-gold hidden" id="btn-younger-you-save">Save Nest picture →</button>
+                <button type="button" class="btn btn-outline hidden" id="btn-younger-you-clear">Cancel</button>
+              </div>
+              <div id="younger-you-preview" class="younger-you-preview"></div>
+              <p id="younger-you-status" class="younger-you-status" role="status"></p>
             </div>
           </div>
         </article>`;
     }
     return `
       <article class="product-card younger-you-card">
-        <p class="eyebrow">younger you</p>
+        <p class="eyebrow">nest picture</p>
         <h3>Add your Nest picture</h3>
-        <p>Upload a photo of you around ages 4–8 in Solo Session 1 (Younger You). It becomes your Nest picture.</p>
-        <div class="btn-row">${soloLink}</div>
+        <p>Upload a photo of you around ages 4–8. It becomes your Nest avatar${hasSoloCourseAccess() ? ' and sits on your Full Flight Plan' : ''}.</p>
+        <div class="btn-row younger-you-actions">
+          <label class="btn btn-gold younger-you-file-label" for="younger-you-file">Choose a photo</label>
+          <input id="younger-you-file" class="younger-you-file-input" type="file" accept="image/*" />
+          <button type="button" class="btn btn-gold hidden" id="btn-younger-you-save">Save Nest picture →</button>
+          <button type="button" class="btn btn-outline hidden" id="btn-younger-you-clear">Cancel</button>
+        </div>
+        <div id="younger-you-preview" class="younger-you-preview"></div>
+        <p id="younger-you-status" class="younger-you-status" role="status"></p>
+        <p class="younger-you-hint">JPG · PNG · HEIC · up to 10 MB. Outdoor light, eyes visible if you can.</p>
       </article>`;
   }
 
@@ -1098,42 +1289,83 @@
           </article>
         </div>`;
     }
+    bindYoungerYouUpload();
   }
 
   function renderSidebar() {
     const el = document.getElementById('sidebar-context-card');
+    const hasIntensive = entitlements.has('life_change_intensive');
+    const email = encodeURIComponent(currentUser?.email || '');
+    const name = encodeURIComponent(courseProfile?.full_name || currentUser?.user_metadata?.full_name || '');
+    const coachingHref = `/coaching/book.html?from=nest${email ? `&email=${email}` : ''}${name ? `&name=${name}` : ''}`;
+
+    if (hasIntensive) {
+      const stats = lciStats();
+      if (stats.hasRows && stats.remaining > 0) {
+        el.innerHTML = `
+          <p class="sidebar-eyebrow">intensive</p>
+          <h4>Book your next session</h4>
+          <p>${stats.remaining} of ${stats.total} sessions remaining. Book one at a time from your Intensive card.</p>
+          <a class="btn btn-ember full" href="${escapeHtml(LCI_BOOKING_URL)}" target="_blank" rel="noopener">Book next session →</a>
+          <a class="btn btn-outline full" href="${workbookHref('roots-and-wings-workbook.html')}">Open workbook</a>`;
+        return;
+      }
+      if (stats.hasRows && stats.allBooked) {
+        el.innerHTML = `
+          <p class="sidebar-eyebrow">intensive</p>
+          <h4>All sessions booked</h4>
+          <p>Reach out to Luke if you need anything between sessions.</p>
+          <a class="btn btn-outline full" href="mailto:hello@lilbird.life">Email Luke</a>`;
+        return;
+      }
+      el.innerHTML = `
+        <p class="sidebar-eyebrow">intensive</p>
+        <h4>Your Intensive is active</h4>
+        <p>Use the Intensive card on My products to book sessions and open your workbook.</p>
+        <button type="button" class="btn btn-outline full" id="btn-sidebar-products">Open My products</button>`;
+      el.querySelector('#btn-sidebar-products')?.addEventListener('click', () => setTab('products'));
+      return;
+    }
+
     if (entitlements.has('first_flight')) {
       el.innerHTML = `
         <p class="sidebar-eyebrow">session context</p>
         <h4>First Flight booked</h4>
-        <p>Session date/time placeholder. Confirm from your Calendly email and complete your workbook first.</p>
+        <p>Confirm from your booking email and complete your workbook first.</p>
         <a class="btn btn-outline full" href="${workbookHref('first-flight-standalone.html')}">Open workbook</a>
         <a class="btn btn-outline full" href="https://cal.com/luke-haythorpe/first-flight-intro-session" target="_blank" rel="noopener">View booking</a>`;
       return;
     }
+
     if (hasSoloCourseAccess()) {
       const p = progressSummary();
       if (p.pct >= 100) {
         el.innerHTML = `
         <p class="sidebar-eyebrow">session context</p>
         <h4>Solo complete</h4>
-        <p>Your plan and takeaways live on the Solo dashboard.</p>
+        <p>Your plan and takeaways live on the Solo dashboard. Book a session with Luke anytime below.</p>
         <a class="btn btn-outline full" href="/solo/?view=plan">Open your plan →</a>
-        <a class="btn btn-outline full" href="/solo/?view=sessions">Revisit sessions</a>`;
+        <a class="btn btn-ember full" href="/first-flight/book.html?code=IMREADY">Book First Flight — $149</a>
+        <a class="btn btn-outline full" href="${coachingHref}">Book coaching — $249</a>`;
         return;
       }
       el.innerHTML = `
         <p class="sidebar-eyebrow">session context</p>
         <h4>Solo next step</h4>
-        <p>Next up: ${escapeHtml(p.next)}.</p>
-        <a class="btn btn-outline full" href="/solo/">Continue Solo →</a>`;
+        <p>Next up: ${escapeHtml(p.next)}. Prefer a live session? Book from your Nest.</p>
+        <a class="btn btn-outline full" href="/solo/">Continue Solo →</a>
+        <a class="btn btn-ember full" href="/first-flight/book.html?code=IMREADY">Book First Flight — $149</a>
+        <a class="btn btn-outline full" href="${coachingHref}">Book coaching — $249</a>`;
       return;
     }
+
     el.innerHTML = `
-      <p class="sidebar-eyebrow">first flight</p>
-      <h4>Book a First Flight</h4>
-      <p>One focused session with Luke to turn insight into a real next step.</p>
-      <a class="btn btn-ember full" href="/first-flight/book.html?code=IMREADY">Book now — $149 →</a>`;
+      <p class="sidebar-eyebrow">book with Luke</p>
+      <h4>Choose how you meet</h4>
+      <p>First Flight to taste it, one coaching session when something’s specific, or the full Intensive.</p>
+      <a class="btn btn-ember full" href="/first-flight/book.html?code=IMREADY">First Flight — $149 →</a>
+      <a class="btn btn-outline full" href="${coachingHref}">Coaching session — $249 →</a>
+      <a class="btn btn-outline full" href="/intensive/enrol.html?from=nest">Life Change Intensive →</a>`;
   }
 
   function escapeHtml(str) {
@@ -1256,7 +1488,8 @@
     if (dashView) dashView.classList.add('active');
     resetLoginButton();
     resetSignupButton();
-    setTab('products');
+    const preferTab = new URLSearchParams(window.location.search).get('tab');
+    setTab(preferTab === 'profile' || preferTab === 'ask' ? preferTab : 'products');
     await hydrateDashboard();
   }
 

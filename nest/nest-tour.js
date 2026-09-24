@@ -77,10 +77,19 @@
         body: 'Your Nest tracks all 8. Book one at a time, then open the workbook before you meet Luke.',
         tip: '» Tap Book your next session when you’re ready'
       });
+    } else {
+      list.push({
+        id: 'book-with-luke',
+        tab: 'products',
+        selector: '#pane-products',
+        title: 'Book with Luke from here',
+        body: 'First Flight ($149), a single coaching session ($249), or enrol in the Life Change Intensive — all from My products.',
+        tip: '» Pick the card that fits'
+      });
     }
 
     var solo = document.querySelector('[data-product="solo_course"]:not(.locked)');
-    if (solo && !lci) {
+    if (solo) {
       list.push({
         id: 'solo',
         tab: 'products',
@@ -104,9 +113,9 @@
         id: 'younger',
         tab: 'profile',
         selector: '.younger-you-card',
-        title: 'Younger You',
-        body: 'A photo of you around ages 4–8 becomes your Nest picture. Upload it in Solo Session 1 when you have access.',
-        tip: null
+        title: 'Nest picture',
+        body: 'Upload or change a photo of you around ages 4–8 right here in My profile. It becomes your Nest avatar.',
+        tip: '» Choose a photo, then Save'
       },
       {
         id: 'ask',

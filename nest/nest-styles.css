@@ -162,6 +162,37 @@ body.nest-page { line-height: 1.5; }
 }
 .younger-you-card h3 { margin-bottom: 0.35rem; }
 .younger-you-card p { margin-bottom: 0.75rem; }
+.younger-you-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+.younger-you-file-label { cursor: pointer; display: inline-flex; align-items: center; }
+.younger-you-actions { position: relative; flex-wrap: wrap; }
+.younger-you-preview { margin-top: 0.75rem; }
+.younger-you-preview:empty { display: none; }
+.younger-you-hint {
+  font-family: "DM Mono", monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 0.65rem;
+  margin-bottom: 0 !important;
+}
+.younger-you-status {
+  display: none;
+  font-size: 0.82rem;
+  margin-top: 0.55rem;
+  margin-bottom: 0 !important;
+  color: var(--text-muted);
+}
+.younger-you-status.visible { display: block; }
+.younger-you-status.success { color: var(--green); }
+.younger-you-status.error { color: var(--ember); }
 
 .dash-wrap { max-width: 1100px; margin: 0 auto; padding: 1.2rem; }
 .dash-error {
