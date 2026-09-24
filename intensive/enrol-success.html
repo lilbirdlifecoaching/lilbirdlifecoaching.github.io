@@ -15,66 +15,188 @@
   <meta name="theme-color" content="#1e2028" />
   <link rel="stylesheet" href="/css/lilbird-tokens.css" />
   <link rel="stylesheet" href="/css/lilbird-theme-chrome.css" />
-  <title>Welcome · Life Change Intensive · lil' bird</title>
+  <title>You're in · Life Change Intensive · lil' bird</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=DM+Sans:wght@400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./intensive-enrol.css?v=1" />
+  <link rel="stylesheet" href="./intensive-enrol.css?v=5" />
   <link rel="stylesheet" href="/css/lilbird-booking-theme.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/lilbird-auth-bridge.js"></script>
-  <!-- Google Tag Manager -->
   <script src="/lilbird-gtm-id.js"></script>
   <script src="/lilbird-gtm.js"></script>
+  <style>
+    .onboard-path {
+      font-family: "DM Mono", monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+      margin: 0 0 1.25rem;
+    }
+    .onboard-steps { list-style: none; margin: 0; padding: 0; }
+    .onboard-steps li {
+      display: grid;
+      grid-template-columns: 1.5rem 1fr;
+      gap: 0.65rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--dark-border);
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.55;
+    }
+    .onboard-steps li:last-child { border-bottom: none; }
+    .onboard-steps .arrow {
+      color: var(--gold);
+      font-family: "DM Mono", monospace;
+      font-weight: 700;
+      font-size: 1.1rem;
+      line-height: 1.4;
+    }
+    .onboard-steps strong {
+      display: block;
+      color: var(--text-main);
+      font-weight: 500;
+      margin-bottom: 0.2rem;
+    }
+    .onboard-msg {
+      font-family: "DM Mono", monospace;
+      font-size: 0.72rem;
+      min-height: 1.2em;
+      margin: 0.75rem 0;
+      color: var(--text-muted);
+    }
+    .onboard-msg.ok { color: var(--green); }
+    .onboard-msg.err { color: var(--ember); }
+  </style>
 </head>
 <body>
-  <!-- Google Tag Manager (noscript) -->
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NG8ZFNX2" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <header class="top-bar">
     <a class="wordmark" href="/">lil' bird</a>
-    <a class="back back-nest" href="/nest/">← back to your Nest</a>
+    <a class="back" href="/intensive/">← Intensive</a>
   </header>
 
   <main class="wrap">
     <p class="eyebrow">payment received</p>
-    <h1>You're in. <em>Check your email.</em></h1>
+    <h1>You're in.<br/><em>Do these next.</em></h1>
     <p class="lead" id="success-lead">
-      We're confirming your payment and unlocking your Nest. This usually takes a few seconds.
+      Confirming payment (a few seconds). Then follow the arrows — you do not need to wait on Luke.
     </p>
+    <p class="onboard-path">» Paid &nbsp;» Nest password &nbsp;» Book session 1 &nbsp;» Workbook</p>
 
     <section class="card">
-      <h2>Your next steps</h2>
-      <ol style="padding-left:1.2rem;color:var(--text-muted);font-size:0.95rem;">
-        <li style="margin-bottom:0.65rem;">Open your <a href="/nest/">Nest dashboard</a> — your home base for this programme</li>
-        <li style="margin-bottom:0.65rem;">Open your <a href="/nest/">Nest dashboard</a> and use <strong>Book your next session</strong> on the Intensive card</li>
-        <li style="margin-bottom:0.65rem;">You have <strong>8 sessions</strong> — book one at a time as you go</li>
-        <li style="margin-bottom:0.65rem;">Open the <a href="/workbooks/roots-and-wings-workbook.html?from=nest">Roots &amp; Wings workbook</a> and start before session one</li>
-        <li>Reply to your welcome email if anything is unclear — hello@lilbird.life</li>
+      <h2>Your checklist</h2>
+      <ol class="onboard-steps">
+        <li>
+          <span class="arrow" aria-hidden="true">»</span>
+          <div>
+            <strong>1. Set your Nest password</strong>
+            Use the email you paid with. New here? Send yourself a set-password link below, or open Nest → Forgot password.
+            <div class="form-group" style="margin-top:0.75rem;">
+              <label for="onboard-email">Email</label>
+              <input id="onboard-email" type="email" autocomplete="email" placeholder="you@example.com" />
+            </div>
+            <p class="onboard-msg" id="onboard-msg" aria-live="polite"></p>
+            <button type="button" class="btn btn-outline" id="btn-send-password" style="margin-top:0.35rem;">» Email me a set-password link</button>
+          </div>
+        </li>
+        <li>
+          <span class="arrow" aria-hidden="true">»</span>
+          <div>
+            <strong>2. Open your Nest</strong>
+            Sign in. Your Intensive card unlocks booking and links.
+          </div>
+        </li>
+        <li>
+          <span class="arrow" aria-hidden="true">»</span>
+          <div>
+            <strong>3. Book session 1</strong>
+            Nest → Life Change Intensive → <em>Book your next session</em>. Eight sessions total — one at a time.
+          </div>
+        </li>
+        <li>
+          <span class="arrow" aria-hidden="true">»</span>
+          <div>
+            <strong>4. Start Roots &amp; Wings</strong>
+            Fill in the workbook before session one and bring it each time.
+          </div>
+        </li>
       </ol>
       <div class="btn-row">
-        <a class="btn btn-gold" href="/nest/">Open your Nest →</a>
-        <a class="btn btn-outline" href="mailto:hello@lilbird.life">Email Luke</a>
+        <a class="btn btn-gold" href="/nest/">» Open Nest</a>
+        <a class="btn btn-outline" href="/workbooks/roots-and-wings-workbook.html?from=nest">» Open workbook</a>
       </div>
     </section>
 
     <p id="poll-status" class="fine-print"></p>
+    <p class="fine-print">Same checklist is in your welcome email. Stuck? <a href="mailto:hello@lilbird.life">hello@lilbird.life</a></p>
   </main>
 
   <script>
     (function () {
       const SUPABASE_URL = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
       const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
+      const WORKER_URL = 'https://worker-solo.cwwq46sn7m.workers.dev';
       const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
         auth: { storageKey: 'lilbird-solo-auth', detectSessionInUrl: false }
       });
 
       const lead = document.getElementById('success-lead');
       const pollStatus = document.getElementById('poll-status');
+      const emailInput = document.getElementById('onboard-email');
+      const msg = document.getElementById('onboard-msg');
+
+      async function prefillsFromStripe() {
+        const sessionId = new URLSearchParams(window.location.search).get('session_id');
+        if (!sessionId) return;
+        // Reuse Solo status endpoint shape if present; otherwise leave blank
+        try {
+          const res = await fetch(WORKER_URL + '/checkout-session-status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ session_id: sessionId })
+          });
+          // Solo-only endpoint may reject Intensive sessions — ignore
+          if (!res.ok) return;
+          const data = await res.json();
+          if (data.email) emailInput.value = data.email;
+        } catch (e) { /* ignore */ }
+      }
+
+      document.getElementById('btn-send-password').addEventListener('click', async () => {
+        const email = emailInput.value.trim().toLowerCase();
+        msg.textContent = '';
+        msg.className = 'onboard-msg';
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          msg.textContent = 'Enter the email you used at checkout.';
+          msg.className = 'onboard-msg err';
+          return;
+        }
+        const btn = document.getElementById('btn-send-password');
+        btn.disabled = true;
+        btn.textContent = 'Sending…';
+        try {
+          const { error } = await sb.auth.resetPasswordForEmail(email, {
+            redirectTo: 'https://lilbird.life/nest/'
+          });
+          if (error) throw error;
+          msg.textContent = 'Check your inbox — the link opens Nest so you can set a password.';
+          msg.className = 'onboard-msg ok';
+        } catch (e) {
+          msg.textContent = e.message || 'Could not send. Try Nest → Forgot password, or email hello@lilbird.life.';
+          msg.className = 'onboard-msg err';
+        } finally {
+          btn.disabled = false;
+          btn.textContent = '» Email me a set-password link';
+        }
+      });
 
       async function pollEntitlement() {
         const { data: { user } } = await sb.auth.getUser();
+        if (user?.email && !emailInput.value) emailInput.value = user.email;
+
         if (!user) {
-          pollStatus.textContent = 'Log in at your Nest with the same email you used to enrol.';
+          pollStatus.textContent = 'Not signed in yet — that is fine. Set your password (step 1), then open Nest.';
           return;
         }
 
@@ -87,20 +209,20 @@
             .maybeSingle();
 
           if (data) {
-            lead.textContent = 'Payment confirmed. Your welcome email is on its way with every link you need.';
-            pollStatus.textContent = 'Nest is unlocked — open it below to book your sessions.';
+            lead.textContent = 'Payment confirmed. Follow the arrows below — Nest, book session 1, workbook.';
+            pollStatus.textContent = 'Intensive unlocked in Nest.';
             return;
           }
           pollStatus.textContent = 'Still confirming… (' + (i + 1) + '/8)';
           await new Promise((r) => setTimeout(r, 2000));
         }
-        pollStatus.textContent = 'Payment may still be processing. Open your Nest in a minute, or email hello@lilbird.life if access is missing.';
+        pollStatus.textContent = 'Still processing. Open Nest in a minute, or email hello@lilbird.life if access is missing.';
       }
 
-      pollEntitlement();
+      prefillsFromStripe().then(pollEntitlement);
     })();
   </script>
-<script src="/js/lilbird-theme.js"></script>
-<script src="/js/lilbird-theme-nav.js"></script>
+  <script src="/js/lilbird-theme.js"></script>
+  <script src="/js/lilbird-theme-nav.js"></script>
 </body>
 </html>

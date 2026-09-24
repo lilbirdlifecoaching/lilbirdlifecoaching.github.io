@@ -354,6 +354,14 @@ input:focus { outline: none; border-color: rgba(245, 200, 66, 0.4); }
   margin-top: 1rem;
 }
 
+.enrol-path {
+  font-family: "DM Mono", monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: var(--gold);
+  margin: 0 0 1.5rem;
+}
+
 .promo-block {
   margin: 1.25rem 0 0.5rem;
   padding: 1rem;

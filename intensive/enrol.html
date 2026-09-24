@@ -16,51 +16,48 @@
   <link rel="stylesheet" href="/css/lilbird-tokens.css" />
   <link rel="stylesheet" href="/css/lilbird-theme-chrome.css" />
   <title>Enrol · Life Change Intensive · lil' bird</title>
-  <meta name="description" content="Read the agreement, create your Nest account, and secure your place on the Life Change Intensive with lil' bird coaching." />
+  <meta name="description" content="Read the agreement, pay securely, then set up your Nest for the Life Change Intensive." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./intensive-enrol.css?v=3" />
+  <link rel="stylesheet" href="./intensive-enrol.css?v=5" />
   <link rel="stylesheet" href="/css/lilbird-booking-theme.css" />
   <script src="https://js.stripe.com/v3/"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="/lilbird-auth-bridge.js"></script>
-  <!-- Google Tag Manager -->
   <script src="/lilbird-gtm-id.js"></script>
   <script src="/lilbird-gtm.js"></script>
 </head>
 <body>
-  <!-- Google Tag Manager (noscript) -->
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NG8ZFNX2" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <header class="top-bar">
     <a class="wordmark" href="/">lil' bird</a>
     <div class="top-bar-actions">
-      <a class="back back-nest" href="/nest/">← back to your Nest</a>
       <a class="back" href="/intensive/">← Intensive</a>
     </div>
   </header>
 
   <main class="wrap">
-    <p class="eyebrow">life change intensive · enrolment</p>
-    <h1>Read, sign, then <em>pay securely.</em></h1>
+    <p class="eyebrow">life change intensive · $4,999</p>
+    <h1>Three steps.<br/><em>You're in control.</em></h1>
     <p class="lead">
-      You'll read the full Client Agreement &amp; Terms of Engagement (Version 2.0) before payment — so you know exactly what you're signing up for and what your rights are.
-      After payment you'll get a welcome email and your Nest dashboard will walk you through booking your eight sessions and opening your workbook.
+      Read the agreement so expectations are clear. Pay securely. Then set up your Nest — booking and workbook live there. No need to wait on Luke.
     </p>
 
     <div class="steps-strip" id="steps-strip">
       <span class="step-pill active" data-step="1">1 · Agreement</span>
-      <span class="step-pill" data-step="2">2 · Sign &amp; account</span>
-      <span class="step-pill" data-step="3">3 · Payment</span>
+      <span class="step-pill" data-step="2">2 · Sign &amp; pay</span>
+      <span class="step-pill" data-step="3">3 · Nest</span>
     </div>
 
+    <p class="enrol-path" aria-hidden="true">» Agreement &nbsp;» Pay &nbsp;» Nest &amp; book</p>
+
     <section class="card" id="section-contract">
-      <h2>Client Agreement &amp; Terms of Engagement</h2>
+      <h2>» 1 · Client Agreement</h2>
       <p class="contract-meta">
-        <strong>Version 2.0</strong> · Life Change Intensive · lil' bird life coaching<br />
-        Eight (8) sessions · 90 minutes to 2 hours each · Programme materials &amp; Nest access included.<br />
-        <a href="./lilbird-life-change-intensive-agreement-v3.pdf" target="_blank" rel="noopener">Open agreement as PDF (new tab) ↗</a>
-        — use this if the viewer below does not load on your device.
+        <strong>Version 2.0</strong> · Eight sessions · Nest + workbook included.<br />
+        <a href="./lilbird-life-change-intensive-agreement-v3.pdf" target="_blank" rel="noopener">Open PDF ↗</a>
+        if the viewer below does not load.
       </p>
       <div class="contract-pdf-wrap" id="contract-pdf-wrap">
         <iframe
@@ -69,19 +66,19 @@
         ></iframe>
       </div>
       <p class="contract-pdf-fallback">
-        This is a legally binding agreement. By signing below and completing payment, you confirm you have read and agree to all terms, including the refund policy (Section 6) and your responsibilities (Section 10). Questions before signing: <a href="mailto:hello@lilbird.life">hello@lilbird.life</a>.
+        Legally binding. Questions before you sign: <a href="mailto:hello@lilbird.life">hello@lilbird.life</a>.
       </p>
     </section>
 
     <section class="card" id="section-sign">
-      <h2>Sign &amp; create your Nest account</h2>
+      <h2>» 2 · Sign &amp; pay</h2>
       <p class="fine-print" style="margin-top:0;margin-bottom:1rem;">
-        Your Nest is where you'll track progress, open your workbook, and book sessions. Same login as the Solo course if you already have one.
+        Nest login comes <strong>after</strong> payment. Use an email you check — we'll send every next step there.
       </p>
 
       <div id="logged-in-banner" class="logged-in-banner hidden">
-        Signed in as <strong id="logged-in-email"></strong>.
-        <a href="#" id="link-logout">Use a different account</a>
+        Already signed in as <strong id="logged-in-email"></strong>.
+        <a href="#" id="link-logout">Use a different email</a>
       </div>
 
       <form id="form-enrol">
@@ -91,9 +88,6 @@
         <div id="account-fields">
           <label for="enrol-email">Email</label>
           <input id="enrol-email" type="email" autocomplete="email" required placeholder="you@example.com" />
-
-          <label for="enrol-password">Password (Nest login)</label>
-          <input id="enrol-password" type="password" autocomplete="new-password" required minlength="8" placeholder="At least 8 characters" />
         </div>
 
         <label for="signature-typed">Type your name to sign</label>
@@ -101,15 +95,14 @@
 
         <label class="checkbox-row">
           <input id="agree-checkbox" type="checkbox" required />
-          <span>I have read the Life Change Intensive Client Agreement &amp; Terms of Engagement (Version 2.0) in full, including the refund policy (Section 6) and my responsibilities (Section 10). I understand the programme includes eight (8) coaching sessions, the fee shown at checkout, and I agree to be bound by all terms. I enter this agreement freely and without duress.</span>
+          <span>I have read the Life Change Intensive Client Agreement &amp; Terms of Engagement (Version 2.0), including the refund policy (Section 6) and my responsibilities (Section 10). I understand this is eight coaching sessions at the fee shown at checkout, and I agree to all terms.</span>
         </label>
 
         <div class="promo-block">
-          <label for="promo-input">Promo or referral code</label>
-          <p class="promo-hint">If you have a code, enter it here before payment. Valid codes are applied automatically; you can also add a code in the Stripe payment step.</p>
+          <label for="promo-input">Promo code (optional)</label>
           <div class="promo-input-wrap">
-            <input id="promo-input" type="text" class="promo-input" placeholder="Enter your code" autocomplete="off" />
-            <button type="button" class="btn btn-outline btn-apply-promo" id="btn-apply-promo">Apply code</button>
+            <input id="promo-input" type="text" class="promo-input" placeholder="Enter code" autocomplete="off" />
+            <button type="button" class="btn btn-outline btn-apply-promo" id="btn-apply-promo">Apply</button>
           </div>
           <p id="promo-message" class="promo-message" aria-live="polite"></p>
         </div>
@@ -117,10 +110,10 @@
         <p id="form-error" class="form-error"></p>
 
         <div class="btn-row">
-          <button id="btn-continue" class="btn btn-gold" type="submit">Continue to secure payment →</button>
-          <a class="btn btn-outline" href="mailto:hello@lilbird.life">Questions first?</a>
+          <button id="btn-continue" class="btn btn-gold" type="submit">» Continue to payment</button>
+          <a class="btn btn-outline" href="mailto:hello@lilbird.life">Questions?</a>
         </div>
-        <p class="fine-print">Payment opens in a secure Stripe window (promo field included). You'll receive a welcome email with your Nest link, booking link, and workbook link.</p>
+        <p class="fine-print">Next: secure Stripe checkout ($4,999). After pay you'll set up Nest and book session one — links in email and on the next page.</p>
       </form>
     </section>
   </main>
@@ -129,8 +122,8 @@
     <div class="checkout-panel">
       <div class="checkout-head">
         <div>
-          <h3 id="checkout-title">Complete payment</h3>
-          <p id="checkout-promo-note" class="checkout-promo-note">Have a promo code? Use “Add promotion code” in the form below if you did not apply one already.</p>
+          <h3 id="checkout-title">» Payment</h3>
+          <p id="checkout-promo-note" class="checkout-promo-note">Promo code? Use “Add promotion code” below if you did not apply one already.</p>
         </div>
         <button type="button" class="checkout-close" id="checkout-modal-close" aria-label="Close">&times;</button>
       </div>
@@ -139,8 +132,8 @@
     </div>
   </div>
 
-  <script src="./intensive-enrol.js?v=4"></script>
-<script src="/js/lilbird-theme.js"></script>
-<script src="/js/lilbird-theme-nav.js"></script>
+  <script src="./intensive-enrol.js?v=5"></script>
+  <script src="/js/lilbird-theme.js"></script>
+  <script src="/js/lilbird-theme-nav.js"></script>
 </body>
 </html>

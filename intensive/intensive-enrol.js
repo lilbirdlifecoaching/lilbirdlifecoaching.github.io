@@ -4,7 +4,6 @@
   const WORKER_URL = 'https://worker-solo.cwwq46sn7m.workers.dev';
   const STRIPE_PUBLISHABLE_KEY = 'pk_live_51QSMYQGAu36WZ7DdlsoNqzwPnsf4HUoOj6F1NZAeGnnH1TPjDEdEQudXIGgTLaUq079aQMI1W2MS6UpMItmTjgxy00HbouBx2g';
   const AGREEMENT_VERSION = 'v2.0-agreement-v3-pdf';
-  const NEST_REDIRECT = window.location.origin + '/nest/';
 
   const { createClient } = supabase;
   const sb = createClient(SUPABASE_URL, SUPABASE_ANON, {
@@ -27,7 +26,6 @@
   const loggedInBanner = document.getElementById('logged-in-banner');
   const accountFields = document.getElementById('account-fields');
   const enrolEmail = document.getElementById('enrol-email');
-  const enrolPassword = document.getElementById('enrol-password');
   const promoInput = document.getElementById('promo-input');
   const promoMessage = document.getElementById('promo-message');
   const checkoutPromoNote = document.getElementById('checkout-promo-note');
@@ -50,10 +48,7 @@
       return;
     }
     activePromoCode = code;
-    setPromoMessage(
-      '“' + code + '” will be applied when you open payment (if valid in Stripe).',
-      'pending'
-    );
+    setPromoMessage('“' + code + '” will be checked when payment opens.', 'pending');
   }
 
   document.getElementById('btn-apply-promo')?.addEventListener('click', applyPromoFromInput);
@@ -93,10 +88,9 @@
   function showLoggedIn(user) {
     loggedInBanner.classList.remove('hidden');
     document.getElementById('logged-in-email').textContent = user.email;
-    accountFields.classList.add('hidden');
-    enrolEmail.removeAttribute('required');
-    enrolPassword.removeAttribute('required');
     if (user.email) enrolEmail.value = user.email;
+    enrolEmail.removeAttribute('required');
+    enrolEmail.readOnly = true;
     const metaName = user.user_metadata?.full_name || '';
     if (metaName && !document.getElementById('signer-name').value) {
       document.getElementById('signer-name').value = metaName;
@@ -105,54 +99,16 @@
 
   function hideLoggedIn() {
     loggedInBanner.classList.add('hidden');
-    accountFields.classList.remove('hidden');
+    enrolEmail.readOnly = false;
     enrolEmail.setAttribute('required', '');
-    enrolPassword.setAttribute('required', '');
   }
 
-  async function ensureUser(name, email, password) {
-    if (currentUser) return currentUser;
-
-    const { data, error } = await sb.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: name },
-        emailRedirectTo: NEST_REDIRECT
-      }
-    });
-
-    if (error) {
-      const msg = (error.message || '').toLowerCase();
-      if (msg.includes('already registered') || msg.includes('already been registered')) {
-        const signIn = await sb.auth.signInWithPassword({ email, password });
-        if (signIn.error) {
-          throw new Error(
-            'An account with this email already exists. Log in at your Nest with that password, then return here — or use Forgot password.'
-          );
-        }
-        return signIn.data.session.user;
-      }
-      throw error;
-    }
-
-    if (data.session?.user) return data.session.user;
-
-    if (data.user) {
-      const signIn = await sb.auth.signInWithPassword({ email, password });
-      if (signIn.data.session?.user) return signIn.data.session.user;
-      throw new Error('Account created but login failed. Try logging in at your Nest, then return here.');
-    }
-
-    throw new Error('Could not create account. Please try again.');
-  }
-
-  async function saveContract(userId, signerName, signerEmail) {
-    const res = await fetch(WORKER_URL + '/intensive-save-contract', {
+  async function prepareEnrol(signerName, signerEmail) {
+    const res = await fetch(WORKER_URL + '/intensive-prepare-enrol', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        user_id: userId,
+        user_id: currentUser?.id || null,
         signer_name: signerName,
         signer_email: signerEmail,
         agreement_version: AGREEMENT_VERSION
@@ -160,8 +116,9 @@
     });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      throw new Error(body.error || 'Could not save your agreement signature.');
+      throw new Error(body.error || 'Could not save your agreement.');
     }
+    return res.json();
   }
 
   function openCheckoutModal() {
@@ -169,7 +126,7 @@
     document.getElementById('checkout-loading').style.display = '';
     document.getElementById('checkout-modal').classList.add('active');
     document.body.style.overflow = 'hidden';
-    setStep(3);
+    setStep(2);
   }
 
   function closeCheckoutModal() {
@@ -218,15 +175,15 @@
       const codeUsed = payload.promo_code || activePromoCode;
       if (checkoutPromoNote) {
         if (payload.promo_applied && codeUsed) {
-          checkoutPromoNote.textContent = 'Promo code “' + codeUsed + '” applied to this payment.';
+          checkoutPromoNote.textContent = 'Promo “' + codeUsed + '” applied.';
           checkoutPromoNote.style.color = 'var(--green)';
         } else if (codeUsed) {
           checkoutPromoNote.textContent =
-            '“' + codeUsed + '” could not be pre-applied — use “Add promotion code” in the Stripe form below, or go back and check the spelling.';
+            '“' + codeUsed + '” could not be pre-applied — use “Add promotion code” below, or go back and check spelling.';
           checkoutPromoNote.style.color = '';
         } else {
           checkoutPromoNote.textContent =
-            'Have a promo code? Click “Add promotion code” in the Stripe form below.';
+            'Have a promo code? Click “Add promotion code” in the form below.';
           checkoutPromoNote.style.color = '';
         }
       }
@@ -251,8 +208,12 @@
 
     const signerName = document.getElementById('signer-name').value.trim();
     const signatureTyped = document.getElementById('signature-typed').value.trim();
-    const email = enrolEmail.value.trim().toLowerCase();
-    const password = enrolPassword.value;
+    const email = (currentUser?.email || enrolEmail.value).trim().toLowerCase();
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      formError.textContent = 'Please enter a valid email.';
+      return;
+    }
 
     if (signatureTyped.toLowerCase() !== signerName.toLowerCase()) {
       formError.textContent = 'Typed signature must match your full legal name exactly.';
@@ -264,31 +225,24 @@
     setStep(2);
 
     try {
-      let user = currentUser;
-      if (!user) {
-        if (password.length < 8) {
-          formError.textContent = 'Password must be at least 8 characters.';
-          return;
-        }
-        user = await ensureUser(signerName, email, password);
-        currentUser = user;
-      }
-
-      if (await hasIntensiveEntitlement(user.id)) {
+      if (currentUser && await hasIntensiveEntitlement(currentUser.id)) {
         window.location.href = '/nest/';
         return;
       }
 
-      await saveContract(user.id, signerName, user.email || email);
+      const prepared = await prepareEnrol(signerName, email);
+      const userId = prepared.user_id;
+      if (!userId) throw new Error('Could not prepare enrolment.');
+
       btnContinue.textContent = 'Opening payment…';
-      await startCheckout(user.id, user.email || email, signerName);
+      await startCheckout(userId, email, signerName);
     } catch (err) {
       console.error('Enrol error:', err);
       formError.textContent = err.message || 'Something went wrong. Please try again.';
       setStep(2);
     } finally {
       btnContinue.disabled = false;
-      btnContinue.textContent = 'Continue to secure payment →';
+      btnContinue.textContent = '» Continue to payment';
     }
   });
 
