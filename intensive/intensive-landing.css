@@ -297,6 +297,67 @@ a:hover { text-decoration: underline; }
   line-height: 1.7;
 }
 
+.ways-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.way-card {
+  background: var(--dark-card);
+  border: 1px solid var(--dark-border);
+  border-radius: 16px;
+  padding: 1.35rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.way-card-alt {
+  border-color: rgba(245, 200, 66, 0.28);
+}
+
+.way-eyebrow {
+  font-family: "DM Mono", monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+}
+
+.way-card h3 {
+  font-family: "Playfair Display", serif;
+  font-weight: 400;
+  font-style: italic;
+  font-size: 1.25rem;
+  line-height: 1.2;
+}
+
+.way-price {
+  font-family: "DM Mono", monospace;
+  font-size: 0.95rem;
+  color: var(--gold);
+  letter-spacing: 0.04em;
+}
+
+.way-copy {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.55;
+  flex: 1;
+  margin-bottom: 0.35rem;
+}
+
+.way-card .btn {
+  width: 100%;
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 560px) {
+  .ways-grid { grid-template-columns: 1fr; }
+}
+
 @media (max-width: 520px) {
   .lci-cta-row { flex-direction: column; align-items: stretch; }
   .lci-cta-row .btn { width: 100%; }

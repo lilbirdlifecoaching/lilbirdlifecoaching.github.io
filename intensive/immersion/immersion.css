@@ -1,0 +1,132 @@
+/* Life Change Immersion — landing extras (uses intensive-landing.css base) */
+
+.immersion-landing .setting-list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.immersion-landing .setting-list li {
+  background: var(--dark-card);
+  border: 1px solid var(--dark-border);
+  border-radius: 12px;
+  padding: 1rem 0.9rem;
+  text-align: center;
+}
+
+.immersion-landing .setting-list strong {
+  display: block;
+  font-family: "Playfair Display", serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.15rem;
+  color: var(--text-main);
+  margin-bottom: 0.25rem;
+}
+
+.immersion-landing .setting-list span {
+  font-family: "DM Mono", monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.price-block {
+  background: var(--dark-card);
+  border: 1px solid var(--dark-border);
+  border-radius: 16px;
+  padding: 1.35rem 1.25rem;
+}
+
+.price-lead {
+  font-size: 1.15rem;
+  margin-bottom: 0.35rem;
+}
+
+.price-lead strong {
+  font-family: "Playfair Display", serif;
+  font-size: 1.75rem;
+  font-weight: 400;
+  color: var(--gold);
+}
+
+.price-sub {
+  font-family: "DM Mono", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--gold-dim);
+  margin-bottom: 0.85rem;
+}
+
+.immersion-form {
+  display: grid;
+  gap: 0.85rem;
+  max-width: 28rem;
+}
+
+.immersion-form label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  color: var(--text-main);
+}
+
+.immersion-form .optional {
+  font-family: "DM Mono", monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.immersion-form input,
+.immersion-form select,
+.immersion-form textarea {
+  background: var(--dark-mid);
+  border: 1px solid rgba(245, 200, 66, 0.18);
+  border-radius: 8px;
+  padding: 0.75rem 0.85rem;
+  color: var(--text-main);
+  font-family: "DM Sans", system-ui, sans-serif;
+  font-size: 0.95rem;
+}
+
+.immersion-form input:focus,
+.immersion-form select:focus,
+.immersion-form textarea:focus {
+  outline: none;
+  border-color: rgba(245, 200, 66, 0.45);
+}
+
+.immersion-form textarea {
+  resize: vertical;
+  min-height: 6rem;
+}
+
+.immersion-form .btn {
+  width: 100%;
+  margin-top: 0.35rem;
+}
+
+.immersion-form .btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.form-status {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.form-error { color: var(--ember); }
+.form-success { color: var(--gold); }
+
+@media (max-width: 560px) {
+  .immersion-landing .setting-list {
+    grid-template-columns: 1fr;
+  }
+}
