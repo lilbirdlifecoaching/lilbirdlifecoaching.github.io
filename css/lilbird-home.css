@@ -1252,7 +1252,36 @@ a.recognition-item:focus-visible .recognition-read {
   flex-direction: column;
   transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
-a.pricing-card:hover {
+.pricing-card-stack {
+  padding: 0;
+  overflow: hidden;
+}
+.pricing-card-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 1.15rem 1.1rem 0.85rem;
+  text-decoration: none;
+  color: inherit;
+}
+.pricing-card-extra {
+  display: block;
+  padding: 0.65rem 1.1rem 0.95rem;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-accent-dim);
+  text-decoration: none;
+  border-top: 1px solid var(--border-subtle, rgba(245, 200, 66, 0.12));
+  transition: color 0.2s ease, background 0.2s ease;
+}
+.pricing-card-extra:hover {
+  color: var(--text-accent, var(--gold, #F5C842));
+  background: rgba(245, 200, 66, 0.06);
+}
+a.pricing-card:hover,
+.pricing-card-stack:hover {
   transform: translateY(-3px);
   border-color: var(--text-accent-dim);
 }
