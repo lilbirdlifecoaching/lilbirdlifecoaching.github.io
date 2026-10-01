@@ -3,7 +3,7 @@
   // Avoid duplicate launcher when a page already embeds the inline chat (e.g. index.html).
   if (document.getElementById('lb-chat-btn')) return;
   var WORKER = 'https://lilbird-chat.cwwq46sn7m.workers.dev/';
-  var FF_URL = 'https://calendly.com/lilbirdlifecoaching/first-flight-session';
+  var FF_URL = 'https://lilbird.life/first-flight/book.html?code=IMREADY';
   var LCS_URL = 'https://lilbird.life/intensive/enrol.html';
   var DISC_URL = 'https://calendly.com/lilbirdlifecoaching/30min';
 
@@ -27,19 +27,28 @@
           return false;
         }
       }
+      function isAllowedCalUrl(url) {
+        try {
+          var u = new URL(url);
+          if (u.protocol !== 'https:' || u.hostname !== 'cal.com') return false;
+          return u.pathname.toLowerCase().indexOf('/luke-haythorpe/') === 0;
+        } catch (e) {
+          return false;
+        }
+      }
       function isAllowedSiteBookingUrl(url) {
         try {
           var u = new URL(url, 'https://lilbird.life');
           if (u.protocol !== 'https:') return false;
           if (u.hostname !== 'lilbird.life' && u.hostname !== 'www.lilbird.life') return false;
           var path = u.pathname.replace(/\/+$/, '') || '/';
-          return path === '/intensive/enrol.html';
+          return path === '/intensive/enrol.html' || path === '/first-flight/book.html' || path === '/coaching/book.html';
         } catch (e) {
           return false;
         }
       }
       function isAllowedBookingUrl(url) {
-        return isAllowedCalendlyUrl(url) || isAllowedSiteBookingUrl(url);
+        return isAllowedCalendlyUrl(url) || isAllowedCalUrl(url) || isAllowedSiteBookingUrl(url);
       }
       function sanitizeAssistantHtml(raw) {
         var placeholders = [];
@@ -85,6 +94,7 @@
       w.lbChatSafe = {
         escapeHtml: escapeHtml,
         isAllowedCalendlyUrl: isAllowedCalendlyUrl,
+        isAllowedCalUrl: isAllowedCalUrl,
         isAllowedSiteBookingUrl: isAllowedSiteBookingUrl,
         isAllowedBookingUrl: isAllowedBookingUrl,
         sanitizeAssistantHtml: sanitizeAssistantHtml,
@@ -283,7 +293,7 @@
   function showBookingOptions() {
     var m = document.createElement('div'); m.className = 'lb-m bot';
     var b = document.createElement('div'); b.className = 'lb-b';
-    b.innerHTML = 'Great — here\'s a quick look at the options:<br><br><strong style="color:#F5C842">🐦 The First Flight</strong> — one 2-hour session. Map your story, find the real issue, leave with your next step. Best starting point, no commitment beyond the conversation.<br><br><strong style="color:#F5C842">🌿 Life Change Sessions</strong> — the full journey. 7 sessions through the complete curriculum. Story, vision, identity, transitions, rhythms, relationships.<br><br><strong style="color:#F5C842">💛 Monthly Coaching</strong> — ongoing thinking partner. Recurring or once-off, flexible to what you need.';
+    b.innerHTML = 'Great — here\'s a quick look at the options:<br><br><strong style="color:#F5C842">🐦 The First Flight</strong> — one 2-hour session. Map your story, find the real issue, leave with your next step. Best starting point, no commitment beyond the conversation.<br><br><strong style="color:#F5C842">🌿 Life Change Sessions</strong> — the full journey. 7 sessions through the complete curriculum. Story, vision, identity, transitions, rhythms, relationships.<br><br><strong style="color:#F5C842">💛 Coaching</strong> — ad hoc thinking partner. $249 per session — pay then book.';
     var wrap = document.createElement('div'); wrap.className = 'lb-opts'; wrap.style.marginTop = '.75rem';
     [
       { label: 'Book a First Flight — $149 with code IMREADY', url: FF_URL, ff: true },
