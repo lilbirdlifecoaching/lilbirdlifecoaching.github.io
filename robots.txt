@@ -7,5 +7,5 @@ Disallow: /solo/
 Disallow: /intensive/enrol
 Disallow: /first-flight/booked
 Disallow: /coaching/booked
-
+Disallow: /workbooks/
 Sitemap: https://lilbird.life/sitemap.xml
