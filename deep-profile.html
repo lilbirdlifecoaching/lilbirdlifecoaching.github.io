@@ -2297,33 +2297,6 @@
   .result-gap-kicker { font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ember); margin: 0 0 0.35rem; }
   .result-gap-body { margin: 0; font-size: 0.95rem; line-height: 1.55; color: var(--text-main); }
 
-  .saturday-opt {
-    margin-top: 1rem;
-    padding: 1rem 1.15rem;
-    border-radius: 12px;
-    border: 1px solid rgba(245,200,66,0.15);
-    background: rgba(255,255,255,0.02);
-    font-size: 0.88rem;
-    color: var(--text-muted);
-    max-width: 480px;
-  }
-  .saturday-opt label { display: flex; gap: 0.65rem; align-items: flex-start; cursor: pointer; }
-  .saturday-opt-hint { margin: 0.6rem 0 0 1.85rem; font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; }
-  .saturday-opt-hint.is-ok { color: #5cba7a; }
-  .saturday-opt-hint.is-err { color: #e8734a; }
-  .saturday-email-capture { display: none; margin: 0.75rem 0 0 1.85rem; max-width: 320px; }
-  .saturday-email-capture.open { display: block; }
-  .saturday-email-capture input {
-    width: 100%; box-sizing: border-box; margin-bottom: 0.5rem;
-    background: rgba(255,255,255,0.05); border: 1px solid rgba(245,200,66,0.2);
-    border-radius: 6px; color: var(--text-main); font-family: 'DM Sans', sans-serif;
-    font-size: 0.88rem; padding: 0.55rem 0.75rem;
-  }
-  .saturday-email-capture button {
-    font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.1em;
-    text-transform: uppercase; background: rgba(245,200,66,0.12); border: 1px solid rgba(245,200,66,0.35);
-    color: var(--gold); padding: 0.45rem 0.75rem; border-radius: 6px; cursor: pointer;
-  }
 
   /* RESPONSIVE */
   @media (max-width: 860px) {
@@ -3023,22 +2996,13 @@
         </div>
 
         <details class="whats-next-panel" id="whats-next-panel">
-          <summary>What's next — coaching, pulse &amp; your link</summary>
+          <summary>What's next — coaching &amp; your link</summary>
           <div class="whats-next-inner">
             <div class="nest-next-card" id="nest-next-card" style="display:none;">
               <p class="nest-next-tier" id="nest-next-tier"></p>
               <h3 id="nest-next-headline"></h3>
               <p class="nest-next-body" id="nest-next-body"></p>
               <div class="nest-next-actions" id="nest-next-actions"></div>
-            </div>
-
-            <div class="saturday-opt" id="saturday-opt-box" style="margin-top:1rem;">
-              <label><input type="checkbox" id="saturday-opt-in"> <span><strong>Saturday pulse</strong> — one short email with a link back to this read for a 2-minute check-in. Low noise. Turn it off anytime.</span></label>
-              <p class="saturday-opt-hint" id="saturday-opt-hint">Saves as soon as you check or uncheck — uses the email you used to unlock this read.</p>
-              <div class="saturday-email-capture" id="saturday-email-capture">
-                <input type="email" id="saturday-email-inline" placeholder="your@email.com" autocomplete="email" aria-label="Email for Saturday pulse">
-                <button type="button" id="saturday-email-save">Save &amp; turn on Saturday pulse</button>
-              </div>
             </div>
 
             <div class="sidebar-card sidebar-card-ember" style="margin-top:1rem;">
@@ -3855,130 +3819,6 @@ async function unlockFullRead(){
 }
 
 // ═══════════════════════════════════════
-// SATURDAY PULSE OPT-IN
-// ═══════════════════════════════════════
-function resolveProfileEmail(){
-  if(typeof userEmail === 'string' && userEmail.trim()) return userEmail.trim();
-  try{
-    var snap = document.getElementById('snap-email');
-    if(snap && snap.value && String(snap.value).trim()) return String(snap.value).trim();
-  }catch(e){}
-  return '';
-}
-
-function setSaturdayHint(text, tone){
-  var satHint = document.getElementById('saturday-opt-hint');
-  if(!satHint) return;
-  satHint.textContent = text;
-  satHint.classList.remove('is-ok', 'is-err');
-  if(tone === 'ok') satHint.classList.add('is-ok');
-  if(tone === 'err') satHint.classList.add('is-err');
-}
-
-async function ensureProfileEmailFromKv(){
-  if(resolveProfileEmail() || !nestId) return resolveProfileEmail();
-  try{
-    var r = await fetch(WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(nestId));
-    if(r.ok){
-      var d = await r.json();
-      if(d && d.email){
-        userEmail = String(d.email).trim();
-        return userEmail;
-      }
-    }
-  }catch(e){}
-  return '';
-}
-
-async function saveSaturdayPreference(wantOn, emailOverride){
-  if(!nestId) return { ok: false, error: 'no_nest' };
-  var em = (emailOverride && String(emailOverride).trim()) || resolveProfileEmail() || await ensureProfileEmailFromKv();
-  if(wantOn && !em) return { ok: false, error: 'email_required' };
-  var r = await fetch(WORKER_URL + '/nest-preferences', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ nestId, saturdayReminder: wantOn, email: em || undefined }),
-  });
-  var data = {};
-  try{ data = await r.json(); }catch(e){}
-  if(!r.ok){
-    return { ok: false, error: data.error || 'save_failed', data: data };
-  }
-  if(em) userEmail = em;
-  return { ok: true, data: data };
-}
-
-function bindSaturdayOptIn(){
-  var satIn = document.getElementById('saturday-opt-in');
-  var satHint = document.getElementById('saturday-opt-hint');
-  var cap = document.getElementById('saturday-email-capture');
-  var capInput = document.getElementById('saturday-email-inline');
-  var capBtn = document.getElementById('saturday-email-save');
-  if(!satIn || !nestId) return;
-  if(satIn.dataset.bound === '1') return;
-  satIn.dataset.bound = '1';
-
-  fetch(WORKER_URL + '/nest-preferences?nestId=' + encodeURIComponent(nestId))
-    .then(function(r){ return r.ok ? r.json() : null; })
-    .then(function(d){
-      if(d && typeof d.saturdayReminder === 'boolean') satIn.checked = d.saturdayReminder;
-      if(d && d.saturdayReminder){
-        setSaturdayHint('Saturday pulse is on — short check-in emails on Saturdays.', 'ok');
-      }
-    }).catch(function(){});
-
-  async function applySaturday(wantOn, emailOverride){
-    satIn.disabled = true;
-    setSaturdayHint('Saving…', null);
-    if(cap) cap.classList.remove('open');
-    try{
-      var result = await saveSaturdayPreference(wantOn, emailOverride);
-      if(!result.ok){
-        if(result.error === 'email_required'){
-          satIn.checked = false;
-          if(cap) cap.classList.add('open');
-          setSaturdayHint('Add the email you used for this read — then we can send Saturday pulses.', 'err');
-          return;
-        }
-        satIn.checked = !wantOn;
-        setSaturdayHint('Could not save — try again or email hello@lilbird.life.', 'err');
-        return;
-      }
-      if(wantOn){
-        if(result.data && result.data.confirmationSent){
-          setSaturdayHint('You\'re on the list — check your inbox for a quick confirm email. Saturdays = a 2-min Nest check-in.', 'ok');
-        }else{
-          setSaturdayHint('Saturday pulse is on. If you don\'t see a confirm email in a few minutes, check spam.', 'ok');
-        }
-      }else{
-        setSaturdayHint('Saturday pulse is off. You can turn it back on anytime.', null);
-      }
-    }catch(e){
-      satIn.checked = !wantOn;
-      setSaturdayHint('Could not save — try again in a moment.', 'err');
-    }finally{
-      satIn.disabled = false;
-    }
-  }
-
-  satIn.onchange = function(){
-    applySaturday(satIn.checked);
-  };
-
-  if(capBtn && capInput){
-    capBtn.addEventListener('click', function(){
-      var em = capInput.value.trim();
-      if(!em || em.indexOf('@') < 1){
-        setSaturdayHint('Enter a valid email to turn on Saturday pulse.', 'err');
-        return;
-      }
-      satIn.checked = true;
-      applySaturday(true, em);
-    });
-  }
-}
-
-// ═══════════════════════════════════════
 // RENDER RESULTS
 // ═══════════════════════════════════════
 // ═══════════════════════════════════════════════════════════════
@@ -4508,7 +4348,6 @@ function renderResults(profile){
       appendNestCta({ label: 'First Flight — from $149 →', url: '/first-flight/book.html?code=IMREADY' }, false);
     }
   }
-  bindSaturdayOptIn();
 
   // Nest ID
   if(nestId){
