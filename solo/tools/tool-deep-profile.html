@@ -137,7 +137,7 @@
   <div class="prompt-card">
     <div class="prompt-avatar">🌳</div>
     <div class="prompt-bubble">
-      There are two ways to approach this. If you haven't done the lil' bird Deep Profile yet, I'd love you to do it now — it takes about 15 minutes and gives us real material. If you already know your type from another assessment, you can enter it directly and we'll work with that.
+      There are two ways to approach this. If you haven't done the lil' bird Inner Compass yet, I'd love you to do it now — it takes about 15 minutes and gives us real material. If you already know your type from another assessment, you can enter it directly and we'll work with that.
     </div>
   </div>
 
@@ -158,7 +158,7 @@
     </div>
     <div class="path-tab" data-path="deep-profile">
       <span class="path-tab-icon">🧭</span>
-      <div class="path-tab-label">Take the Deep Profile</div>
+      <div class="path-tab-label">Take the Inner Compass</div>
       <div class="path-tab-hint">15-minute assessment on lilbird.life</div>
     </div>
   </div>
@@ -225,9 +225,9 @@
   <!-- Deep Profile panel -->
   <div class="panel" id="panel-deep-profile">
     <div class="deep-profile-card">
-      <h3>The lil' bird Deep Profile</h3>
+      <h3>The lil' bird Inner Compass</h3>
       <p>A 15-minute personality assessment that explores how you think, what drives you, and how you show up in relationships and under pressure. Built specifically for the lil' bird coaching journey.</p>
-      <button type="button" id="btn-launch-deep-profile" class="btn-do-assessment">Take the Deep Profile →</button>
+      <button type="button" id="btn-launch-deep-profile" class="btn-do-assessment">Take the Inner Compass →</button>
       <div class="assessment-note" id="launch-note">Opens in a new tab. We'll auto-pull your result back here when you're done — no re-typing.</div>
     </div>
 
@@ -273,7 +273,7 @@
     }
   );
   const ASSESSMENT_WORKER_URL = 'https://lilbird-assessment.cwwq46sn7m.workers.dev';
-  const ASSESSMENT_FRONTEND_URL = 'https://lilbird.life/deep-profile.html';
+  const ASSESSMENT_FRONTEND_URL = 'https://lilbird.life/inner-compass/';
 
   var currentUser = null;
   var selectedMbti = '';
@@ -473,10 +473,10 @@
   }
 
   function showLinkedSavedState(p) {
-    const headline = p.archetypePlain || p.archetype || 'Your Deep Profile';
+    const headline = p.archetypePlain || p.archetype || 'Your Inner Compass read';
     const techBits = [p.mbti, p.enneagram, p.attachment].filter(Boolean).join(' · ');
     const card = document.getElementById('saved-card');
-    document.querySelector('#saved-card .saved-label').textContent = 'From your Deep Profile';
+    document.querySelector('#saved-card .saved-label').textContent = 'From your Inner Compass';
     document.getElementById('saved-type-display').textContent = headline;
     document.getElementById('saved-subtype-display').textContent = techBits || (p.archetypePlainDescription || '');
     card.classList.add('visible');

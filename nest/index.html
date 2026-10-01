@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
-  <link rel="stylesheet" href="./nest-styles.css?v=28" />
+  <link rel="stylesheet" href="./nest-styles.css?v=29" />
   <link rel="stylesheet" href="./nest-tour.css?v=2" />
   <link rel="stylesheet" href="/css/lilbird-nest-theme.css?v=20260917m" />
   <!-- Google Tag Manager -->
@@ -48,12 +48,7 @@
       <div class="auth-card">
         <p class="eyebrow">lil' bird · Nest</p>
         <h1>One home for what's <em>next.</em></h1>
-        <p class="auth-copy">Log in to see what you have unlocked and what to do next.</p>
-
-        <div class="auth-tabs">
-          <button id="tab-login" class="auth-tab active" type="button">Log in</button>
-          <button id="tab-signup" class="auth-tab" type="button">Create account</button>
-        </div>
+        <p class="auth-copy" id="auth-copy">Log in to see what you have unlocked and what to do next.</p>
 
         <form id="form-login" class="auth-form">
           <label>Email</label>
@@ -61,22 +56,24 @@
           <label>Password</label>
           <input id="login-password" type="password" placeholder="••••••••" required />
           <button id="btn-login" class="btn btn-gold" type="submit">Log in →</button>
-          <button id="btn-forgot" class="btn btn-outline" type="button">Forgot password</button>
-          <button id="btn-magic-link" class="btn btn-outline" type="button">Email me a sign-in link</button>
-          <p class="auth-hint">After Create account you should land in your Nest straight away. If not, log in with the same password.</p>
           <p id="login-error" class="auth-error"></p>
+          <div class="auth-first-time">
+            <p><strong>First time here, or forgot your password?</strong> If you bought something from lil' bird, your Nest is already waiting. Enter that email above and we'll send a link to set your password.</p>
+            <button id="btn-forgot" class="btn btn-outline" type="button">Email me a link to set my password</button>
+          </div>
+          <div class="auth-new-here">
+            <p>New to lil' bird? Your Nest comes with your Inner Compass read. Your two types are free.</p>
+            <a class="btn btn-ember" href="/inner-compass/?from=nest">Take your Inner Compass →</a>
+          </div>
         </form>
 
-        <form id="form-signup" class="auth-form hidden">
-          <label>Your name</label>
-          <input id="signup-name" type="text" placeholder="First name" required />
-          <label>Email</label>
-          <input id="signup-email" type="email" placeholder="you@example.com" required />
-          <label>Password</label>
-          <input id="signup-password" type="password" placeholder="at least 8 characters" required />
-          <button id="btn-signup" class="btn btn-gold" type="submit">Create account →</button>
-          <p id="signup-note" class="auth-note">Nest uses the same login as the Solo course. If you already bought Solo, log in with that email instead of creating again.</p>
-          <p id="signup-error" class="auth-error"></p>
+        <form id="form-set-password" class="auth-form hidden">
+          <label>Choose your Nest password</label>
+          <input id="set-password" type="password" placeholder="at least 8 characters" autocomplete="new-password" required />
+          <label>Type it again</label>
+          <input id="set-password-confirm" type="password" placeholder="same again" autocomplete="new-password" required />
+          <button id="btn-set-password" class="btn btn-gold" type="submit">Save password and open my Nest →</button>
+          <p id="set-password-error" class="auth-error"></p>
         </form>
       </div>
     </main>
@@ -96,6 +93,7 @@
           <span class="theme-toggle-label">Night</span>
         </button>
         <span id="nav-user-name" class="nav-user-name"></span>
+        <span id="nav-plan" class="nav-plan hidden"></span>
         <button id="btn-nest-tour" class="btn btn-outline btn-tour" type="button" title="Take a Nest tour">
           <span class="tour-label-long">Take a tour</span>
           <span class="tour-label-short" aria-hidden="true">Tour</span>
@@ -146,12 +144,7 @@
 
         <aside class="side-col">
           <article id="sidebar-context-card" class="sidebar-card ember"></article>
-          <article class="sidebar-card">
-            <p class="sidebar-eyebrow">relationship dynamic</p>
-            <h4>How do you work with others?</h4>
-            <p>Use your wiring to decode collaboration friction and communicate better.</p>
-            <a class="btn btn-outline full" href="/relationship-dynamic.html?from=nest">Open tool →</a>
-          </article>
+          <article class="sidebar-card" id="sidebar-relationship-card"></article>
           <article class="sidebar-card hint">
             <p class="sidebar-eyebrow">chat hint</p>
             <p>Questions? The lil' bird chat knows this ecosystem cold.</p>
@@ -166,7 +159,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="/js/lilbird-theme.js"></script>
   <script src="/js/lilbird-theme-nav.js"></script>
-  <script src="./nest-tour.js?v=3"></script>
-  <script src="./nest-client.js?v=34"></script>
+  <script src="./nest-tour.js?v=4"></script>
+  <script src="./nest-client.js?v=35"></script>
 </body>
 </html>

@@ -1073,9 +1073,9 @@
     let activeSession = null, chatMsgs = [], isTyping = false, exchangeCount = 0;
     let sessionContext = {}, toolOutputsCache = {}, sessionMemoriesCache = {};
     let completeDashTab = 'plan';
-    // Bridge to the lil' bird Deep Profile (Cloudflare Worker, KV-backed):
+    // Bridge to the lil' bird Inner Compass (Cloudflare Worker, KV-backed):
     //   1. Solo course writes a single-use launch token to deep_profile_launches
-    //      when the user clicks "Take the Deep Profile" inside Session 3.
+    //      when the user clicks "Take the Inner Compass" inside Session 3.
     //   2. Assessment frontend POSTs back to the worker with that token + nestId,
     //      which writes deep_profile_links { user_id → nest_id }.
     //   3. Dashboard reads deep_profile_links and fetches the live profile JSON
@@ -1455,25 +1455,25 @@
 
     function renderDeepProfileCard() {
       if (!deepProfileState.loaded) {
-        return '<div class="deep-snapshot empty"><div class="deep-snap-label">Identity · Deep Profile</div><div class="deep-snap-empty-text">Loading your profile…</div></div>';
+        return '<div class="deep-snapshot empty"><div class="deep-snap-label">Identity · Inner Compass</div><div class="deep-snap-empty-text">Loading your profile…</div></div>';
       }
       const p = deepProfileState.profile;
       if (!p) {
         if (deepProfileState.nestId) {
           return '<div class="deep-snapshot empty">'
-            + '<div class="deep-snap-label">Identity · Deep Profile</div>'
+            + '<div class="deep-snap-label">Identity · Inner Compass</div>'
             + '<div class="deep-snap-empty-text">Your read is linked to this account, but we couldn\'t load the snapshot just now. Open your full read or refresh this page.</div>'
-            + '<a class="btn-deep-snap-cta" href="https://lilbird.life/deep-profile.html?nest=' +
+            + '<a class="btn-deep-snap-cta" href="https://lilbird.life/inner-compass/?nest=' +
             encodeURIComponent(deepProfileState.nestId) + '" target="_blank" rel="noopener">Open your full read →</a>'
             + '</div>';
         }
         return '<div class="deep-snapshot empty">'
-          + '<div class="deep-snap-label">Identity · Deep Profile</div>'
-          + '<div class="deep-snap-empty-text">You haven\'t taken the Deep Profile yet — a 15-minute read of how you\'re wired. Start it from Session 3 and your result will land here automatically.</div>'
+          + '<div class="deep-snap-label">Identity · Inner Compass</div>'
+          + '<div class="deep-snap-empty-text">You haven\'t taken the Inner Compass yet — a 15-minute read of how you\'re wired. Start it from Session 3 and your result will land here automatically.</div>'
           + '<button class="btn-deep-snap-cta" id="btn-deep-snap-cta">Open Session 3 →</button>'
           + '</div>';
       }
-      const headline = p.archetypePlain || p.likelyCoreArchetypePlain || p.archetype || p.likelyCoreArchetype || 'Your Deep Profile';
+      const headline = p.archetypePlain || p.likelyCoreArchetypePlain || p.archetype || p.likelyCoreArchetype || 'Your Inner Compass read';
       const desc     = p.archetypePlainDescription || p.archetypeSub || p.bridge || '';
       const mbtiChip = p.mbti || p.likelyCoreMbti;
       const ennChip  = p.enneagram || p.likelyCoreEnneagram;
@@ -1492,7 +1492,7 @@
       const notes = p.confidence && p.confidence.notes ? p.confidence.notes : '';
       const quote = p.quote || '';
       let html = '<div class="deep-snapshot">';
-      html += '<div class="deep-snap-label">Identity · Deep Profile</div>';
+      html += '<div class="deep-snap-label">Identity · Inner Compass</div>';
       html += '<div class="deep-snap-headline">' + escapeHtml(headline) + '</div>';
       if (desc)  html += '<div class="deep-snap-desc">' + escapeHtml(desc) + '</div>';
       if (chips) html += '<div class="deep-snap-types">' + chips + '</div>';
@@ -1505,7 +1505,7 @@
               + '</div>';
       }
       if (deepProfileState.nestId) {
-        html += '<a class="btn-deep-snap-cta" href="https://lilbird.life/deep-profile.html?nest=' +
+        html += '<a class="btn-deep-snap-cta" href="https://lilbird.life/inner-compass/?nest=' +
           encodeURIComponent(deepProfileState.nestId) + '" target="_blank" rel="noopener">Open your full read →</a>';
       }
       html += '</div>';
@@ -1831,7 +1831,7 @@
       'adventure-map':   { file: 'tools/tool-adventure-map.html',   icon: '🗺️', name: 'Adventure Map',             hint: 'Map your journey to your North Star.' },
       'shadows-sparks':  { file: 'tools/tool-shadows-sparks.html',  icon: '✨', name: 'Shadows & Sparks',          hint: 'What drives you from fear vs passion.' },
       'tangle-within':   { file: 'tools/tool-tangle-within.html',   icon: '🌿', name: 'The Tangle Within',         hint: 'Name what is holding you back.' },
-      'deep-profile':    { file: 'tools/tool-deep-profile.html',    icon: '🧭', name: 'Identity Profile',          hint: 'Enter your MBTI, Enneagram, or take the Deep Profile.' },
+      'deep-profile':    { file: 'tools/tool-deep-profile.html',    icon: '🧭', name: 'Identity Profile',          hint: 'Enter your MBTI, Enneagram, or take the Inner Compass.' },
       'courage-compass': { file: 'tools/tool-courage-compass.html', icon: '🧭', name: 'Courage Compass',           hint: 'Orient yourself at the crossroads.' },
       'birdsong':        { file: 'tools/tool-birdsong.html',        icon: '🎵', name: 'Birdsong Scale',            hint: 'Map your energy states and design your week.' },
       'forest':          { file: 'tools/tool-forest.html',          icon: '🌲', name: 'Forest of Connections',     hint: 'Map the people in your relational landscape.' },

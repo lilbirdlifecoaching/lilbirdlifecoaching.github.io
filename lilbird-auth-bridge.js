@@ -1,5 +1,5 @@
 /**
- * Keeps Supabase auth in sync across lilbird.life pages (Nest, Solo, Deep Profile).
+ * Keeps Supabase auth in sync across lilbird.life pages (Nest, Solo, Inner Compass).
  * Uses one storage key: lilbird-solo-auth (same Supabase project).
  */
 (function () {

@@ -268,6 +268,16 @@
     animation: fadeUp 0.35s ease both;
   }
   .dynamic-result.visible { display: block; }
+  [hidden] { display: none !important; }
+  .rd-checking { margin: 1rem 0; }
+  .rd-lock-pill { display: inline-block; font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); border: 1px solid var(--gold-faint, rgba(245,200,66,0.3)); border-radius: 100px; padding: 0.25rem 0.65rem; margin-bottom: 0.75rem; }
+  .rd-actions { margin: 1rem 0 0.25rem; }
+  .rd-actions .card-hint { margin-top: 0.75rem; }
+  .rd-example { position: relative; margin-top: 1.5rem; padding: 1.25rem 1.25rem 1rem; border: 1px dashed var(--dark-border); border-radius: 12px; }
+  .rd-example-label { position: absolute; top: -0.65rem; left: 1rem; padding: 0 0.5rem; background: var(--dark-card); color: var(--gold-dim); font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.12em; text-transform: uppercase; margin: 0; }
+  .rd-example h3 { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 400; font-size: 1.15rem; color: var(--gold); margin: 0.2rem 0 0.4rem; }
+  .rd-example-meta { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.9rem; }
+  .rd-example p { font-size: 0.9rem; line-height: 1.7; margin-bottom: 0.8rem; }
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
@@ -364,7 +374,7 @@
       <span class="theme-toggle-label">Night</span>
     </button>
     <a href="/nest/" id="nav-back-nest" class="nav-link nav-link-nest lilbird-nav-nest" hidden>← back to your Nest</a>
-    <a class="nav-link" href="/deep-profile.html?from=nest">Inner Compass →</a>
+    <a class="nav-link" href="/inner-compass/?from=nest">Inner Compass →</a>
   </div>
 </nav>
 
@@ -375,6 +385,34 @@
     Put in what you know about another person — a colleague, collaborator, manager, or friend — and we'll read the dynamic between your wiring and theirs.
   </p>
 
+  <p class="card-hint rd-checking" id="rd-checking">Checking your Nest…</p>
+
+  <section class="card rd-locked" id="rd-locked" hidden>
+    <p class="rd-lock-pill">🔒 Nest Plus</p>
+    <h2 class="card-title">The Relationship Dynamic is part of Nest Plus</h2>
+    <p class="card-hint">Nest Plus is a one-off $5 and also includes the First Flight workbook. It's already included with any coaching, Solo or Intensive purchase.</p>
+    <div class="rd-actions" id="rd-actions-in">
+      <button type="button" class="btn-primary" id="rd-upgrade-btn">Add Nest Plus — $5 →</button>
+    </div>
+    <div class="rd-actions" id="rd-actions-out" hidden>
+      <a class="btn-primary" href="/nest/" style="display:inline-block;text-decoration:none;">Log in to my Nest →</a>
+      <p class="card-hint">New to lil' bird? <a href="/inner-compass/">Take your free Inner Compass</a> first. The Relationship Dynamic uses your read.</p>
+    </div>
+    <p class="error-msg" id="rd-upgrade-error" style="display:none;"></p>
+
+    <div class="rd-example">
+      <p class="rd-example-label">Example result</p>
+      <h3>The Spark and the Anchor</h3>
+      <p class="rd-example-meta">You: Connector · ENFP · Enneagram 7 &nbsp;·&nbsp; Them (romantic partner): Steady Guardian · ISFJ · Enneagram 6</p>
+      <p>You bring the open doors; they bring the floor to stand on. When it works, you widen each other's world without either of you losing your footing.</p>
+      <p><span class="result-label">What they bring to you</span>Follow-through. They notice when you've said yes to too much and quietly hold the details you drop.</p>
+      <p><span class="result-label">What you bring to them</span>Permission to try. Your ease with change makes new things feel less risky for them.</p>
+      <p><span class="result-label">Watch out for</span>Under stress you reach for more options and they reach for certainty. Name it early: "I need to explore, you need a plan. Can we do both?"</p>
+      <p><span class="result-label">The invitation</span>Make one decision together this week where you slow down and they speed up.</p>
+    </div>
+  </section>
+
+  <div id="rd-tool" hidden>
   <!-- YOUR PROFILE -->
   <section class="card" id="you-section">
     <h2 class="card-title">About you</h2>
@@ -438,18 +476,13 @@
     </div>
   </div>
 
-  <div class="dynamic-result" id="nest-plus-upsell" role="region" aria-live="polite">
-    <h2>The Relationship Dynamic is part of Nest Plus</h2>
-    <p>Nest Plus is a one-off $5 and also includes the First Flight workbook. It’s already included with any coaching, Solo or Intensive purchase.</p>
-    <p><a class="btn-primary" href="/nest/" style="display:inline-block;text-decoration:none;">Add Nest Plus in my Nest →</a></p>
-    <p class="card-hint">Already have it? <a href="/nest/">Log in to your Nest</a> and open the Relationship Dynamic from there.</p>
-  </div>
   <div class="dynamic-result" id="dynamic-result" role="region" aria-live="polite"></div>
   <p class="error-msg" id="error-msg" style="display:none;"></p>
+  </div>
 </main>
 
 <footer class="site-footer">
-  <p>Powered by <a href="https://lilbird.life" target="_blank" rel="noopener">lil' bird</a> · <a href="https://lilbird.life/privacy.html" target="_blank" rel="noopener">Privacy</a> · <a href="https://lilbird.life/deep-profile.html" target="_blank" rel="noopener">Inner Compass</a></p>
+  <p>Powered by <a href="https://lilbird.life" target="_blank" rel="noopener">lil' bird</a> · <a href="https://lilbird.life/privacy.html" target="_blank" rel="noopener">Privacy</a> · <a href="https://lilbird.life/inner-compass/" target="_blank" rel="noopener">Inner Compass</a></p>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -471,20 +504,76 @@
       return {};
     }
   }
-  const upsellEl = document.getElementById('nest-plus-upsell');
+  const SOLO_WORKER_URL = 'https://worker-solo.cwwq46sn7m.workers.dev';
+  // Server enforces access on /partner-dynamic; this only decides what to show first.
+  const NEST_PLUS_PRODUCTS = ['nest_plus', 'first_flight', 'solo_course', 'coaching', 'life_change_intensive'];
+
+  async function currentSession() {
+    if (!sb) return null;
+    try {
+      const { data } = await sb.auth.getSession();
+      return (data && data.session) || null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  async function accountHasNestPlus(session) {
+    if (!sb || !session) return false;
+    try {
+      const { data } = await sb.from('user_entitlements').select('product').eq('user_id', session.user.id).eq('active', true);
+      return (data || []).some(function (row) { return NEST_PLUS_PRODUCTS.indexOf(row.product) !== -1; });
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function showGate(state) {
+    document.getElementById('rd-checking').hidden = true;
+    document.getElementById('rd-tool').hidden = state !== 'open';
+    document.getElementById('rd-locked').hidden = state === 'open';
+    document.getElementById('rd-actions-in').hidden = state !== 'locked-in';
+    document.getElementById('rd-actions-out').hidden = state !== 'locked-out';
+    notifyResize();
+  }
+
   function showUpsell() {
     errorEl.style.display = 'none';
     resultEl.classList.remove('visible');
-    upsellEl.classList.add('visible');
-    upsellEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    notifyResize();
+    void currentSession().then(function (s) { showGate(s ? 'locked-in' : 'locked-out'); });
   }
+
+  document.getElementById('rd-upgrade-btn').addEventListener('click', async function () {
+    const btn = this;
+    const err = document.getElementById('rd-upgrade-error');
+    err.style.display = 'none';
+    btn.disabled = true;
+    btn.textContent = 'Opening secure checkout…';
+    try {
+      const r = await fetch(SOLO_WORKER_URL + '/nest-upgrade-checkout', {
+        method: 'POST',
+        headers: Object.assign({ 'Content-Type': 'application/json' }, await authHeaders()),
+        body: JSON.stringify({ item: 'nest_plus' })
+      });
+      const out = await r.json().catch(function () { return {}; });
+      if (out.url) { window.location.href = out.url; return; }
+      if (out.already_owned) { showGate('open'); return; }
+      throw new Error(out.error || 'checkout failed');
+    } catch (_) {
+      err.textContent = 'Checkout could not open just now. Try again in a moment, or add Nest Plus from your Nest.';
+      err.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Add Nest Plus — $5 →';
+    }
+  });
   const params = new URLSearchParams(window.location.search);
   const isEmbed = params.get('embed') === '1' || params.get('embed') === 'true';
   if (isEmbed) document.body.classList.add('embed');
 
   let userProfile = null;
   let nestId = null;
+  let lastLoadNestPlus = false;
   let useManualProfile = true;
 
   const nestLoadedEl = document.getElementById('nest-loaded');
@@ -560,6 +649,7 @@
       if (!r.ok) return false;
       const data = await r.json();
       if (!data.profile) return false;
+      lastLoadNestPlus = data.nestPlus === true;
       nestId = id;
       showNestProfile(data.profile);
       return true;
@@ -631,7 +721,6 @@
     }
 
     setLoading(true);
-    upsellEl.classList.remove('visible');
     try {
       const r = await fetch(WORKER_URL + '/partner-dynamic', {
         method: 'POST',
@@ -693,12 +782,17 @@
   }
 
   (async function init() {
+    const session = await currentSession();
     const fromUrl = params.get('nest');
+    let readHasNestPlus = false;
     if (fromUrl) {
       nestIdInput.value = fromUrl;
       const ok = await loadNest(fromUrl);
+      readHasNestPlus = ok && lastLoadNestPlus;
       if (!ok) showError('Nest not found — enter your types manually below.');
     }
+    if (readHasNestPlus || (await accountHasNestPlus(session))) showGate('open');
+    else showGate(session ? 'locked-in' : 'locked-out');
     notifyResize();
     window.addEventListener('resize', notifyResize);
     if (typeof ResizeObserver !== 'undefined') {

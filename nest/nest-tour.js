@@ -69,8 +69,9 @@
       },
       locked: {
         title: 'Nest Plus · $5',
-        body: 'Adds the Relationship Dynamic tool and the First Flight workbook. A one-off $5, unlocked right here on this card. Already included with any coaching, Solo or Intensive purchase.',
-        tip: '» Add Nest Plus from this card'
+        body: 'Adds the Relationship Dynamic tool and the First Flight workbook. A one-off $5, yours to keep. Already included with any coaching, Solo or Intensive purchase.',
+        tip: null,
+        action: { label: 'Add Nest Plus — $5 →', upgrade: 'nest_plus' }
       }
     },
     lcs_workbook: {
@@ -84,8 +85,9 @@
       },
       locked: {
         title: 'Life Change Sessions workbook · $27',
-        body: 'The complete eight-session workbook to work through on your own. Get it from this card; it’s included with the Life Change Intensive.',
-        tip: null
+        body: 'The complete eight-session workbook to work through on your own. It’s included with the Life Change Intensive.',
+        tip: null,
+        action: { label: 'Get the workbook — $27 →', upgrade: 'lcs_workbook' }
       }
     },
     solo_course: {
@@ -124,7 +126,7 @@
     var def = PRODUCT_STEPS[key];
     if (!def) return null;
     var copy = mode === 'owned' ? def.owned() : def.locked;
-    return { id: key, tab: 'products', selector: def.selector, title: copy.title, body: copy.body, tip: copy.tip };
+    return { id: key, tab: 'products', selector: def.selector, title: copy.title, body: copy.body, tip: copy.tip, action: copy.action || null };
   }
 
   function buildSteps() {
@@ -170,9 +172,10 @@
         id: 'younger',
         tab: 'profile',
         selector: '.younger-you-card',
-        title: 'Nest picture',
-        body: 'Upload or change a photo of you around ages 4–8 right here in My profile. It becomes your Nest avatar.',
-        tip: '» Choose a photo, then Save'
+        title: 'A picture of little you',
+        body: 'Add a photo of you around ages 4–8. It becomes your Nest picture, and it’s a fun one to dig out.',
+        tip: null,
+        action: { label: 'Choose a photo →', photo: true }
       },
       {
         id: 'ask',
@@ -244,6 +247,7 @@
       '  <h3 class="nest-tour-title" id="nest-tour-title"></h3>' +
       '  <p class="nest-tour-body" id="nest-tour-body"></p>' +
       '  <p class="nest-tour-tip hidden" id="nest-tour-tip"></p>' +
+      '  <button type="button" class="btn btn-ember nest-tour-action hidden" id="nest-tour-action"></button>' +
       '  <div class="nest-tour-actions">' +
       '    <button type="button" class="btn btn-outline nest-tour-skip" data-tour-skip>Skip</button>' +
       '    <span class="nest-tour-progress" id="nest-tour-progress"></span>' +
@@ -261,6 +265,20 @@
     });
     document.getElementById('nest-tour-next').addEventListener('click', function () {
       goNext();
+    });
+    document.getElementById('nest-tour-action').addEventListener('click', function () {
+      var step = steps[stepIndex];
+      var action = step && step.action;
+      if (!action) return;
+      endTour(true);
+      if (action.upgrade) {
+        var btn = document.querySelector('#pane-products [data-upgrade="' + action.upgrade + '"]');
+        if (btn) btn.click();
+      } else if (action.photo) {
+        setTab('profile');
+        var label = document.querySelector('.younger-you-file-label');
+        if (label) label.click();
+      }
     });
   }
 
@@ -344,6 +362,14 @@
         } else {
           tipEl.textContent = '';
           tipEl.classList.add('hidden');
+        }
+        var actionEl = document.getElementById('nest-tour-action');
+        if (step.action) {
+          actionEl.textContent = step.action.label;
+          actionEl.classList.remove('hidden');
+        } else {
+          actionEl.textContent = '';
+          actionEl.classList.add('hidden');
         }
         document.getElementById('nest-tour-progress').textContent =
           i + 1 + ' / ' + steps.length;

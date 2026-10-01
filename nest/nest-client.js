@@ -124,29 +124,73 @@
   const urlParams = new URLSearchParams(window.location.search);
   const wantsLogout = urlParams.get('logout') === '1';
 
-  // auth tabs
-  const tabLogin = document.getElementById('tab-login');
-  const tabSignup = document.getElementById('tab-signup');
+  // Nest accounts are created by a purchase (or the Inner Compass unlock), never from this page.
   const formLogin = document.getElementById('form-login');
-  const formSignup = document.getElementById('form-signup');
+  const formSetPassword = document.getElementById('form-set-password');
   const loginError = document.getElementById('login-error');
-  const signupError = document.getElementById('signup-error');
+  const setPasswordError = document.getElementById('set-password-error');
+  const PW_SETUP_KEY = 'lilbird-pw-setup';
+  let passwordSetupPending = false;
 
-  function swapAuth(isSignup) {
-    tabLogin.classList.toggle('active', !isSignup);
-    tabSignup.classList.toggle('active', isSignup);
-    formLogin.classList.toggle('hidden', isSignup);
-    formSignup.classList.toggle('hidden', !isSignup);
+  function pwSetupFlag(on) {
+    try {
+      if (on) localStorage.setItem(PW_SETUP_KEY, '1');
+      else localStorage.removeItem(PW_SETUP_KEY);
+    } catch (e) {}
   }
-  tabLogin.addEventListener('click', () => {
-    swapAuth(false);
-    signupError.textContent = '';
-    clearSignupSuccess();
-  });
-  tabSignup.addEventListener('click', () => {
-    swapAuth(true);
-    signupError.textContent = '';
-    clearSignupSuccess();
+
+  function pwSetupFlagSet() {
+    try {
+      return localStorage.getItem(PW_SETUP_KEY) === '1';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function showSetPassword() {
+    showAuthViewNow();
+    formLogin.classList.add('hidden');
+    formSetPassword.classList.remove('hidden');
+    const copy = document.getElementById('auth-copy');
+    if (copy) copy.textContent = 'One last step: choose a password so you can log in to your Nest anytime.';
+    setPasswordError.textContent = '';
+    document.getElementById('set-password')?.focus();
+  }
+
+  formSetPassword.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    setPasswordError.textContent = '';
+    const pw = document.getElementById('set-password').value;
+    const pw2 = document.getElementById('set-password-confirm').value;
+    if (pw.length < 8) {
+      setPasswordError.textContent = 'Password must be at least 8 characters.';
+      return;
+    }
+    if (pw !== pw2) {
+      setPasswordError.textContent = 'Those two passwords don’t match.';
+      return;
+    }
+    const btn = document.getElementById('btn-set-password');
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+    try {
+      const { error } = await sb.auth.updateUser({ password: pw });
+      if (error) {
+        setPasswordError.textContent = error.message || 'Could not save that password. Try again.';
+        return;
+      }
+      passwordSetupPending = false;
+      pwSetupFlag(false);
+      formSetPassword.classList.add('hidden');
+      formLogin.classList.remove('hidden');
+      await showDashboard();
+    } catch (err) {
+      console.error('Nest set password:', err);
+      setPasswordError.textContent = 'Something went wrong. Please try again.';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Save password and open my Nest →';
+    }
   });
 
   formLogin.addEventListener('submit', async (e) => {
@@ -176,6 +220,7 @@
         return;
       }
 
+      pwSetupFlag(false);
       await showDashboard(data.session.user);
     } catch (err) {
       console.error('Nest login:', err);
@@ -190,13 +235,20 @@
     loginError.style.color = '';
     const email = document.getElementById('login-email').value.trim().toLowerCase();
     if (!email) {
-      loginError.textContent = 'Enter your email first to reset password.';
+      loginError.textContent = 'Enter your email above first, then tap this again.';
       return;
     }
+    const btn = document.getElementById('btn-forgot');
+    btn.disabled = true;
     const { error } = await sb.auth.resetPasswordForEmail(email, {
       redirectTo: NEST_AUTH_REDIRECT
     });
-    loginError.textContent = error ? (error.message || 'Could not send reset email.') : 'Password reset email sent.';
+    btn.disabled = false;
+    if (!error) pwSetupFlag(true);
+    loginError.style.color = error ? '' : 'var(--gold)';
+    loginError.textContent = error
+      ? (error.message || 'Could not send the email. Try again in a minute.')
+      : 'Check your email (and spam) for a link from lil’ bird. It brings you back here to choose your password.';
   });
 
   const btnResendConfirm = document.getElementById('btn-resend-confirm');
@@ -216,152 +268,6 @@
     loginError.textContent = error
       ? error.message || 'Could not resend confirmation.'
       : 'Confirmation email sent — check inbox and spam, then click the link (it should open this Nest page).';
-  });
-
-  document.getElementById('btn-magic-link').addEventListener('click', async () => {
-    loginError.textContent = '';
-    loginError.style.color = '';
-    const email = document.getElementById('login-email').value.trim().toLowerCase();
-    if (!email) {
-      loginError.textContent = 'Enter your email first, then request a sign-in link.';
-      return;
-    }
-    const btn = document.getElementById('btn-magic-link');
-    if (btn) {
-      btn.disabled = true;
-      btn.textContent = 'Sending link…';
-    }
-    const { error } = await sb.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: NEST_AUTH_REDIRECT }
-    });
-    if (btn) {
-      btn.disabled = false;
-      btn.textContent = 'Email me a sign-in link';
-    }
-    loginError.style.color = error ? '' : 'var(--gold)';
-    loginError.textContent = error
-      ? error.message || 'Could not send sign-in link.'
-      : 'Sign-in link sent — check inbox and spam. Click it to open your Nest (no password needed for that login).';
-  });
-
-  function resetSignupButton() {
-    const btn = document.getElementById('btn-signup');
-    if (!btn) return;
-    btn.disabled = false;
-    btn.textContent = 'Create account →';
-  }
-
-  function showSignupSuccess(message) {
-    const note = document.getElementById('signup-note');
-    signupError.textContent = '';
-    if (note) {
-      note.textContent = message;
-      note.classList.add('auth-success');
-      note.classList.remove('auth-note');
-    }
-  }
-
-  function clearSignupSuccess() {
-    const note = document.getElementById('signup-note');
-    if (!note) return;
-    note.classList.remove('auth-success');
-    note.classList.add('auth-note');
-    note.textContent =
-      'Nest uses the same login as the Solo course. If you already bought Solo, log in with that email instead of creating again.';
-  }
-
-  formSignup.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    signupError.textContent = '';
-    clearSignupSuccess();
-
-    const name = document.getElementById('signup-name').value.trim();
-    const email = document.getElementById('signup-email').value.trim().toLowerCase();
-    const password = document.getElementById('signup-password').value;
-    const btnSignup = document.getElementById('btn-signup');
-
-    if (password.length < 8) {
-      signupError.textContent = 'Password must be at least 8 characters.';
-      return;
-    }
-
-    signupInFlight = true;
-    if (btnSignup) {
-      btnSignup.disabled = true;
-      btnSignup.textContent = 'Creating account…';
-    }
-
-    try {
-      const { data, error } = await sb.auth.signUp({
-        email,
-        password,
-        options: {
-          data: { full_name: name },
-          emailRedirectTo: NEST_AUTH_REDIRECT
-        }
-      });
-
-      if (error) {
-        const msg = (error.message || '').toLowerCase();
-        if (msg.includes('already registered') || msg.includes('already been registered')) {
-          signupError.textContent =
-            'An account with this email already exists — often from the Solo course or an earlier signup. Switch to Log in, or use Forgot password on that tab.';
-          document.getElementById('login-email').value = email;
-          swapAuth(false);
-          return;
-        }
-        signupError.textContent = error.message || 'Could not create account.';
-        return;
-      }
-
-      const identities = data.user?.identities;
-      const hasNewIdentity = Array.isArray(identities) && identities.length > 0;
-
-      if (data.session?.user) {
-        await sendNestWelcomeEmail(email, name || email, data.session.user.id);
-        await showDashboard(data.session.user);
-        return;
-      }
-
-      // Confirm-email is off in Supabase but signUp sometimes returns user without session.
-      if (data.user && hasNewIdentity) {
-        const signIn = await sb.auth.signInWithPassword({ email, password });
-        if (signIn.data.session?.user) {
-          await sendNestWelcomeEmail(email, name || email, signIn.data.session.user.id);
-          await showDashboard(signIn.data.session.user);
-          return;
-        }
-        if (signIn.error) {
-          signupError.textContent =
-            'Account was created but automatic login failed: ' +
-            loginErrorMessage(signIn.error) +
-            ' Try the Log in tab with the same password, or Forgot password.';
-          document.getElementById('login-email').value = email;
-          swapAuth(false);
-          return;
-        }
-      }
-
-      if (data.user && !hasNewIdentity && !data.session) {
-        showSignupSuccess(
-          'If you already have an account (e.g. Solo), use Log in. Otherwise try again or use Forgot password.'
-        );
-        document.getElementById('login-email').value = email;
-        swapAuth(false);
-        return;
-      }
-
-      showSignupSuccess('Account may have been created. Try Log in with your password, or Forgot password.');
-      document.getElementById('login-email').value = email;
-      swapAuth(false);
-    } catch (err) {
-      console.error('Nest signup:', err);
-      signupError.textContent = 'Something went wrong. Please try again.';
-    } finally {
-      signupInFlight = false;
-      resetSignupButton();
-    }
   });
 
   async function workerAuthHeaders() {
@@ -843,7 +749,7 @@
 
   async function linkInnerCompassToAccount(btn) {
     const hint =
-      'Paste your Inner Compass results link from email\n(for example: lilbird.life/deep-profile.html?nest=…)\n\nOr paste the nest id only:';
+      'Paste your Inner Compass results link from email\n(for example: lilbird.life/inner-compass/?nest=…)\n\nOr paste the nest id only:';
     const raw = window.prompt(hint, '');
     if (raw == null) return;
 
@@ -909,7 +815,7 @@
   }
 
   function innerCompassHref() {
-    const base = '/deep-profile.html';
+    const base = '/inner-compass/';
     if (hasInnerCompassComplete() && deepNestId) {
       return (
         base +
@@ -1030,7 +936,7 @@
           <span class="status-badge pending">free · about 15 minutes</span>
           <p>Understand your wiring. The foundation everything else builds on. Your two types are free; the full read is $2.</p>
           ${connectBlock}
-          <div class="btn-row"><a class="btn btn-ember" href="/deep-profile.html?from=nest">Take the Inner Compass →</a></div>
+          <div class="btn-row"><a class="btn btn-ember" href="/inner-compass/?from=nest">Take the Inner Compass →</a></div>
         </article>`;
     }
 
@@ -1191,6 +1097,7 @@
         <strong class="plan-badge-name">${escapeHtml(plan.name)}</strong>
         <span class="plan-badge-note">${escapeHtml(plan.note)}</span>
       </div>
+      ${renderPhotoPrompt()}
       ${cardProduct('inner_compass')}
       ${cardProduct('nest_plus')}
       ${cardProduct('lcs_workbook')}
@@ -1205,6 +1112,11 @@
     productsPane.querySelectorAll('[data-upgrade]').forEach((btn) => {
       btn.addEventListener('click', () => void startUpgrade(btn.dataset.upgrade, btn));
     });
+    productsPane.querySelectorAll('[data-go-photo]').forEach((btn) => {
+      btn.addEventListener('click', goToPhoto);
+    });
+    renderSidebarRelationship();
+    renderNavPlan();
     const claimBtn = productsPane.querySelector('#btn-lci-claim');
     if (claimBtn) {
       claimBtn.addEventListener('click', () => void claimNextLciSession(claimBtn));
@@ -1313,11 +1225,75 @@
     const url = youngerYouPhotoUrl();
     if (url) {
       btn.classList.add('has-photo');
+      btn.classList.remove('needs-photo');
+      btn.title = 'My profile';
+      btn.setAttribute('aria-label', 'Open My profile');
       btn.innerHTML = '<img src="' + escapeHtml(url) + '" alt="" width="30" height="30" />';
     } else {
       btn.classList.remove('has-photo');
-      btn.innerHTML = '<i class="ti ti-user"></i>';
+      btn.classList.add('needs-photo');
+      btn.title = 'Add your Nest picture';
+      btn.setAttribute('aria-label', 'Add your Nest picture');
+      btn.innerHTML = '<i class="ti ti-camera-plus"></i>';
     }
+  }
+
+  function goToPhoto() {
+    setTab('profile');
+    requestAnimationFrame(() => {
+      const card = document.querySelector('.younger-you-card');
+      if (!card) return;
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      card.classList.remove('is-pulsing');
+      void card.offsetWidth;
+      card.classList.add('is-pulsing');
+    });
+  }
+
+  function renderPhotoPrompt() {
+    if (youngerYouPhotoUrl()) return '';
+    return `
+      <article class="product-card photo-prompt-card">
+        <span class="photo-prompt-icon" aria-hidden="true"><i class="ti ti-camera-plus"></i></span>
+        <div>
+          <h3>Add a picture of little you</h3>
+          <p>A photo of you around ages 4–8 makes your Nest feel like yours, and it’s a lovely reminder of who you were before the world told you who to be.</p>
+          <div class="btn-row"><button type="button" class="btn btn-outline" data-go-photo>Add my picture →</button></div>
+        </div>
+      </article>`;
+  }
+
+  function renderSidebarRelationship() {
+    const el = document.getElementById('sidebar-relationship-card');
+    if (!el) return;
+    if (hasNestPlus()) {
+      const link = deepNestId
+        ? '/relationship-dynamic.html?nest=' + encodeURIComponent(deepNestId) + '&from=nest'
+        : '/relationship-dynamic.html?from=nest';
+      el.innerHTML = `
+        <p class="sidebar-eyebrow">relationship dynamic · nest plus</p>
+        <h4>How do you fit with someone close?</h4>
+        <p>Use your wiring to understand a partner, friend, family member or colleague.</p>
+        <a class="btn btn-outline full" href="${escapeHtml(link)}">Open tool →</a>`;
+      return;
+    }
+    el.innerHTML = `
+      <p class="sidebar-eyebrow"><i class="ti ti-lock"></i> relationship dynamic · nest plus</p>
+      <h4>How do you fit with someone close?</h4>
+      <p>See how your wiring meets a partner’s, friend’s or colleague’s: what each of you brings, and where you snag. Part of Nest Plus.</p>
+      <button type="button" class="btn btn-ember full" data-upgrade="nest_plus">Add Nest Plus — $5 →</button>`;
+    el.querySelector('[data-upgrade]').addEventListener('click', (e) => void startUpgrade('nest_plus', e.currentTarget));
+  }
+
+  function renderNavPlan() {
+    const el = document.getElementById('nav-plan');
+    if (!el) return;
+    const plan = planInfo();
+    const plus = plan.name !== 'Nest';
+    el.textContent = plus ? '✦ ' + plan.name : 'Nest';
+    el.classList.toggle('is-plus', plus);
+    el.title = plan.note;
+    el.classList.remove('hidden');
   }
 
   function setYoungerYouStatus(msg, kind) {
@@ -1389,6 +1365,7 @@
           await saveYoungerYouPhoto(pendingFile);
           updateNavAvatar();
           renderNextSteps();
+          renderProducts();
           renderProfile();
           setYoungerYouStatus('Saved. This is your Nest picture.', 'success');
         } catch (err) {
@@ -1427,8 +1404,8 @@
     return `
       <article class="product-card younger-you-card">
         <p class="eyebrow">nest picture</p>
-        <h3>Add your Nest picture</h3>
-        <p>Upload a photo of you around ages 4–8. It becomes your Nest avatar${hasSoloCourseAccess() ? ' and sits on your Full Flight Plan' : ''}.</p>
+        <h3>Add a picture of little you</h3>
+        <p>Dig out a photo of you around ages 4–8. It becomes your Nest picture${hasSoloCourseAccess() ? ' and sits on your Full Flight Plan' : ''}, a small daily reminder of who you were before anyone told you who to be.</p>
         <div class="btn-row younger-you-actions">
           <label class="btn btn-gold younger-you-file-label" for="younger-you-file">Choose a photo</label>
           <input id="younger-you-file" class="younger-you-file-input" type="file" accept="image/*" />
@@ -1480,7 +1457,7 @@
             <p class="eyebrow">my profile</p>
             <h3>Inner Compass profile</h3>
             <p>Take your Inner Compass read first. Your profile will appear here once unlocked.</p>
-            <div class="btn-row"><a class="btn btn-ember" href="/deep-profile.html?from=nest">Take the Inner Compass →</a></div>
+            <div class="btn-row"><a class="btn btn-ember" href="/inner-compass/?from=nest">Take the Inner Compass →</a></div>
           </article>
         </div>`;
     }
@@ -1597,6 +1574,9 @@
     document.getElementById('sidebar-context-card').innerHTML = '';
     document.getElementById('next-steps-list').innerHTML = '';
     document.getElementById('nav-user-name').textContent = '';
+    document.getElementById('nav-plan')?.classList.add('hidden');
+    const rdCard = document.getElementById('sidebar-relationship-card');
+    if (rdCard) rdCard.innerHTML = '';
     const btn = document.getElementById('btn-nav-profile');
     if (btn) {
       btn.classList.remove('has-photo');
@@ -1665,6 +1645,10 @@
 
   async function showDashboard(preloadedUser) {
     if (suppressDashboard) return;
+    if (passwordSetupPending) {
+      showSetPassword();
+      return;
+    }
 
     let user = preloadedUser || null;
     if (!user) {
@@ -1682,7 +1666,6 @@
     if (authView) authView.classList.remove('active');
     if (dashView) dashView.classList.add('active');
     resetLoginButton();
-    resetSignupButton();
     const preferTab = new URLSearchParams(window.location.search).get('tab');
     setTab(preferTab === 'profile' || preferTab === 'ask' ? preferTab : 'products');
     await hydrateDashboard();
@@ -1695,7 +1678,6 @@
     resetDashboardUi();
     showAuthViewNow();
     resetLoginButton();
-    resetSignupButton();
   }
 
   async function forceLogout() {
@@ -1731,6 +1713,11 @@
       return;
     }
     if (signupInFlight) return;
+    if (event === 'PASSWORD_RECOVERY') {
+      passwordSetupPending = true;
+      showSetPassword();
+      return;
+    }
 
     if (event === 'SIGNED_OUT') {
       showAuth();
@@ -1786,6 +1773,7 @@
       const accessToken = hashParams.get('access_token');
       const refreshToken = hashParams.get('refresh_token');
       if (accessToken && refreshToken) {
+        if (hashParams.get('type') === 'recovery' || pwSetupFlagSet()) passwordSetupPending = true;
         const { data, error } = await sb.auth.setSession({
           access_token: accessToken,
           refresh_token: refreshToken
@@ -1803,6 +1791,7 @@
     const authCode = params.get('code');
     if (!authCode) return null;
 
+    if (pwSetupFlagSet()) passwordSetupPending = true;
     const { data, error } = await sb.auth.exchangeCodeForSession(authCode);
     clearAuthParamsFromUrl();
     if (error) {
@@ -1817,7 +1806,10 @@
 
   const btnNavProfile = document.getElementById('btn-nav-profile');
   if (btnNavProfile) {
-    btnNavProfile.addEventListener('click', () => openInnerCompassRead());
+    btnNavProfile.addEventListener('click', () => {
+      if (!youngerYouPhotoUrl()) goToPhoto();
+      else openInnerCompassRead();
+    });
   }
 
   document.addEventListener('visibilitychange', () => {
@@ -1832,7 +1824,6 @@
 
   (async function init() {
     resetLoginButton();
-    resetSignupButton();
 
     if (wantsLogout) {
       try {
@@ -1861,6 +1852,7 @@
       return;
     }
 
+    if (pwSetupFlagSet()) passwordSetupPending = true;
     await showDashboard();
   })();
 })();
