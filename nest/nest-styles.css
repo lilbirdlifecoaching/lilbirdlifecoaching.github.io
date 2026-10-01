@@ -552,3 +552,28 @@ body.nest-page { line-height: 1.5; }
   .lock-pill { position: static; display: inline-block; margin-bottom: 0.5rem; }
   .nav-user-name { max-width: 140px; }
 }
+
+.plan-badge {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.75rem;
+  padding: 0.85rem 1.1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(245,200,66,0.28);
+  background: rgba(245,200,66,0.06);
+}
+.plan-badge-label {
+  font-family: "DM Mono", monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.plan-badge-name {
+  font-family: "Playfair Display", serif;
+  font-weight: 400;
+  font-size: 1.15rem;
+  color: var(--gold, #F5C842);
+}
+.plan-badge-note { flex-basis: 100%; color: var(--text-muted); font-size: 0.86rem; }

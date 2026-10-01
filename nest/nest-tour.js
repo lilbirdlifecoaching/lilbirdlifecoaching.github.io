@@ -6,6 +6,7 @@
   'use strict';
 
   var STORAGE_KEY = 'lilbird-nest-tour-v1';
+  var SEEN_KEY = 'lilbird-nest-seen-access';
   var PAD = 10;
   var root = null;
   var hole = null;
@@ -47,7 +48,87 @@
     if (tab) tab.click();
   }
 
+  function access() {
+    return window.__nestAccess || { owned: [], plan: 'Nest', nestPlusSource: '', workbookSource: '' };
+  }
+
+  function owns(key) {
+    return access().owned.indexOf(key) !== -1;
+  }
+
+  var PRODUCT_STEPS = {
+    nest_plus: {
+      selector: '[data-product="nest_plus"]',
+      owned: function () {
+        var src = access().nestPlusSource;
+        return {
+          title: 'Nest Plus' + (src && src !== 'Nest Plus' ? ' · ' + src.toLowerCase() : ''),
+          body: 'Open the Relationship Dynamic to see how you and someone close to you fit together. Your First Flight workbook is here too.',
+          tip: '» Tap Relationship Dynamic to start'
+        };
+      },
+      locked: {
+        title: 'Nest Plus · $5',
+        body: 'Adds the Relationship Dynamic tool and the First Flight workbook. A one-off $5, unlocked right here on this card. Already included with any coaching, Solo or Intensive purchase.',
+        tip: '» Add Nest Plus from this card'
+      }
+    },
+    lcs_workbook: {
+      selector: '[data-product="lcs_workbook"]',
+      owned: function () {
+        return {
+          title: 'Your Life Change workbook',
+          body: 'All eight sessions in one interactive workbook. Answers save on this device, and Download as PDF keeps a copy.',
+          tip: '» Open workbook when you’re ready'
+        };
+      },
+      locked: {
+        title: 'Life Change Sessions workbook · $27',
+        body: 'The complete eight-session workbook to work through on your own. Get it from this card; it’s included with the Life Change Intensive.',
+        tip: null
+      }
+    },
+    solo_course: {
+      selector: '[data-product="solo_course"]',
+      owned: function () {
+        return {
+          title: 'Continue Solo here',
+          body: 'Your self-guided course progress shows on this card. Jump back in whenever you’re ready.',
+          tip: '» Continue from the Solo card'
+        };
+      },
+      locked: {
+        title: 'Life Change Sessions: Solo · $197',
+        body: 'Eight self-guided sessions with an AI coaching guide. Unlock it from this card; it includes Nest Plus.',
+        tip: null
+      }
+    },
+    life_change_intensive: {
+      selector: '[data-product="life_change_intensive"]',
+      owned: function () {
+        return {
+          title: 'Book your Intensive sessions',
+          body: 'Your Nest tracks all 8. Book one at a time, then open the workbook before you meet Luke. Your Intensive includes everything in the Nest.',
+          tip: '» Tap Book your next session when you’re ready'
+        };
+      },
+      locked: {
+        title: 'Work with Luke',
+        body: 'Start with a First Flight session ($149), book a single coaching session ($249), or enrol in the Life Change Intensive — all from these cards.',
+        tip: '» Pick the card that fits'
+      }
+    }
+  };
+
+  function productStep(key, mode) {
+    var def = PRODUCT_STEPS[key];
+    if (!def) return null;
+    var copy = mode === 'owned' ? def.owned() : def.locked;
+    return { id: key, tab: 'products', selector: def.selector, title: copy.title, body: copy.body, tip: copy.tip };
+  }
+
   function buildSteps() {
+    var plan = access().plan;
     var list = [
       {
         id: 'welcome',
@@ -58,47 +139,21 @@
         tip: null
       },
       {
-        id: 'products',
+        id: 'plan',
         tab: 'products',
-        selector: '#tab-products',
-        title: 'My products',
-        body: 'Everything you own lives on this tab — Inner Compass, Solo, First Flight, Intensive, and more.',
-        tip: '» Open a card when you’re ready to continue'
+        selector: '.plan-badge',
+        title: 'Your plan: ' + plan,
+        body: plan === 'Intensive'
+          ? 'Your Intensive includes everything in the Nest, so every card below is open to you.'
+          : 'This shows what your Nest includes. Locked cards say what they are, what they cost and where to unlock them.',
+        tip: null
       }
     ];
 
-    var lci = document.querySelector('[data-product="life_change_intensive"]:not(.locked)');
-    if (lci) {
-      list.push({
-        id: 'intensive',
-        tab: 'products',
-        selector: '[data-product="life_change_intensive"]',
-        title: 'Book your Intensive sessions',
-        body: 'Your Nest tracks all 8. Book one at a time, then open the workbook before you meet Luke.',
-        tip: '» Tap Book your next session when you’re ready'
-      });
-    } else {
-      list.push({
-        id: 'book-with-luke',
-        tab: 'products',
-        selector: '#pane-products',
-        title: 'Book with Luke from here',
-        body: 'First Flight ($149), a single coaching session ($249), or enrol in the Life Change Intensive — all from My products.',
-        tip: '» Pick the card that fits'
-      });
-    }
-
-    var solo = document.querySelector('[data-product="solo_course"]:not(.locked)');
-    if (solo) {
-      list.push({
-        id: 'solo',
-        tab: 'products',
-        selector: '[data-product="solo_course"]',
-        title: 'Continue Solo here',
-        body: 'Your self-guided course progress shows on this card. Jump back in whenever you’re ready.',
-        tip: '» Continue from the Solo card'
-      });
-    }
+    ['life_change_intensive', 'nest_plus', 'lcs_workbook', 'solo_course'].forEach(function (key) {
+      var step = productStep(key, owns(key) ? 'owned' : 'locked');
+      if (step) list.push(step);
+    });
 
     list.push(
       {
@@ -106,7 +161,9 @@
         tab: 'profile',
         selector: '#tab-profile',
         title: 'My profile',
-        body: 'Your Inner Compass read (and Life Canvas once you’ve taken it) lives here — the wiring everything else builds on.',
+        body: owns('full_read')
+          ? 'Your full Inner Compass read and Life Canvas live here — the wiring everything else builds on.'
+          : 'Your Inner Compass lives here. Your two types are free; the full read and Nest unlock for $2 from your read.',
         tip: '» Complete or open Inner Compass from this tab'
       },
       {
@@ -138,6 +195,36 @@
     return list.filter(function (s) {
       return !!document.querySelector(s.selector);
     });
+  }
+
+  /** One-time steps for access gained since this browser last saw the Nest. */
+  function buildWhatsNewSteps(newKeys) {
+    var list = [];
+    newKeys.forEach(function (key) {
+      var step = productStep(key, 'owned');
+      if (step) {
+        step.title = 'New: ' + step.title;
+        list.push(step);
+      }
+    });
+    return list.filter(function (s) {
+      return !!document.querySelector(s.selector);
+    });
+  }
+
+  function readSeen() {
+    try {
+      var raw = localStorage.getItem(SEEN_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function writeSeen(list) {
+    try {
+      localStorage.setItem(SEEN_KEY, JSON.stringify(list));
+    } catch (e) { /* ignore */ }
   }
 
   function ensureDom() {
@@ -317,7 +404,8 @@
     opts = opts || {};
     if (running) return;
     ensureDom();
-    steps = buildSteps();
+    steps = opts.steps || buildSteps();
+    writeSeen(access().owned);
     if (!steps.length) return;
 
     running = true;
@@ -328,15 +416,40 @@
   }
 
   function maybeAutoStart() {
-    if (autoAttempted || running || isDone()) return;
+    if (running) return;
     var params = new URLSearchParams(window.location.search);
     if (params.get('tour') === '0') return;
+    if (isDone()) {
+      maybeWhatsNew();
+      return;
+    }
+    if (autoAttempted) return;
     autoAttempted = true;
     // slight delay so Nest UI finishes painting
     setTimeout(function () {
       if (!document.getElementById('view-dashboard') || !document.getElementById('view-dashboard').classList.contains('active')) return;
       if (isDone() || running) return;
       startTour({ auto: true });
+    }, 700);
+  }
+
+  function maybeWhatsNew() {
+    var seen = readSeen();
+    var owned = access().owned;
+    if (!seen) {
+      writeSeen(owned);
+      return;
+    }
+    var fresh = owned.filter(function (k) { return seen.indexOf(k) === -1 && PRODUCT_STEPS[k]; });
+    if (!fresh.length) {
+      if (owned.length !== seen.length) writeSeen(owned);
+      return;
+    }
+    setTimeout(function () {
+      if (running) return;
+      var list = buildWhatsNewSteps(fresh);
+      if (list.length) startTour({ steps: list });
+      else writeSeen(owned);
     }, 700);
   }
 

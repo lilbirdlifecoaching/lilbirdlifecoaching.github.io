@@ -1718,3 +1718,45 @@ footer, .site-footer {
     padding: 1rem 1.25rem 1.5rem;
   }
 }
+
+/* ─── Hero: one main CTA ─── */
+.hero-cta-note {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.hero-text-link {
+  flex-basis: 100%;
+  font-size: 0.92rem;
+  color: var(--text-accent-dim);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.hero-text-link:hover { color: var(--text-accent, var(--gold, #F5C842)); }
+
+/* ─── Two paths ─── */
+.pricing-grid.two-paths { grid-template-columns: repeat(2, 1fr); }
+.path-card-home { gap: 0.35rem; }
+.path-step {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-top: 0.65rem;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid var(--border-subtle, rgba(245, 200, 66, 0.14));
+  border-radius: 6px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.path-step:hover { border-color: var(--text-accent-dim); transform: translateY(-2px); }
+.path-step-name { font-weight: 500; color: var(--text-main); }
+.path-step-detail { font-size: 0.86rem; color: var(--text-muted); line-height: 1.5; }
+.path-step .pricing-go { padding-top: 0.4rem; }
+[data-theme="light"] .path-step { background: #fff; border-color: rgba(17, 17, 17, 0.12); }
+@media (max-width: 760px) {
+  .pricing-grid.two-paths { grid-template-columns: 1fr; }
+}

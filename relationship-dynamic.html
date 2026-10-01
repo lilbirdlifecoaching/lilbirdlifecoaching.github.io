@@ -438,6 +438,12 @@
     </div>
   </div>
 
+  <div class="dynamic-result" id="nest-plus-upsell" role="region" aria-live="polite">
+    <h2>The Relationship Dynamic is part of Nest Plus</h2>
+    <p>Nest Plus is a one-off $5 and also includes the First Flight workbook. It’s already included with any coaching, Solo or Intensive purchase.</p>
+    <p><a class="btn-primary" href="/nest/" style="display:inline-block;text-decoration:none;">Add Nest Plus in my Nest →</a></p>
+    <p class="card-hint">Already have it? <a href="/nest/">Log in to your Nest</a> and open the Relationship Dynamic from there.</p>
+  </div>
   <div class="dynamic-result" id="dynamic-result" role="region" aria-live="polite"></div>
   <p class="error-msg" id="error-msg" style="display:none;"></p>
 </main>
@@ -446,9 +452,33 @@
   <p>Powered by <a href="https://lilbird.life" target="_blank" rel="noopener">lil' bird</a> · <a href="https://lilbird.life/privacy.html" target="_blank" rel="noopener">Privacy</a> · <a href="https://lilbird.life/deep-profile.html" target="_blank" rel="noopener">Inner Compass</a></p>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 (function () {
   const WORKER_URL = 'https://lilbird-assessment.cwwq46sn7m.workers.dev';
+  const sb = window.supabase ? window.supabase.createClient(
+    'https://mebqqzbuwkogdxvnihrq.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU',
+    { auth: { storageKey: 'lilbird-solo-auth', autoRefreshToken: true, persistSession: true, detectSessionInUrl: false } }
+  ) : null;
+  async function authHeaders() {
+    if (!sb) return {};
+    try {
+      const { data } = await sb.auth.getSession();
+      const token = data && data.session && data.session.access_token;
+      return token ? { Authorization: 'Bearer ' + token } : {};
+    } catch (_) {
+      return {};
+    }
+  }
+  const upsellEl = document.getElementById('nest-plus-upsell');
+  function showUpsell() {
+    errorEl.style.display = 'none';
+    resultEl.classList.remove('visible');
+    upsellEl.classList.add('visible');
+    upsellEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    notifyResize();
+  }
   const params = new URLSearchParams(window.location.search);
   const isEmbed = params.get('embed') === '1' || params.get('embed') === 'true';
   if (isEmbed) document.body.classList.add('embed');
@@ -526,7 +556,7 @@
   async function loadNest(id) {
     if (!id) return false;
     try {
-      const r = await fetch(WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(id));
+      const r = await fetch(WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(id), { headers: await authHeaders() });
       if (!r.ok) return false;
       const data = await r.json();
       if (!data.profile) return false;
@@ -601,15 +631,21 @@
     }
 
     setLoading(true);
+    upsellEl.classList.remove('visible');
     try {
       const r = await fetch(WORKER_URL + '/partner-dynamic', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: Object.assign({ 'Content-Type': 'application/json' }, await authHeaders()),
         body: JSON.stringify({
+          nestId: useManualProfile ? undefined : nestId,
           userProfile: profile,
           partnerInput: { relationship: rel, types, description: desc }
         })
       });
+      if (r.status === 403) {
+        showUpsell();
+        return;
+      }
       if (!r.ok) throw new Error('request failed');
       const dynamic = await r.json();
       if (dynamic.error) throw new Error(dynamic.error);

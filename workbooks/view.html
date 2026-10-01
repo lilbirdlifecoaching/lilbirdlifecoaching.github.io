@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Your workbook — lil' bird</title>
+<style>
+  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #1e2028; color: #f0ece4; font-family: Georgia, serif; }
+  .card { max-width: 460px; margin: 2rem 1.25rem; padding: 2rem; background: #2a2d38; border: 1px solid rgba(245,200,66,0.2); border-radius: 14px; text-align: center; }
+  h1 { margin: 0 0 0.75rem; font-size: 1.4rem; font-weight: 400; font-style: italic; color: #F5C842; }
+  p { margin: 0 0 1.25rem; line-height: 1.7; color: rgba(240,236,228,0.85); }
+  a.btn { display: inline-block; margin: 0.25rem; padding: 0.75rem 1.4rem; border-radius: 100px; background: #F5C842; color: #1e2028; text-decoration: none; font-family: monospace; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; }
+  a.btn.ghost { background: transparent; color: #F5C842; border: 1px solid rgba(245,200,66,0.4); }
+</style>
+</head>
+<body>
+<div class="card" id="state">
+  <h1>Opening your workbook…</h1>
+  <p>One moment.</p>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+(async function () {
+  const SUPABASE_URL = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
+  const SOLO_WORKER_URL = 'https://worker-solo.cwwq46sn7m.workers.dev';
+  const WORKBOOKS = {
+    'first-flight': { name: 'First Flight workbook', locked: 'The First Flight workbook comes with Nest Plus ($5), or with any coaching, Solo or Intensive purchase.' },
+    'life-change': { name: 'Life Change Sessions workbook', locked: 'The complete Life Change Sessions workbook is $27, and is included with the Life Change Intensive.' }
+  };
+
+  const state = document.getElementById('state');
+  function show(title, body, buttons) {
+    state.innerHTML = '';
+    const h = document.createElement('h1'); h.textContent = title; state.appendChild(h);
+    const p = document.createElement('p'); p.textContent = body; state.appendChild(p);
+    (buttons || []).forEach(function (b) {
+      const a = document.createElement('a');
+      a.className = 'btn' + (b.ghost ? ' ghost' : '');
+      a.href = b.href; a.textContent = b.label;
+      state.appendChild(a);
+    });
+  }
+
+  const key = new URLSearchParams(location.search).get('w');
+  const wb = WORKBOOKS[key];
+  if (!wb) { show('Workbook not found', 'That link does not point to a workbook.', [{ label: 'Open my Nest', href: '/nest/' }]); return; }
+
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+    auth: { storageKey: 'lilbird-solo-auth', autoRefreshToken: true, persistSession: true, detectSessionInUrl: false }
+  });
+  const { data } = await sb.auth.getSession();
+  const token = data && data.session && data.session.access_token;
+  if (!token) {
+    show('Log in to open your ' + wb.name, 'Your workbook lives in your Nest. Log in, then open it again from there.', [{ label: 'Log in to my Nest', href: '/nest/' }]);
+    return;
+  }
+
+  try {
+    const res = await fetch(SOLO_WORKER_URL + '/workbook-content', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body: JSON.stringify({ w: key })
+    });
+    if (res.status === 401) { show('Log in again', 'Your session has expired. Log in to your Nest, then open the workbook again.', [{ label: 'Log in to my Nest', href: '/nest/' }]); return; }
+    if (res.status === 403) { show(wb.name + ' is locked', wb.locked, [{ label: 'Unlock it in my Nest', href: '/nest/#unlock' }]); return; }
+    const out = await res.json();
+    if (!res.ok || !out.html) throw new Error('load failed');
+    document.open();
+    document.write(out.html);
+    document.close();
+  } catch (e) {
+    show('Something went wrong', 'The workbook could not load just now. Please try again in a moment.', [{ label: 'Try again', href: location.href }, { label: 'Open my Nest', href: '/nest/', ghost: true }]);
+  }
+})();
+</script>
+</body>
+</html>

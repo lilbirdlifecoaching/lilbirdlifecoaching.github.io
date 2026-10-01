@@ -28,6 +28,16 @@
   let courseProfile = null;
   let sessionProgress = [];
   let deepProfile = null;
+  let deepReadPaid = false;
+
+  // Server enforces all of this; the Nest only uses it to label cards.
+  const NEST_PLUS_SOURCES = [
+    ['life_change_intensive', 'Included with your Intensive'],
+    ['coaching', 'Included with your coaching'],
+    ['solo_course', 'Included with Solo'],
+    ['first_flight', 'Included with First Flight'],
+    ['nest_plus', 'Nest Plus']
+  ];
   let deepNestId = null;
   let intensiveEnrolment = null;
   let lciSessions = [];
@@ -442,13 +452,17 @@
       }
 
       deepProfile = null;
+      deepReadPaid = false;
 
       if (deepNestId) {
         try {
-          const res = await fetch(ASSESSMENT_WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(deepNestId));
+          const res = await fetch(ASSESSMENT_WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(deepNestId), {
+            headers: await authHeaders()
+          });
           if (res.ok) {
             const payload = await res.json();
             deepProfile = parseAssessmentProfile(payload);
+            deepReadPaid = payload?.paid === true;
           }
         } catch (e) {
           console.error('Could not load deep profile:', e);
@@ -464,6 +478,7 @@
       renderProducts();
       renderProfile();
       renderSidebar();
+      window.__nestAccess = nestAccessSummary();
       if (window.LilBirdNestTour) {
         window.LilBirdNestTour.bindReplayButton();
         const forceTour = new URLSearchParams(window.location.search).get('tour') === '1';
@@ -473,6 +488,8 @@
           window.LilBirdNestTour.maybeAutoStart();
         }
       }
+      void handlePurchaseReturn();
+    } catch (err) {
       console.error('Nest hydrateDashboard:', err);
       if (token === dashboardHydrateToken) {
         setDashError('Could not load your Nest. Please refresh the page or try again.');
@@ -480,6 +497,113 @@
     } finally {
       if (token === dashboardHydrateToken) setDashLoading(false);
     }
+  }
+
+  async function authHeaders() {
+    try {
+      const { data } = await sb.auth.getSession();
+      const token = data?.session?.access_token;
+      return token ? { Authorization: 'Bearer ' + token } : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function nestPlusSource() {
+    if (hasSoloCourseAccess() && !entitlements.has('life_change_intensive') && !entitlements.has('coaching')) {
+      return 'Included with Solo';
+    }
+    const hit = NEST_PLUS_SOURCES.find(([key]) => entitlements.has(key));
+    return hit ? hit[1] : '';
+  }
+
+  function hasNestPlus() {
+    return !!nestPlusSource();
+  }
+
+  function workbookSource() {
+    if (entitlements.has('life_change_intensive')) return 'Included with your Intensive';
+    if (entitlements.has('lcs_workbook')) return 'Yours to keep';
+    return '';
+  }
+
+  function hasWorkbookAccess() {
+    return !!workbookSource();
+  }
+
+  function planInfo() {
+    if (entitlements.has('life_change_intensive')) {
+      return { name: 'Intensive', note: 'Your Intensive includes everything in your Nest.' };
+    }
+    if (hasNestPlus()) {
+      const src = nestPlusSource();
+      return { name: 'Nest Plus', note: src === 'Nest Plus' ? 'Relationship Dynamic and the First Flight workbook are unlocked.' : src + '.' };
+    }
+    return { name: 'Nest', note: 'Your read, Life Canvas and Ask lil’ bird. Add Nest Plus for $5 to unlock the Relationship Dynamic and First Flight workbook.' };
+  }
+
+  function nestAccessSummary() {
+    const owned = [];
+    if (deepReadPaid) owned.push('full_read');
+    if (hasNestPlus()) owned.push('nest_plus');
+    if (hasWorkbookAccess()) owned.push('lcs_workbook');
+    if (hasSoloCourseAccess()) owned.push('solo_course');
+    if (entitlements.has('first_flight')) owned.push('first_flight');
+    if (entitlements.has('life_change_intensive')) owned.push('life_change_intensive');
+    return { owned, plan: planInfo().name, nestPlusSource: nestPlusSource(), workbookSource: workbookSource() };
+  }
+
+  async function startUpgrade(item, btn) {
+    const original = btn ? btn.textContent : '';
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Opening secure checkout…';
+    }
+    setDashError('');
+    try {
+      const res = await fetch(SOLO_WORKER_URL + '/nest-upgrade-checkout', {
+        method: 'POST',
+        headers: Object.assign({ 'Content-Type': 'application/json' }, await authHeaders()),
+        body: JSON.stringify({ item })
+      });
+      const out = await res.json().catch(() => ({}));
+      if (out.url) {
+        window.location.href = out.url;
+        return;
+      }
+      if (out.already_owned) {
+        await hydrateDashboard();
+        return;
+      }
+      setDashError(res.status === 401 ? 'Please log in again, then try once more.' : 'Checkout could not open just now. Please try again in a moment.');
+    } catch (e) {
+      console.error('startUpgrade:', e);
+      setDashError('Checkout could not open just now. Please try again in a moment.');
+    }
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = original;
+    }
+  }
+
+  let purchasePolls = 0;
+  async function handlePurchaseReturn() {
+    const params = new URLSearchParams(window.location.search);
+    const item = params.get('purchase');
+    if (item !== 'nest_plus' && item !== 'lcs_workbook') return;
+    const unlocked = item === 'nest_plus' ? hasNestPlus() : hasWorkbookAccess();
+    if (unlocked || purchasePolls >= 8) {
+      params.delete('purchase');
+      const qs = params.toString();
+      window.history.replaceState(null, '', window.location.pathname + (qs ? '?' + qs : '') + window.location.hash);
+      if (!unlocked) {
+        setDashError('Payment received — your unlock is still on its way. Refresh in a minute, or email hello@lilbird.life if it does not appear.');
+      }
+      return;
+    }
+    purchasePolls += 1;
+    setDashError('Payment received — unlocking now…');
+    setTimeout(() => void hydrateDashboard(), 2500);
   }
 
   /** Solo unlock: Nest entitlement row and/or legacy course_users purchase (same Supabase login). */
@@ -580,7 +704,7 @@
       <div class="btn-row">
         ${bookingAction}
         ${syncButton}
-        <a class="btn btn-outline" href="${workbookHref('roots-and-wings-workbook.html')}">Open workbook</a>
+        <a class="btn btn-outline" href="${workbookHref('life-change')}">Open workbook</a>
       </div>`;
   }
 
@@ -652,7 +776,7 @@
           ? 'Inner Compass completed'
           : hasInner
             ? 'Take your Inner Compass assessment'
-            : 'Unlock Inner Compass in your Nest'
+            : 'Take your free Inner Compass'
       });
       steps.push({
         done: hasFirstFlight,
@@ -709,7 +833,8 @@
 
   async function fetchAssessmentProfile(nestId) {
     const res = await fetch(
-      ASSESSMENT_WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(nestId)
+      ASSESSMENT_WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(nestId),
+      { headers: await authHeaders() }
     );
     if (!res.ok) return null;
     const payload = await res.json();
@@ -746,8 +871,8 @@
       const { error } = await sb.rpc('link_deep_profile_to_user', { p_nest_id: nestId });
       if (error) {
         setDashError(
-          error.message.includes('function') || error.code === 'PGRST202'
-            ? 'Database not ready — run nest/link-inner-compass-grant-on-link.sql in Supabase, then try again.'
+          error.message.includes('another account')
+            ? 'That read is already connected to a different Nest account.'
             : 'Could not save the link. Try again or email hello@lilbird.life.'
         );
         return;
@@ -755,9 +880,6 @@
 
       deepNestId = nestId;
       deepProfile = profile;
-      if (!entitlements.has('inner_compass')) {
-        entitlements.add('inner_compass');
-      }
 
       await hydrateDashboard();
       if (hasInnerCompassComplete()) {
@@ -779,7 +901,7 @@
   }
 
   function hasInnerCompassAccess() {
-    return entitlements.has('inner_compass') || !!deepNestId || hasInnerCompassComplete();
+    return entitlements.has('inner_compass') || hasInnerCompassComplete();
   }
 
   function hasInnerCompassComplete() {
@@ -853,12 +975,12 @@
         <h3 class="ic-snap-headline">${escapeHtml(snap.headline)}</h3>
         ${blurbHtml}
         ${typesHtml}
-        <span class="ic-snap-cta">Open your full read →</span>
+        <span class="ic-snap-cta">${deepReadPaid ? 'Open your full read →' : 'Open your read · unlock the full read for $2 →'}</span>
       </a>`;
   }
 
-  function workbookHref(filename) {
-    return '/workbooks/' + filename + '?from=nest';
+  function workbookHref(key) {
+    return '/workbooks/view.html?w=' + key;
   }
 
   function progressSummary() {
@@ -902,13 +1024,61 @@
           </article>`;
       }
       return `
-        <article class="product-card locked" data-product="inner_compass">
-          <span class="lock-pill"><i class="ti ti-lock"></i> not yet unlocked</span>
+        <article class="product-card" data-product="inner_compass">
           <p class="eyebrow">assessment</p>
           <h3>Inner Compass read</h3>
-          <p>Understand your wiring. The foundation everything else builds on.</p>
+          <span class="status-badge pending">free · about 15 minutes</span>
+          <p>Understand your wiring. The foundation everything else builds on. Your two types are free; the full read is $2.</p>
           ${connectBlock}
           <div class="btn-row"><a class="btn btn-ember" href="/deep-profile.html?from=nest">Take the Inner Compass →</a></div>
+        </article>`;
+    }
+
+    if (key === 'nest_plus') {
+      const src = nestPlusSource();
+      if (src) {
+        const readLink = deepNestId ? '/relationship-dynamic.html?nest=' + encodeURIComponent(deepNestId) + '&from=nest' : '/relationship-dynamic.html?from=nest';
+        return `
+          <article class="product-card" data-product="nest_plus">
+            <p class="eyebrow">nest plus</p>
+            <h3>Relationship Dynamic + First Flight workbook</h3>
+            <span class="status-badge">${escapeHtml(src)}</span>
+            <p>See how you and someone close to you fit together, and work through the First Flight workbook at your own pace.</p>
+            <div class="btn-row">
+              <a class="btn btn-gold" href="${escapeHtml(readLink)}">Relationship Dynamic →</a>
+              <a class="btn btn-outline" href="${workbookHref('first-flight')}">First Flight workbook</a>
+            </div>
+          </article>`;
+      }
+      return `
+        <article class="product-card locked" data-product="nest_plus">
+          <span class="lock-pill"><i class="ti ti-lock"></i> Add Nest Plus, $5</span>
+          <p class="eyebrow">nest plus</p>
+          <h3>Relationship Dynamic + First Flight workbook</h3>
+          <p>Compare your wiring with a partner, friend or family member, and get the First Flight workbook. One-off $5, yours to keep. Included with any coaching, Solo or Intensive purchase.</p>
+          <div class="btn-row"><button type="button" class="btn btn-ember" data-upgrade="nest_plus">Add Nest Plus — $5 →</button></div>
+        </article>`;
+    }
+
+    if (key === 'lcs_workbook') {
+      const src = workbookSource();
+      if (src) {
+        return `
+          <article class="product-card" data-product="lcs_workbook">
+            <p class="eyebrow">workbook</p>
+            <h3>Life Change Sessions workbook</h3>
+            <span class="status-badge">${escapeHtml(src)}</span>
+            <p>All eight sessions in one interactive workbook. Answers save privately on this device; use Download as PDF to keep a copy.</p>
+            <div class="btn-row"><a class="btn btn-gold" href="${workbookHref('life-change')}">Open workbook →</a></div>
+          </article>`;
+      }
+      return `
+        <article class="product-card locked" data-product="lcs_workbook">
+          <span class="lock-pill"><i class="ti ti-lock"></i> $27</span>
+          <p class="eyebrow">workbook</p>
+          <h3>Life Change Sessions workbook</h3>
+          <p>The complete eight-session workbook to work through on your own, online or as a PDF. Included with the Life Change Intensive.</p>
+          <div class="btn-row"><button type="button" class="btn btn-ember" data-upgrade="lcs_workbook">Get the workbook — $27 →</button></div>
         </article>`;
     }
 
@@ -921,7 +1091,7 @@
             <span class="status-badge">booked</span>
             <p>Fill in your workbook before your session. It saves privately to your device.</p>
             <div class="btn-row">
-              <a class="btn btn-gold" href="${workbookHref('first-flight-standalone.html')}">Open workbook</a>
+              <a class="btn btn-gold" href="${workbookHref('first-flight')}">Open workbook</a>
               <a class="btn btn-outline" href="https://cal.com/luke-haythorpe/first-flight-intro-session" target="_blank" rel="noopener">View booking</a>
             </div>
           </article>`;
@@ -1014,8 +1184,16 @@
 
   function renderProducts() {
     const productsPane = document.getElementById('pane-products');
+    const plan = planInfo();
     productsPane.innerHTML = `<div class="product-grid">
+      <div class="plan-badge" data-plan="${escapeHtml(plan.name)}">
+        <span class="plan-badge-label">Your plan</span>
+        <strong class="plan-badge-name">${escapeHtml(plan.name)}</strong>
+        <span class="plan-badge-note">${escapeHtml(plan.note)}</span>
+      </div>
       ${cardProduct('inner_compass')}
+      ${cardProduct('nest_plus')}
+      ${cardProduct('lcs_workbook')}
       ${cardProduct('first_flight')}
       ${cardProduct('coaching')}
       ${cardProduct('solo_course')}
@@ -1023,6 +1201,9 @@
     </div>`;
     productsPane.querySelectorAll('[data-open-ask]').forEach((btn) => {
       btn.addEventListener('click', () => setTab('ask'));
+    });
+    productsPane.querySelectorAll('[data-upgrade]').forEach((btn) => {
+      btn.addEventListener('click', () => void startUpgrade(btn.dataset.upgrade, btn));
     });
     const claimBtn = productsPane.querySelector('#btn-lci-claim');
     if (claimBtn) {
@@ -1321,7 +1502,7 @@
           <h4>Book your next session</h4>
           <p>${stats.remaining} of ${stats.total} sessions remaining. Book one at a time from your Intensive card.</p>
           <a class="btn btn-ember full" href="${escapeHtml(LCI_BOOKING_URL)}" target="_blank" rel="noopener">Book next session →</a>
-          <a class="btn btn-outline full" href="${workbookHref('roots-and-wings-workbook.html')}">Open workbook</a>`;
+          <a class="btn btn-outline full" href="${workbookHref('life-change')}">Open workbook</a>`;
         return;
       }
       if (stats.hasRows && stats.allBooked) {
@@ -1346,7 +1527,7 @@
         <p class="sidebar-eyebrow">session context</p>
         <h4>First Flight booked</h4>
         <p>Confirm from your booking email and complete your workbook first.</p>
-        <a class="btn btn-outline full" href="${workbookHref('first-flight-standalone.html')}">Open workbook</a>
+        <a class="btn btn-outline full" href="${workbookHref('first-flight')}">Open workbook</a>
         <a class="btn btn-outline full" href="https://cal.com/luke-haythorpe/first-flight-intro-session" target="_blank" rel="noopener">View booking</a>`;
       return;
     }
