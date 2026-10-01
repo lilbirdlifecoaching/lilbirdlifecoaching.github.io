@@ -5,7 +5,8 @@
   const ASSESSMENT_WORKER_URL = 'https://lilbird-assessment.cwwq46sn7m.workers.dev';
   // Optional secure endpoint for sending a Resend "Your Nest is ready" email.
   // Leave empty unless you have a backend endpoint configured.
-  const NEST_WELCOME_EMAIL_ENDPOINT = 'https://worker-solo.cwwq46sn7m.workers.dev/nest-welcome-email';
+  const SOLO_WORKER_URL = 'https://worker-solo.cwwq46sn7m.workers.dev';
+  const NEST_WELCOME_EMAIL_ENDPOINT = SOLO_WORKER_URL + '/nest-welcome-email';
   const LCI_BOOKING_URL = 'https://cal.com/luke-haythorpe/life-change-session';
   const CHILDHOOD_PHOTO_BUCKET = 'childhood-photos';
   const CHILDHOOD_PHOTO_MAX_BYTES = 10 * 1024 * 1024;
@@ -353,19 +354,20 @@
     }
   });
 
-  async function sendNestWelcomeEmail(email, name, userId) {
+  async function workerAuthHeaders() {
+    const headers = { 'Content-Type': 'application/json' };
+    const { data: { session } } = await sb.auth.getSession();
+    if (session?.access_token) headers.Authorization = 'Bearer ' + session.access_token;
+    return headers;
+  }
+
+  async function sendNestWelcomeEmail(email, name) {
     if (!NEST_WELCOME_EMAIL_ENDPOINT) return;
     try {
       await fetch(NEST_WELCOME_EMAIL_ENDPOINT, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          name,
-          user_id: userId || undefined,
-          subject: 'Your Nest is ready',
-          steps: ['Log in', 'See your products', 'Complete next steps']
-        })
+        headers: await workerAuthHeaders(),
+        body: JSON.stringify({ name })
       });
     } catch (e) {
       console.error('Nest welcome email failed:', e);
@@ -1106,6 +1108,18 @@
       );
     } catch (e) {
       console.warn('tool_outputs childhood_photo mirror:', e);
+    }
+
+    if (hasSoloCourseAccess()) {
+      try {
+        await fetch(SOLO_WORKER_URL + '/notify-illustrator', {
+          method: 'POST',
+          headers: await workerAuthHeaders(),
+          body: JSON.stringify({ photo_url: photoUrl })
+        });
+      } catch (e) {
+        console.warn('notify-illustrator:', e);
+      }
     }
 
     courseProfile = { ...(courseProfile || {}), childhood_photo_url: photoUrl };
