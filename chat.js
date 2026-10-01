@@ -5,7 +5,7 @@
   var WORKER = 'https://lilbird-chat.cwwq46sn7m.workers.dev/';
   var FF_URL = 'https://lilbird.life/first-flight/book.html?code=IMREADY';
   var LCS_URL = 'https://lilbird.life/intensive/enrol.html';
-  var DISC_URL = 'https://calendly.com/lilbirdlifecoaching/30min';
+  var DISC_URL = 'https://cal.com/luke-haythorpe/30min';
 
   if (!window.lbChatSafe) {
     (function (w) {
@@ -215,12 +215,15 @@
 
   // ── Calendly overlay ────────────────────────────────────────────
   function openCal(url, isFF) {
-    if (!Safe.isAllowedCalendlyUrl(url)) return;
+    var isCal = Safe.isAllowedCalUrl(url);
+    if (!isCal && !Safe.isAllowedCalendlyUrl(url)) return;
     if (isFF && window.LbFirstFlight && window.LbFirstFlight.openModal) {
       window.LbFirstFlight.openModal();
       return;
     }
-    var themed = url + (url.includes('?') ? '&' : '?') + 'hide_event_type_details=1&hide_gdpr_banner=1&background_color=1e2028&text_color=f0ead8&primary_color=F5C842';
+    var themed = isCal
+      ? url.split('?')[0].replace(/\/$/, '') + '?theme=dark'
+      : url + (url.includes('?') ? '&' : '?') + 'hide_event_type_details=1&hide_gdpr_banner=1&background_color=1e2028&text_color=f0ead8&primary_color=F5C842';
     calFrame.src = themed;
     var title = document.querySelector('.lb-cal-title');
     var disc = document.querySelector('.lb-cal-disc');
@@ -252,7 +255,7 @@
       return;
     }
     var t = e.target.closest('[data-cal-url]');
-    if (t) { e.preventDefault(); var cu = t.getAttribute('data-cal-url'); if (!cu || !Safe.isAllowedCalendlyUrl(cu)) return; openCal(cu, t.getAttribute('data-ff') === '1'); return; }
+    if (t) { e.preventDefault(); var cu = t.getAttribute('data-cal-url'); if (!cu || !(Safe.isAllowedCalendlyUrl(cu) || Safe.isAllowedCalUrl(cu))) return; openCal(cu, t.getAttribute('data-ff') === '1'); return; }
     // Also catch plain calendly links
     var a = e.target.closest('a');
     if (a && a.href && a.href.includes('calendly.com')) {
@@ -321,7 +324,8 @@
     // Convert any calendly links in AI response to in-app buttons
     var processed = text
       .replace(/href="(https:\/\/calendly\.com\/[^"]+first-flight[^"]*)"/g, 'data-cal-url="$1" data-ff="1" href="#"')
-      .replace(/href="(https:\/\/calendly\.com\/[^"]+30min[^"]*)"/g, 'data-cal-url="$1" data-ff="0" href="#"')
+      .replace(/href="(https:\/\/calendly\.com\/[^"]+30min[^"]*)"/g, 'data-cal-url="https://cal.com/luke-haythorpe/30min" data-ff="0" href="#"')
+      .replace(/href="(https:\/\/cal\.com\/luke-haythorpe\/30min[^"]*)"/g, 'data-cal-url="$1" data-ff="0" href="#"')
       .replace(/href="(https:\/\/calendly\.com\/[^"]+coaching[^"]*)"/g, 'data-cal-url="$1" data-ff="0" href="#"')
       .replace(/href="(https:\/\/calendly\.com\/[^"]+packages[^"]*)"/g, 'data-cal-url="$1" data-ff="0" href="#"');
 
