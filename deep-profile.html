@@ -60,7 +60,6 @@
 <!-- Fonts load non-blocking so they don't delay first paint -->
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"></noscript>
-<!-- Stripe loaded on demand when pay screen opens, not on page load -->
 <style>
   :root {
     --gold: #F5C842;
@@ -2849,64 +2848,6 @@
 
 
 <!-- ══════════════════════════════════════
-     PAYMENT
-══════════════════════════════════════ -->
-<div class="screen" id="screen-pay">
-  <div class="inner">
-    <p class="eyebrow">unlock your nest</p>
-    <h2>Pay what<br><em>feels right.</em></h2>
-    <p class="pay-intro">Your full Inner Compass read, saved in your Nest, with a link you can return to. Pay what feels honest for the unlock.</p>
-
-    <div class="pay-amounts">
-      <button class="pay-btn" onclick="selectAmount(5,this)">$5<span>just getting started</span></button>
-      <button class="pay-btn selected" onclick="selectAmount(12,this)">$12<span>feels fair</span></button>
-      <button class="pay-btn" onclick="selectAmount(25,this)">$25<span>pay it forward</span></button>
-    </div>
-
-    <div class="offer-codes">
-      <p class="offer-codes-title">🎁 your discount codes — save these</p>
-      <div class="offer-item">
-        <span class="offer-code">IMREADY</span>
-        <p class="offer-desc">Fixed price $149 for your first <a href="/first-flight/book.html?code=IMREADY" target="_blank">First Flight coaching session →</a></p>
-      </div>
-      <div class="offer-item">
-        <span class="offer-code">SOLO50</span>
-        <p class="offer-desc">50% off <a href="https://lilbird.life/solo/" target="_blank" rel="noopener">Life Change Sessions: Solo →</a> — our self-guided course (now live)</p>
-      </div>
-      <p class="offer-note">These codes are yours — no expiry, no pressure. Use them whenever you're ready.</p>
-    </div>
-
-    <!-- Email for profile delivery -->
-    <div style="margin-bottom:1.25rem;">
-      <p style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:0.5rem;">Send my Nest link to</p>
-      <input type="email" id="pay-email" placeholder="your@email.com" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(245,200,66,0.2);border-radius:6px;color:var(--text-main);font-family:'DM Sans',sans-serif;font-size:0.95rem;padding:0.7rem 1rem;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(245,200,66,0.2)'">
-      <p style="font-size:0.78rem;color:var(--text-muted);opacity:0.7;margin-top:0.4rem;">We'll email you your Nest link so you can always find your way back.</p>
-    </div>
-
-    <!-- Promo code -->
-    <div style="margin-bottom:1.25rem;">
-      <p style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:0.5rem;">Have a promo code?</p>
-      <div style="display:flex;gap:0.75rem;">
-        <input type="text" id="promo-code" placeholder="Enter code" style="flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(245,200,66,0.15);border-radius:6px;color:var(--text-main);font-family:'DM Mono',monospace;font-size:0.85rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.65rem 1rem;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(245,200,66,0.15)'" oninput="this.value=this.value.toUpperCase()">
-        <button class="btn btn-outline" onclick="applyPromo()" style="white-space:nowrap;padding:0.65rem 1.25rem;">Apply</button>
-      </div>
-      <p id="promo-msg" style="font-size:0.82rem;margin-top:0.5rem;display:none;"></p>
-    </div>
-
-    <div class="stripe-wrap" id="stripe-wrap-el">
-      <div id="card-element"></div>
-      <div id="card-errors"></div>
-    </div>
-
-    <button class="btn btn-gold" id="payButton" onclick="processPayment()">Unlock my full read →</button>
-    <div id="payProcessing"><span>🐦</span><span>Processing payment…</span></div>
-    <div id="payError"></div>
-    <p class="pay-reassure">Secured by Stripe · My bias is you — if something goes wrong, email hello@lilbird.life</p>
-  </div>
-</div>
-
-
-<!-- ══════════════════════════════════════
      RESULTS — THE NEST DASHBOARD
 ══════════════════════════════════════ -->
 <div class="screen" id="screen-results">
@@ -2917,7 +2858,7 @@
       <p class="eyebrow">your saved read</p>
       <p id="results-email-note" style="display:none;font-size:0.88rem;color:var(--text-muted);margin:0 0 1rem;line-height:1.5;"></p>
       <div class="result-hero-landing">
-        <h1 id="result-archetype" style="margin-bottom:0.25rem;">The Connector</h1>
+        <h1 id="result-archetype" style="margin-bottom:0.25rem;"></h1>
         <p id="result-archetype-sub" style="color:var(--gold-dim);font-family:'Playfair Display',serif;font-style:italic;font-size:1.05rem;margin-bottom:0.35rem;"></p>
         <p id="result-archetype-plain-desc" class="result-archetype-plain-desc" style="display:none;"></p>
       </div>
@@ -3071,7 +3012,7 @@
           </div>
           <div class="partner-input">
             <label class="partner-label">Their personality types (if you know them)</label>
-            <input type="text" id="partner-types" placeholder="e.g. INFJ, Enneagram 9, Nurturer — anything you know">
+            <input type="text" id="partner-types" placeholder="e.g. INFJ, Enneagram 9 — anything you know">
           </div>
           <div class="partner-input">
             <label class="partner-label">Describe them in a few words</label>
@@ -3242,12 +3183,7 @@
 // ═══════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════
-const DEEP_PROFILE_BUILD = 'v7.5.1-20260812-maintenance-hardening';
-/** Default: email unlock for ads/lead gen. Add ?paywall=1 to URL to restore pay-what-you-want flow. */
-const INNER_COMPASS_PAYWALL = (function(){
-  try{ return new URLSearchParams(window.location.search).get('paywall') === '1'; }catch(_){ return false; }
-})();
-const INNER_COMPASS_LEADGEN = !INNER_COMPASS_PAYWALL;
+const DEEP_PROFILE_BUILD = 'v7.6.0-20261001-security-pass';
 const WORKER_URL     = 'https://lilbird-assessment.cwwq46sn7m.workers.dev';
 const SUPABASE_URL   = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
 const SUPABASE_ANON  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
@@ -3323,7 +3259,6 @@ async function _postCourseLink(nestIdToLink){
   }
   console.warn('Course link gave up after', maxAttempts, 'attempts — user can complete in-course manually.');
 }
-const STRIPE_PK      = 'pk_live_51QSMYQGAu36WZ7DdlsoNqzwPnsf4HUoOj6F1NZAeGnnH1TPjDEdEQudXIGgTLaUq079aQMI1W2MS6UpMItmTjgxy00HbouBx2g';
 const SHEETS_URL     = 'https://script.google.com/macros/s/AKfycbwPoMHcmTKO8JiDt8VS4fVsvGKqw-CQGLktQKImKeUPsfqX7WhH1IJCsG2M2fF7lyL6/exec';
 const BEEHIIV_PUB_ID = 'pub_53a4cafc-9b30-41d5-bd5e-4dc0026b4308';
 // RESEND_API_KEY is stored as a Cloudflare Worker env var (never in frontend code)
@@ -3331,9 +3266,6 @@ const BEEHIIV_PUB_ID = 'pub_53a4cafc-9b30-41d5-bd5e-4dc0026b4308';
 // ═══════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════
-let selectedAmount = 12;
-let stripeInstance = null;
-let cardElement    = null;
 let nestId         = null;
 let hasRetake      = false;
 let hasPaid        = false;
@@ -3345,7 +3277,7 @@ const PROGRESS = {
   'screen-chat':5,
   'screen-canvas':95,
   'screen-preview':98,
-  'screen-landing':99,'screen-snapshot':100,'screen-pay':100,'screen-results':100,
+  'screen-landing':99,'screen-snapshot':100,'screen-results':100,
 };
 
 // ═══════════════════════════════════════
@@ -3369,52 +3301,15 @@ const PROGRESS = {
 // NAVIGATION
 // ═══════════════════════════════════════
 function goTo(screenId){
-  if(screenId==='screen-pay' && INNER_COMPASS_LEADGEN && userEmail){
-    unlockFullRead();
-    return;
-  }
   if(typeof stopMic === 'function' && activeRecognitionId) stopMic();
   document.body.classList.toggle('dp-in-chat', screenId === 'screen-chat');
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   const t = document.getElementById(screenId);
   if(t){ t.classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }
   document.getElementById('progressBar').style.width=(PROGRESS[screenId]??0)+'%';
-  if(screenId==='screen-pay' && !stripeInstance) initStripe();
-  if(screenId==='screen-pay') prefillPayEmail();
   if(screenId==='screen-preview') runPreview();
   if(screenId==='screen-landing') runAnalysis();
   if(screenId==='screen-snapshot' && profileData) populateGateHook(profileData);
-}
-
-function prefillPayEmail(){
-  const payEmailEl  = document.getElementById('pay-email');
-  const payEmailWrap = payEmailEl?.closest('div');
-  if(!payEmailEl) return;
-
-  if(userEmail){
-    // Already have their email — pre-fill and show a confirmed state
-    payEmailEl.value = userEmail;
-    // Replace the whole email section with a simple confirmation line
-    if(payEmailWrap){
-      payEmailWrap.innerHTML = `
-        <p style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:0.35rem;">Profile will be sent to</p>
-        <p style="font-size:0.95rem;color:var(--gold);margin:0;">✓ ${userEmail} <span style="font-size:0.78rem;color:var(--text-muted);cursor:pointer;" onclick="resetPayEmail(this)">&nbsp;change</span></p>
-        <input type="hidden" id="pay-email" value="${userEmail}">
-      `;
-    }
-  }
-}
-
-function resetPayEmail(el){
-  // Allow them to change their email if needed
-  const wrap = el?.closest('div');
-  if(wrap){
-    wrap.innerHTML = `
-      <p style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:0.5rem;">Send my Nest link to</p>
-      <input type="email" id="pay-email" value="${userEmail}" placeholder="your@email.com" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(245,200,66,0.2);border-radius:6px;color:var(--text-main);font-family:'DM Sans',sans-serif;font-size:0.95rem;padding:0.7rem 1rem;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(245,200,66,0.2)'">
-      <p style="font-size:0.78rem;color:var(--text-muted);opacity:0.7;margin-top:0.4rem;">We'll email you your Nest link so you can always find your way back.</p>
-    `;
-  }
 }
 
 function reflectAndGo(next, inputId, pillId){
@@ -3429,179 +3324,6 @@ function reflectAndGo(next, inputId, pillId){
 
 function finishJourney(){
   goTo('screen-canvas');
-}
-
-// ═══════════════════════════════════════
-// PAYMENT
-// ═══════════════════════════════════════
-function selectAmount(amount, el){
-  selectedAmount = amount;
-  document.querySelectorAll('.pay-btn').forEach(b=>b.classList.remove('selected'));
-  el.classList.add('selected');
-  // Recalculate promo if one is applied
-  if(promoApplied) applyPromo();
-}
-
-// ── PROMO CODE SYSTEM ────────────────────────────────────────────────
-// Add codes here — key is code, value is discount (1.0 = 100% off, 0.5 = 50% off)
-const PROMO_CODES = {
-  'LUKE100':    1.0,   // 100% off — testing/gifting
-  'FRIEND100':  1.0,   // 100% off — friends and family
-  'LAUNCH50':   0.5,   // 50% off — launch offer
-  'EARLYBIRD':  0.25,  // 25% off
-};
-
-let promoApplied = false;
-let promoDiscount = 0;
-
-function applyPromo(){
-  const codeEl  = document.getElementById('promo-code');
-  const msgEl   = document.getElementById('promo-msg');
-  const stripeW = document.getElementById('stripe-wrap-el');
-  const payBtn  = document.getElementById('payButton');
-  if(!codeEl || !msgEl) return;
-
-  const code = codeEl.value.trim().toUpperCase();
-  if(!code){ msgEl.style.display='none'; return; }
-
-  msgEl.style.display = 'block';
-
-  if(PROMO_CODES.hasOwnProperty(code)){
-    promoDiscount = PROMO_CODES[code];
-    promoApplied  = true;
-
-    if(promoDiscount >= 1.0){
-      // 100% off — hide Stripe card, change button
-      msgEl.style.color = '#4adea8';
-      msgEl.textContent = '✓ Code applied — your read is on us 🐦';
-      if(stripeW) stripeW.style.display = 'none';
-      if(payBtn)  payBtn.textContent    = 'Unlock my full read →';
-    } else {
-      const pct = Math.round(promoDiscount * 100);
-      const newAmt = Math.round(selectedAmount * (1 - promoDiscount));
-      msgEl.style.color = '#4adea8';
-      msgEl.textContent = `✓ ${pct}% off applied — you're paying $${newAmt}`;
-      if(stripeW) stripeW.style.display = 'block';
-    }
-  } else {
-    promoApplied  = false;
-    promoDiscount = 0;
-    msgEl.style.color = 'var(--ember)';
-    msgEl.textContent = "That code doesn't look right — check and try again.";
-    if(stripeW) stripeW.style.display = 'block';
-  }
-}
-
-function initStripe(){
-  // Load Stripe JS on demand — only when pay screen is shown
-  if (typeof Stripe === 'undefined') {
-    var s = document.createElement('script');
-    s.src = 'https://js.stripe.com/v3/';
-    s.onload = function() { _initStripeElements(); };
-    document.head.appendChild(s);
-    return;
-  }
-  _initStripeElements();
-}
-function _initStripeElements(){
-  stripeInstance = Stripe(STRIPE_PK);
-  const elements = stripeInstance.elements();
-  cardElement = elements.create('card', {
-    style: {
-      base: {
-        color: '#f0ece4',
-        fontFamily: '"DM Sans", sans-serif',
-        fontSize: '15px',
-        fontWeight: '300',
-        iconColor: '#F5C842',
-        '::placeholder': { color: 'rgba(240,236,228,0.35)' }
-      },
-      invalid: {
-        color: '#e8734a',
-        iconColor: '#e8734a'
-      }
-    }
-  });
-  cardElement.mount('#card-element');
-  cardElement.on('change', evt => {
-    document.getElementById('card-errors').textContent = evt.error ? evt.error.message : '';
-  });
-}
-
-async function processPayment(){
-  const btn=document.getElementById('payButton');
-  const proc=document.getElementById('payProcessing');
-  const err=document.getElementById('payError');
-
-  // Get email — prefer userEmail state var (already validated), fall back to DOM
-  const emailVal = userEmail || document.getElementById('pay-email')?.value?.trim() || '';
-  if(!emailVal || !emailVal.includes('@') || !emailVal.includes('.')){
-    if(err){ err.textContent='Please enter your email so we can send you your Nest link.'; err.style.display='block'; }
-    return;
-  }
-
-  btn.style.display='none'; proc.style.display='flex'; err.style.display='none';
-  try{
-    // Handle 100% promo — skip Stripe entirely
-    if(promoApplied && promoDiscount >= 1.0){
-      if(SHEETS_URL && profileData) logToSheet({ event: 'promo_unlock', email: emailVal, paid: 'yes', amount: 0, promoCode: 'promo' });
-      try{
-        // Store profile in KV first so Nest link works
-        await fetch(`${WORKER_URL}/store-profile`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nestId,profile:profileData,canvasScores,canvasHistory:[],assessmentMode: assessmentPath === 'know' ? 'know-type' : 'full',pairTheseLog})});
-        if(launchToken){ _postCourseLink(nestId).catch(err => console.warn('Course link unhandled:', err)); }
-        _linkToNestIfLoggedIn(nestId).catch(err => console.warn('Nest link unhandled:', err));
-        // Then send email (which also marks as paid in KV)
-        console.log('Sending promo profile email to:', emailVal);
-        const emailRes = await fetch(`${WORKER_URL}/send-profile-email`,{
-          method:'POST',headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({email:emailVal, nestId, profile:profileData})
-        });
-        console.log('Promo email result:', await emailRes.json());
-      }catch(emailErr){ console.warn('Email send failed (non-fatal):', emailErr); }
-      userEmail=emailVal; hasPaid=true;
-      renderResults(profileData);
-      goTo('screen-results');
-      return;
-    }
-
-    // Calculate final amount with any partial promo
-    const finalAmount = promoApplied
-      ? Math.round(selectedAmount * (1 - promoDiscount) * 100)
-      : selectedAmount * 100;
-
-    const r=await fetch(`${WORKER_URL}/create-payment-intent`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:finalAmount,nestId,email:emailVal})});
-    if(!r.ok) throw new Error('Payment setup failed. Please try again.');
-    const {clientSecret}=await r.json();
-    const {error,paymentIntent}=await stripeInstance.confirmCardPayment(clientSecret,{payment_method:{card:cardElement}});
-    if(error) throw new Error(error.message);
-    if(paymentIntent.status!=='succeeded') throw new Error('Payment did not complete. Please try again.');
-
-    if(SHEETS_URL && profileData) logToSheet({ event: 'paid', email: emailVal, paid: 'yes', amount: selectedAmount });
-
-    // Send profile email + mark as paid in KV
-    try{
-      console.log('Sending profile email to:', emailVal, 'nestId:', nestId);
-      const emailRes = await fetch(`${WORKER_URL}/send-profile-email`,{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({email:emailVal, nestId, profile:profileData})
-      });
-      const emailData = await emailRes.json();
-      console.log('Email send result:', emailData);
-    }catch(emailErr){
-      console.warn('Email send failed (non-fatal):', emailErr);
-    }
-
-    // Store email locally for retake logic
-    userEmail = emailVal;
-    hasPaid = true;
-
-    renderResults(profileData);
-    goTo('screen-results');
-  }catch(e){
-    err.textContent=e.message||'Something went wrong. Please try again.';
-    err.style.display='block'; btn.style.display='flex'; proc.style.display='none';
-  }
 }
 
 // ═══════════════════════════════════════
@@ -3982,13 +3704,8 @@ function populateGateHook(profile){
 function updateGateCopy(){
   const hint = document.getElementById('email-gate-hint');
   const btn = document.getElementById('btn-snap-email');
-  if(INNER_COMPASS_PAYWALL){
-    if(hint) hint.textContent = 'Enter your email. We\'ll show your read next; pay what feels fair to unlock and save your link.';
-    if(btn) btn.textContent = 'Continue →';
-  }else{
-    if(hint) hint.textContent = 'Enter your email. We\'ll open your full read here and send a link so you can come back anytime. Free. No card. No account required.';
-    if(btn) btn.textContent = 'Get my full read →';
-  }
+  if(hint) hint.textContent = 'Enter your email. We\'ll open your full read here and send a link so you can come back anytime. Free. No card. No account required.';
+  if(btn) btn.textContent = 'Get my full read →';
 }
 
 function getGateSubmitBtn(){
@@ -4041,7 +3758,7 @@ async function submitEmail(){
     }catch(e){ console.warn('Beehiiv request failed:', e); }
   }
 
-  logToSheet({ event: 'email_captured', email, paid: INNER_COMPASS_PAYWALL ? 'no' : 'pending' });
+  logToSheet({ event: 'email_captured', email, paid: 'pending' });
 
   if(nestId){
     fetch(WORKER_URL + '/nest-preferences', {
@@ -4070,12 +3787,6 @@ async function unlockFullRead(){
       unlockErr.textContent = 'Your read is still loading. Wait a moment and try again.';
       unlockErr.style.display = 'block';
     }
-    return;
-  }
-
-  if(INNER_COMPASS_PAYWALL){
-    userEmail = emailVal;
-    goTo('screen-pay');
     return;
   }
 
@@ -4149,8 +3860,6 @@ async function unlockFullRead(){
 function resolveProfileEmail(){
   if(typeof userEmail === 'string' && userEmail.trim()) return userEmail.trim();
   try{
-    var pe = document.getElementById('pay-email');
-    if(pe && pe.value && String(pe.value).trim()) return String(pe.value).trim();
     var snap = document.getElementById('snap-email');
     if(snap && snap.value && String(snap.value).trim()) return String(snap.value).trim();
   }catch(e){}
@@ -4275,7 +3984,7 @@ function bindSaturdayOptIn(){
 // ═══════════════════════════════════════════════════════════════
 // v6.0 — INLINE GLOSSARY SYSTEM
 // Maps technical labels (MBTI, Enneagram types/wings/subtypes, attachment,
-// centre of intelligence, 5 Voices) to plain-English explainers shown as
+// centre of intelligence) to plain-English explainers shown as
 // hover/tap popovers in the result.
 // ═══════════════════════════════════════════════════════════════
 const GLOSSARY = (function(){
@@ -4352,18 +4061,6 @@ const GLOSSARY = (function(){
     const key = String(label||'').toLowerCase().trim().replace(/\s+subtype$/, '');
     return { plain: subtypePlain[key] || 'One of three Enneagram instinctual subtypes — where your core type points its first attention.' };
   }
-  const voicesPlain = {
-    Pioneer:   'Driving forward, future-focused, decisive. Lights up at vision and direction.',
-    Connector: 'Relationally warm, persuasive, keeps people engaged and enrolled.',
-    Creative:  'Sees possibilities others miss. Imaginative, system-thinking, generative.',
-    Guardian:  'Steady, responsible, protects what matters. Catches what others overlook.',
-    Nurturer:  'Tunes in to people, holds the group, attends to wellbeing first.',
-  };
-  function voicesEntry(label){
-    const key = String(label||'').trim();
-    return { plain: voicesPlain[key] || 'One of the five GiANT voices — your most natural register in groups and leadership.' };
-  }
-
   // Lookup function: takes a typed label, returns { term, technical, body }
   function lookup(text){
     if(!text) return null;
@@ -4414,15 +4111,6 @@ const GLOSSARY = (function(){
     if(/centre|center/i.test(raw) || /^(head|heart|gut|body)$/i.test(raw)){
       const e = centreEntry(raw);
       return { term: raw, technical: 'Enneagram · centre of intelligence', body: `<p>${e.plain}</p><p style="opacity:0.7;font-style:italic;">Each Enneagram type belongs to one of three centres (head, heart, gut) — your dominant processing channel.</p>` };
-    }
-
-    // 5 Voices
-    if(/^5V:/.test(raw) || /\b(Pioneer|Connector|Creative|Guardian|Nurturer)\b/.test(raw)){
-      const m = raw.match(/Pioneer|Connector|Creative|Guardian|Nurturer/);
-      if(m){
-        const e = voicesEntry(m[0]);
-        return { term: raw, technical: '5 Voices · GiANT framework', body: `<p>${e.plain}</p><p style="opacity:0.7;font-style:italic;">The 5 Voices is a framework of five core leadership/relational voices — yours are ordered by how naturally each one comes.</p>` };
-      }
     }
 
     return null;
@@ -4510,21 +4198,6 @@ function _resultTagChip(cls, text, opts){
   // text the glossary doesn't know how to explain (the popover just won't open).
   return `<span class="ftag${c} glossary-trigger has-glossary" tabindex="0" data-glossary="${String(text).replace(/"/g,'&quot;')}">${text}</span>${conf}`;
 }
-function _voicesLabel(order, lead){
-  if(Array.isArray(order) && order.length){
-    return '5V: '+order.join(' › ');
-  }
-  if(lead) return '5V: '+lead;
-  return '';
-}
-function _voicesHeroLead(p, isLikely){
-  const order = isLikely ? p.likelyCoreFiveVoicesOrder : p.fiveVoicesOrder;
-  const nod = isLikely ? p.likelyCoreFiveVoicesNod : p.fiveVoicesNod;
-  const lead = (Array.isArray(order) && order.length) ? order[0] : nod;
-  if(!lead) return '';
-  const g = String(lead).replace(/"/g,'&quot;');
-  return `<span class="ftag glossary-trigger has-glossary" tabindex="0" data-glossary="${g}" style="color:var(--text-muted);border-color:rgba(255,255,255,0.1);">Lead · ${lead}</span>`;
-}
 function _confDots(level){
   const v = _confLevel(level);
   let n = 0;
@@ -4558,7 +4231,6 @@ function _confLevel(c){
   return (v === 'high' || v === 'medium' || v === 'low') ? v : '';
 }
 function _expressionTagChips(p, options){
-  const hero = options && options.hero;
   const skip = options && options.skipConfidence;
   const oSub = skip ? { skipConfidence: true } : {};
   const conf = p.confidence || {};
@@ -4576,16 +4248,9 @@ function _expressionTagChips(p, options){
   }
   h+=_resultTagChip('', p.attachment, skip ? oSub : { conf: _confLevel(conf.attachment) });
   if(p.centerOfIntelligence) h+=`<span class="ftag glossary-trigger has-glossary" tabindex="0" data-glossary="${String(p.centerOfIntelligence).replace(/"/g,'&quot;')} centre" style="color:var(--gold-dim);">${p.centerOfIntelligence} Centre</span>`;
-  if(hero){
-    h+=_voicesHeroLead(p, false);
-  }else{
-    const v=_voicesLabel(p.fiveVoicesOrder, p.fiveVoicesNod);
-    if(v) h+=`<span class="ftag glossary-trigger has-glossary" tabindex="0" data-glossary="${String(p.fiveVoicesNod || (p.fiveVoicesOrder && p.fiveVoicesOrder[0]) || '').replace(/"/g,'&quot;')}" style="color:var(--text-muted);opacity:0.75;">${v}</span>`;
-  }
   return h;
 }
 function _likelyCoreTagChips(p, options){
-  const hero = options && options.hero;
   const skip = options && options.skipConfidence;
   const oSub = skip ? { skipConfidence: true } : {};
   const conf = p.confidence || {};
@@ -4603,12 +4268,6 @@ function _likelyCoreTagChips(p, options){
   }
   h+=_resultTagChip('', p.likelyCoreAttachment, skip ? oSub : { conf: _confLevel(conf.attachment) });
   if(p.likelyCoreCenterOfIntelligence) h+=`<span class="ftag glossary-trigger has-glossary" tabindex="0" data-glossary="${String(p.likelyCoreCenterOfIntelligence).replace(/"/g,'&quot;')} centre" style="color:var(--gold-dim);">${p.likelyCoreCenterOfIntelligence} Centre</span>`;
-  if(hero){
-    h+=_voicesHeroLead(p, true);
-  }else{
-    const v=_voicesLabel(p.likelyCoreFiveVoicesOrder, p.likelyCoreFiveVoicesNod);
-    if(v) h+=`<span class="ftag glossary-trigger has-glossary" tabindex="0" data-glossary="${String(p.likelyCoreFiveVoicesNod || (p.likelyCoreFiveVoicesOrder && p.likelyCoreFiveVoicesOrder[0]) || '').replace(/"/g,'&quot;')}" style="color:var(--text-muted);opacity:0.75;">${v}</span>`;
-  }
   return h;
 }
 function _buildHeroSnapshotHtml(profile, heroPlain){
@@ -5053,10 +4712,8 @@ function logToSheet(opts){
   opts = opts || {};
   const emailVal = (opts.email || userEmail || '').trim();
   const id = opts.nestId || nestId || '';
-  const codeEl = document.getElementById('promo-code');
-  const usedCode = opts.promoCode || (codeEl ? codeEl.value.trim().toUpperCase() : '');
   const amt = typeof opts.amount === 'number' ? opts.amount : 0;
-  const paidFlag = opts.paid || (amt > 0 || usedCode ? 'yes' : 'no');
+  const paidFlag = opts.paid || (amt > 0 ? 'yes' : 'no');
   const p = profileData || {};
   const cs = opts.canvasScores || canvasScores || {};
   const canvasDims = ['why', 'who', 'where', 'what', 'how'];
@@ -5077,7 +4734,7 @@ function logToSheet(opts){
       event: opts.event || 'log',
       paid: paidFlag,
       amount: amt,
-      promoCode: usedCode,
+      promoCode: '',
       canvasWhy: cs.why ?? '',
       canvasWho: cs.who ?? '',
       canvasWhere: cs.where ?? '',
@@ -5178,60 +4835,6 @@ function clearAndRestart(){
   }, 80);
 }
 
-function getFallbackProfile(){
-  return {
-    archetype:'The Bright Mirror',
-    archetypePlain:'The Tuned-In Companion',
-    archetypePlainDescription:'Holds the room steady, reads emotional weather before words, gives more than they take.',
-    archetypeSub:'a Spark with Dreamer undertones',
-    mbti:'ENFJ',
-    enneagram:'Enneagram 3w4',
-    enneagramSubtype:'Social',
-    attachment:'Anxious-Secure',
-    centerOfIntelligence:'Heart',
-    healthLevel:'growing',
-    fiveVoicesNod:'Connector',
-    likelyCoreArchetype:'The Restless Cartographer',
-    likelyCoreArchetypePlain:'The Future Mapper',
-    likelyCoreArchetypePlainDescription:'Future-focused, possibility-led, builds maps three moves ahead and refuses small.',
-    likelyCoreArchetypeSub:'a Trailblazer with Dreamer undertones',
-    likelyCoreMbti:'INTJ',
-    likelyCoreEnneagram:'Enneagram 7w8',
-    likelyCoreEnneagramSubtype:'Social',
-    likelyCoreAttachment:'Secure-leaning',
-    likelyCoreCenterOfIntelligence:'Head',
-    likelyCoreFiveVoicesNod:'Pioneer',
-    confidence: {
-      mbti:'high', enneagram:'high', wing:'medium', subtype:'low', attachment:'medium', baselineDivergence:'high',
-      notes:'Subtype is the soft call here — your answers point both ways. Everything else is settled.'
-    },
-    expressionVersusCoreSummary:'What you\'re living right now can look more caretaking and visible than the part of you that usually plans three moves ahead and chases possibility.',
-    betweenPresentAndCore:'Under strain, many people slide toward dutiful precision and emotional attunement — even when their baseline is bolder and more independent.\n\nThat doesn\'t make either version false. It means your context is borrowing extra bandwidth from patterns that keep you safe.\n\nThe invitation is to let both be named: the survival self and the self that remembers what freedom felt like.',
-    howYoureShowingUp:'Right now you may be showing up as the person who holds the room together, reads the emotional weather, and keeps things moving — even when you\'re tired.\n\nThat can look like a Spark-leaning season: relational energy out front, performance pressure nearby, and a quiet hunger to be known without having to manage the moment.',
-    whoYouAre:'You are the person who walks into a room and immediately, almost involuntarily, takes its temperature. Not for danger — for who looks like they need someone to talk to. Your warmth is structural. People feel seen around you faster than they can explain why.\n\nThis isn\'t performance. It\'s just how you\'re made. And it\'s one of your most significant gifts — even when it costs you.\n\nThere is also a through-line in you that is less sentimental and more strategic — a mind that likes a map, a future, and a door that still opens. Both belong in your story.',
-    howWired:'When you\'re closer to baseline, your mind likes distance, pattern, and a clean read on the board before you emote about it. You tend toward independence not because you don\'t care — but because clarity feels like oxygen.\n\nThere\'s also a hunger for momentum and possibility in you — the part that would rather build a future than rehearse a problem. That 7-ish edge shows up as options, humour, and refusal to let life shrink you — when you\'re not running on fumes.',
-    wingProfile:'You\'re a 3 with both wings present in different contexts — your 4 wing shows up in your interior life, the part of you that sits with the deeper questions and craves meaning and authenticity. Your 2 wing comes forward in how you relate — warm, generous, attuned to what others need. This makes you more complex than most 3 descriptions give you credit for.',
-    subtypeProfile:'There\'s a social subtype flavour to how you move through the world — you\'re aware of your role within groups, attuned to belonging and contribution, and energised by being part of something that matters.',
-    coreWoundAndGift:'Your gift is authentic inspiration — the ability to show people what\'s possible and make them feel like they can actually do it. Under pressure, that same gift can quietly become performing worth rather than living it. The shift from doing to being is your ongoing invitation.\n\nYou probably already notice when it flips. Trust that noticing.',
-    attachmentDetail:'You lean anxious-secure — capable of deep connection, but under stress you can spiral into "are we okay?" before the other person even knows anything\'s wrong. You\'re not needy. You\'re just paying very close attention.',
-    healthReflection:'Something in how you\'re answering these questions suggests you might be in a reaching season — not crisis, but a kind of stretch. Like you know something needs to shift and you\'re not quite sure which lever to pull. That restlessness is actually a signal. Pay attention to it.',
-    thingsToRemember:'You give far more than you take. That\'s a gift and it\'s also worth watching. A 2 degree shift toward receiving as generously as you give changes everything downstream.\n\nYou can\'t give what you don\'t have. Full stop.',
-    stuckPlaces:'Your pattern probably involves saying yes when you mean not yet, or carrying the emotional weight of a room so nobody else has to. The leap from Rescuer to Coach is one of the most significant shifts your type can make — and it starts with one honest conversation.',
-    roleReflection:'',
-    wingTitle:'Your Enneagram wings',
-    wing:'',
-    quote:'Clarity changes everything. And you already have more of it than you think — you just haven\'t given yourself permission to act on it yet.',
-    idealVersusPresent:'The life you want probably has more room — mentally, temporally, relationally — than the one you\'re gritting through.\n\nNaming that gap without shame is how the Nest stops being a label and starts being a compass.',
-    partnerDynamicReady:true,
-    nestNextSteps: {
-      headline: 'Worth a real conversation',
-      body: 'There\'s a gap between how you\'re wired and how you\'re showing up — that\'s data, not failure. A free discovery call is the straightest way to talk it through: fit, cost, and one honest next step.',
-      primaryCta: { label: 'Free discovery call →', url: 'https://calendly.com/lilbirdlifecoaching/30min' },
-      secondaryCta: { label: 'First Flight — from $149 →', url: '/first-flight/book.html?code=IMREADY' },
-      tier: 'bridge',
-    },
-  };
-}
 
 
 // ═══════════════════════════════════════
@@ -6869,22 +6472,6 @@ window.addEventListener('DOMContentLoaded', function() {
   const params = new URLSearchParams(window.location.search);
 
   updateGateCopy();
-
-  // Test mode: skip to unlock gate with fallback profile
-  if (params.get('testpay') === '1' || params.get('testunlock') === '1') {
-    nestId = generateNestId();
-    profileData = getFallbackProfile();
-    document.getElementById('nest-id').textContent = nestId;
-    populateGateHook(profileData);
-    goTo('screen-snapshot');
-    if (params.get('testunlock') === '1') {
-      userEmail = 'test@lilbird.life';
-      const snap = document.getElementById('snap-email');
-      if(snap) snap.value = userEmail;
-      setTimeout(function(){ unlockFullRead(); }, 400);
-    }
-    return;
-  }
 
   // Only hit the Worker if a ?nest= param is in the URL
   const existingNest = params.get('nest');
