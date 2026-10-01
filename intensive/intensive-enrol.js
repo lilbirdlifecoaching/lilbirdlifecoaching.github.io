@@ -104,11 +104,15 @@
   }
 
   async function prepareEnrol(signerName, signerEmail) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (currentUser) {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session?.access_token) headers.Authorization = 'Bearer ' + session.access_token;
+    }
     const res = await fetch(WORKER_URL + '/intensive-prepare-enrol', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({
-        user_id: currentUser?.id || null,
         signer_name: signerName,
         signer_email: signerEmail,
         agreement_version: AGREEMENT_VERSION
@@ -231,6 +235,10 @@
       }
 
       const prepared = await prepareEnrol(signerName, email);
+      if (prepared.already_paid) {
+        window.location.href = '/nest/';
+        return;
+      }
       const userId = prepared.user_id;
       if (!userId) throw new Error('Could not prepare enrolment.');
 
