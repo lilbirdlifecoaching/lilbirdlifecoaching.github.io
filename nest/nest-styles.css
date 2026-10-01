@@ -250,6 +250,18 @@ body.nest-page { line-height: 1.5; }
 .steps-list { list-style: none; margin-top: 0.6rem; display: grid; gap: 0.35rem; }
 .steps-list li { color: var(--gold-dim); font-size: 0.9rem; }
 .steps-list li.done { color: var(--green); }
+.steps-list .step-link {
+  color: inherit;
+  font: inherit;
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  border-bottom: 1px dotted currentColor;
+}
+.steps-list .step-link:hover { color: var(--gold); }
 .intensive-checklist { margin: 0.75rem 0 1rem; }
 
 .lci-counter {

@@ -661,19 +661,21 @@
     if (hasIntensive) {
       const { contractDone, paidDone } = intensiveProgressFlags();
       const stats = lciStats();
-      steps.push({ done: contractDone, text: contractDone ? 'Agreement signed' : 'Sign the coaching agreement' });
-      steps.push({ done: paidDone, text: paidDone ? 'Payment confirmed' : 'Complete Intensive payment' });
+      steps.push({ done: contractDone, text: contractDone ? 'Agreement signed' : 'Sign the coaching agreement', href: '/intensive/enrol.html?from=nest' });
+      steps.push({ done: paidDone, text: paidDone ? 'Payment confirmed' : 'Complete Intensive payment', href: '/intensive/enrol.html?from=nest' });
       steps.push({
         done: stats.hasRows && stats.allBooked,
         text: stats.allBooked
           ? 'All 8 sessions booked'
           : stats.hasRows
             ? `Book your next session (${stats.remaining} of 8 remaining)`
-            : 'Book sessions from your Intensive card'
+            : 'Book sessions from your Intensive card',
+        href: stats.allBooked ? '' : LCI_BOOKING_URL,
+        external: true
       });
-      steps.push({ done: paidDone, text: 'Open Roots & Wings workbook before session one' });
+      steps.push({ done: paidDone, text: 'Open Roots & Wings workbook before session one', href: workbookHref('life-change') });
       if (!youngerYouPhotoUrl()) {
-        steps.push({ done: false, text: 'Add your Nest picture in My profile' });
+        steps.push({ done: false, text: 'Add your Nest picture in My profile', action: 'photo' });
       }
     } else {
       steps.push({
@@ -682,37 +684,53 @@
           ? 'Inner Compass completed'
           : hasInner
             ? 'Take your Inner Compass assessment'
-            : 'Take your free Inner Compass'
+            : 'Take your free Inner Compass',
+        href: innerDone ? innerCompassHref() : '/inner-compass/?from=nest'
       });
       steps.push({
         done: hasFirstFlight,
         text: hasFirstFlight
           ? 'First Flight booked'
-          : 'Book a First Flight session — $149'
+          : 'Book a First Flight session — $149',
+        href: hasFirstFlight ? '' : '/first-flight/book.html?code=IMREADY'
       });
       steps.push({
         done: false,
-        text: 'Or book a coaching session (à la carte) — $249'
+        text: 'Or book a coaching session (à la carte) — $249',
+        href: '/coaching/book.html?from=nest'
       });
       steps.push({
         done: hasIntensive,
-        text: 'Or enrol in the Life Change Intensive'
+        text: 'Or enrol in the Life Change Intensive',
+        href: '/intensive/enrol.html?from=nest'
       });
       if (hasSolo) {
-        steps.push({ done: false, text: 'Continue your Solo journey' });
+        steps.push({ done: false, text: 'Continue your Solo journey', href: '/solo/' });
       }
       steps.push({
         done: !!youngerYouPhotoUrl(),
         text: youngerYouPhotoUrl()
           ? 'Nest picture added'
-          : 'Add your Nest picture in My profile'
+          : 'Add your Nest picture in My profile',
+        action: youngerYouPhotoUrl() ? '' : 'photo'
       });
     }
 
     const ul = document.getElementById('next-steps-list');
     ul.innerHTML = steps
-      .map((s) => `<li class="${s.done ? 'done' : ''}">${s.done ? '✓' : '○'} ${escapeHtml(s.text)}</li>`)
+      .map((s) => {
+        const label = `${s.done ? '✓' : '○'} ${escapeHtml(s.text)}`;
+        if (s.href) {
+          const ext = s.external ? ' target="_blank" rel="noopener"' : '';
+          return `<li class="${s.done ? 'done' : ''}"><a class="step-link" href="${escapeHtml(s.href)}"${ext}>${label} →</a></li>`;
+        }
+        if (s.action === 'photo') {
+          return `<li><button type="button" class="step-link" data-step-photo>${label} →</button></li>`;
+        }
+        return `<li class="${s.done ? 'done' : ''}">${label}</li>`;
+      })
       .join('');
+    ul.querySelectorAll('[data-step-photo]').forEach((btn) => btn.addEventListener('click', goToPhoto));
   }
 
   function parseAssessmentProfile(payload) {
