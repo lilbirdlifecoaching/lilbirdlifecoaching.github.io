@@ -170,6 +170,55 @@ body.nest-page { line-height: 1.5; }
   background: var(--dark-mid);
   flex-shrink: 0;
 }
+.avatar.has-photo { position: relative; }
+.avatar-edit {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 0.85rem;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.avatar.has-photo:hover .avatar-edit,
+.avatar.has-photo:focus-visible .avatar-edit { opacity: 1; }
+.younger-you-photo-edit {
+  position: relative;
+  display: block;
+  flex-shrink: 0;
+  cursor: pointer;
+  border-radius: 50%;
+}
+.younger-you-photo-badge {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--gold);
+  color: #111;
+  font-size: 0.9rem;
+  border: 2px solid var(--dark-card);
+}
+.younger-you-photo-edit:hover .younger-you-photo { filter: brightness(0.85); }
+.younger-you-remove {
+  background: none;
+  border: none;
+  padding: 0.4rem 0.2rem;
+  font: inherit;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.younger-you-remove:hover { color: var(--ember); }
+.younger-you-remove.hidden { display: none; }
 .younger-you-card h3 { margin-bottom: 0.35rem; }
 .younger-you-card p { margin-bottom: 0.75rem; }
 .younger-you-file-input {

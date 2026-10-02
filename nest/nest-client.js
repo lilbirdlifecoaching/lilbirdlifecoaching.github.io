@@ -1237,6 +1237,37 @@
     return photoUrl;
   }
 
+  async function removeYoungerYouPhoto() {
+    if (!currentUser?.id) throw new Error('Not signed in.');
+    const oldUrl = youngerYouPhotoUrl();
+    const { error: dbErr } = await sb
+      .from('course_users')
+      .update({ childhood_photo_url: null })
+      .eq('id', currentUser.id);
+    if (dbErr) throw dbErr;
+
+    try {
+      await sb.from('tool_outputs').delete().eq('user_id', currentUser.id).eq('tool_name', 'childhood_photo');
+    } catch (e) {
+      console.warn('tool_outputs childhood_photo remove:', e);
+    }
+
+    const marker = '/' + CHILDHOOD_PHOTO_BUCKET + '/';
+    const at = oldUrl.indexOf(marker);
+    if (at !== -1) {
+      const path = decodeURIComponent(oldUrl.slice(at + marker.length).split('?')[0]);
+      if (path.startsWith(currentUser.id + '/')) {
+        try {
+          await sb.storage.from(CHILDHOOD_PHOTO_BUCKET).remove([path]);
+        } catch (e) {
+          console.warn('childhood photo file remove:', e);
+        }
+      }
+    }
+
+    courseProfile = { ...(courseProfile || {}), childhood_photo_url: null };
+  }
+
   function updateNavAvatar() {
     const btn = document.getElementById('btn-nav-profile');
     if (!btn) return;
@@ -1244,9 +1275,11 @@
     if (url) {
       btn.classList.add('has-photo');
       btn.classList.remove('needs-photo');
-      btn.title = 'My profile';
-      btn.setAttribute('aria-label', 'Open My profile');
-      btn.innerHTML = '<img src="' + escapeHtml(url) + '" alt="" width="30" height="30" />';
+      btn.title = 'Change your Nest picture';
+      btn.setAttribute('aria-label', 'Change your Nest picture');
+      btn.innerHTML =
+        '<img src="' + escapeHtml(url) + '" alt="" width="30" height="30" />' +
+        '<span class="avatar-edit" aria-hidden="true"><i class="ti ti-camera"></i></span>';
     } else {
       btn.classList.remove('has-photo');
       btn.classList.add('needs-photo');
@@ -1326,7 +1359,27 @@
     const saveBtn = document.getElementById('btn-younger-you-save');
     const clearBtn = document.getElementById('btn-younger-you-clear');
     const preview = document.getElementById('younger-you-preview');
+    const removeBtn = document.getElementById('btn-younger-you-remove');
     if (!input) return;
+
+    if (removeBtn) {
+      removeBtn.addEventListener('click', async () => {
+        if (!confirm('Remove your Nest picture?')) return;
+        removeBtn.disabled = true;
+        setYoungerYouStatus('Removing…', '');
+        try {
+          await removeYoungerYouPhoto();
+          updateNavAvatar();
+          renderNextSteps();
+          renderProducts();
+          renderProfile();
+        } catch (err) {
+          console.error('Nest photo remove:', err);
+          setYoungerYouStatus(err.message || 'Something went wrong. Try again.', 'error');
+          removeBtn.disabled = false;
+        }
+      });
+    }
 
     let pendingFile = null;
 
@@ -1345,6 +1398,7 @@
         saveBtn.textContent = 'Save Nest picture →';
       }
       if (clearBtn) clearBtn.classList.remove('hidden');
+      if (removeBtn) removeBtn.classList.add('hidden');
       setYoungerYouStatus('Looks good — save to use this as your Nest picture.', '');
     }
 
@@ -1403,15 +1457,19 @@
         <article class="product-card younger-you-card">
           <p class="eyebrow">nest picture</p>
           <div class="younger-you-row">
-            <img class="younger-you-photo" src="${escapeHtml(url)}" alt="Younger you" width="88" height="88" />
+            <label class="younger-you-photo-edit" for="younger-you-file" title="Change photo">
+              <img class="younger-you-photo" src="${escapeHtml(url)}" alt="Younger you" width="88" height="88" />
+              <span class="younger-you-photo-badge" aria-hidden="true"><i class="ti ti-camera"></i></span>
+            </label>
             <div>
               <h3>Your Nest picture</h3>
               <p>You around ages 4–8. Shows on your Nest${hasSoloCourseAccess() ? ' and Full Flight Plan' : ''}.</p>
               <div class="btn-row younger-you-actions">
-                <label class="btn btn-outline younger-you-file-label" for="younger-you-file">Replace photo</label>
+                <label class="btn btn-outline younger-you-file-label" for="younger-you-file"><i class="ti ti-camera"></i>&nbsp;Change photo</label>
                 <input id="younger-you-file" class="younger-you-file-input" type="file" accept="image/*" />
                 <button type="button" class="btn btn-gold hidden" id="btn-younger-you-save">Save Nest picture →</button>
                 <button type="button" class="btn btn-outline hidden" id="btn-younger-you-clear">Cancel</button>
+                <button type="button" class="younger-you-remove" id="btn-younger-you-remove">Remove</button>
               </div>
               <div id="younger-you-preview" class="younger-you-preview"></div>
               <p id="younger-you-status" class="younger-you-status" role="status"></p>
@@ -1825,8 +1883,7 @@
   const btnNavProfile = document.getElementById('btn-nav-profile');
   if (btnNavProfile) {
     btnNavProfile.addEventListener('click', () => {
-      if (!youngerYouPhotoUrl()) goToPhoto();
-      else openInnerCompassRead();
+      goToPhoto();
     });
   }
 
