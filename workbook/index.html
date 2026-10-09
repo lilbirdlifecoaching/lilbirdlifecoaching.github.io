@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>
+    (function(){
+      var k='lilbird-theme', s=null;
+      try{s=localStorage.getItem(k);}catch(e){}
+      var t=(s==='light'||s==='dark')?s:(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+      document.documentElement.setAttribute('data-theme', t);
+      document.documentElement.style.colorScheme=t;
+    })();
+  </script>
+  <meta name="theme-color" content="#1e2028" />
+  <link rel="stylesheet" href="/css/lilbird-tokens.css" />
+  <link rel="stylesheet" href="/css/lilbird-theme-chrome.css" />
+  <title>Life Change Sessions workbook · lil' bird</title>
+  <meta name="description" content="The complete eight-session Life Change Sessions workbook to work through on your own, online or as a PDF. $27, yours to keep in your Nest." />
+  <link rel="canonical" href="https://lilbird.life/workbook/" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/coaching/coaching.css?v=1" />
+  <link rel="stylesheet" href="/css/lilbird-booking-theme.css" />
+  <script src="/lilbird-gtm-id.js"></script>
+  <script src="/lilbird-gtm.js"></script>
+  <style>
+    .wb-points { list-style: none; margin: 0.25rem 0 0.5rem; }
+    .wb-points li { padding: 0.45rem 0; border-bottom: 1px solid var(--dark-border); font-size: 0.92rem; }
+    .wb-points li:last-child { border-bottom: none; }
+    .wb-points li::before { content: '✦'; color: var(--gold); margin-right: 0.6rem; font-size: 0.75rem; }
+  </style>
+</head>
+<body>
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NG8ZFNX2" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <header class="top-bar">
+    <a class="wordmark" href="/">lil' bird</a>
+    <div class="top-bar-actions">
+      <a class="back" href="/#paths">← back home</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <p class="eyebrow">life change sessions · workbook · $27</p>
+    <h1>Do the work <em>on your own time.</em></h1>
+    <p class="lead">
+      The complete Life Change Sessions workbook: all eight sessions to work through at your own pace, online or as a PDF.
+      It lives in your Nest, so it's always there when you want to pick it back up.
+    </p>
+
+    <section class="card">
+      <h2>What you get</h2>
+      <ul class="wb-points">
+        <li>All eight Life Change Sessions in one interactive workbook</li>
+        <li>Your answers save privately on your device</li>
+        <li>Download as a PDF any time to keep a copy</li>
+        <li>A Nest login, so you can come back to it whenever you like</li>
+      </ul>
+      <p class="fine-print" style="margin-top:0.75rem;">
+        Want guidance as you go? <a href="/solo/">Solo</a> adds an AI coaching guide for $197, and the
+        <a href="/intensive/">Life Change Intensive</a> is the full journey in person with Luke (the workbook is included).
+      </p>
+    </section>
+
+    <section class="card" id="section-buy">
+      <h2>Get the workbook — $27</h2>
+
+      <div id="logged-in" class="logged-in-banner hidden">
+        You're logged in as <strong id="logged-in-email"></strong>. The workbook will be added to this Nest.
+        <a href="#" id="btn-switch-account">Not you?</a>
+      </div>
+
+      <form id="form-account" novalidate>
+        <p class="fine-print" style="margin-top:0;margin-bottom:0.5rem;">
+          Your workbook is kept in your Nest. Enter your email and choose a password, and we'll set it up before payment.
+          Already have a Nest? Use the same email and password.
+        </p>
+        <label for="wb-email">Email</label>
+        <input id="wb-email" type="email" autocomplete="email" required placeholder="you@example.com" />
+        <label for="wb-password">Password</label>
+        <input id="wb-password" type="password" autocomplete="new-password" minlength="8" required placeholder="At least 8 characters" />
+      </form>
+
+      <p id="form-error" class="form-error" role="alert"></p>
+
+      <div class="btn-row">
+        <button id="btn-buy" class="btn btn-gold" type="button">Continue to secure payment →</button>
+      </div>
+      <p class="fine-print">Payment opens in a secure Stripe window. Afterwards you'll land in your Nest with the workbook unlocked.</p>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="./workbook-buy.js?v=1"></script>
+  <script src="/js/lilbird-theme.js"></script>
+  <script src="/js/lilbird-theme-nav.js"></script>
+</body>
+</html>
