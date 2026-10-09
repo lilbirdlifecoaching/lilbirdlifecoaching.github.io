@@ -412,3 +412,32 @@ input:focus { outline: none; border-color: rgba(245, 200, 66, 0.4); }
   margin: 0.35rem 0 0;
   max-width: 28rem;
 }
+
+/* pick a time, then pay */
+[hidden] { display: none !important; }
+.cal-embed-wrap {
+  position: relative;
+  margin-top: 1rem;
+  min-height: 640px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--dark-border);
+  background: var(--dark-mid);
+}
+.cal-embed-wrap iframe { display: block; width: 100%; height: 720px; border: 0; }
+.cal-loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  pointer-events: none;
+}
+.held-time {
+  font-family: "Playfair Display", serif;
+  font-size: 1.3rem;
+  color: var(--gold);
+  margin-bottom: 0.25rem;
+}
+.held-who { color: var(--text-muted); font-size: 0.9rem; }

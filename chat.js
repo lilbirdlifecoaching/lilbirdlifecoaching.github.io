@@ -296,7 +296,7 @@
   function showBookingOptions() {
     var m = document.createElement('div'); m.className = 'lb-m bot';
     var b = document.createElement('div'); b.className = 'lb-b';
-    b.innerHTML = 'Great — here\'s a quick look at the options:<br><br><strong style="color:#F5C842">🐦 The First Flight</strong> — one 2-hour session. Map your story, find the real issue, leave with your next step. Best starting point, no commitment beyond the conversation.<br><br><strong style="color:#F5C842">🌿 Life Change Sessions</strong> — the full journey. 7 sessions through the complete curriculum. Story, vision, identity, transitions, rhythms, relationships.<br><br><strong style="color:#F5C842">💛 Coaching</strong> — ad hoc thinking partner. $249 per session — pay then book.';
+    b.innerHTML = 'Great — here\'s a quick look at the options:<br><br><strong style="color:#F5C842">🐦 The First Flight</strong> — one 90-minute session. Map your story, find the real issue, leave with your next step. Best starting point, no commitment beyond the conversation.<br><br><strong style="color:#F5C842">🌿 Life Change Sessions</strong> — the full journey. 7 sessions through the complete curriculum. Story, vision, identity, transitions, rhythms, relationships.<br><br><strong style="color:#F5C842">💛 Coaching</strong> — ad hoc thinking partner. $249 per session — pay then book.';
     var wrap = document.createElement('div'); wrap.className = 'lb-opts'; wrap.style.marginTop = '.75rem';
     [
       { label: 'Book a First Flight — $149 with code IMREADY', url: FF_URL, ff: true },

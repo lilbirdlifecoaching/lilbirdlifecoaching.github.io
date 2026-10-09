@@ -15,39 +15,15 @@
   <meta name="theme-color" content="#1e2028" />
   <link rel="stylesheet" href="/css/lilbird-tokens.css" />
   <link rel="stylesheet" href="/css/lilbird-theme-chrome.css" />
-  <title>Book your time · Coaching · lil' bird</title>
-  <meta name="description" content="Payment received — pick your coaching session time with Luke on Cal.com." />
+  <title>Confirmed · Coaching · lil' bird</title>
+  <meta name="description" content="Your coaching session with Luke is confirmed." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=DM+Sans:wght@400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./coaching.css?v=1" />
+  <link rel="stylesheet" href="./coaching.css?v=2" />
   <link rel="stylesheet" href="/css/lilbird-booking-theme.css" />
   <script src="/lilbird-gtm-id.js"></script>
   <script src="/lilbird-gtm.js"></script>
-  <style>
-    .cal-embed-wrap {
-      margin-top: 1.25rem;
-      min-height: 620px;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid var(--dark-border);
-      background: #252830;
-    }
-    .cal-embed-wrap iframe {
-      width: 100%;
-      height: 700px;
-      border: 0;
-      display: block;
-    }
-    .next-note {
-      margin-top: 1.5rem;
-      padding-top: 1.25rem;
-      border-top: 1px solid var(--dark-border);
-      color: var(--text-muted);
-      font-size: 0.9rem;
-    }
-    .next-note a { color: var(--gold); }
-  </style>
 </head>
 <body>
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NG8ZFNX2" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -58,31 +34,24 @@
 
   <main class="wrap">
     <p class="eyebrow">payment received</p>
-    <h1>Now pick your <em>session time.</em></h1>
+    <h1>You're <em>confirmed.</em></h1>
     <p class="lead">
-      You're paid ($249) — choose a slot below. There's no payment on Cal.com.
-      A confirmation email is on its way with the same link.
+      Thank you. Your coaching session with Luke is booked, and Cal.com is sending a calendar invite to your email.
     </p>
 
-    <section class="card">
-      <h2>Book on Cal.com</h2>
-      <p class="fine-print" style="margin-top:0;">
-        Prefer a new tab?
-        <a href="https://cal.com/luke-haythorpe/coaching-session" target="_blank" rel="noopener">Open Cal.com ↗</a>
-      </p>
-      <div class="cal-embed-wrap">
-        <iframe
-          src="https://cal.com/luke-haythorpe/coaching-session?embed=true&theme=dark"
-          title="Book coaching on Cal.com"
-          loading="lazy"
-        ></iframe>
-      </div>
+    <div class="steps-strip">
+      <span class="step-pill done">1 · Pick a time</span>
+      <span class="step-pill done">2 · Pay to confirm</span>
+      <span class="step-pill active">3 · Confirmed</span>
+    </div>
 
-      <div class="next-note">
-        <p style="margin:0 0 0.75rem;">Need another session later? Come back to <a href="/coaching/book.html">pay &amp; book again</a>.</p>
-        <div class="btn-row" style="margin-top:1rem;">
-          <a class="btn btn-outline" href="mailto:hello@lilbird.life">Email Luke</a>
-        </div>
+    <section class="card">
+      <h2>What's next</h2>
+      <p style="margin-bottom:0.65rem;">Need to move your time? Use the reschedule link in your Cal.com invite.</p>
+      <p style="margin:0;">Want another session later? <a href="/coaching/book.html">Book again here</a>.</p>
+      <div class="btn-row" style="margin-top:1.25rem;">
+        <a class="btn btn-outline" href="/nest/">Open your Nest →</a>
+        <a class="btn btn-outline" href="mailto:hello@lilbird.life">Email Luke</a>
       </div>
     </section>
   </main>

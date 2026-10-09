@@ -16,11 +16,11 @@
   <link rel="stylesheet" href="/css/lilbird-tokens.css" />
   <link rel="stylesheet" href="/css/lilbird-theme-chrome.css" />
   <title>Book Coaching · lil' bird</title>
-  <meta name="description" content="Book an ad hoc coaching session with Luke — $249. Pay on-site, then pick your time on Cal.com." />
+  <meta name="description" content="Book an ad hoc coaching session with Luke — $249. Pick your time, then pay to confirm." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./coaching.css?v=1" />
+  <link rel="stylesheet" href="./coaching.css?v=2" />
   <link rel="stylesheet" href="/css/lilbird-booking-theme.css" />
   <script src="https://js.stripe.com/v3/"></script>
   <script src="/lilbird-gtm-id.js"></script>
@@ -37,30 +37,38 @@
 
   <main class="wrap">
     <p class="eyebrow">coaching · ad hoc · 1-to-1</p>
-    <h1>Pay here, then <em>book your time.</em></h1>
+    <h1>Pick your time, <em>then pay to confirm.</em></h1>
     <p class="lead">
       One focused 45-minute session when something specific needs working through — book as you need, no package.
-      <strong>$249</strong> per session. After payment you'll pick your slot on Cal.com (no second payment there).
+      <strong>$249</strong> per session.
     </p>
 
     <div class="steps-strip" id="steps-strip">
-      <span class="step-pill active" data-step="1">1 · Your details</span>
-      <span class="step-pill" data-step="2">2 · Payment</span>
-      <span class="step-pill" data-step="3">3 · Book time</span>
+      <span class="step-pill active" data-step="1">1 · Pick a time</span>
+      <span class="step-pill" data-step="2">2 · Pay to confirm</span>
+      <span class="step-pill" data-step="3">3 · Confirmed</span>
     </div>
 
-    <section class="card" id="section-details">
-      <h2>Your details</h2>
-      <p class="fine-print" style="margin-top:0;margin-bottom:1rem;">
-        Use the email you'll check for confirmation. A receipt and booking link will go there.
+    <section class="card" id="section-pick">
+      <h2>Pick a time that works</h2>
+      <p class="fine-print" style="margin-top:0;">
+        Choose a slot and enter your name and email. We'll hold it for an hour while you pay.
+      </p>
+      <div class="cal-embed-wrap">
+        <p id="cal-loading" class="cal-loading">Loading Luke's calendar…</p>
+        <iframe id="cal-frame" title="Pick a coaching time"></iframe>
+      </div>
+    </section>
+
+    <section class="card" id="section-details" hidden>
+      <h2>Your time is held</h2>
+      <p class="held-time" id="held-time"></p>
+      <p class="held-who"><span id="buyer-name"></span> · <span id="buyer-email"></span></p>
+      <p class="fine-print" style="margin-top:0.25rem;">
+        Pay within an hour to confirm it. Wrong time? <a href="/coaching/book.html">Pick a different one</a>.
       </p>
 
       <form id="form-book">
-        <label for="buyer-name">Name</label>
-        <input id="buyer-name" type="text" autocomplete="name" required placeholder="Your name" />
-
-        <label for="buyer-email">Email</label>
-        <input id="buyer-email" type="email" autocomplete="email" required placeholder="you@example.com" />
 
         <div class="promo-block">
           <label for="promo-input">Promo code <span style="color:var(--text-muted);font-weight:400;">(optional)</span></label>
@@ -75,10 +83,10 @@
         <p id="form-error" class="form-error"></p>
 
         <div class="btn-row">
-          <button id="btn-continue" class="btn btn-gold" type="submit">Continue to secure payment →</button>
+          <button id="btn-continue" class="btn btn-gold" type="submit">Pay to confirm →</button>
           <a class="btn btn-outline" href="mailto:hello@lilbird.life">Questions first?</a>
         </div>
-        <p class="fine-print">Payment opens in a secure Stripe window ($249). Afterward you'll book your session on Cal.com.</p>
+        <p class="fine-print">Payment opens in a secure Stripe window ($249). Your session is confirmed as soon as it goes through, and Cal.com sends the calendar invite.</p>
       </form>
     </section>
   </main>
@@ -97,7 +105,7 @@
     </div>
   </div>
 
-  <script src="./coaching-book.js?v=2"></script>
+  <script src="./coaching-book.js?v=3"></script>
 <script src="/js/lilbird-theme.js"></script>
 <script src="/js/lilbird-theme-nav.js"></script>
 </body>

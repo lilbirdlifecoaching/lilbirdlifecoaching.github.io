@@ -1016,7 +1016,7 @@
             <p>Fill in your workbook before your session. It saves privately to your device.</p>
             <div class="btn-row">
               <a class="btn btn-gold" href="${workbookHref('first-flight')}">Open workbook</a>
-              <a class="btn btn-outline" href="https://cal.com/luke-haythorpe/first-flight-intro-session" target="_blank" rel="noopener">View booking</a>
+              <a class="btn btn-outline" href="mailto:hello@lilbird.life?subject=My%20First%20Flight">Email Luke</a>
             </div>
           </article>`;
       }
@@ -1581,7 +1581,7 @@
         <h4>First Flight booked</h4>
         <p>Confirm from your booking email and complete your workbook first.</p>
         <a class="btn btn-outline full" href="${workbookHref('first-flight')}">Open workbook</a>
-        <a class="btn btn-outline full" href="https://cal.com/luke-haythorpe/first-flight-intro-session" target="_blank" rel="noopener">View booking</a>`;
+        <a class="btn btn-outline full" href="mailto:hello@lilbird.life?subject=My%20First%20Flight">Email Luke</a>`;
       return;
     }
 
