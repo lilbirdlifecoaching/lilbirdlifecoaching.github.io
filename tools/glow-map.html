@@ -499,7 +499,7 @@
     <p class="eyebrow">From the lil' bird curriculum</p>
     <h1>Where is your life <em>glowing</em>?</h1>
     <p class="lead">
-      The Glow Map is one exercise from our coaching work: a quick snapshot of five areas that shape how you feel day to day. Score each from 1–10 and watch the shape emerge. No account, no email gate. Just you and the map.
+      The Glow Map is one exercise from our coaching work: a quick snapshot of five areas that shape how you feel day to day. Score each from 1–10 and watch the shape emerge. There's no account or email gate, just you and the map.
     </p>
     <div class="pill-row">
       <span class="pill">~5 minutes</span>
@@ -508,7 +508,7 @@
     </div>
     <ol class="how-list">
       <li><span class="how-num">01</span><span>Move the sliders for Connections, Spaces, Passion &amp; Purpose, Resources, and Energy &amp; Wellbeing.</span></li>
-      <li><span class="how-num">02</span><span>Watch your Glow Map update live. The dips and peaks are the point.</span></li>
+      <li><span class="how-num">02</span><span>Watch your Glow Map update live, and notice where it dips and peaks.</span></li>
       <li><span class="how-num">03</span><span>See a short read on your map, plus one practical question and a small action step aimed at your lowest score.</span></li>
     </ol>
     <button type="button" class="btn btn-primary" id="btn-start">Start your Glow Map →</button>
@@ -522,7 +522,7 @@
     <div class="tool-head">
       <p class="eyebrow">Your map</p>
       <h2>Glow Map</h2>
-      <p>Score what's true right now, not where you wish you were.</p>
+      <p>Score each area as it is right now.</p>
     </div>
     <div class="chart-wrap">
       <svg id="glow-svg" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Glow Map radar chart"></svg>
@@ -556,7 +556,7 @@
 
     <div class="done-card">
       <p style="font-size:0.88rem;line-height:1.75;color:var(--text-dim);">
-        One exercise can't carry the whole story, but it can name what matters. If something here landed, you don't have to figure out the next chapter alone.
+        One exercise can't carry the whole story, but it can name what matters. If something here stood out, you don't have to figure out the next chapter alone.
       </p>
     </div>
 
@@ -565,13 +565,13 @@
       <div class="cta-grid">
         <div class="cta-card featured">
           <h3>First Flight</h3>
-          <p>One 2-hour session with Luke. Map your story, name the real issue, leave with a next brave step. Lowest barrier to see if coaching fits.</p>
+          <p>One 90-minute session with Luke. Map your story, name the real issue, and leave with a next brave step. It's the easiest way to see if coaching fits.</p>
           <p class="code">Code <strong>IMREADY</strong> · fixed price $149</p>
           <a href="/first-flight/book.html?code=IMREADY" class="btn btn-gold" target="_blank" rel="noopener">Book a First Flight →</a>
         </div>
         <div class="cta-card">
           <h3>Life Change Sessions: Solo</h3>
-          <p>The full self-guided course: same curriculum spine, your pace. AI coach, session tools, and the arc this Glow Map sits inside.</p>
+          <p>The full self-guided course: the same curriculum at your own pace. AI coach, session tools, and the arc this Glow Map sits inside.</p>
           <p class="code">Code <strong>SOLO50</strong> · 50% off</p>
           <a href="https://lilbird.life/solo/" class="btn btn-outline" target="_blank" rel="noopener">Explore Solo →</a>
         </div>
@@ -625,7 +625,7 @@
       step: 'Name one drain you could reduce or pause for seven days. Write it down or tell one person so it stops being background noise.'
     },
     wellbeing: {
-      question: 'What does your body need that you\'ve been putting off? Not someday. This week.',
+      question: 'What does your body need that you\'ve been putting off, and could you give it that this week?',
       step: 'Pick one non-negotiable for the next seven days: one earlier night, one walk without your phone, or one meal eaten sitting down.'
     }
   };
@@ -774,16 +774,16 @@
 
     if (avg <= 4) {
       headline = 'A lot is running dim right now';
-      body = 'Most of your map is sitting low. That usually means strain is not isolated to one corner of life. The whole system is under pressure. Naming ' + dimLabels + ' as the lowest is not failure. It is data.';
+      body = 'Most of your map is sitting low. That usually means the strain is spread across your whole life rather than one corner. Naming ' + dimLabels + ' as the lowest is useful information, and it doesn\'t mean you\'ve failed.';
     } else if (avg >= 7.5) {
       headline = 'Strong light across the board';
-      body = 'You\'re scoring high in most areas. The work now is often maintenance: do not let the bright spots hide a small dip. Even high maps have edges. Yours shows ' + dimLabels + ' as the relative low.';
+      body = 'You\'re scoring high in most areas. The work now is often maintenance, making sure the bright spots don\'t hide a small dip. Yours shows ' + dimLabels + ' as the relative low.';
     } else if (brightest[0].score - dimmest[0].score >= 4) {
       headline = 'Big gap between glow and dim';
-      body = brightLabels + ' is carrying real energy for you (' + brightest[0].score + '/10), while ' + dimLabels + ' is lagging (' + dimmest[0].score + '/10). That kind of split often shows up as fine on paper and heavy in real life. The gap is the conversation.';
+      body = brightLabels + ' is carrying real energy for you (' + brightest[0].score + '/10), while ' + dimLabels + ' is lagging (' + dimmest[0].score + '/10). That kind of split often feels fine on paper and heavy in real life, and the gap is worth talking about.';
     } else {
-      headline = 'Uneven but not collapsed';
-      body = dimLabels + ' is where the map dips first (' + dimmest[0].score + '/10). ' + brightLabels + ' is your steadiest area (' + brightest[0].score + '/10). You do not need to fix everything at once. The dim edge is usually where change wants to start.';
+      headline = 'Uneven, but holding';
+      body = dimLabels + ' is where the map dips first (' + dimmest[0].score + '/10). ' + brightLabels + ' is your steadiest area (' + brightest[0].score + '/10). You don\'t need to fix everything at once. Change usually starts at the dim edge.';
     }
 
     document.getElementById('insight-headline').textContent = headline;
