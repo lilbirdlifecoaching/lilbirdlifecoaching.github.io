@@ -467,6 +467,21 @@
     .site-footer a { color: var(--gold-dim); text-decoration: none; }
     .site-footer a:hover { color: var(--gold); }
 
+    .glow-email-row { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1rem; }
+    .glow-email-row input {
+      flex: 1 1 220px;
+      min-width: 0;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--glow-border);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      color: inherit;
+      font: inherit;
+      font-size: 0.95rem;
+    }
+    .glow-email-row input:focus { outline: none; border-color: var(--glow); }
+    .glow-email-status { margin-top: 0.75rem; font-size: 0.85rem; min-height: 1.2em; }
+
     @media (max-width: 480px) {
       .nav { padding: 1rem; }
       .wrap { padding-top: 4.75rem; }
@@ -553,6 +568,17 @@
       <div id="action-blocks"></div>
       <p class="action-tie-note" id="action-tie-note" hidden></p>
     </div>
+
+    <form class="done-card" id="glow-email-form" novalidate>
+      <p class="action-card-kicker">Keep a copy</p>
+      <h2>Email me my map</h2>
+      <p>I'll send your scores and the step for your dimmest area. After that, two short notes over the next week and a reminder to retake it in a few months. Unsubscribe anytime.</p>
+      <div class="glow-email-row">
+        <input type="email" id="glow-email" placeholder="you@example.com" autocomplete="email" required aria-label="Email address" />
+        <button type="submit" class="btn btn-primary" id="glow-email-btn">Send it →</button>
+      </div>
+      <p class="glow-email-status" id="glow-email-status" role="status"></p>
+    </form>
 
     <div class="done-card">
       <p style="font-size:0.88rem;line-height:1.75;color:var(--text-dim);">
@@ -865,6 +891,34 @@
     buildSliders();
     drawChart();
     showScreen('tool');
+  });
+
+  const GLOW_EMAIL_URL = 'https://lilbird-assessment.cwwq46sn7m.workers.dev/glow-map-email';
+  document.getElementById('glow-email-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const input = document.getElementById('glow-email');
+    const btn = document.getElementById('glow-email-btn');
+    const status = document.getElementById('glow-email-status');
+    const email = input.value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      status.textContent = 'Please check that email address.';
+      return;
+    }
+    btn.disabled = true;
+    status.textContent = 'Sending…';
+    fetch(GLOW_EMAIL_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, scores: scores })
+    }).then(function (res) {
+      if (!res.ok) throw new Error('send failed');
+      status.textContent = 'Sent. Check your inbox (and your spam folder, just in case).';
+      input.value = '';
+    }).catch(function () {
+      status.textContent = "That didn't go through. Try again in a minute.";
+    }).then(function () {
+      btn.disabled = false;
+    });
   });
 
   // Deep-link: ?start=1 skips intro (handy for returning visitors)
