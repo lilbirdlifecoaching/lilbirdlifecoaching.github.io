@@ -720,8 +720,8 @@
   }
   .canvas-dim-header {
     display: flex;
-    align-items: baseline;
-    gap: 0.75rem;
+    flex-direction: column;
+    gap: 0.2rem;
     margin-bottom: 0.35rem;
   }
   .canvas-dim-key {
@@ -2654,8 +2654,8 @@
     <!-- WHY -->
     <div class="canvas-dimension">
       <div class="canvas-dim-header">
-        <span class="canvas-dim-key">WHY</span>
-        <span class="canvas-dim-title">Purpose: My place in the world</span>
+        <span class="canvas-dim-key">Passion &amp; Purpose</span>
+        <span class="canvas-dim-title">My place in the world</span>
       </div>
       <p class="canvas-dim-question">Do you wake up with a sense of direction, or does it feel like you're moving through fog? Think about your work, your calling, whatever gets you out of bed. When you imagine it, does it light something up or slowly drain you? Are you <em>running toward something</em> or away from it, or not sure?</p>
       <div class="canvas-slider-wrap">
@@ -2669,8 +2669,8 @@
     <!-- WHO -->
     <div class="canvas-dimension">
       <div class="canvas-dim-header">
-        <span class="canvas-dim-key">WHO</span>
-        <span class="canvas-dim-title">People: The people around me</span>
+        <span class="canvas-dim-key">Connections</span>
+        <span class="canvas-dim-title">The people around me</span>
       </div>
       <p class="canvas-dim-question">Who makes up your daily life? Partners, family, friends, flatmates, colleagues. Are they filling you up or wearing you down? If you had to name the one relationship having the <em>biggest impact on you right now</em>, good or bad, what's it doing to you?</p>
       <div class="canvas-slider-wrap">
@@ -2684,8 +2684,8 @@
     <!-- WHERE -->
     <div class="canvas-dimension">
       <div class="canvas-dim-header">
-        <span class="canvas-dim-key">WHERE</span>
-        <span class="canvas-dim-title">Place: Where I've landed</span>
+        <span class="canvas-dim-key">Spaces</span>
+        <span class="canvas-dim-title">Where I've landed</span>
       </div>
       <p class="canvas-dim-question">Look around you, literally. Your city, your street, your home. Does it feel like <em>yours</em>, or like somewhere you're just passing through? If your soul needs trees, do you have trees? If it needs ocean, is it close? When you walk through your front door at the end of a hard day, does the space hold you, or add to the weight?</p>
       <div class="canvas-slider-wrap">
@@ -2699,8 +2699,8 @@
     <!-- WHAT -->
     <div class="canvas-dimension">
       <div class="canvas-dim-header">
-        <span class="canvas-dim-key">WHAT</span>
-        <span class="canvas-dim-title">Provision: What I have to work with</span>
+        <span class="canvas-dim-key">Resources</span>
+        <span class="canvas-dim-title">What I have to work with</span>
       </div>
       <p class="canvas-dim-question">This one's for you, so give yourself the real answer. How are you doing financially, materially? Skip the polished version. Do you feel like you have enough, or is there a <em>low-level hum of worry</em> that follows you around? Are you building something, holding steady, or slowly sliding?</p>
       <div class="canvas-slider-wrap">
@@ -2714,8 +2714,8 @@
     <!-- HOW -->
     <div class="canvas-dimension">
       <div class="canvas-dim-header">
-        <span class="canvas-dim-key">HOW</span>
-        <span class="canvas-dim-title">Wellbeing: How I'm really doing</span>
+        <span class="canvas-dim-key">Energy &amp; Wellbeing</span>
+        <span class="canvas-dim-title">How I'm really doing</span>
       </div>
       <p class="canvas-dim-question">Last one, and the most important. How are you doing, beyond "fine"? Are you sleeping? Moving? Does your body feel like an ally or something you're managing? And mentally, are you okay, or are you carrying something heavy right now? If you fudge this answer, everything else in your read will be slightly off. So be real. <em>Are you trending up or spiraling down?</em></p>
       <div class="canvas-slider-wrap">
@@ -3149,27 +3149,27 @@
           <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:1.25rem;">Drag each slider to reflect where you are right now. Takes 2 minutes.</p>
 
           <div class="canvas-redo-dim">
-            <div class="canvas-redo-label"><span style="color:#F5C842;font-weight:500;">WHY</span> <span style="opacity:0.6;">Purpose & Direction</span></div>
+            <div class="canvas-redo-label"><span style="color:#F5C842;font-weight:500;">Passion &amp; Purpose</span></div>
             <input type="range" class="canvas-slider" id="redo-why" min="0" max="100" value="50" oninput="updateSlider('redo-why','redo-score-why')">
             <div class="canvas-score-display" id="redo-score-why" style="font-size:1.4rem;">50</div>
           </div>
           <div class="canvas-redo-dim">
-            <div class="canvas-redo-label"><span style="color:#4adea8;font-weight:500;">WHO</span> <span style="opacity:0.6;">People & Relationships</span></div>
+            <div class="canvas-redo-label"><span style="color:#4adea8;font-weight:500;">Connections</span></div>
             <input type="range" class="canvas-slider" id="redo-who" min="0" max="100" value="50" oninput="updateSlider('redo-who','redo-score-who')">
             <div class="canvas-score-display" id="redo-score-who" style="font-size:1.4rem;">50</div>
           </div>
           <div class="canvas-redo-dim">
-            <div class="canvas-redo-label"><span style="color:#5ab4f0;font-weight:500;">WHERE</span> <span style="opacity:0.6;">Place & Environment</span></div>
+            <div class="canvas-redo-label"><span style="color:#5ab4f0;font-weight:500;">Spaces</span></div>
             <input type="range" class="canvas-slider" id="redo-where" min="0" max="100" value="50" oninput="updateSlider('redo-where','redo-score-where')">
             <div class="canvas-score-display" id="redo-score-where" style="font-size:1.4rem;">50</div>
           </div>
           <div class="canvas-redo-dim">
-            <div class="canvas-redo-label"><span style="color:#e8734a;font-weight:500;">WHAT</span> <span style="opacity:0.6;">Resources & Provision</span></div>
+            <div class="canvas-redo-label"><span style="color:#e8734a;font-weight:500;">Resources</span></div>
             <input type="range" class="canvas-slider" id="redo-what" min="0" max="100" value="50" oninput="updateSlider('redo-what','redo-score-what')">
             <div class="canvas-score-display" id="redo-score-what" style="font-size:1.4rem;">50</div>
           </div>
           <div class="canvas-redo-dim">
-            <div class="canvas-redo-label"><span style="color:#c94aad;font-weight:500;">HOW</span> <span style="opacity:0.6;">Personal Health</span></div>
+            <div class="canvas-redo-label"><span style="color:#c94aad;font-weight:500;">Energy &amp; Wellbeing</span></div>
             <input type="range" class="canvas-slider" id="redo-how" min="0" max="100" value="50" oninput="updateSlider('redo-how','redo-score-how')">
             <div class="canvas-score-display" id="redo-score-how" style="font-size:1.4rem;">50</div>
           </div>
@@ -5356,11 +5356,11 @@ function renderCanvasHeroMain(profile){
   if(!wrap) return;
   const cs = canvasScores || profile.canvasScores || {};
   const dims = [
-    { key: 'why', label: 'WHY', color: '#F5C842' },
-    { key: 'who', label: 'WHO', color: '#4adea8' },
-    { key: 'where', label: 'WHERE', color: '#5ab4f0' },
-    { key: 'what', label: 'WHAT', color: '#e8734a' },
-    { key: 'how', label: 'HOW', color: '#c94aad' },
+    { key: 'why', label: 'Passion & Purpose', color: '#F5C842' },
+    { key: 'who', label: 'Connections', color: '#4adea8' },
+    { key: 'where', label: 'Spaces', color: '#5ab4f0' },
+    { key: 'what', label: 'Resources', color: '#e8734a' },
+    { key: 'how', label: 'Energy & Wellbeing', color: '#c94aad' },
   ];
   const vals = dims.map(function(d){ return typeof cs[d.key] === 'number' ? cs[d.key] : 50; });
   const overall = Math.round(vals.reduce(function(a,b){ return a+b; }, 0) / vals.length);
@@ -6088,11 +6088,11 @@ function setCanvasView(v){
 
 function renderCanvasResults(scores, synthesis) {
   const dimDefs = [
-    { key:'why',   label:'WHY',   sub:'Purpose',   color:'#F5C842' },
-    { key:'who',   label:'WHO',   sub:'People',    color:'#4adea8' },
-    { key:'where', label:'WHERE', sub:'Place',     color:'#5ab4f0' },
-    { key:'what',  label:'WHAT',  sub:'Provision', color:'#e8734a' },
-    { key:'how',   label:'HOW',   sub:'Wellbeing', color:'#c94aad' },
+    { key:'why',   label:'Passion & Purpose', color:'#F5C842' },
+    { key:'who',   label:'Connections', color:'#4adea8' },
+    { key:'where', label:'Spaces', color:'#5ab4f0' },
+    { key:'what',  label:'Resources', color:'#e8734a' },
+    { key:'how',   label:'Energy & Wellbeing', color:'#c94aad' },
   ];
 
   const overall = Math.round(Object.values(scores).reduce((a,b)=>a+b,0)/5);
@@ -6104,9 +6104,8 @@ function renderCanvasResults(scores, synthesis) {
   if(barsEl){
     barsEl.innerHTML = dimDefs.map(d=>`
       <div class="canvas-bar-row">
-        <div style="min-width:72px;display:flex;flex-direction:column;gap:1px;">
+        <div style="width:104px;flex-shrink:0;line-height:1.3;">
           <span class="canvas-bar-label" style="color:${d.color};font-weight:700;">${d.label}</span>
-          <span style="font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--text-muted);opacity:0.65;letter-spacing:0.04em;">${d.sub}</span>
         </div>
         <div class="canvas-bar-track">
           <div class="canvas-bar-fill" id="cbf-${d.key}" style="width:0%;background:${d.color};opacity:0.85;"></div>
@@ -6332,11 +6331,11 @@ async function saveCanvasUpdate(){
 }
 
 const CANVAS_HISTORY_DIMS = [
-  { key: 'why', title: 'Purpose & direction', color: '#F5C842' },
-  { key: 'who', title: 'People & relationships', color: '#4adea8' },
-  { key: 'where', title: 'Place & environment', color: '#5ab4f0' },
-  { key: 'what', title: 'Resources & provision', color: '#e8734a' },
-  { key: 'how', title: 'Personal health', color: '#c94aad' },
+  { key: 'why', title: 'Passion & Purpose', color: '#F5C842' },
+  { key: 'who', title: 'Connections', color: '#4adea8' },
+  { key: 'where', title: 'Spaces', color: '#5ab4f0' },
+  { key: 'what', title: 'Resources', color: '#e8734a' },
+  { key: 'how', title: 'Energy & Wellbeing', color: '#c94aad' },
 ];
 const CANVAS_HISTORY_VIEW_HINTS = {
   arc: 'Your overall arc, then each life area: how you\'ve shifted since your first check-in.',
