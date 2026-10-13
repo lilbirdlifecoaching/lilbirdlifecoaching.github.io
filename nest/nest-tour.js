@@ -71,7 +71,7 @@
         title: 'Nest Plus · $5',
         body: 'Adds the Relationship Dynamic tool and the First Flight workbook. A one-off $5, yours to keep. Already included with any coaching, Solo or Intensive purchase.',
         tip: null,
-        action: { label: 'Add Nest Plus — $5 →', upgrade: 'nest_plus' }
+        action: { label: 'Add Nest Plus · $5 →', upgrade: 'nest_plus' }
       }
     },
     lcs_workbook: {
@@ -87,7 +87,7 @@
         title: 'Life Change Sessions workbook · $27',
         body: 'The complete eight-session workbook to work through on your own. It’s included with the Life Change Intensive.',
         tip: null,
-        action: { label: 'Get the workbook — $27 →', upgrade: 'lcs_workbook' }
+        action: { label: 'Get the workbook · $27 →', upgrade: 'lcs_workbook' }
       }
     },
     solo_course: {
@@ -116,7 +116,7 @@
       },
       locked: {
         title: 'Work with Luke',
-        body: 'Start with a First Flight session ($149), book a single coaching session ($249), or enrol in the Life Change Intensive — all from these cards.',
+        body: 'Start with a First Flight session ($149), book a single coaching session ($249), or enrol in the Life Change Intensive, all from these cards.',
         tip: '» Pick the card that fits'
       }
     }
@@ -164,7 +164,7 @@
         selector: '#tab-profile',
         title: 'My profile',
         body: owns('full_read')
-          ? 'Your full Inner Compass read and Life Canvas live here — the wiring everything else builds on.'
+          ? 'Your full Inner Compass read and Life Canvas live here. Everything else builds on them.'
           : 'Your Inner Compass lives here. Your two types are free; the full read and Nest unlock for $2 from your read.',
         tip: '» Complete or open Inner Compass from this tab'
       },
@@ -182,7 +182,7 @@
         tab: 'ask',
         selector: '#tab-ask',
         title: 'Ask lil’ bird',
-        body: 'Stuck or curious? Same guide voice, inside your Nest — ask anything about your work here.',
+        body: 'Stuck or curious? Ask the same guide anything about your work, right here in your Nest.',
         tip: null
       },
       {

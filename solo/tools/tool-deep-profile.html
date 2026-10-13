@@ -131,19 +131,19 @@
 
   <div class="eyebrow">Session 03 · Identity</div>
   <h1>Your Identity<br>Profile</h1>
-  <p class="intro">Understanding how you're wired — how you think, feel, and move through the world — gives the coaching real material to work with. This isn't about putting you in a box. It's about giving you a language for what you already know about yourself.</p>
+  <p class="intro">Understanding how you're wired (how you think, feel, and move through the world) gives the coaching real material to work with. It gives you language for what you already know about yourself.</p>
 
   <!-- Opening prompt from lil' bird -->
   <div class="prompt-card">
     <div class="prompt-avatar">🌳</div>
     <div class="prompt-bubble">
-      There are two ways to approach this. If you haven't done the lil' bird Inner Compass yet, I'd love you to do it now — it takes about 15 minutes and gives us real material. If you already know your type from another assessment, you can enter it directly and we'll work with that.
+      There are two ways to approach this. If you haven't done the lil' bird Inner Compass yet, I'd love you to do it now. It takes about 15 minutes and gives us real material. If you already know your type from another assessment, you can enter it directly and we'll work with that.
     </div>
   </div>
 
   <!-- Already saved — show this if data exists -->
   <div class="saved-card" id="saved-card">
-    <div class="saved-label">Your profile — saved</div>
+    <div class="saved-label">Your profile · saved</div>
     <div class="saved-type" id="saved-type-display"></div>
     <div class="saved-subtype" id="saved-subtype-display"></div>
     <button type="button" class="btn-edit" id="btn-edit-profile">Edit profile</button>
@@ -217,7 +217,7 @@
 
     <div class="reflection-card">
       <div class="reflection-label">One question from lil' bird</div>
-      <p class="reflection-prompt">When you first saw your type — whether it was MBTI, Enneagram, or something else — what surprised you most? Was there something that felt immediately true, or something you pushed back on?</p>
+      <p class="reflection-prompt">When you first saw your type (MBTI, Enneagram, or something else), what surprised you most? Was there something that felt immediately true, or something you pushed back on?</p>
       <textarea class="field-textarea" id="type-reflection" placeholder="What landed, what didn't..."></textarea>
     </div>
   </div>
@@ -226,9 +226,9 @@
   <div class="panel" id="panel-deep-profile">
     <div class="deep-profile-card">
       <h3>The lil' bird Inner Compass</h3>
-      <p>A 15-minute personality assessment that explores how you think, what drives you, and how you show up in relationships and under pressure. Built specifically for the lil' bird coaching journey.</p>
+      <p>A 15-minute personality assessment that explores how you think, what drives you, and how you show up in relationships and under pressure. Built specifically for lil' bird coaching.</p>
       <button type="button" id="btn-launch-deep-profile" class="btn-do-assessment">Take the Inner Compass →</button>
-      <div class="assessment-note" id="launch-note">Opens in a new tab. We'll auto-pull your result back here when you're done — no re-typing.</div>
+      <div class="assessment-note" id="launch-note">Opens in a new tab. We'll pull your result back here automatically when you're done, so there's no re-typing.</div>
     </div>
 
     <div class="return-card">
@@ -418,7 +418,7 @@
       } else {
         window.open(fallback, '_blank', 'noopener');
       }
-      if (note) note.textContent = "Opens in a new tab. (Couldn't auto-link this run — enter your result manually when you return.)";
+      if (note) note.textContent = "Opens in a new tab. (Couldn't auto-link this run. Enter your result manually when you return.)";
     }
   });
 

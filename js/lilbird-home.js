@@ -159,7 +159,7 @@
   function initFooterFeedback() {
     var a = document.getElementById('footer-feedback-link');
     if (!a) return;
-    var subject = encodeURIComponent("lilbird.life — site feedback");
+    var subject = encodeURIComponent("lilbird.life site feedback");
     var body = encodeURIComponent(
       'What went wrong or what would help?\n\n—\nPage: ' + global.location.href + '\n'
     );

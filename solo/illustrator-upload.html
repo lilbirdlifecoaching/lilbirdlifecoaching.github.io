@@ -188,7 +188,7 @@ btnAuth.addEventListener('click', async function() {
     portal.classList.add('visible');
     loadUserInfo();
   } catch (err) {
-    authError.textContent = 'Could not reach server — check your connection.';
+    authError.textContent = 'Could not reach the server. Check your connection.';
     btnAuth.disabled = false;
     btnAuth.textContent = 'Continue →';
   }
@@ -274,7 +274,7 @@ btnChange.addEventListener('click', function() {
 // ── Submit ────────────────────────────────────────────────
 btnSubmit.addEventListener('click', async function() {
   if (!illustFile) { setStatus('Choose an illustration file first.', true); return; }
-  if (!userId)     { setStatus('No user_id — copy the link from the email.', true); return; }
+  if (!userId)     { setStatus('No user_id. Copy the link from the email.', true); return; }
   if (!password)   { setStatus('Not authenticated.', true); return; }
 
   btnSubmit.disabled = true;
@@ -316,7 +316,7 @@ btnSubmit.addEventListener('click', async function() {
 
   } catch (err) {
     console.error('Submit error:', err);
-    setStatus('Something went wrong — ' + (err.message || 'try again.'), true);
+    setStatus('Something went wrong: ' + (err.message || 'try again.'), true);
     btnSubmit.disabled = false;
     btnSubmit.textContent = 'Send illustration →';
   }

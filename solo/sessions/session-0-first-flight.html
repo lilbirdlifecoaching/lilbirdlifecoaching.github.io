@@ -611,7 +611,7 @@
         <div class="session-tag">Orientation</div>
         <h1>First<br>Flight.</h1>
         <p class="session-desc">
-          Name where you are. Glimpse where you could be. Take one real step. This is the beginning — and beginnings matter.
+          Name where you are. Glimpse where you could be. Take one real step. This is the beginning, and beginnings matter.
         </p>
 
         <!-- Video placeholder -->
@@ -675,7 +675,7 @@
         <!-- Complete panel — shown after enough exchange -->
         <div class="complete-panel" id="complete-panel">
           <h3>That's a good start.</h3>
-          <p>You've named where you are and glimpsed where you could go. Session 1 is waiting — and it goes deeper. When you're ready.</p>
+          <p>You've named where you are and glimpsed where you could go. Session 1 is waiting, and it goes deeper. Start it when you're ready.</p>
           <button class="btn-complete" id="btn-complete">Mark complete & continue →</button>
         </div>
 
@@ -820,7 +820,7 @@
 
       } catch (err) {
         hideTyping();
-        renderMessage('assistant', 'Something got in the way there. Take a breath — try sending your message again.');
+        renderMessage('assistant', 'Something got in the way there. Take a breath and try sending your message again.');
         messages.pop();
       }
 
@@ -906,7 +906,7 @@
                   session_number:     SESSION_NUMBER,
                   summary:            summary,
                   action_point:       extractActionPoint(messages),
-                  next_session_title: 'Story — Before you take flight, know where you\'ve been.',
+                  next_session_title: 'Story: Before you take flight, know where you\'ve been.',
                 }),
               }).catch(() => {});
             }
@@ -940,7 +940,7 @@
 
       return actionMsg
         ? actionMsg.slice(0, 200) + (actionMsg.length > 200 ? '...' : '')
-        : 'Take some time before your next session to sit with what came up today.';
+        : 'Take some time before your next session to think about what came up today.';
     }
 
     // ── Auto-resize textarea ───────────────────────────────────
@@ -1006,8 +1006,8 @@
         }
       } else {
         const greeting = userName
-          ? `${userName}. You made it here — and that already says something about you.\n\nI'm lil' bird. Think of me as a guide — I'm not going to tell you what to do or hand you a plan. My job is to ask the right questions and stay curious with you as you figure out what's actually true for your life.\n\nBefore we go anywhere — tell me what brought you here. What's alive for you right now?`
-          : `You made it here — and that already says something about you.\n\nI'm lil' bird. Think of me as a guide — I'm not going to tell you what to do or hand you a plan. My job is to ask the right questions and stay curious with you as you figure out what's actually true for your life.\n\nBefore we go anywhere — tell me what brought you here. What's alive for you right now?`;
+          ? `${userName}. You made it here, and I'm glad.\n\nI'm lil' bird. Think of me as a guide. I won't tell you what to do or hand you a plan. My job is to ask the right questions and stay curious with you as you figure out what's true for your life.\n\nBefore we go anywhere, tell me what brought you here. What's alive for you right now?`
+          : `You made it here, and I'm glad.\n\nI'm lil' bird. Think of me as a guide. I won't tell you what to do or hand you a plan. My job is to ask the right questions and stay curious with you as you figure out what's true for your life.\n\nBefore we go anywhere, tell me what brought you here. What's alive for you right now?`;
 
         setTimeout(() => {
           renderMessage('assistant', greeting);

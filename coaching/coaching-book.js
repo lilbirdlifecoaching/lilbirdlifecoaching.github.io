@@ -139,7 +139,7 @@
           checkoutPromoNote.style.color = 'var(--green)';
         } else if (codeUsed) {
           checkoutPromoNote.textContent =
-            '“' + codeUsed + '” could not be pre-applied — use “Add promotion code” in the Stripe form below, or go back and check the spelling.';
+            '“' + codeUsed + '” could not be pre-applied. Use “Add promotion code” in the Stripe form below, or go back and check the spelling.';
           checkoutPromoNote.style.color = '';
         } else {
           checkoutPromoNote.textContent = 'Have a promo code? Click “Add promotion code” in the Stripe form below.';

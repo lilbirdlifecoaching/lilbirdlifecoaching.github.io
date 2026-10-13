@@ -171,7 +171,7 @@
         <div class="lb-cal-hdr">
           <div>
             <div class="lb-cal-title">book your first flight</div>
-            <div class="lb-cal-disc">✦ use code IMREADY — $149 (list $299)</div>
+            <div class="lb-cal-disc">✦ use code IMREADY for $149 (list $299)</div>
           </div>
           <button id="lb-cal-x">✕</button>
         </div>
@@ -254,7 +254,7 @@
     var options = [
       { label: '🔍 See if coaching is a good fit for me', val: 'I want to see if coaching is a good fit for me' },
       { label: '💬 Unpack something I\'m working through', val: 'I want to unpack a problem or situation I\'m working through' },
-      { label: '📅 I\'m ready to book — just help me choose', val: 'I already know I want to book — can you help me choose the right option?' },
+      { label: '📅 I\'m ready to book, just help me choose', val: 'I already know I want to book. Can you help me choose the right option?' },
     ];
     options.forEach(function(o) {
       var btn = document.createElement('button'); btn.className = 'lb-opt';
@@ -275,10 +275,10 @@
   function showBookingOptions() {
     var m = document.createElement('div'); m.className = 'lb-m bot';
     var b = document.createElement('div'); b.className = 'lb-b';
-    b.innerHTML = 'Great — here\'s a quick look at the options:<br><br><strong style="color:#F5C842">🐦 The First Flight</strong> — one 90-minute session. Map your story, find the real issue, leave with your next step. Best starting point, no commitment beyond the conversation.<br><br><strong style="color:#F5C842">🌿 Life Change Sessions</strong> — the full journey. 7 sessions through the complete curriculum. Story, vision, identity, transitions, rhythms, relationships.<br><br><strong style="color:#F5C842">💛 Coaching</strong> — ad hoc thinking partner. $249 per session — pay then book.';
+    b.innerHTML = 'Great, here\'s a quick look at the options:<br><br><strong style="color:#F5C842">🐦 The First Flight</strong>: one 90-minute session. Map your story, find the real issue, leave with your next step. Best starting point, no commitment beyond the conversation.<br><br><strong style="color:#F5C842">🌿 Life Change Sessions</strong>: eight sessions through the complete curriculum. Story, vision, identity, transitions, rhythms, relationships.<br><br><strong style="color:#F5C842">💛 Coaching</strong>: an ad hoc thinking partner. $249 per session, pay then book.';
     var wrap = document.createElement('div'); wrap.className = 'lb-opts'; wrap.style.marginTop = '.75rem';
     [
-      { label: 'Book a First Flight — $149 with code IMREADY', url: FF_URL, ff: true },
+      { label: 'Book a First Flight · $149 with code IMREADY', url: FF_URL, ff: true },
       { label: 'Start Life Change Intensive enrolment', url: LCS_URL, ff: false, site: true },
       { label: 'Book a free Discovery Call first', url: DISC_URL, ff: false },
     ].forEach(function(o) {
@@ -291,7 +291,7 @@
       wrap.appendChild(btn);
     });
     var disc = document.createElement('span'); disc.className = 'lb-disc';
-    disc.textContent = '✦ Use code IMREADY at checkout — $149 for your First Flight (list $299)';
+    disc.textContent = '✦ Use code IMREADY at checkout for a $149 First Flight (list $299)';
     wrap.appendChild(disc);
     m.appendChild(b); m.appendChild(wrap); msgsEl.appendChild(m);
     msgs.push({role:'assistant', content:'Here are the session options...'});

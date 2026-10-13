@@ -80,7 +80,7 @@
     <p class="eyebrow">payment received</p>
     <h1>You're in.<br/><em>Do these next.</em></h1>
     <p class="lead" id="success-lead">
-      Confirming payment (a few seconds). Then follow the arrows — you do not need to wait on Luke.
+      Confirming payment (a few seconds). Then follow the arrows. You don't need to wait on Luke.
     </p>
     <p class="onboard-path">» Paid &nbsp;» Nest password &nbsp;» Book session 1 &nbsp;» Workbook</p>
 
@@ -111,7 +111,7 @@
           <span class="arrow" aria-hidden="true">»</span>
           <div>
             <strong>3. Book session 1</strong>
-            Nest → Life Change Intensive → <em>Book your next session</em>. Eight sessions total — one at a time.
+            Nest → Life Change Intensive → <em>Book your next session</em>. Eight sessions in total, booked one at a time.
           </div>
         </li>
         <li>
@@ -180,7 +180,7 @@
             redirectTo: 'https://lilbird.life/nest/'
           });
           if (error) throw error;
-          msg.textContent = 'Check your inbox — the link opens Nest so you can set a password.';
+          msg.textContent = 'Check your inbox. The link opens Nest so you can set a password.';
           msg.className = 'onboard-msg ok';
         } catch (e) {
           msg.textContent = e.message || 'Could not send. Try Nest → Forgot password, or email hello@lilbird.life.';
@@ -196,7 +196,7 @@
         if (user?.email && !emailInput.value) emailInput.value = user.email;
 
         if (!user) {
-          pollStatus.textContent = 'Not signed in yet — that is fine. Set your password (step 1), then open Nest.';
+          pollStatus.textContent = 'Not signed in yet, and that\'s fine. Set your password (step 1), then open Nest.';
           return;
         }
 
@@ -209,7 +209,7 @@
             .maybeSingle();
 
           if (data) {
-            lead.textContent = 'Payment confirmed. Follow the arrows below — Nest, book session 1, workbook.';
+            lead.textContent = 'Payment confirmed. Follow the arrows below: Nest, book session 1, workbook.';
             pollStatus.textContent = 'Intensive unlocked in Nest.';
             return;
           }

@@ -512,7 +512,7 @@
       <li><span class="how-num">03</span><span>See a short read on your map, plus one practical question and a small action step aimed at your lowest score.</span></li>
     </ol>
     <button type="button" class="btn btn-primary" id="btn-start">Start your Glow Map →</button>
-    <p class="note-small">This is one tool from Life Change Sessions. The full journey (guided sessions, AI coach, and the rest of the toolkit) lives in the <a href="https://lilbird.life/solo/" style="color:var(--glow);text-decoration:none;">Solo course</a> or in-person through the <a href="../book.html#intensive" style="color:var(--glow);text-decoration:none;">Life Change Intensive</a>.</p>
+    <p class="note-small">This is one tool from Life Change Sessions. The full course (guided sessions, AI coach, and the rest of the toolkit) lives in the <a href="https://lilbird.life/solo/" style="color:var(--glow);text-decoration:none;">Solo course</a> or in-person through the <a href="../book.html#intensive" style="color:var(--glow);text-decoration:none;">Life Change Intensive</a>.</p>
   </div>
 </section>
 
@@ -577,7 +577,7 @@
         </div>
         <div class="cta-card">
           <h3>Life Change Intensive</h3>
-          <p>The full in-person journey with Luke: story, vision, identity, transitions, rhythms, relationships. For when you're ready to go all the way in the room.</p>
+          <p>The full in-person program with Luke: story, vision, identity, transitions, rhythms, relationships. For when you're ready to go all the way in the room.</p>
           <a href="../book.html#intensive" class="btn btn-outline">Learn about the Intensive →</a>
         </div>
       </div>
@@ -601,7 +601,7 @@
   const AXES = [
     { key: 'connections',  label: 'Connections',       desc: 'How alive and nourishing are your relationships right now?',            color: '#c4956a' },
     { key: 'spaces',       label: 'Spaces',            desc: 'Does your physical environment support the life you want to live?',      color: '#7eb8c9' },
-    { key: 'purpose',      label: 'Passion & Purpose', desc: 'How much of your time is spent on things that genuinely matter to you?', color: '#F5C842' },
+    { key: 'purpose',      label: 'Passion & Purpose', desc: 'How much of your time goes to things that matter to you?', color: '#F5C842' },
     { key: 'resources',    label: 'Resources',         desc: 'Do you have enough time, money, and energy to live without constant strain?', color: '#9dbf8a' },
     { key: 'wellbeing',    label: 'Energy & Wellbeing',desc: 'How well are you sleeping, moving, resting, and caring for yourself?',   color: '#a89060' },
   ];
@@ -610,15 +610,15 @@
   const ACTION_BY_AXIS = {
     connections: {
       question: 'Who is one person you could be more direct with this week, without trying to fix the whole relationship?',
-      step: 'Send one message or make one call to someone who matters to you. Keep it short. Say one thing that is actually true.'
+      step: 'Send one message or make one call to someone who matters to you. Keep it short. Say one thing you mean.'
     },
     spaces: {
       question: 'What is one change to your physical environment that would make tomorrow feel even 10% easier to be in?',
-      step: 'Reclaim one small thing today: clear one surface, open a window, or dedicate one corner to something you actually want to do there.'
+      step: 'Reclaim one small thing today: clear one surface, open a window, or dedicate one corner to something you want to do there.'
     },
     purpose: {
       question: 'If you looked at last week\'s calendar, how much of it would you choose again? What is that telling you?',
-      step: 'Block 30 minutes this week for one thing that genuinely matters to you. Treat it like a meeting with someone you respect.'
+      step: 'Block 30 minutes this week for one thing that matters to you. Treat it like a meeting with someone you respect.'
     },
     resources: {
       question: 'Where are you paying a cost you never consciously agreed to, in time, money, or energy?',
@@ -777,7 +777,7 @@
       body = 'Most of your map is sitting low. That usually means strain is not isolated to one corner of life. The whole system is under pressure. Naming ' + dimLabels + ' as the lowest is not failure. It is data.';
     } else if (avg >= 7.5) {
       headline = 'Strong light across the board';
-      body = 'You\'re scoring high in most areas. The work now is often maintenance: do not let the bright spots hide a quiet dip. Even high maps have edges. Yours shows ' + dimLabels + ' as the relative low.';
+      body = 'You\'re scoring high in most areas. The work now is often maintenance: do not let the bright spots hide a small dip. Even high maps have edges. Yours shows ' + dimLabels + ' as the relative low.';
     } else if (brightest[0].score - dimmest[0].score >= 4) {
       headline = 'Big gap between glow and dim';
       body = brightLabels + ' is carrying real energy for you (' + brightest[0].score + '/10), while ' + dimLabels + ' is lagging (' + dimmest[0].score + '/10). That kind of split often shows up as fine on paper and heavy in real life. The gap is the conversation.';

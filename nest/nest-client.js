@@ -62,7 +62,7 @@
       return 'Please confirm your email first (check inbox and spam), then log in. Use Resend confirmation below if needed.';
     }
     if (code === 'invalid_credentials' || msg.includes('invalid login')) {
-      return 'Could not log in. If you just created an account, open the confirmation email first — until then login will fail. Otherwise check your password or use Forgot password.';
+      return 'Could not log in. If you just created an account, open the confirmation email first. Login will not work until you do. Otherwise check your password or use Forgot password.';
     }
     return error.message || 'Could not log in.';
   }
@@ -267,7 +267,7 @@
     loginError.style.color = error ? '' : 'var(--gold)';
     loginError.textContent = error
       ? error.message || 'Could not resend confirmation.'
-      : 'Confirmation email sent — check inbox and spam, then click the link (it should open this Nest page).';
+      : 'Confirmation email sent. Check your inbox and spam, then click the link (it should open this Nest page).';
   });
 
   async function workerAuthHeaders() {
@@ -503,12 +503,12 @@
       const qs = params.toString();
       window.history.replaceState(null, '', window.location.pathname + (qs ? '?' + qs : '') + window.location.hash);
       if (!unlocked) {
-        setDashError('Payment received — your unlock is still on its way. Refresh in a minute, or email hello@lilbird.life if it does not appear.');
+        setDashError('Payment received. Your unlock is still on its way. Refresh in a minute, or email hello@lilbird.life if it does not appear.');
       }
       return;
     }
     purchasePolls += 1;
-    setDashError('Payment received — unlocking now…');
+    setDashError('Payment received. Unlocking now…');
     setTimeout(() => void hydrateDashboard(), 2500);
   }
 
@@ -581,7 +581,7 @@
         .join('');
     } else {
       sessionRows =
-        '<li class="lci-session-empty">Session slots are being set up — refresh in a moment or email hello@lilbird.life.</li>';
+        '<li class="lci-session-empty">Session slots are being set up. Refresh in a moment or email hello@lilbird.life.</li>';
     }
 
     let bookingAction = '';
@@ -626,7 +626,7 @@
       if (error) {
         setDashError(
           error.message === 'no available sessions'
-            ? 'No sessions left to mark — you may already be up to date.'
+            ? 'No sessions left to mark. You may already be up to date.'
             : 'Could not update your session count. Try refreshing, or email hello@lilbird.life.'
         );
         return;
@@ -691,12 +691,12 @@
         done: hasFirstFlight,
         text: hasFirstFlight
           ? 'First Flight booked'
-          : 'Book a First Flight session — $149',
+          : 'Book a First Flight session · $149',
         href: hasFirstFlight ? '' : '/first-flight/book.html?code=IMREADY'
       });
       steps.push({
         done: false,
-        text: 'Or book a coaching session (à la carte) — $249',
+        text: 'Or book a single coaching session · $249',
         href: '/coaching/book.html?from=nest'
       });
       steps.push({
@@ -705,7 +705,7 @@
         href: '/intensive/enrol.html?from=nest'
       });
       if (hasSolo) {
-        steps.push({ done: false, text: 'Continue your Solo journey', href: '/solo/' });
+        steps.push({ done: false, text: 'Continue Solo', href: '/solo/' });
       }
       steps.push({
         done: !!youngerYouPhotoUrl(),
@@ -786,7 +786,7 @@
       const profile = await fetchAssessmentProfile(nestId);
       if (!profile) {
         setDashError(
-          'That link did not load a saved read. Open it in a new tab — if it works there, copy the full URL again. The email on the assessment can differ from your Nest login; that is OK.'
+          'That link did not load a saved read. Open it in a new tab. If it works there, copy the full URL again. The email on the assessment can differ from your Nest login; that is OK.'
         );
         return;
       }
@@ -814,7 +814,7 @@
         }, 2500);
         return;
       }
-      setDashError('Link saved — refresh the page if your profile does not appear.');
+      setDashError('Link saved. Refresh the page if your profile does not appear.');
     } catch (e) {
       console.error('link_deep_profile_to_user:', e);
       setDashError('Could not connect your results. Try again or email hello@lilbird.life.');
@@ -980,7 +980,7 @@
           <p class="eyebrow">nest plus</p>
           <h3>Relationship Dynamic + First Flight workbook</h3>
           <p>Compare your wiring with a partner, friend or family member, and get the First Flight workbook. One-off $5, yours to keep. Included with any coaching, Solo or Intensive purchase.</p>
-          <div class="btn-row"><button type="button" class="btn btn-ember" data-upgrade="nest_plus">Add Nest Plus — $5 →</button></div>
+          <div class="btn-row"><button type="button" class="btn btn-ember" data-upgrade="nest_plus">Add Nest Plus · $5 →</button></div>
         </article>`;
     }
 
@@ -1002,7 +1002,7 @@
           <p class="eyebrow">workbook</p>
           <h3>Life Change Sessions workbook</h3>
           <p>The complete eight-session workbook to work through on your own, online or as a PDF. Included with the Life Change Intensive.</p>
-          <div class="btn-row"><button type="button" class="btn btn-ember" data-upgrade="lcs_workbook">Get the workbook — $27 →</button></div>
+          <div class="btn-row"><button type="button" class="btn btn-ember" data-upgrade="lcs_workbook">Get the workbook · $27 →</button></div>
         </article>`;
     }
 
@@ -1025,8 +1025,8 @@
           <span class="lock-pill"><i class="ti ti-lock"></i> not yet unlocked</span>
           <p class="eyebrow">1-to-1 coaching</p>
           <h3>First Flight session</h3>
-          <p>Book a single session with Luke from your Nest — take your Inner Compass read and turn it into a real conversation.</p>
-          <div class="btn-row"><a class="btn btn-ember" href="/first-flight/book.html?code=IMREADY">Book First Flight — $149 →</a></div>
+          <p>Book a single session with Luke from your Nest and bring your Inner Compass read to talk through.</p>
+          <div class="btn-row"><a class="btn btn-ember" href="/first-flight/book.html?code=IMREADY">Book First Flight · $149 →</a></div>
         </article>`;
     }
 
@@ -1038,8 +1038,8 @@
         <article class="product-card" data-product="coaching">
           <p class="eyebrow">à la carte</p>
           <h3>Coaching session</h3>
-          <p>One focused session when something specific needs working through — book anytime from your Nest, no package required.</p>
-          <div class="btn-row"><a class="btn btn-ember" href="${href}">Book coaching — $249 →</a></div>
+          <p>One focused session when something specific needs working through. Book anytime from your Nest, no package required.</p>
+          <div class="btn-row"><a class="btn btn-ember" href="${href}">Book coaching · $249 →</a></div>
         </article>`;
     }
 
@@ -1076,7 +1076,7 @@
           <p class="eyebrow">self-guided course</p>
           <h3>Life Change Sessions: Solo</h3>
           <p>Eight sessions at your own pace. An AI coaching guide that helps you see yourself again.</p>
-          <div class="btn-row"><a class="btn btn-ember" href="/solo/">Unlock — $197 →</a></div>
+          <div class="btn-row"><a class="btn btn-ember" href="/solo/">Unlock · $197 →</a></div>
         </article>`;
     }
 
@@ -1087,7 +1087,7 @@
             <p class="eyebrow">full programme</p>
             <h3>Life Change Intensive</h3>
             <span class="status-badge">active</span>
-            <p>Book one session at a time — your Nest tracks all 8.</p>
+            <p>Book one session at a time. Your Nest tracks all 8.</p>
             ${renderLciBookingSection()}
           </article>`;
       }
@@ -1096,9 +1096,9 @@
           <span class="lock-pill"><i class="ti ti-lock"></i> not yet unlocked</span>
           <p class="eyebrow">full programme</p>
           <h3>Life Change Intensive</h3>
-          <p>Eight sessions with Luke. Enrol from your Nest — read the agreement, pay securely, then book session by session here.</p>
+          <p>Eight sessions with Luke. Enrol from your Nest: read the agreement, pay securely, then book session by session here.</p>
           <div class="btn-row">
-            <a class="btn btn-ember" href="/intensive/enrol.html?from=nest">Enrol — read agreement &amp; pay →</a>
+            <a class="btn btn-ember" href="/intensive/enrol.html?from=nest">Enrol: read agreement &amp; pay →</a>
             <button class="btn btn-outline" data-open-ask>Ask a question</button>
           </div>
         </article>`;
@@ -1332,7 +1332,7 @@
       <p class="sidebar-eyebrow"><i class="ti ti-lock"></i> relationship dynamic · nest plus</p>
       <h4>How do you fit with someone close?</h4>
       <p>See how your wiring meets a partner’s, friend’s or colleague’s: what each of you brings, and where you snag. Part of Nest Plus.</p>
-      <button type="button" class="btn btn-ember full" data-upgrade="nest_plus">Add Nest Plus — $5 →</button>`;
+      <button type="button" class="btn btn-ember full" data-upgrade="nest_plus">Add Nest Plus · $5 →</button>`;
     el.querySelector('[data-upgrade]').addEventListener('click', (e) => void startUpgrade('nest_plus', e.currentTarget));
   }
 
@@ -1399,7 +1399,7 @@
       }
       if (clearBtn) clearBtn.classList.remove('hidden');
       if (removeBtn) removeBtn.classList.add('hidden');
-      setYoungerYouStatus('Looks good — save to use this as your Nest picture.', '');
+      setYoungerYouStatus('Looks good. Save to use this as your Nest picture.', '');
     }
 
     input.addEventListener('change', () => {
@@ -1593,8 +1593,8 @@
         <h4>Solo complete</h4>
         <p>Your plan and takeaways live on the Solo dashboard. Book a session with Luke anytime below.</p>
         <a class="btn btn-outline full" href="/solo/?view=plan">Open your plan →</a>
-        <a class="btn btn-ember full" href="/first-flight/book.html?code=IMREADY">Book First Flight — $149</a>
-        <a class="btn btn-outline full" href="${coachingHref}">Book coaching — $249</a>`;
+        <a class="btn btn-ember full" href="/first-flight/book.html?code=IMREADY">Book First Flight · $149</a>
+        <a class="btn btn-outline full" href="${coachingHref}">Book coaching · $249</a>`;
         return;
       }
       el.innerHTML = `
@@ -1602,8 +1602,8 @@
         <h4>Solo next step</h4>
         <p>Next up: ${escapeHtml(p.next)}. Prefer a live session? Book from your Nest.</p>
         <a class="btn btn-outline full" href="/solo/">Continue Solo →</a>
-        <a class="btn btn-ember full" href="/first-flight/book.html?code=IMREADY">Book First Flight — $149</a>
-        <a class="btn btn-outline full" href="${coachingHref}">Book coaching — $249</a>`;
+        <a class="btn btn-ember full" href="/first-flight/book.html?code=IMREADY">Book First Flight · $149</a>
+        <a class="btn btn-outline full" href="${coachingHref}">Book coaching · $249</a>`;
       return;
     }
 
@@ -1611,8 +1611,8 @@
       <p class="sidebar-eyebrow">book with Luke</p>
       <h4>Choose how you meet</h4>
       <p>First Flight to taste it, one coaching session when something’s specific, or the full Intensive.</p>
-      <a class="btn btn-ember full" href="/first-flight/book.html?code=IMREADY">First Flight — $149 →</a>
-      <a class="btn btn-outline full" href="${coachingHref}">Coaching session — $249 →</a>
+      <a class="btn btn-ember full" href="/first-flight/book.html?code=IMREADY">First Flight · $149 →</a>
+      <a class="btn btn-outline full" href="${coachingHref}">Coaching session · $249 →</a>
       <a class="btn btn-outline full" href="/intensive/enrol.html?from=nest">Life Change Intensive →</a>`;
   }
 

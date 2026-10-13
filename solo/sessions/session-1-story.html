@@ -710,7 +710,7 @@
         <div class="session-tag">Session 01 · Story</div>
         <h1>Before you<br>take flight,<br>know where<br>you've been.</h1>
         <p class="session-desc">
-          We don't start with goals. We start with the ground beneath them — your history, your people, the seasons that made you. This is where it all begins.
+          We don't start with goals. We start with the ground beneath them: your history, your people, the seasons that made you. This is where it all begins.
         </p>
 
         <!-- Video placeholder -->
@@ -801,7 +801,7 @@
         <!-- Complete panel -->
         <div class="complete-panel" id="complete-panel">
           <h3>You've done something tender here.</h3>
-          <p>The story you've told yourself about your life just got a little more honest. Before you move on — try one of the tools to anchor what came up in this session.</p>
+          <p>The story you tell yourself about your life just got a little clearer. Before you move on, try one of the tools to anchor what came up in this session.</p>
           <div class="tools-nudge">
             <a class="tool-nudge-chip" onclick="openTool('peak-plunge')">Peak & Plunge →</a>
             <a class="tool-nudge-chip" onclick="openTool('nurture-prune')">Nurture & Prune →</a>
@@ -964,7 +964,7 @@
 
       } catch (err) {
         hideTyping();
-        renderMessage('assistant', 'Something got in the way there. Take a breath — try sending that again.');
+        renderMessage('assistant', 'Something got in the way there. Take a breath and try sending that again.');
         messages.pop();
       }
 
@@ -1050,7 +1050,7 @@
                   session_number:     SESSION_NUMBER,
                   summary:            summary,
                   action_point:       extractActionPoint(messages),
-                  next_session_title: 'Vision & Goals — Clarify where you\'re going by discovering what matters most.',
+                  next_session_title: 'Vision & Goals: Clarify where you\'re going by discovering what matters most.',
                 }),
               }).catch(() => {});
             }
@@ -1203,9 +1203,9 @@
 
         if (hasContext) {
           // We know something from their First Flight — reference the fact they've already begun
-          greeting = `${nameClause}you've already taken the first step — and now we go somewhere different.\n\nSession 1 is about your story. Not your goals, not your plans — your actual history. The people who raised you. The seasons that stretched you. The moments you still carry.\n\nI want to start somewhere slow. Think back to where you grew up — the house, the people, the unspoken rules of that place. What's the first thing that comes to mind when you picture it?`;
+          greeting = `${nameClause}you've already taken the first step, and now we go somewhere different.\n\nSession 1 is about your story: your history, before we get anywhere near goals or plans. The people who raised you. The seasons that stretched you. The moments you still carry.\n\nI want to start somewhere slow. Think back to where you grew up: the house, the people, the unspoken rules of that place. What's the first thing that comes to mind when you picture it?`;
         } else {
-          greeting = `Welcome to Session 1 — Story.\n\nBefore we talk about where you want to go, I want to understand where you've come from. Your history isn't just background — it's the ground your future is built on.\n\nLet's start somewhere slow. Think back to where you grew up — the house, the people, the unspoken rules of that place. What's the first thing that comes to mind when you picture it?`;
+          greeting = `Welcome to Session 1: Story.\n\nBefore we talk about where you want to go, I want to understand where you've come from. Your history is the ground your future gets built on.\n\nLet's start somewhere slow. Think back to where you grew up: the house, the people, the unspoken rules of that place. What's the first thing that comes to mind when you picture it?`;
         }
 
         setTimeout(() => {

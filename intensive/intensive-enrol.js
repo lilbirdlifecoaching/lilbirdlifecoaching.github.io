@@ -183,7 +183,7 @@
           checkoutPromoNote.style.color = 'var(--green)';
         } else if (codeUsed) {
           checkoutPromoNote.textContent =
-            '“' + codeUsed + '” could not be pre-applied — use “Add promotion code” below, or go back and check spelling.';
+            '“' + codeUsed + '” could not be pre-applied. Use “Add promotion code” below, or go back and check spelling.';
           checkoutPromoNote.style.color = '';
         } else {
           checkoutPromoNote.textContent =

@@ -117,8 +117,8 @@
   const AXES = [
     { key: 'connections',  label: 'Connections',      desc: 'How alive and nourishing are your relationships right now?',           color: '#c4956a' },
     { key: 'spaces',       label: 'Spaces',            desc: 'Does your physical environment support the life you want to live?',     color: '#7eb8c9' },
-    { key: 'purpose',      label: 'Passion & Purpose', desc: 'How much of your time is spent on things that genuinely matter to you?', color: '#F5C842' },
-    { key: 'resources',    label: 'Resources',         desc: 'Do you have enough — time, money, energy — to live without constant strain?', color: '#9dbf8a' },
+    { key: 'purpose',      label: 'Passion & Purpose', desc: 'How much of your time goes to things that matter to you?', color: '#F5C842' },
+    { key: 'resources',    label: 'Resources',         desc: 'Do you have enough time, money and energy to live without constant strain?', color: '#9dbf8a' },
     { key: 'wellbeing',    label: 'Energy & Wellbeing',desc: 'How well are you sleeping, moving, resting, and caring for yourself?',  color: '#a89060' },
   ];
 
@@ -303,7 +303,7 @@
           var note = document.getElementById('compare-note');
           if (note) note.style.display = 'block';
           var intro = document.getElementById('intro-copy');
-          if (intro) intro.textContent = 'Score where you are now. The faded shape is your Session 2 map — see what brightened or dimmed.';
+          if (intro) intro.textContent = 'Score where you are now. The faded shape is your Session 2 map, so you can see what brightened or dimmed.';
         }
       } catch(e) {}
     }

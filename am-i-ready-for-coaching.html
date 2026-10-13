@@ -16,19 +16,19 @@
   <link rel="stylesheet" href="/css/lilbird-theme-chrome.css" />
 
   <!-- ═══════════ SEO META TAGS ═══════════ -->
-  <meta name="description" content="Free quiz: is life coaching right for you right now? Seven honest questions from Luke Haythorpe (lil' bird). Bay Area &amp; Melbourne coaching for people in transition." />
+  <meta name="description" content="Free quiz: is life coaching right for you right now? Seven quick questions from Luke Haythorpe (lil' bird). Bay Area &amp; Melbourne coaching for people in transition." />
   <meta name="author" content="Luke Haythorpe" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://lilbird.life/am-i-ready-for-coaching.html" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://lilbird.life/am-i-ready-for-coaching.html" />
-  <meta property="og:title" content="Am I Ready for Coaching? — lil' bird" />
-  <meta property="og:description" content="Seven honest questions. Find out if coaching fits where you are right now — no sales pitch." />
+  <meta property="og:title" content="Am I Ready for Coaching? | lil' bird" />
+  <meta property="og:description" content="Seven quick questions to see if coaching fits where you are right now. No sales pitch." />
   <meta property="og:image" content="https://lilbird.life/bird-logo.png" />
   <meta property="og:site_name" content="lil’ bird coaching" />
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Am I Ready for Coaching? — lil' bird" />
-  <meta name="twitter:description" content="Seven honest questions. Find out if coaching fits where you are right now — no sales pitch." />
+  <meta name="twitter:title" content="Am I Ready for Coaching? | lil' bird" />
+  <meta name="twitter:description" content="Seven quick questions to see if coaching fits where you are right now. No sales pitch." />
   <meta name="twitter:image" content="https://lilbird.life/bird-logo.png" />
   <script type="application/ld+json">
   {
@@ -48,7 +48,7 @@
     "areaServed": ["San Francisco Bay Area", "Melbourne", "Worldwide"]
   }
   </script>
-  <title>Am I Ready for Coaching? — lil' bird</title>
+  <title>Am I Ready for Coaching? | lil' bird</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
   <style>
@@ -423,7 +423,7 @@
     Let's find out <em>if now is the moment.</em>
   </h1>
   <p class="intro-body">
-    Seven straight questions from Luke Haythorpe, a life and leadership coach for people who feel stuck. No sales pitch. Just a clear read on whether coaching could help you right now. Want more context first? <a href="/articles/how-do-you-know-youre-ready-for-life-coaching.html" style="color:var(--gold-dim);text-decoration:none;">Read the longer guide →</a>
+    Seven straight questions from Luke Haythorpe, a life and leadership coach for people who feel stuck. There's no sales pitch, just a clear read on whether coaching could help you right now. Want more context first? <a href="/articles/how-do-you-know-youre-ready-for-life-coaching.html" style="color:var(--gold-dim);text-decoration:none;">Read the longer guide →</a>
   </p>
   <div class="intro-meta">
     <span class="meta-pill">⏱ ~2 minutes</span>
@@ -494,19 +494,19 @@ const FIRST_FLIGHT_COUPON_CODE = 'IMREADY';
 // ── QUESTIONS ─────────────────────────────────────────────────────────────────
 const QUESTIONS = [
   {
-    text: "When you think about where you are right now — which best describes you?",
+    text: "When you think about where you are right now, which best describes you?",
     opts: [
-      { text: "I'm in a real season of transition — new role, new chapter, something just shifted", score: 3 },
+      { text: "I'm in a real season of transition: new role, new chapter, something just shifted", score: 3 },
       { text: "I'm moving forward but I keep hitting the same wall", score: 2 },
       { text: "Things are fine on paper, but something feels off underneath", score: 2 },
-      { text: "Honestly, things are pretty good right now", score: 0 }
+      { text: "Things are pretty good right now", score: 0 }
     ],
     dim: "readiness"
   },
   {
     text: "What's your relationship with change?",
     opts: [
-      { text: "I initiate it — I'm usually ahead of it before it arrives", score: 1 },
+      { text: "I initiate it. I'm usually ahead of it before it arrives", score: 1 },
       { text: "I adapt well once I understand why it's happening", score: 2 },
       { text: "I want to change but I get in my own way", score: 3 },
       { text: "I avoid it unless I absolutely have to", score: 1 }
@@ -514,11 +514,11 @@ const QUESTIONS = [
     dim: "openness"
   },
   {
-    text: "What's your honest relationship with self-awareness?",
+    text: "How self-aware would you say you are?",
     opts: [
-      { text: "I know myself well — I just need help acting on what I know", score: 3 },
+      { text: "I know myself well. I just need help acting on what I know", score: 3 },
       { text: "I have blindspots I know I'm not seeing", score: 3 },
-      { text: "I'm not sure — I don't spend much time thinking about it", score: 1 },
+      { text: "I'm not sure. I don't spend much time thinking about it", score: 1 },
       { text: "I've done a lot of work here and feel pretty grounded", score: 2 }
     ],
     dim: "self-awareness"
@@ -529,27 +529,27 @@ const QUESTIONS = [
       { text: "It feels too expensive for where I'm at right now", score: 1, objection: "cost" },
       { text: "I don't feel 'bad enough' to need it", score: 2, objection: "threshold" },
       { text: "I'm used to figuring things out on my own", score: 2, objection: "independence" },
-      { text: "Honestly, not much — I'm open to it", score: 3, objection: "none" }
+      { text: "Not much. I'm open to it", score: 3, objection: "none" }
     ],
     dim: "openness",
     isObjection: true
   },
   {
-    text: "When it comes to investing in yourself — how do you think about it?",
+    text: "How do you think about investing in yourself?",
     opts: [
       { text: "I've invested before and I take it seriously", score: 3 },
       { text: "I want to but I haven't found the right fit yet", score: 2 },
-      { text: "I'm open to it — this quiz is me testing the waters", score: 2 },
+      { text: "I'm open to it. This quiz is me testing the waters", score: 2 },
       { text: "It's hard to justify financially or emotionally right now", score: 0 }
     ],
     dim: "investment"
   },
   {
-    text: "How honest are you willing to be in a coaching relationship?",
+    text: "How open are you willing to be in a coaching relationship?",
     opts: [
-      { text: "Fully honest — even if it's uncomfortable", score: 3 },
-      { text: "Mostly honest, with a little guard up at first", score: 2 },
-      { text: "I'd need to build trust first before I really opened up", score: 2 },
+      { text: "Completely open, even if it's uncomfortable", score: 3 },
+      { text: "Mostly open, with a little guard up at first", score: 2 },
+      { text: "I'd need to build trust first before I opened up", score: 2 },
       { text: "I tend to keep things pretty surface-level", score: 0 }
     ],
     dim: "openness"
@@ -557,9 +557,9 @@ const QUESTIONS = [
   {
     text: "What's the real reason you're here right now?",
     opts: [
-      { text: "Something in me knows I need this — I'm ready to do the work", score: 3 },
+      { text: "Something in me knows I need this. I'm ready to do the work", score: 3 },
       { text: "Someone suggested coaching and I'm curious what it could do", score: 2 },
-      { text: "I'm researching options — not quite decided yet", score: 1 },
+      { text: "I'm researching options and haven't decided yet", score: 1 },
       { text: "Just poking around, no real agenda", score: 0 }
     ],
     dim: "readiness"
@@ -569,15 +569,15 @@ const QUESTIONS = [
 const OBJECTION_RESPONSES = {
   cost: {
     label: "💬 On the cost question",
-    text: "Coaching is an investment, and that's real. The free discovery call is where we talk through what's possible, what it costs, and whether the timing works. No pressure, no pitch."
+    text: "Coaching is an investment. The free discovery call is where we talk through what's possible, what it costs, and whether the timing works, with no pressure and no pitch."
   },
   threshold: {
     label: "💬 You don't have to be in crisis",
-    text: "Coaching isn't triage. Plenty of clients are functioning well and ready to go further. You don't need to hit rock bottom to deserve support."
+    text: "Plenty of clients are functioning well and ready to go further. You don't need to hit rock bottom to deserve support."
   },
   independence: {
     label: "💬 On figuring things out alone",
-    text: "That's a strength. There's still a difference between solving problems and seeing yourself clearly. A coach helps you notice what you can't see from inside the picture."
+    text: "That's a strength. Solving problems and seeing yourself clearly are different skills, though, and a coach helps you notice what you can't see from inside the picture."
   },
   none: {
     label: "✦ That openness matters",
@@ -727,20 +727,20 @@ function showResult() {
     badgeClass   = 'badge-yes';
     badgeText    = '✦ strong fit';
     headline     = name + ', you\'re ready for this.';
-    tagline      = 'You know what you\'re carrying, you\'re willing to name it, and you\'re in a season where real movement is possible. That\'s someone coaching can actually work with.';
+    tagline      = 'You know what you\'re carrying, you\'re willing to name it, and you\'re in a season where real movement is possible. That\'s exactly when coaching helps.';
     primaryCta   = PAID_CALL_URL;
-    primaryLabel = 'Book a First Flight — $149 (code IMREADY) →';
+    primaryLabel = 'Book a First Flight · $149 (code IMREADY) →';
     ghostLabel   = 'Retake quiz';
     sections = [
       { label: '🌱 What this means', text: 'The gap between where you are and where you want to be is real, and it\'s closeable. You have enough self-awareness to do real work in coaching.' },
-      { label: '⚡ What coaching could do for you', text: 'Help you see yourself again. Name what\'s actually going on so you can move. Stop looping the same argument and pick one next step you\'ll actually take.' },
+      { label: '⚡ What coaching could do for you', text: 'Help you see yourself again. Name what\'s going on so you can move. Stop looping the same argument and pick one next step you\'ll take.' },
       { label: '◈ What happens next', html: 'A First Flight is a focused 90-minute coaching session. List price is $' + FIRST_FLIGHT_LIST_USD + '; as a thank-you for finishing this quiz, you can book for <strong>$' + FIRST_FLIGHT_QUIZ_PRICE_USD + '</strong> using the code when you tap Book. It\'s the real session, not a sales call or a taster.' }
     ];
   } else if (pct >= 0.42) {
     badgeClass   = 'badge-maybe';
     badgeText    = '◈ possible fit';
     headline     = name + ', you\'re closer than you think.';
-    tagline      = 'Something real brought you here. A few things are still in the way, and that\'s okay. A discovery call is a straight conversation about what\'s actually going on.';
+    tagline      = 'Something real brought you here. A few things are still in the way, and that\'s okay. A discovery call is a straight conversation about what\'s going on.';
     primaryCta   = FREE_CALL_URL;
     primaryLabel = 'Book a free discovery call →';
     ghostLabel   = 'Retake quiz';
@@ -751,7 +751,7 @@ function showResult() {
     ];
   } else {
     badgeClass   = 'badge-not-yet';
-    badgeText    = '— not quite yet';
+    badgeText    = 'Not quite yet';
     headline     = name + ', the timing might not be right.';
     tagline      = 'Coaching lands best when you\'re ready to show up and do the work. It sounds like you\'re still figuring out what you want, and that\'s fine. Keep exploring.';
     primaryCta   = FREE_CALL_URL;
@@ -806,14 +806,14 @@ function showResult() {
     var pctApprox = Math.round((saveP / listP) * 100);
     ctasEl.innerHTML =
       '<div class="quiz-offer-highlight" role="region" aria-label="Quiz First Flight offer">' +
-      '<div class="quiz-offer-tag">Quiz completion — First Flight</div>' +
+      '<div class="quiz-offer-tag">Quiz completion: First Flight</div>' +
       '<div class="quiz-offer-main">' +
       '<span class="quiz-offer-price">$' + saleP + '</span>' +
       '<span class="quiz-offer-was">$' + listP + '</span></div>' +
       '<div class="quiz-offer-save">Save $' + saveP + ' · about ' + pctApprox + '% off list</div>' +
       '<p class="quiz-offer-note">Code <strong>' + FIRST_FLIGHT_COUPON_CODE + '</strong> is applied on the secure payment page. Tap <strong>Book First Flight</strong> to continue.</p>' +
       '</div>' +
-      '<button class="btn-cta" onclick="openModal()">Book First Flight — $' + saleP + ' with code →</button>' +
+      '<button class="btn-cta" onclick="openModal()">Book First Flight · $' + saleP + ' with code →</button>' +
       '<button class="btn-cta-ghost" onclick="retake()">Retake quiz</button>' +
       '<div class="result-cta-alt-wrap">' +
       '<div class="result-cta-alt-label">Want something lighter on budget or time?</div>' +

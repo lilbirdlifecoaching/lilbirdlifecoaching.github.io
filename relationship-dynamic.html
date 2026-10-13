@@ -17,7 +17,7 @@
 <link rel="stylesheet" href="/css/lilbird-tokens.css" />
 <link rel="stylesheet" href="/css/lilbird-theme-chrome.css" />
 <title>Relationship Dynamic · lil' bird</title>
-<meta name="description" content="Understand how your wiring meets someone else's — and how to work together better.">
+<meta name="description" content="Understand how your wiring meets someone else's, and how to work together better.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -382,7 +382,7 @@
   <p class="eyebrow">relationship dynamic</p>
   <h1>How do you work with <em>someone you know?</em></h1>
   <p class="intro" id="intro-copy">
-    Put in what you know about another person — a colleague, collaborator, manager, or friend — and we'll read the dynamic between your wiring and theirs.
+    Put in what you know about another person (a colleague, collaborator, manager, or friend) and we'll read the dynamic between your wiring and theirs.
   </p>
 
   <p class="card-hint rd-checking" id="rd-checking">Checking your Nest…</p>
@@ -392,7 +392,7 @@
     <h2 class="card-title">The Relationship Dynamic is part of Nest Plus</h2>
     <p class="card-hint">Nest Plus is a one-off $5 and also includes the First Flight workbook. It's already included with any coaching, Solo or Intensive purchase.</p>
     <div class="rd-actions" id="rd-actions-in">
-      <button type="button" class="btn-primary" id="rd-upgrade-btn">Add Nest Plus — $5 →</button>
+      <button type="button" class="btn-primary" id="rd-upgrade-btn">Add Nest Plus · $5 →</button>
     </div>
     <div class="rd-actions" id="rd-actions-out" hidden>
       <a class="btn-primary" href="/nest/" style="display:inline-block;text-decoration:none;">Log in to my Nest →</a>
@@ -405,7 +405,7 @@
       <h3>The Spark and the Anchor</h3>
       <p class="rd-example-meta">You: Connector · ENFP · Enneagram 7 &nbsp;·&nbsp; Them (romantic partner): Steady Guardian · ISFJ · Enneagram 6</p>
       <p>You bring the open doors; they bring the floor to stand on. When it works, you widen each other's world without either of you losing your footing.</p>
-      <p><span class="result-label">What they bring to you</span>Follow-through. They notice when you've said yes to too much and quietly hold the details you drop.</p>
+      <p><span class="result-label">What they bring to you</span>Follow-through. They notice when you've said yes to too much and pick up the details you drop.</p>
       <p><span class="result-label">What you bring to them</span>Permission to try. Your ease with change makes new things feel less risky for them.</p>
       <p><span class="result-label">Watch out for</span>Under stress you reach for more options and they reach for certainty. Name it early: "I need to explore, you need a plan. Can we do both?"</p>
       <p><span class="result-label">The invitation</span>Make one decision together this week where you slow down and they speed up.</p>
@@ -432,7 +432,7 @@
       </div>
       <div class="field">
         <label class="field-label" for="user-types">Your personality types (if you know them)</label>
-        <input type="text" id="user-types" placeholder="e.g. ENFP, Enneagram 7, Connector — anything you know">
+        <input type="text" id="user-types" placeholder="e.g. ENFP, Enneagram 7, Connector, anything you know">
       </div>
       <div class="field">
         <label class="field-label" for="user-description">Describe how you tend to work</label>
@@ -444,7 +444,7 @@
   <!-- THEM -->
   <section class="card">
     <h2 class="card-title">About them</h2>
-    <p class="card-hint">You don't need a full profile — a few honest details is enough.</p>
+    <p class="card-hint">You don't need a full profile. A few real details is enough.</p>
 
     <div class="field">
       <label class="field-label" for="partner-relationship">Who is this person to you?</label>
@@ -458,7 +458,7 @@
     </div>
     <div class="field">
       <label class="field-label" for="partner-types">Their personality types (if you know them)</label>
-      <input type="text" id="partner-types" placeholder="e.g. INFJ, Enneagram 9 — anything you know">
+      <input type="text" id="partner-types" placeholder="e.g. INFJ, Enneagram 9, anything you know">
     </div>
     <div class="field">
       <label class="field-label" for="partner-description">Describe them in a few words</label>
@@ -564,7 +564,7 @@
       err.style.display = 'block';
     } finally {
       btn.disabled = false;
-      btn.textContent = 'Add Nest Plus — $5 →';
+      btn.textContent = 'Add Nest Plus · $5 →';
     }
   });
   const params = new URLSearchParams(window.location.search);
@@ -702,7 +702,7 @@
     if (useManualProfile) {
       profile = buildManualUserProfile();
       if (!profile) {
-        showError('Tell us a little about yourself first — your types or how you tend to work.');
+        showError('Tell us a little about yourself first: your types or how you tend to work.');
         return;
       }
     }
@@ -716,7 +716,7 @@
     const desc = document.getElementById('partner-description').value.trim();
 
     if (!types && !desc) {
-      showError('Tell us a little about the other person — even just their Enneagram type or a brief description.');
+      showError('Tell us a little about the other person, even just their Enneagram type or a brief description.');
       return;
     }
 
@@ -778,7 +778,7 @@
 
   const intro = document.getElementById('intro-copy');
   if (relParam === 'colleague' || relParam === 'manager') {
-    intro.textContent = "Put in what you know about a colleague or collaborator — types, habits, friction points — and we'll read how your wiring meets theirs at work.";
+    intro.textContent = "Put in what you know about a colleague or collaborator (types, habits, friction points) and we'll read how your wiring meets theirs at work.";
   }
 
   (async function init() {
@@ -789,7 +789,7 @@
       nestIdInput.value = fromUrl;
       const ok = await loadNest(fromUrl);
       readHasNestPlus = ok && lastLoadNestPlus;
-      if (!ok) showError('Nest not found — enter your types manually below.');
+      if (!ok) showError('Nest not found. Enter your types manually below.');
     }
     if (readHasNestPlus || (await accountHasNestPlus(session))) showGate('open');
     else showGate(session ? 'locked-in' : 'locked-out');
