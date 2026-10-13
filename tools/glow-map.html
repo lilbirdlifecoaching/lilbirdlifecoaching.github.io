@@ -481,6 +481,8 @@
     }
     .glow-email-row input:focus { outline: none; border-color: var(--glow); }
     .glow-email-status { margin-top: 0.75rem; font-size: 0.85rem; min-height: 1.2em; }
+    .glow-email-optin { display: flex; align-items: flex-start; gap: 0.5rem; margin-top: 0.85rem; font-size: 0.85rem; color: var(--text-dim); cursor: pointer; }
+    .glow-email-optin input { margin-top: 0.2rem; accent-color: var(--glow); }
 
     @media (max-width: 480px) {
       .nav { padding: 1rem; }
@@ -577,6 +579,10 @@
         <input type="email" id="glow-email" placeholder="you@example.com" autocomplete="email" required aria-label="Email address" />
         <button type="submit" class="btn btn-primary" id="glow-email-btn">Send it →</button>
       </div>
+      <label class="glow-email-optin">
+        <input type="checkbox" id="glow-newsletter-opt" />
+        <span>Send me occasional letters from lil' bird too (optional)</span>
+      </label>
       <p class="glow-email-status" id="glow-email-status" role="status"></p>
     </form>
 
@@ -909,7 +915,7 @@
     fetch(GLOW_EMAIL_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email, scores: scores })
+      body: JSON.stringify({ email: email, scores: scores, newsletter: document.getElementById('glow-newsletter-opt').checked === true })
     }).then(function (res) {
       if (!res.ok) throw new Error('send failed');
       status.textContent = 'Sent. Check your inbox (and your spam folder, just in case).';
