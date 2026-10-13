@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>
+    (function(){
+      var k='lilbird-theme', s=null;
+      try{s=localStorage.getItem(k);}catch(e){}
+      var t=(s==='light'||s==='dark')?s:(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+      document.documentElement.setAttribute('data-theme', t);
+      document.documentElement.style.colorScheme=t;
+    })();
+  </script>
+  <link rel="stylesheet" href="/css/lilbird-tokens.css" />
+  <link rel="stylesheet" href="/css/lilbird-theme-chrome.css" />
+  <link rel="stylesheet" href="/css/lilbird-theme-pages.css" />
+  <title>Page not found | lil' bird</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" type="image/png" href="/bird-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --gold: #F5C842;
+      --gold-dim: #c9a130;
+      --dark: #1e2028;
+      --dark-mid: #252830;
+      --text-main: #f0ead8;
+      --text-muted: #a09880;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--dark);
+      color: var(--text-main);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-weight: 300;
+      line-height: 1.75;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    nav {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid rgba(245,200,66,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand { font-family: 'Playfair Display', serif; font-style: italic; color: var(--gold); text-decoration: none; font-size: 1.1rem; }
+    main { flex: 1; max-width: 640px; margin: 0 auto; padding: 4rem 1.5rem; }
+    .eyebrow { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold-dim); margin-bottom: 0.75rem; }
+    h1 { font-family: 'Playfair Display', serif; font-size: clamp(1.9rem, 5vw, 2.6rem); font-weight: 400; line-height: 1.15; margin-bottom: 1rem; }
+    h1 em { color: var(--gold); }
+    p { color: var(--text-muted); margin-bottom: 1.75rem; }
+    .links { display: grid; gap: 0.75rem; }
+    .links a {
+      display: block;
+      padding: 0.9rem 1.1rem;
+      border: 1px solid rgba(245,200,66,0.18);
+      border-radius: 10px;
+      color: var(--text-main);
+      text-decoration: none;
+    }
+    .links a:hover { border-color: var(--gold); }
+    .links strong { color: var(--gold); font-weight: 500; }
+    footer { border-top: 1px solid rgba(245,200,66,0.1); padding: 1.5rem; text-align: center; font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.08em; color: var(--text-muted); }
+    footer a { color: var(--gold-dim); text-decoration: none; }
+  </style>
+  <script src="/lilbird-gtm-id.js"></script>
+  <script src="/lilbird-gtm.js"></script>
+</head>
+<body>
+<nav>
+  <a class="nav-brand" href="/">lil' bird</a>
+</nav>
+
+<main>
+  <p class="eyebrow">404</p>
+  <h1>This page has <em>flown off.</em></h1>
+  <p>The link may be old, or the page has moved. Here's where most people are heading:</p>
+  <div class="links">
+    <a href="/"><strong>Home</strong> · coaching with Luke</a>
+    <a href="/book.html"><strong>Book</strong> · First Flight, coaching, or a free discovery call</a>
+    <a href="/inner-compass/"><strong>Inner Compass</strong> · your personality read</a>
+    <a href="/articles/"><strong>Journal</strong> · articles on stuck seasons and big decisions</a>
+    <a href="/nest/"><strong>Your Nest</strong> · log in to your reads and tools</a>
+  </div>
+</main>
+
+<footer>
+  <p>lil' bird life coaching · <a href="/">lilbird.life</a> · <a href="mailto:hello@lilbird.life">hello@lilbird.life</a></p>
+</footer>
+
+<script src="/js/lilbird-theme.js"></script>
+</body>
+</html>

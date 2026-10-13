@@ -14,16 +14,6 @@
       .replace(/'/g, '&#39;');
   }
 
-  /** Only lilbirdlifecoaching Calendly HTTPS URLs (no javascript:, no other hosts). */
-  function isAllowedCalendlyUrl(url) {
-    try {
-      var u = new URL(url);
-      if (u.protocol !== 'https:' || u.hostname !== 'calendly.com') return false;
-      return u.pathname.toLowerCase().indexOf('/lilbirdlifecoaching/') === 0;
-    } catch (e) {
-      return false;
-    }
-  }
 
   /** Luke's Cal.com booking links only. */
   function isAllowedCalUrl(url) {
@@ -49,9 +39,9 @@
     }
   }
 
-  /** Calendly, Cal.com (Luke), or whitelisted lilbird.life booking links. */
+  /** Cal.com (Luke) or whitelisted lilbird.life booking links. */
   function isAllowedBookingUrl(url) {
-    return isAllowedCalendlyUrl(url) || isAllowedCalUrl(url) || isAllowedSiteBookingUrl(url);
+    return isAllowedCalUrl(url) || isAllowedSiteBookingUrl(url);
   }
 
   /**
@@ -108,7 +98,6 @@
 
   w.lbChatSafe = {
     escapeHtml: escapeHtml,
-    isAllowedCalendlyUrl: isAllowedCalendlyUrl,
     isAllowedCalUrl: isAllowedCalUrl,
     isAllowedSiteBookingUrl: isAllowedSiteBookingUrl,
     isAllowedBookingUrl: isAllowedBookingUrl,

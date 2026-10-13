@@ -184,6 +184,7 @@
   });
 
   function formatSlot(iso) {
+    if (!iso) return '';
     const d = new Date(iso);
     if (isNaN(d)) return '';
     return d.toLocaleString(undefined, {

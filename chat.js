@@ -18,15 +18,6 @@
           .replace(/"/g, '&quot;')
           .replace(/'/g, '&#39;');
       }
-      function isAllowedCalendlyUrl(url) {
-        try {
-          var u = new URL(url);
-          if (u.protocol !== 'https:' || u.hostname !== 'calendly.com') return false;
-          return u.pathname.toLowerCase().indexOf('/lilbirdlifecoaching/') === 0;
-        } catch (e) {
-          return false;
-        }
-      }
       function isAllowedCalUrl(url) {
         try {
           var u = new URL(url);
@@ -48,7 +39,7 @@
         }
       }
       function isAllowedBookingUrl(url) {
-        return isAllowedCalendlyUrl(url) || isAllowedCalUrl(url) || isAllowedSiteBookingUrl(url);
+        return isAllowedCalUrl(url) || isAllowedSiteBookingUrl(url);
       }
       function sanitizeAssistantHtml(raw) {
         var placeholders = [];
@@ -93,7 +84,6 @@
       }
       w.lbChatSafe = {
         escapeHtml: escapeHtml,
-        isAllowedCalendlyUrl: isAllowedCalendlyUrl,
         isAllowedCalUrl: isAllowedCalUrl,
         isAllowedSiteBookingUrl: isAllowedSiteBookingUrl,
         isAllowedBookingUrl: isAllowedBookingUrl,
@@ -213,17 +203,14 @@
     isOpen = false; win.classList.remove('open');
   });
 
-  // ── Calendly overlay ────────────────────────────────────────────
+  // ── Cal.com overlay ─────────────────────────────────────────────
   function openCal(url, isFF) {
-    var isCal = Safe.isAllowedCalUrl(url);
-    if (!isCal && !Safe.isAllowedCalendlyUrl(url)) return;
+    if (!Safe.isAllowedCalUrl(url)) return;
     if (isFF && window.LbFirstFlight && window.LbFirstFlight.openModal) {
       window.LbFirstFlight.openModal();
       return;
     }
-    var themed = isCal
-      ? url.split('?')[0].replace(/\/$/, '') + '?theme=dark'
-      : url + (url.includes('?') ? '&' : '?') + 'hide_event_type_details=1&hide_gdpr_banner=1&background_color=1e2028&text_color=f0ead8&primary_color=F5C842';
+    var themed = url.split('?')[0].replace(/\/$/, '') + '?theme=dark';
     calFrame.src = themed;
     var title = document.querySelector('.lb-cal-title');
     var disc = document.querySelector('.lb-cal-disc');
@@ -243,7 +230,7 @@
     if (e.target === cal) { cal.classList.remove('open'); calFrame.src = ''; }
   });
 
-  // Intercept ANY click on a booking button or Calendly link inside chat
+  // Intercept any booking button inside chat
   msgsEl.addEventListener('click', function(e) {
     var trigger = e.target.closest('.lb-book-trigger');
     if (trigger) {
@@ -255,15 +242,7 @@
       return;
     }
     var t = e.target.closest('[data-cal-url]');
-    if (t) { e.preventDefault(); var cu = t.getAttribute('data-cal-url'); if (!cu || !(Safe.isAllowedCalendlyUrl(cu) || Safe.isAllowedCalUrl(cu))) return; openCal(cu, t.getAttribute('data-ff') === '1'); return; }
-    // Also catch plain calendly links
-    var a = e.target.closest('a');
-    if (a && a.href && a.href.includes('calendly.com')) {
-      e.preventDefault();
-      if (!Safe.isAllowedCalendlyUrl(a.href)) return;
-      var isFF = a.href.includes('first-flight');
-      openCal(a.href, isFF);
-    }
+    if (t) { e.preventDefault(); var cu = t.getAttribute('data-cal-url'); if (!cu || !Safe.isAllowedCalUrl(cu)) return; openCal(cu, t.getAttribute('data-ff') === '1'); return; }
   });
 
   // ── Welcome message with options ────────────────────────────────
@@ -321,13 +300,9 @@
 
   // ── Message helpers ─────────────────────────────────────────────
   function addBot(text) {
-    // Convert any calendly links in AI response to in-app buttons
+    // Convert Cal.com discovery-call links in AI response to in-app buttons
     var processed = text
-      .replace(/href="(https:\/\/calendly\.com\/[^"]+first-flight[^"]*)"/g, 'data-cal-url="$1" data-ff="1" href="#"')
-      .replace(/href="(https:\/\/calendly\.com\/[^"]+30min[^"]*)"/g, 'data-cal-url="https://cal.com/luke-haythorpe/30min" data-ff="0" href="#"')
-      .replace(/href="(https:\/\/cal\.com\/luke-haythorpe\/30min[^"]*)"/g, 'data-cal-url="$1" data-ff="0" href="#"')
-      .replace(/href="(https:\/\/calendly\.com\/[^"]+coaching[^"]*)"/g, 'data-cal-url="$1" data-ff="0" href="#"')
-      .replace(/href="(https:\/\/calendly\.com\/[^"]+packages[^"]*)"/g, 'data-cal-url="$1" data-ff="0" href="#"');
+      .replace(/href="(https:\/\/cal\.com\/luke-haythorpe\/30min[^"]*)"/g, 'data-cal-url="$1" data-ff="0" href="#"');
 
     var m = document.createElement('div'); m.className = 'lb-m bot';
     var b = document.createElement('div'); b.className = 'lb-b';

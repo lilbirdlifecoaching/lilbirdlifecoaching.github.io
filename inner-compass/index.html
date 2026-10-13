@@ -18,7 +18,6 @@
 <link rel="stylesheet" href="/css/lilbird-theme-chrome.css" />
 <title>Inner Compass — personality read | lil' bird</title>
 <meta name="description" content="Inner Compass: a story-first personality read (MBTI, Enneagram, attachment) through conversation, not multiple choice. By Luke Haythorpe. Words for what you've been circling.">
-<meta name="keywords" content="Inner Compass, deep profile, personality assessment, MBTI, Enneagram, attachment style, Luke Haythorpe, life coach, self discovery, lil bird">
 <meta name="author" content="Luke Haythorpe">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://lilbird.life/inner-compass/">
@@ -3216,7 +3215,7 @@
 <script src="/js/lilbird-theme-nav.js"></script>
 <script src="/lilbird-auth-bridge.js"></script>
 <script src="/lilbird-nest-nav.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="/js/vendor/supabase-js-2.117.3.js"></script>
 <script>
 (function () {
   const a = document.getElementById('footer-feedback-link');
@@ -3314,7 +3313,6 @@ async function _postCourseLink(nestIdToLink){
   }
   console.warn('Course link gave up after', maxAttempts, 'attempts — user can complete in-course manually.');
 }
-const SHEETS_URL     = 'https://script.google.com/macros/s/AKfycbwPoMHcmTKO8JiDt8VS4fVsvGKqw-CQGLktQKImKeUPsfqX7WhH1IJCsG2M2fF7lyL6/exec';
 const BEEHIIV_PUB_ID = 'pub_53a4cafc-9b30-41d5-bd5e-4dc0026b4308';
 // RESEND_API_KEY is stored as a Cloudflare Worker env var (never in frontend code)
 
@@ -3858,8 +3856,6 @@ async function submitEmail(){
     }catch(e){ console.warn('Beehiiv request failed:', e); }
   }
 
-  logToSheet({ event: 'email_captured', email, paid: 'pending' });
-
   if(nestId){
     fetch(WORKER_URL + '/nest-preferences', {
       method: 'POST',
@@ -3934,7 +3930,6 @@ async function unlockFullRead(){
     readOwnerEmail = emailVal;
     _linkToNestIfLoggedIn(nestId, emailVal).catch(err => console.warn('Nest link unhandled:', err));
 
-    logToSheet({ event: 'lead_unlock', email: emailVal, paid: hasPaid ? 'yes' : 'free', amount: 0 });
 
     renderResults(profileData);
     const emailNote = document.getElementById('results-email-note');
@@ -4919,54 +4914,6 @@ function copyPartnerDynamic(){
   }else{
     window.prompt('Copy for them:', text);
   }
-}
-
-// ═══════════════════════════════════════
-// SHEETS LOGGING — nest recovery registry (privacy-minimal)
-// Records: email, nestId, nest link, Life Canvas scores, payment status, type summary.
-// Does NOT log chat answers, canvas free-text, or full response payloads.
-// ═══════════════════════════════════════
-function logToSheet(opts){
-  if(!SHEETS_URL) return;
-  opts = opts || {};
-  const emailVal = (opts.email || userEmail || '').trim();
-  const id = opts.nestId || nestId || '';
-  const amt = typeof opts.amount === 'number' ? opts.amount : 0;
-  const paidFlag = opts.paid || (amt > 0 ? 'yes' : 'no');
-  const p = profileData || {};
-  const cs = opts.canvasScores || canvasScores || {};
-  const canvasDims = ['why', 'who', 'where', 'what', 'how'];
-  const canvasVals = canvasDims.map((k) => (typeof cs[k] === 'number' ? cs[k] : parseInt(cs[k], 10))).filter((n) => !Number.isNaN(n));
-  const canvasOverall = canvasVals.length
-    ? Math.round(canvasVals.reduce((s, n) => s + n, 0) / canvasVals.length)
-    : '';
-
-  fetch(SHEETS_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      nestId: id,
-      email: emailVal,
-      nestLink: id ? `https://lilbird.life/inner-compass/?nest=${id}` : '',
-      timestamp: new Date().toISOString(),
-      event: opts.event || 'log',
-      paid: paidFlag,
-      amount: amt,
-      promoCode: '',
-      canvasWhy: cs.why ?? '',
-      canvasWho: cs.who ?? '',
-      canvasWhere: cs.where ?? '',
-      canvasWhat: cs.what ?? '',
-      canvasHow: cs.how ?? '',
-      canvasOverall: canvasOverall,
-      archetype: p.archetypePlain || p.archetype || '',
-      mbti: p.mbti || '',
-      enneagram: p.enneagram || '',
-      likelyCoreMbti: p.likelyCoreMbti || '',
-      likelyCoreEnneagram: p.likelyCoreEnneagram || '',
-    }),
-  }).catch(() => {});
 }
 
 // ═══════════════════════════════════════
