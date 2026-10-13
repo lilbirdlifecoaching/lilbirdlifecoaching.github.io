@@ -156,6 +156,39 @@
     );
   }
 
+  function initLetterPosts() {
+    var wrap = document.querySelector('.journal-preview');
+    if (!wrap || !global.fetch) return;
+    global
+      .fetch('https://lilbird-assessment.cwwq46sn7m.workers.dev/letter-posts')
+      .then(function (res) { return res.ok ? res.json() : null; })
+      .then(function (json) {
+        var posts = json && Array.isArray(json.posts) ? json.posts : [];
+        if (!posts.length) return;
+        wrap.innerHTML = '';
+        posts.forEach(function (p) {
+          if (!p || !p.title || !/^https:\/\//.test(p.url || '')) return;
+          var a = document.createElement('a');
+          a.className = 'journal-preview-card';
+          a.href = p.url;
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          var cat = document.createElement('span');
+          cat.className = 'journal-preview-cat';
+          cat.textContent = p.date
+            ? new Date(p.date * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+            : 'From the letter';
+          var title = document.createElement('span');
+          title.className = 'journal-preview-title';
+          title.textContent = p.title;
+          a.appendChild(cat);
+          a.appendChild(title);
+          wrap.appendChild(a);
+        });
+      })
+      .catch(function () {});
+  }
+
   function initFooterFeedback() {
     var a = document.getElementById('footer-feedback-link');
     if (!a) return;
@@ -333,6 +366,7 @@
     initParticles();
     initReveal();
     initBeehiiv();
+    initLetterPosts();
     initFooterFeedback();
     initPathfinder();
     initNavMenu();
