@@ -1,19 +1,14 @@
 (function () {
   const WORKER_URL = 'https://worker-solo.cwwq46sn7m.workers.dev';
   const STRIPE_PUBLISHABLE_KEY = 'pk_live_51QSMYQGAu36WZ7DdlsoNqzwPnsf4HUoOj6F1NZAeGnnH1TPjDEdEQudXIGgTLaUq079aQMI1W2MS6UpMItmTjgxy00HbouBx2g';
-  const CAL_EVENT_URL = 'https://cal.com/luke-haythorpe/first-flight-intro-session';
+  const CAL_LINK = 'luke-haythorpe/first-flight-intro-session';
+  const CAL_NS = 'firstFlight';
   const CHECKOUT_PATH = '/create-first-flight-checkout-session';
   const DEFAULT_PROMO = 'IMREADY';
   const PROMO_KEY = 'lilbird-ff-promo';
 
   const params = new URLSearchParams(window.location.search);
-  const bookingUid = (params.get('uid') || '').trim();
-
-  // Cal.com redirects inside the embedded calendar; move the pay step to the full window.
-  if (bookingUid && window.top !== window.self) {
-    window.top.location.href = window.location.href;
-    return;
-  }
+  let bookingUid = (params.get('uid') || '').trim();
 
   let stripeInstance = null;
   let embeddedCheckout = null;
@@ -205,14 +200,67 @@
       try { sessionStorage.setItem(PROMO_KEY, urlPromo.trim()); } catch (e) { /* ignore */ }
     }
     const theme = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
-    const calParams = new URLSearchParams({ layout: 'month_view', theme });
+    const config = { layout: 'month_view', theme };
     const name = (params.get('name') || '').trim();
     const email = (params.get('email') || '').trim();
-    if (name) calParams.set('name', name);
-    if (email) calParams.set('email', email);
-    const frame = document.getElementById('cal-frame');
-    frame.addEventListener('load', () => document.getElementById('cal-loading')?.remove());
-    frame.src = CAL_EVENT_URL + '?' + calParams.toString();
+    if (name) config.name = name;
+    if (email) config.email = email;
+
+    (function (C, A, L) {
+      const p = function (a, ar) { a.q.push(ar); };
+      const d = C.document;
+      C.Cal = C.Cal || function () {
+        const cal = C.Cal;
+        const ar = arguments;
+        if (!cal.loaded) {
+          cal.ns = {};
+          cal.q = cal.q || [];
+          d.head.appendChild(d.createElement('script')).src = A;
+          cal.loaded = true;
+        }
+        if (ar[0] === L) {
+          const api = function () { p(api, arguments); };
+          const namespace = ar[1];
+          api.q = api.q || [];
+          if (typeof namespace === 'string') {
+            cal.ns[namespace] = cal.ns[namespace] || api;
+            p(cal.ns[namespace], ar);
+            p(cal, ['initNamespace', namespace]);
+          } else p(cal, ar);
+          return;
+        }
+        p(cal, ar);
+      };
+    })(window, 'https://app.cal.com/embed/embed.js', 'init');
+
+    Cal('init', CAL_NS, { origin: 'https://app.cal.com' });
+    const cal = Cal.ns[CAL_NS];
+    cal('inline', { elementOrSelector: '#cal-inline', calLink: CAL_LINK, config });
+    cal('ui', { theme, hideEventTypeDetails: false, layout: 'month_view' });
+    cal('on', {
+      action: 'linkReady',
+      callback: () => document.getElementById('cal-loading')?.remove()
+    });
+    cal('on', {
+      action: 'bookingSuccessfulV2',
+      callback: (e) => {
+        const data = (e && e.detail && e.detail.data) || {};
+        if (!data.uid) return;
+        onBooked(data.uid, data.startTime);
+      }
+    });
+  }
+
+  function onBooked(uid, startTime) {
+    bookingUid = String(uid);
+    const next = new URLSearchParams(params);
+    next.set('uid', bookingUid);
+    if (startTime) next.set('startTime', startTime);
+    params.set('uid', bookingUid);
+    if (startTime) params.set('startTime', startTime);
+    history.replaceState(null, '', window.location.pathname + '?' + next.toString());
+    showPayStep();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function showPayStep() {
@@ -220,8 +268,6 @@
     document.getElementById('section-pick').hidden = true;
     document.getElementById('section-details').hidden = false;
     document.getElementById('held-time').textContent = formatSlot(params.get('startTime')) || 'Your chosen time';
-    document.getElementById('buyer-name').textContent = (params.get('attendeeName') || '').trim();
-    document.getElementById('buyer-email').textContent = (params.get('email') || '').trim();
     if (promoInput) {
       let saved = '';
       try { saved = sessionStorage.getItem(PROMO_KEY) || ''; } catch (e) { /* ignore */ }

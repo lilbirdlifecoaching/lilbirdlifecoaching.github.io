@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./coaching.css?v=2" />
+  <link rel="stylesheet" href="./coaching.css?v=3" />
   <link rel="stylesheet" href="/css/lilbird-booking-theme.css" />
   <script src="https://js.stripe.com/v3/"></script>
   <script src="/lilbird-gtm-id.js"></script>
@@ -56,14 +56,14 @@
       </p>
       <div class="cal-embed-wrap">
         <p id="cal-loading" class="cal-loading">Loading Luke's calendar…</p>
-        <iframe id="cal-frame" title="Pick a coaching time"></iframe>
+        <div id="cal-inline" aria-label="Pick a coaching time"></div>
       </div>
     </section>
 
     <section class="card" id="section-details" hidden>
       <h2>Your time is held</h2>
       <p class="held-time" id="held-time"></p>
-      <p class="held-who"><span id="buyer-name"></span> · <span id="buyer-email"></span></p>
+      <p class="held-who">Booked under the name and email you just entered.</p>
       <p class="fine-print" style="margin-top:0.25rem;">
         Pay within an hour to confirm it. Wrong time? <a href="/coaching/book.html">Pick a different one</a>.
       </p>
@@ -105,7 +105,7 @@
     </div>
   </div>
 
-  <script src="./coaching-book.js?v=3"></script>
+  <script src="./coaching-book.js?v=4"></script>
 <script src="/js/lilbird-theme.js"></script>
 <script src="/js/lilbird-theme-nav.js"></script>
 </body>
