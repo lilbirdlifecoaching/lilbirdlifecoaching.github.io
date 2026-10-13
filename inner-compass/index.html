@@ -3236,13 +3236,13 @@
 // ═══════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════
-const DEEP_PROFILE_BUILD = 'v8.0.0-20261001-paid-tiers';
+const DEEP_PROFILE_BUILD = 'v8.1.0-20261013-read-owner';
 const WORKER_URL     = 'https://lilbird-assessment.cwwq46sn7m.workers.dev';
 const SUPABASE_URL   = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
 const SUPABASE_ANON  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
 console.info("lil' bird Inner Compass", DEEP_PROFILE_BUILD, '| worker:', WORKER_URL);
 
-async function _linkToNestIfLoggedIn(nestIdToLink){
+async function _linkToNestIfLoggedIn(nestIdToLink, readEmail){
   if(!nestIdToLink || typeof supabase === 'undefined') return;
   try{
     const { createClient } = supabase;
@@ -3251,6 +3251,8 @@ async function _linkToNestIfLoggedIn(nestIdToLink){
     });
     const { data: { session } } = await sb.auth.getSession();
     if(!session?.user?.id) return;
+    const owner = String(readEmail || '').trim().toLowerCase();
+    if(!owner || owner !== String(session.user.email || '').trim().toLowerCase()) return;
     const { error } = await sb.rpc('link_deep_profile_to_user', { p_nest_id: nestIdToLink });
     if(error) console.warn('Nest profile link RPC:', error.message || error);
     else console.info('Inner Compass linked to your Nest account.');
@@ -3324,6 +3326,7 @@ let hasRetake      = false;
 let hasPaid        = false;
 let hasNestPlus    = false;
 let hasWorkbook    = false;
+let readOwnerEmail = '';
 let retakeOfNest   = null;
 let userEmail      = '';
 let profileData    = null;
@@ -3652,7 +3655,7 @@ async function runAnalysis(){
 
   const responses=collectResponses();
   nestId=generateNestId();
-  hasPaid = false; hasNestPlus = false; hasWorkbook = false;
+  hasPaid = false; hasNestPlus = false; hasWorkbook = false; readOwnerEmail = '';
   document.getElementById('nest-id').textContent=nestId;
   document.getElementById('loadingOverlay').classList.add('active');
   const clarifications = _collectClarificationsPayload();
@@ -3693,7 +3696,6 @@ async function runAnalysis(){
     }
     retakeOfNest = null;
     if(launchToken){ _postCourseLink(nestId).catch(err => console.warn('Course link unhandled:', err)); }
-    _linkToNestIfLoggedIn(nestId).catch(err => console.warn('Nest link unhandled:', err));
   }catch(e){
     console.error('Analysis error:', e.message);
     profileData = null;
@@ -3716,6 +3718,7 @@ async function runAnalysis(){
   if(hasPaid){
     // Paid retake: the read already belongs to the buyer's email.
     await loadAccessFromServer();
+    _linkToNestIfLoggedIn(nestId, readOwnerEmail).catch(err => console.warn('Nest link unhandled:', err));
     renderResults(profileData);
     goTo('screen-results');
     return;
@@ -3928,7 +3931,8 @@ async function unlockFullRead(){
     }
 
     if(launchToken){ _postCourseLink(nestId).catch(err => console.warn('Course link unhandled:', err)); }
-    _linkToNestIfLoggedIn(nestId).catch(err => console.warn('Nest link unhandled:', err));
+    readOwnerEmail = emailVal;
+    _linkToNestIfLoggedIn(nestId, emailVal).catch(err => console.warn('Nest link unhandled:', err));
 
     logToSheet({ event: 'lead_unlock', email: emailVal, paid: hasPaid ? 'yes' : 'free', amount: 0 });
 
@@ -4528,8 +4532,31 @@ function renderIcUnlock(profile, locked){
     : 'Your full read is unlocked. These are optional extras, yours to keep.';
   card.dataset.locked = locked ? '1' : '0';
   card.style.display = 'block';
+  const btn = document.getElementById('ic-unlock-btn');
+  const fine = card.querySelector('.ic-unlock-fine');
+  if(btn) btn.style.display = '';
+  if(fine) fine.style.display = '';
   updateIcTotal();
-  void syncIcAccount(locked);
+  void syncIcAccount(locked).then(checkIcReadOwner);
+}
+
+/** Purchases go to the read's email, so a read taken under another email gets no offers from this login. */
+async function checkIcReadOwner(){
+  const owner = String(readOwnerEmail || '').trim().toLowerCase();
+  const session = await dpSession();
+  const login = String(session?.user?.email || '').trim().toLowerCase();
+  const card = document.getElementById('ic-unlock');
+  if(!card || !owner || !login || owner === login) return;
+  ['ic-unlock-locked', 'ic-addon-nest-plus-row', 'ic-addon-workbook-row', 'ic-account', 'ic-account-signed', 'ic-unlock-btn', 'ic-unlock-error']
+    .forEach((id) => { const el = document.getElementById(id); if(el) el.style.display = 'none'; });
+  const fine = card.querySelector('.ic-unlock-fine');
+  if(fine) fine.style.display = 'none';
+  document.getElementById('ic-unlock-kicker').textContent = 'a different account';
+  document.getElementById('ic-unlock-title').textContent = 'This read was taken as ' + owner;
+  document.getElementById('ic-unlock-lead').innerHTML =
+    'You\'re logged in to the Nest as ' + _escHtml(login) + '. Anything bought for this read goes to ' + _escHtml(owner) +
+    ', so log in as that email to add to it. <a href="/nest/" style="color:inherit;text-decoration:underline;">Open your own Nest →</a>';
+  card.style.display = 'block';
 }
 
 /** The $2 unlock also creates the buyer's Nest login, so they come back from Stripe already signed in. */
@@ -4681,6 +4708,7 @@ async function loadAccessFromServer(){
     hasNestPlus = data.nestPlus === true;
     hasWorkbook = data.workbook === true;
     if(data.email) userEmail = data.email;
+    readOwnerEmail = data.email || '';
     return data;
   }catch(_){ return null; }
 }
@@ -4989,7 +5017,7 @@ function clearAndRestart(){
   if(messagesEl) messagesEl.innerHTML = '';
   if(activeRecognitionId) stopMic();
   profileData = null;
-  hasPaid = false; hasNestPlus = false; hasWorkbook = false;
+  hasPaid = false; hasNestPlus = false; hasWorkbook = false; readOwnerEmail = '';
   quizStarted = false; quizStep = 0; sliderValues = {}; quizTexts = {};
   nestId = generateNestId();
   try{
@@ -6837,6 +6865,7 @@ window.addEventListener('DOMContentLoaded', function() {
         hasNestPlus = data.nestPlus === true;
         hasWorkbook = data.workbook === true;
         if (data.email) userEmail = data.email;
+        readOwnerEmail = data.email || '';
         // Load stored canvas data
         if(data.canvasScores) canvasScores = data.canvasScores;
         if(data.canvasHistory) canvasHistory = data.canvasHistory;
