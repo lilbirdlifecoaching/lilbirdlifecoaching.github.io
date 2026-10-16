@@ -277,6 +277,8 @@
     return headers;
   }
 
+  window.__nestWorkerAuthHeaders = workerAuthHeaders;
+
   async function sendNestWelcomeEmail(email, name) {
     if (!NEST_WELCOME_EMAIL_ENDPOINT) return;
     try {

@@ -1,19 +1,23 @@
 /**
  * Nest lil' bird guided tour — spotlight coachmarks on live UI.
- * Auto-starts once per browser after first Nest hydrate; replay via Take a tour.
+ * First visit: welcome video, then tour. Replay video via What is Nest?; tour via Take a tour.
  */
 (function () {
   'use strict';
 
   var STORAGE_KEY = 'lilbird-nest-tour-v1';
+  var VIDEO_KEY = 'lilbird-nest-welcome-video-v1';
   var SEEN_KEY = 'lilbird-nest-seen-access';
+  var WORKER_URL = 'https://worker-solo.cwwq46sn7m.workers.dev';
   var PAD = 10;
   var root = null;
   var hole = null;
   var card = null;
+  var videoRoot = null;
   var stepIndex = 0;
   var steps = [];
   var running = false;
+  var videoOpen = false;
   var resizeTimer = null;
   var autoAttempted = false;
 
@@ -37,6 +41,20 @@
 
   function isDone() {
     return storageGet() === 'done';
+  }
+
+  function videoSeen() {
+    try {
+      return localStorage.getItem(VIDEO_KEY) === 'done';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function markVideoSeen() {
+    try {
+      localStorage.setItem(VIDEO_KEY, 'done');
+    } catch (e) { /* ignore */ }
   }
 
   function setTab(name) {
@@ -190,7 +208,7 @@
         tab: 'products',
         selector: '#btn-nest-tour',
         title: 'You’re set',
-        body: 'That’s the lay of the land. Replay this tour anytime from Take a tour.',
+        body: 'That’s the lay of the land. Replay this tour anytime from Take a tour, or watch What is Nest? again whenever you like.',
         tip: null
       }
     );
@@ -441,21 +459,148 @@
     showStep(0);
   }
 
+  async function fetchWelcomeVideoUrl() {
+    var headers = { 'Content-Type': 'application/json' };
+    if (typeof window.__nestWorkerAuthHeaders === 'function') {
+      try {
+        var auth = await window.__nestWorkerAuthHeaders();
+        if (auth && auth.Authorization) headers.Authorization = auth.Authorization;
+      } catch (e) { /* ignore */ }
+    }
+    var res = await fetch(WORKER_URL + '/nest-welcome-video-url', {
+      method: 'POST',
+      headers: headers,
+      body: '{}'
+    });
+    if (!res.ok) throw new Error('Could not load welcome video');
+    var data = await res.json();
+    if (!data || !data.url) throw new Error('Could not load welcome video');
+    return data.url;
+  }
+
+  function ensureVideoDom() {
+    if (videoRoot) return videoRoot;
+    videoRoot = document.createElement('div');
+    videoRoot.id = 'nest-welcome-video-root';
+    videoRoot.className = 'nest-welcome-video-root hidden';
+    videoRoot.setAttribute('role', 'dialog');
+    videoRoot.setAttribute('aria-modal', 'true');
+    videoRoot.setAttribute('aria-labelledby', 'nest-welcome-video-title');
+    videoRoot.innerHTML =
+      '<div class="nest-welcome-video-backdrop" data-welcome-close></div>' +
+      '<div class="nest-welcome-video-panel">' +
+      '  <p class="nest-welcome-video-kicker">lil’ bird</p>' +
+      '  <h2 class="nest-welcome-video-title" id="nest-welcome-video-title">Welcome to your Nest</h2>' +
+      '  <p class="nest-welcome-video-body">A short look at the habitat you’re in — and how to use it.</p>' +
+      '  <div class="nest-welcome-video-frame">' +
+      '    <video id="nest-welcome-video" controls playsinline preload="metadata"></video>' +
+      '    <p class="nest-welcome-video-status" id="nest-welcome-video-status">Loading video…</p>' +
+      '  </div>' +
+      '  <div class="nest-welcome-video-actions">' +
+      '    <button type="button" class="btn btn-outline" data-welcome-close>Skip</button>' +
+      '    <button type="button" class="btn btn-gold" id="nest-welcome-video-continue" data-welcome-close>Continue</button>' +
+      '  </div>' +
+      '</div>';
+    document.body.appendChild(videoRoot);
+    videoRoot.addEventListener('click', function (e) {
+      if (e.target && e.target.getAttribute && e.target.getAttribute('data-welcome-close') !== null) {
+        closeWelcomeVideo();
+      }
+    });
+    return videoRoot;
+  }
+
+  function closeWelcomeVideo() {
+    if (!videoOpen) return;
+    videoOpen = false;
+    markVideoSeen();
+    var after = videoRoot && videoRoot._afterClose;
+    if (videoRoot) {
+      videoRoot._afterClose = null;
+      videoRoot.classList.add('hidden');
+      var vid = document.getElementById('nest-welcome-video');
+      if (vid) {
+        try { vid.pause(); } catch (e) { /* ignore */ }
+        vid.removeAttribute('src');
+        try { vid.load(); } catch (e2) { /* ignore */ }
+      }
+    }
+    document.body.classList.remove('nest-welcome-video-active');
+    document.removeEventListener('keydown', onVideoKey);
+    if (typeof after === 'function') {
+      setTimeout(after, 200);
+    }
+  }
+
+  function onVideoKey(e) {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      closeWelcomeVideo();
+    }
+  }
+
+  function showWelcomeVideo(opts) {
+    opts = opts || {};
+    if (videoOpen || running) return Promise.resolve();
+    ensureVideoDom();
+    videoOpen = true;
+    videoRoot._afterClose = typeof opts.after === 'function' ? opts.after : null;
+    videoRoot.classList.remove('hidden');
+    document.body.classList.add('nest-welcome-video-active');
+    document.addEventListener('keydown', onVideoKey);
+
+    var status = document.getElementById('nest-welcome-video-status');
+    var vid = document.getElementById('nest-welcome-video');
+    var continueBtn = document.getElementById('nest-welcome-video-continue');
+    if (status) {
+      status.textContent = 'Loading video…';
+      status.classList.remove('hidden');
+    }
+    if (continueBtn) continueBtn.textContent = opts.continueLabel || 'Continue';
+
+    return fetchWelcomeVideoUrl().then(function (url) {
+      if (!videoOpen || !vid) return;
+      vid.src = url;
+      if (status) status.classList.add('hidden');
+      var playPromise = vid.play();
+      if (playPromise && typeof playPromise.catch === 'function') {
+        playPromise.catch(function () { /* autoplay blocked — controls still work */ });
+      }
+      vid.onended = function () {
+        if (continueBtn) continueBtn.focus();
+      };
+    }).catch(function () {
+      if (status) {
+        status.textContent = 'Couldn’t load the video just now. Continue to explore your Nest.';
+        status.classList.remove('hidden');
+      }
+    });
+  }
+
   function maybeAutoStart() {
-    if (running) return;
+    if (running || videoOpen) return;
     var params = new URLSearchParams(window.location.search);
     if (params.get('tour') === '0') return;
-    if (isDone()) {
-      maybeWhatsNew();
-      return;
-    }
     if (autoAttempted) return;
     autoAttempted = true;
-    // slight delay so Nest UI finishes painting
+
     setTimeout(function () {
       if (!document.getElementById('view-dashboard') || !document.getElementById('view-dashboard').classList.contains('active')) return;
-      if (isDone() || running) return;
-      startTour({ auto: true });
+      if (running || videoOpen) return;
+
+      function startTourIfNeeded() {
+        if (isDone()) {
+          maybeWhatsNew();
+          return;
+        }
+        startTour({ auto: true });
+      }
+
+      if (!videoSeen()) {
+        showWelcomeVideo({ after: startTourIfNeeded, continueLabel: 'Take the tour →' });
+        return;
+      }
+      startTourIfNeeded();
     }, 700);
   }
 
@@ -487,17 +632,26 @@
 
   function bindReplayButton() {
     var btn = document.getElementById('btn-nest-tour');
-    if (!btn || btn.dataset.tourBound) return;
-    btn.dataset.tourBound = '1';
-    btn.addEventListener('click', function () {
-      startTour({ force: true });
-    });
+    if (btn && !btn.dataset.tourBound) {
+      btn.dataset.tourBound = '1';
+      btn.addEventListener('click', function () {
+        startTour({ force: true });
+      });
+    }
+    var welcomeBtn = document.getElementById('btn-nest-welcome');
+    if (welcomeBtn && !welcomeBtn.dataset.welcomeBound) {
+      welcomeBtn.dataset.welcomeBound = '1';
+      welcomeBtn.addEventListener('click', function () {
+        showWelcomeVideo({ continueLabel: 'Close' });
+      });
+    }
   }
 
   window.LilBirdNestTour = {
     start: startTour,
     startForced: startForced,
     maybeAutoStart: maybeAutoStart,
+    showWelcomeVideo: showWelcomeVideo,
     bindReplayButton: bindReplayButton,
     isDone: isDone,
     markDone: markDone
