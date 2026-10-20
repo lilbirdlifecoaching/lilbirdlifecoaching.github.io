@@ -207,8 +207,8 @@
     var visuals = layout.querySelectorAll('.pathfinder-visual');
     var caption = document.getElementById('pathfinder-visual-caption');
     var captions = [
-      'Stage one · Find the door',
-      'Stage two · The Nest, deeper',
+      'Stage one · The Nest',
+      'Stage two · Nest Plus',
       'Stage three · With Luke'
     ];
     var activeIdx = '0';

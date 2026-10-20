@@ -1032,6 +1032,17 @@ a.recognition-item:focus-visible .recognition-read {
   line-height: 1.45;
 }
 .tier-rows { display: flex; flex-direction: column; }
+.tier-note {
+  margin: 0;
+  padding: 0.85rem 1.25rem 1.1rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+.tier-note a {
+  color: inherit;
+  text-underline-offset: 0.15em;
+}
 .pathfinder-row {
   display: grid;
   grid-template-columns: 1fr auto;
