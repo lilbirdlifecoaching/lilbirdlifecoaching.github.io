@@ -81,13 +81,13 @@
         var src = access().nestPlusSource;
         return {
           title: 'Nest Plus' + (src && src !== 'Nest Plus' ? ' · ' + src.toLowerCase() : ''),
-          body: 'Open the Relationship Dynamic to see how you and someone close to you fit together. Your First Flight workbook is here too.',
-          tip: '» Tap Relationship Dynamic to start'
+          body: 'Life Canvas, Relationship Dynamic, and the Roots & Wings workbook are here. The First Flight workbook is already in your free Nest.',
+          tip: '» Open Roots & Wings when you’re ready'
         };
       },
       locked: {
         title: 'Nest Plus · $5',
-        body: 'Adds the Relationship Dynamic tool and the First Flight workbook. A one-off $5, yours to keep. Already included with any coaching, Solo or Intensive purchase.',
+        body: 'Adds Life Canvas, the full Inner Compass read, Relationship Dynamic, and the Roots & Wings workbook. A one-off $5, yours to keep. Included with coaching, Solo, or the Intensive.',
         tip: null,
         action: { label: 'Add Nest Plus · $5 →', upgrade: 'nest_plus' }
       }

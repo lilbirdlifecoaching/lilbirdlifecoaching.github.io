@@ -207,9 +207,9 @@
     var visuals = layout.querySelectorAll('.pathfinder-visual');
     var caption = document.getElementById('pathfinder-visual-caption');
     var captions = [
-      'Act one · Still deciding',
-      'Act two · Dip your toe in',
-      'Act three · Dive in'
+      'Stage one · Find the door',
+      'Stage two · The Nest, deeper',
+      'Stage three · With Luke'
     ];
     var activeIdx = '0';
     var observer = null;

@@ -126,8 +126,10 @@
 
   // Nest accounts are created by a purchase (or the Inner Compass unlock), never from this page.
   const formLogin = document.getElementById('form-login');
+  const formSignup = document.getElementById('form-signup');
   const formSetPassword = document.getElementById('form-set-password');
   const loginError = document.getElementById('login-error');
+  const signupError = document.getElementById('signup-error');
   const setPasswordError = document.getElementById('set-password-error');
   const PW_SETUP_KEY = 'lilbird-pw-setup';
   let passwordSetupPending = false;
@@ -147,15 +149,90 @@
     }
   }
 
+  function showSignup() {
+    showAuthViewNow();
+    formSignup?.classList.remove('hidden');
+    formLogin?.classList.add('hidden');
+    formSetPassword?.classList.add('hidden');
+    document.getElementById('auth-plans')?.classList.remove('hidden');
+    const title = document.getElementById('auth-title');
+    const copy = document.getElementById('auth-copy');
+    if (title) title.innerHTML = 'Create your Nest. <em>It\'s free.</em>';
+    if (copy) copy.textContent = 'This is where the lil\' bird work lives. Open a Nest for free. Add more when you want it.';
+  }
+
+  function showLogin() {
+    showAuthViewNow();
+    formSignup?.classList.add('hidden');
+    formSetPassword?.classList.add('hidden');
+    formLogin?.classList.remove('hidden');
+    document.getElementById('auth-plans')?.classList.add('hidden');
+    const title = document.getElementById('auth-title');
+    const copy = document.getElementById('auth-copy');
+    if (title) title.textContent = 'Log in to your Nest.';
+    if (copy) copy.textContent = 'Pick up where you left off.';
+    document.getElementById('login-email')?.focus();
+  }
+
   function showSetPassword() {
     showAuthViewNow();
+    formSignup?.classList.add('hidden');
     formLogin.classList.add('hidden');
+    document.getElementById('auth-plans')?.classList.add('hidden');
     formSetPassword.classList.remove('hidden');
+    const title = document.getElementById('auth-title');
     const copy = document.getElementById('auth-copy');
-    if (copy) copy.textContent = 'One last step: choose a password so you can log in to your Nest anytime.';
+    if (title) title.textContent = 'Choose a password.';
+    if (copy) copy.textContent = 'One last step, so you can log in to your Nest anytime.';
     setPasswordError.textContent = '';
     document.getElementById('set-password')?.focus();
   }
+
+  document.getElementById('btn-show-login')?.addEventListener('click', showLogin);
+  document.getElementById('btn-show-signup')?.addEventListener('click', showSignup);
+
+  formSignup?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!signupError) return;
+    signupError.textContent = '';
+    signupError.classList.remove('auth-success');
+    const email = document.getElementById('signup-email').value.trim().toLowerCase();
+    const password = document.getElementById('signup-password').value;
+    if (password.length < 8) {
+      signupError.textContent = 'Use at least 8 characters.';
+      return;
+    }
+    const btn = document.getElementById('btn-signup');
+    if (btn) { btn.disabled = true; btn.textContent = 'Creating…'; }
+    signupInFlight = true;
+    try {
+      const { data, error } = await sb.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: window.location.origin + '/nest/' }
+      });
+      if (error) {
+        const msg = String(error.message || '').toLowerCase();
+        signupError.textContent = msg.includes('already')
+          ? 'That email already has a Nest. Log in, or use the password link if you have not set one yet.'
+          : (error.message || 'Could not create the Nest. Try again.');
+        return;
+      }
+      if (data?.session?.user) {
+        signupInFlight = false;
+        await showDashboard(data.session.user);
+        return;
+      }
+      signupError.classList.add('auth-success');
+      signupError.textContent = 'Check your email to confirm this Nest, then come back and log in.';
+    } catch (err) {
+      console.error('Nest signup:', err);
+      signupError.textContent = 'Could not create the Nest. Try again.';
+    } finally {
+      signupInFlight = false;
+      if (btn) { btn.disabled = false; btn.textContent = 'Create my free Nest →'; }
+    }
+  });
 
   formSetPassword.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -445,9 +522,9 @@
     }
     if (hasNestPlus()) {
       const src = nestPlusSource();
-      return { name: 'Nest Plus', note: src === 'Nest Plus' ? 'Relationship Dynamic and the First Flight workbook are unlocked.' : src + '.' };
+      return { name: 'Nest Plus', note: src === 'Nest Plus' ? 'Full read, Life Canvas, Relationship Dynamic, and the Roots & Wings workbook.' : src + '.' };
     }
-    return { name: 'Nest', note: 'Your read, Life Canvas and Ask lil’ bird. Add Nest Plus for $5 to unlock the Relationship Dynamic and First Flight workbook.' };
+    return { name: 'Nest', note: 'First Flight workbook, Glow Map, and quizzes. Nest Plus adds the full read, Life Canvas, Relationship Dynamic, and Roots & Wings.' };
   }
 
   function nestAccessSummary() {
@@ -827,7 +904,7 @@
   }
 
   function hasInnerCompassAccess() {
-    return entitlements.has('inner_compass') || hasInnerCompassComplete();
+    return entitlements.has('inner_compass') || hasInnerCompassComplete() || hasNestPlus();
   }
 
   function hasInnerCompassComplete() {
@@ -962,49 +1039,53 @@
 
     if (key === 'nest_plus') {
       const src = nestPlusSource();
+      const readLink = deepNestId ? '/relationship-dynamic.html?nest=' + encodeURIComponent(deepNestId) + '&from=nest' : '/relationship-dynamic.html?from=nest';
+      const canvasLink = innerCompassHref();
       if (src) {
-        const readLink = deepNestId ? '/relationship-dynamic.html?nest=' + encodeURIComponent(deepNestId) + '&from=nest' : '/relationship-dynamic.html?from=nest';
         return `
           <article class="product-card" data-product="nest_plus">
             <p class="eyebrow">nest plus</p>
-            <h3>Relationship Dynamic + First Flight workbook</h3>
+            <h3>The Intensive workbook, on your own time</h3>
             <span class="status-badge">${escapeHtml(src)}</span>
-            <p>See how you and someone close to you fit together, and work through the First Flight workbook at your own pace.</p>
+            <p>Life Canvas puts passion, connections, spaces, resources, and energy on one page. Roots &amp; Wings is the eight-session workbook from the Intensive. You also get the full Inner Compass read and Relationship Dynamic.</p>
             <div class="btn-row">
-              <a class="btn btn-gold" href="${escapeHtml(readLink)}">Relationship Dynamic →</a>
-              <a class="btn btn-outline" href="${workbookHref('first-flight')}">First Flight workbook</a>
+              <a class="btn btn-gold" href="${escapeHtml(canvasLink)}">Life Canvas →</a>
+              <a class="btn btn-outline" href="${workbookHref('life-change')}">Roots &amp; Wings</a>
+              <a class="btn btn-outline" href="${escapeHtml(readLink)}">Relationship Dynamic</a>
             </div>
           </article>`;
       }
       return `
         <article class="product-card locked" data-product="nest_plus">
-          <span class="lock-pill"><i class="ti ti-lock"></i> Add Nest Plus, $5</span>
+          <span class="lock-pill"><i class="ti ti-lock"></i> $5, yours to keep</span>
           <p class="eyebrow">nest plus</p>
-          <h3>Relationship Dynamic + First Flight workbook</h3>
-          <p>Compare your wiring with a partner, friend or family member, and get the First Flight workbook. One-off $5, yours to keep. Included with any coaching, Solo or Intensive purchase.</p>
+          <h3>The Intensive workbook, on your own time</h3>
+          <p>Life Canvas puts passion, connections, spaces, resources, and energy on one page. Roots &amp; Wings is the eight-session workbook from the Intensive. You also get the full Inner Compass read and Relationship Dynamic. Included with coaching, Solo, or the Intensive.</p>
           <div class="btn-row"><button type="button" class="btn btn-ember" data-upgrade="nest_plus">Add Nest Plus · $5 →</button></div>
         </article>`;
     }
 
     if (key === 'lcs_workbook') {
+      if (hasNestPlus()) return '';
       const src = workbookSource();
-      if (src) {
-        return `
-          <article class="product-card" data-product="lcs_workbook">
-            <p class="eyebrow">workbook</p>
-            <h3>Life Change Sessions workbook</h3>
-            <span class="status-badge">${escapeHtml(src)}</span>
-            <p>All eight sessions in one interactive workbook. Answers save privately on this device; use Download as PDF to keep a copy.</p>
-            <div class="btn-row"><a class="btn btn-gold" href="${workbookHref('life-change')}">Open workbook →</a></div>
-          </article>`;
-      }
+      if (!src) return '';
       return `
-        <article class="product-card locked" data-product="lcs_workbook">
-          <span class="lock-pill"><i class="ti ti-lock"></i> $27</span>
+        <article class="product-card" data-product="lcs_workbook">
           <p class="eyebrow">workbook</p>
-          <h3>Life Change Sessions workbook</h3>
-          <p>The complete eight-session workbook to work through on your own, online or as a PDF. Included with the Life Change Intensive.</p>
-          <div class="btn-row"><button type="button" class="btn btn-ember" data-upgrade="lcs_workbook">Get the workbook · $27 →</button></div>
+          <h3>Roots &amp; Wings</h3>
+          <span class="status-badge">${escapeHtml(src)}</span>
+          <p>Eight sessions in one workbook. Answers save on this device. Download as PDF keeps a copy.</p>
+          <div class="btn-row"><a class="btn btn-gold" href="${workbookHref('life-change')}">Open workbook →</a></div>
+        </article>`;
+    }
+
+    if (key === 'free_workbook') {
+      return `
+        <article class="product-card" data-product="free_workbook">
+          <p class="eyebrow">free · already yours</p>
+          <h3>First Flight workbook</h3>
+          <p>Map what's going on and pick one next move.</p>
+          <div class="btn-row"><a class="btn btn-gold" href="${workbookHref('first-flight')}">Open workbook →</a></div>
         </article>`;
     }
 
@@ -1118,6 +1199,7 @@
         <span class="plan-badge-note">${escapeHtml(plan.note)}</span>
       </div>
       ${renderPhotoPrompt()}
+      ${cardProduct('free_workbook')}
       ${cardProduct('inner_compass')}
       ${cardProduct('nest_plus')}
       ${cardProduct('lcs_workbook')}
@@ -1316,6 +1398,25 @@
       </article>`;
   }
 
+  function premiumMailto() {
+    const email = currentUser?.email || '';
+    const body = encodeURIComponent(email ? 'Please tell me when Nest Premium opens.\n\nMy Nest email: ' + email : 'Please tell me when Nest Premium opens.');
+    return 'mailto:hello@lilbird.life?subject=' + encodeURIComponent('Tell me when Nest Premium opens') + '&body=' + body;
+  }
+
+  function renderLiveGroup() {
+    const el = document.getElementById('sidebar-live-card');
+    if (!el) return;
+    const included = entitlements.has('life_change_intensive')
+      ? 'Included with your Intensive for the first year, once booking opens.'
+      : 'A session with Luke and other people in the Nest. You bring what\'s going on. You leave with one next move. $47 a month when booking opens. Includes the Solo course and everything in Nest Plus.';
+    el.innerHTML = `
+      <p class="sidebar-eyebrow">Live group coaching <span class="soon-tag">Coming soon</span></p>
+      <h4>Live group coaching</h4>
+      <p>${included}</p>
+      <a class="btn btn-outline full" href="${premiumMailto()}">Tell me when it opens</a>`;
+  }
+
   function renderSidebarRelationship() {
     const el = document.getElementById('sidebar-relationship-card');
     if (!el) return;
@@ -1330,12 +1431,7 @@
         <a class="btn btn-outline full" href="${escapeHtml(link)}">Open tool →</a>`;
       return;
     }
-    el.innerHTML = `
-      <p class="sidebar-eyebrow"><i class="ti ti-lock"></i> relationship dynamic · nest plus</p>
-      <h4>How do you fit with someone close?</h4>
-      <p>See how your wiring meets a partner’s, friend’s or colleague’s: what each of you brings, and where you snag. Part of Nest Plus.</p>
-      <button type="button" class="btn btn-ember full" data-upgrade="nest_plus">Add Nest Plus · $5 →</button>`;
-    el.querySelector('[data-upgrade]').addEventListener('click', (e) => void startUpgrade('nest_plus', e.currentTarget));
+    el.innerHTML = '';
   }
 
   function renderNavPlan() {
@@ -1543,6 +1639,7 @@
   }
 
   function renderSidebar() {
+    renderLiveGroup();
     const el = document.getElementById('sidebar-context-card');
     const hasIntensive = entitlements.has('life_change_intensive');
     const email = encodeURIComponent(currentUser?.email || '');
@@ -1609,12 +1706,24 @@
       return;
     }
 
+    if (!hasNestPlus()) {
+      el.classList.remove('ember');
+      el.innerHTML = `
+        <p class="sidebar-eyebrow">Nest Plus · $5</p>
+        <h4>The Intensive workbook, on your own time</h4>
+        <p>Life Canvas, the full Inner Compass read, Relationship Dynamic, and Roots &amp; Wings. Eight sessions, the same workbook as the Intensive. Yours to keep.</p>
+        <button type="button" class="btn btn-ember full" id="btn-sidebar-plus">Add Nest Plus · $5 →</button>`;
+      el.querySelector('#btn-sidebar-plus')?.addEventListener('click', (e) => void startUpgrade('nest_plus', e.currentTarget));
+      return;
+    }
+
+    el.classList.add('ember');
     el.innerHTML = `
-      <p class="sidebar-eyebrow">book with Luke</p>
-      <h4>Choose how you meet</h4>
-      <p>First Flight to taste it, one coaching session when something’s specific, or the full Intensive.</p>
-      <a class="btn btn-ember full" href="/first-flight/book.html?code=IMREADY">First Flight · $149 →</a>
-      <a class="btn btn-outline full" href="${coachingHref}">Coaching session · $249 →</a>
+      <p class="sidebar-eyebrow">one to one</p>
+      <h4>When you want Luke, just you</h4>
+      <p>First Flight is one session. Coaching is there when something specific needs the hour. The Intensive is the full eight.</p>
+      <a class="btn btn-outline full" href="/first-flight/book.html?code=IMREADY">First Flight · $149 →</a>
+      <a class="btn btn-outline full" href="${coachingHref}">Coaching · $249 →</a>
       <a class="btn btn-outline full" href="/intensive/enrol.html?from=nest">Life Change Intensive →</a>`;
   }
 
@@ -1650,6 +1759,8 @@
     document.getElementById('pane-products').innerHTML = '';
     document.getElementById('pane-profile').innerHTML = '';
     document.getElementById('sidebar-context-card').innerHTML = '';
+    const live = document.getElementById('sidebar-live-card');
+    if (live) live.innerHTML = '';
     document.getElementById('next-steps-list').innerHTML = '';
     document.getElementById('nav-user-name').textContent = '';
     document.getElementById('nav-plan')?.classList.add('hidden');
@@ -1756,6 +1867,7 @@
     resetDashboardUi();
     showAuthViewNow();
     resetLoginButton();
+    if (!passwordSetupPending) showSignup();
   }
 
   async function forceLogout() {
@@ -1824,6 +1936,7 @@
 
   function showAuthLinkError(message) {
     showAuth();
+    showLogin();
     if (!loginError) return;
     loginError.style.color = '';
     loginError.textContent = message;

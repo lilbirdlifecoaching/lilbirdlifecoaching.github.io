@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.49.0/dist/tabler-icons.min.css" />
-  <link rel="stylesheet" href="./nest-styles.css?v=31" />
+  <link rel="stylesheet" href="./nest-styles.css?v=32" />
   <link rel="stylesheet" href="./nest-tour.css?v=3" />
   <link rel="stylesheet" href="/css/lilbird-nest-theme.css?v=20260917m" />
   <!-- Google Tag Manager -->
@@ -47,10 +47,20 @@
     <main class="auth-wrap">
       <div class="auth-card">
         <p class="eyebrow">lil' bird · Nest</p>
-        <h1>One home for what's <em>next.</em></h1>
-        <p class="auth-copy" id="auth-copy">Log in to see what you have unlocked and what to do next.</p>
+        <h1 id="auth-title">Create your Nest. <em>It's free.</em></h1>
+        <p class="auth-copy" id="auth-copy">This is where the lil' bird work lives. Open a Nest for free. Add more when you want it.</p>
 
-        <form id="form-login" class="auth-form">
+        <form id="form-signup" class="auth-form">
+          <label>Email</label>
+          <input id="signup-email" type="email" placeholder="you@example.com" autocomplete="email" required />
+          <label>Password</label>
+          <input id="signup-password" type="password" placeholder="at least 8 characters" autocomplete="new-password" required />
+          <button id="btn-signup" class="btn btn-gold" type="submit">Create my free Nest →</button>
+          <p id="signup-error" class="auth-error"></p>
+          <button id="btn-show-login" class="btn btn-outline" type="button">Already have one? Log in</button>
+        </form>
+
+        <form id="form-login" class="auth-form hidden">
           <label>Email</label>
           <input id="login-email" type="email" placeholder="you@example.com" required />
           <label>Password</label>
@@ -61,11 +71,14 @@
             <p><strong>First time here, or forgot your password?</strong> If you bought something from lil' bird, your Nest is already waiting. Enter that email above and we'll send a link to set your password.</p>
             <button id="btn-forgot" class="btn btn-outline" type="button">Email me a link to set my password</button>
           </div>
-          <div class="auth-new-here">
-            <p>New to lil' bird? Your Nest comes with your Inner Compass read. Your two types are free.</p>
-            <a class="btn btn-ember" href="/inner-compass/?from=nest">Take your Inner Compass →</a>
-          </div>
+          <button id="btn-show-signup" class="btn btn-outline" type="button">Create a free Nest instead</button>
         </form>
+
+        <div class="auth-plans" id="auth-plans">
+          <div class="auth-plan"><strong>Free Nest</strong><b>Free</b><span>Glow Map, quizzes, letters if you opt in, and the First Flight workbook. Map what's going on and leave with one next move.</span></div>
+          <div class="auth-plan"><strong>Nest Plus</strong><b>$5</b><span>Full Inner Compass read, Life Canvas, Relationship Dynamic, and the Roots &amp; Wings workbook. Eight sessions, the same workbook as the Intensive. Yours to keep.</span></div>
+          <div class="auth-plan is-soon"><strong>Nest Premium</strong><b>Coming soon</b><span>Everything in Plus, the Solo course, and live group coaching with Luke. $47 a month when booking opens.</span></div>
+        </div>
 
         <form id="form-set-password" class="auth-form hidden">
           <label>Choose your Nest password</label>
@@ -147,6 +160,7 @@
         </section>
 
         <aside class="side-col">
+          <article id="sidebar-live-card" class="sidebar-card premium"></article>
           <article id="sidebar-context-card" class="sidebar-card ember"></article>
           <article class="sidebar-card" id="sidebar-relationship-card"></article>
           <article class="sidebar-card hint">
@@ -163,7 +177,7 @@
   <script src="/js/vendor/supabase-js-2.117.3.js"></script>
   <script src="/js/lilbird-theme.js"></script>
   <script src="/js/lilbird-theme-nav.js"></script>
-  <script src="./nest-tour.js?v=6"></script>
-  <script src="./nest-client.js?v=40"></script>
+  <script src="./nest-tour.js?v=7"></script>
+  <script src="./nest-client.js?v=41"></script>
 </body>
 </html>
