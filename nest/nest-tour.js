@@ -86,10 +86,10 @@
         };
       },
       locked: {
-        title: 'Nest Plus · $5',
-        body: 'Adds Life Canvas, the full Inner Compass read, Relationship Dynamic, and the Roots & Wings workbook. A one-off $5, yours to keep. Included with coaching, Solo, or the Intensive.',
+        title: 'Nest Plus · $7.99/month',
+        body: 'Adds Life Canvas, the full Inner Compass read, Relationship Dynamic, and the Roots & Wings workbook. $7.99 a month. Cancel anytime from your Nest. Included with coaching, Solo, or the Intensive.',
         tip: null,
-        action: { label: 'Add Nest Plus · $5 →', upgrade: 'nest_plus' }
+        action: { label: 'Add Nest Plus · $7.99/month →', upgrade: 'nest_plus' }
       }
     },
     lcs_workbook: {

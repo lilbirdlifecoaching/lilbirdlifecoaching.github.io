@@ -25,6 +25,7 @@
 
   let currentUser = null;
   let entitlements = new Set();
+  let nestPlusGrantedBy = '';
   let courseProfile = null;
   let sessionProgress = [];
   let deepProfile = null;
@@ -394,7 +395,7 @@
 
     try {
       const [entRes, courseRes, progressRes, linkRes, intensiveRes, lciRes] = await Promise.all([
-        sb.from('user_entitlements').select('product,active').eq('user_id', uid).eq('active', true),
+        sb.from('user_entitlements').select('product,active,granted_by').eq('user_id', uid).eq('active', true),
         sb.from('course_users').select('*').eq('id', uid).maybeSingle(),
         sb.from('session_progress').select('*').eq('user_id', uid).order('session_number'),
         sb.from('deep_profile_links').select('nest_id').eq('user_id', uid).maybeSingle(),
@@ -411,6 +412,7 @@
       }
 
       entitlements = new Set((entRes.data || []).map((r) => r.product));
+      nestPlusGrantedBy = (entRes.data || []).find((r) => r.product === 'nest_plus')?.granted_by || '';
       courseProfile = courseRes.data || null;
       sessionProgress = progressRes.data || [];
       deepNestId = linkRes.data?.nest_id || null;
@@ -494,6 +496,10 @@
     }
   }
 
+  function nestPlusIsSubscription() {
+    return String(nestPlusGrantedBy || '').indexOf('stripe_sub:') === 0;
+  }
+
   function nestPlusSource() {
     if (hasSoloCourseAccess() && !entitlements.has('life_change_intensive') && !entitlements.has('coaching')) {
       return 'Included with Solo';
@@ -522,7 +528,7 @@
     }
     if (hasNestPlus()) {
       const src = nestPlusSource();
-      return { name: 'Nest Plus', note: src === 'Nest Plus' ? 'Full read, Life Canvas, Relationship Dynamic, and the Roots & Wings workbook.' : src + '.' };
+      return { name: 'Nest Plus', note: src === 'Nest Plus' ? 'Full read, Life Canvas, Relationship Dynamic, and the Roots & Wings workbook. $7.99 a month.' : src + '.' };
     }
     return { name: 'Nest', note: 'First Flight workbook, Glow Map, and quizzes. Nest Plus adds the full read, Life Canvas, Relationship Dynamic, and Roots & Wings.' };
   }
@@ -564,6 +570,37 @@
     } catch (e) {
       console.error('startUpgrade:', e);
       setDashError('Checkout could not open just now. Please try again in a moment.');
+    }
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = original;
+    }
+  }
+
+  async function openNestPlusBilling(btn) {
+    const original = btn ? btn.textContent : '';
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Opening billing…';
+    }
+    setDashError('');
+    try {
+      const res = await fetch(SOLO_WORKER_URL + '/nest-plus-billing', {
+        method: 'POST',
+        headers: Object.assign({ 'Content-Type': 'application/json' }, await authHeaders()),
+        body: '{}'
+      });
+      const out = await res.json().catch(() => ({}));
+      if (out.url) {
+        window.location.href = out.url;
+        return;
+      }
+      setDashError(out.legacy
+        ? 'This Nest Plus was a one-time purchase, so there is no monthly bill to manage.'
+        : 'Billing could not open just now. Email hello@lilbird.life and we will sort it.');
+    } catch (e) {
+      console.error('openNestPlusBilling:', e);
+      setDashError('Billing could not open just now. Email hello@lilbird.life and we will sort it.');
     }
     if (btn) {
       btn.disabled = false;
@@ -1052,16 +1089,17 @@
               <a class="btn btn-gold" href="${escapeHtml(canvasLink)}">Life Canvas →</a>
               <a class="btn btn-outline" href="${workbookHref('life-change')}">Roots &amp; Wings</a>
               <a class="btn btn-outline" href="${escapeHtml(readLink)}">Relationship Dynamic</a>
+              ${nestPlusIsSubscription() ? '<button type="button" class="btn btn-outline" data-manage-plus>Manage billing</button>' : ''}
             </div>
           </article>`;
       }
       return `
         <article class="product-card locked" data-product="nest_plus">
-          <span class="lock-pill"><i class="ti ti-lock"></i> $5, yours to keep</span>
+          <span class="lock-pill"><i class="ti ti-lock"></i> $7.99/month</span>
           <p class="eyebrow">nest plus</p>
           <h3>The Intensive workbook, on your own time</h3>
-          <p>Life Canvas puts passion, connections, spaces, resources, and energy on one page. Roots &amp; Wings is the eight-session workbook from the Intensive. You also get the full Inner Compass read and Relationship Dynamic. Included with coaching, Solo, or the Intensive.</p>
-          <div class="btn-row"><button type="button" class="btn btn-ember" data-upgrade="nest_plus">Add Nest Plus · $5 →</button></div>
+          <p>Life Canvas puts passion, connections, spaces, resources, and energy on one page. Roots &amp; Wings is the eight-session workbook from the Intensive. You also get the full Inner Compass read and Relationship Dynamic. Cancel anytime. Included with coaching, Solo, or the Intensive.</p>
+          <div class="btn-row"><button type="button" class="btn btn-ember" data-upgrade="nest_plus">Add Nest Plus · $7.99/month →</button></div>
         </article>`;
     }
 
@@ -1213,6 +1251,9 @@
     });
     productsPane.querySelectorAll('[data-upgrade]').forEach((btn) => {
       btn.addEventListener('click', () => void startUpgrade(btn.dataset.upgrade, btn));
+    });
+    productsPane.querySelectorAll('[data-manage-plus]').forEach((btn) => {
+      btn.addEventListener('click', () => void openNestPlusBilling(btn));
     });
     productsPane.querySelectorAll('[data-go-photo]').forEach((btn) => {
       btn.addEventListener('click', goToPhoto);
@@ -1709,10 +1750,10 @@
     if (!hasNestPlus()) {
       el.classList.remove('ember');
       el.innerHTML = `
-        <p class="sidebar-eyebrow">Nest Plus · $5</p>
+        <p class="sidebar-eyebrow">Nest Plus · $7.99/month</p>
         <h4>The Intensive workbook, on your own time</h4>
-        <p>Life Canvas, the full Inner Compass read, Relationship Dynamic, and Roots &amp; Wings. Eight sessions, the same workbook as the Intensive. Yours to keep.</p>
-        <button type="button" class="btn btn-ember full" id="btn-sidebar-plus">Add Nest Plus · $5 →</button>`;
+        <p>Life Canvas, the full Inner Compass read, Relationship Dynamic, and Roots &amp; Wings. Eight sessions, the same workbook as the Intensive. Cancel anytime.</p>
+        <button type="button" class="btn btn-ember full" id="btn-sidebar-plus">Add Nest Plus · $7.99/month →</button>`;
       el.querySelector('#btn-sidebar-plus')?.addEventListener('click', (e) => void startUpgrade('nest_plus', e.currentTarget));
       return;
     }
@@ -1750,6 +1791,7 @@
   window.__nestSetTab = setTab;
 
   function resetDashboardUi() {
+    nestPlusGrantedBy = '';
     setTab('products');
     setDashError('');
     setDashLoading(false);

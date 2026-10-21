@@ -2932,7 +2932,7 @@
           <ul class="ic-unlock-locked" id="ic-unlock-locked"></ul>
           <label class="ic-unlock-addon" id="ic-addon-nest-plus-row">
             <input type="checkbox" id="ic-addon-nest-plus" onchange="updateIcTotal()">
-            <span><strong>Add Nest Plus · +$5</strong><br>The Relationship Dynamic tool (see how you fit with a partner, friend or colleague) and the First Flight workbook.</span>
+            <span><strong>Add Nest Plus · +$7.99/month</strong><br>Life Canvas, Relationship Dynamic, and the Roots &amp; Wings workbook. Cancel anytime.</span>
           </label>
           <label class="ic-unlock-addon" id="ic-addon-workbook-row">
             <input type="checkbox" id="ic-addon-workbook" onchange="updateIcTotal()">
@@ -2950,7 +2950,7 @@
           </div>
           <p class="ic-account-signed" id="ic-account-signed" style="display:none;"></p>
           <button type="button" class="btn btn-gold ic-unlock-btn" id="ic-unlock-btn" onclick="startIcCheckout()">Unlock my full read · $2 →</button>
-          <p class="ic-unlock-fine">Secure checkout with Stripe. One-off payment, no subscription.</p>
+          <p class="ic-unlock-fine">Secure checkout with Stripe. The full read is a one-time $2.</p>
           <p class="ic-unlock-error" id="ic-unlock-error" style="display:none;"></p>
         </div>
 
@@ -3051,13 +3051,13 @@
           <h3>How do you work with someone you know?</h3>
           <p>Put in what you know about someone in your life (a partner, colleague, friend) and we'll read the dynamic. Then share it with them if it fits.</p>
           <div class="partner-upsell" id="partner-upsell" style="display:none;">
-            <p><strong>The Relationship Dynamic is part of Nest Plus.</strong> A one-off $5, and it includes the First Flight workbook. Already included with any coaching, Solo or Intensive purchase.</p>
+            <p><strong>The Relationship Dynamic is part of Nest Plus.</strong> $7.99 a month. It also includes Life Canvas and the Roots &amp; Wings workbook. Cancel anytime. Already included with any coaching, Solo or Intensive purchase.</p>
             <div class="partner-example">
               <p class="partner-example-label">Example result</p>
               <p><em>The Spark and the Anchor</em> · you (ENFP · 7) with a partner (ISFJ · 6)</p>
               <p>You bring the open doors; they bring the floor to stand on. Under stress you reach for more options and they reach for certainty, so name it early: “I need to explore, you need a plan. Can we do both?”</p>
             </div>
-            <button type="button" class="btn btn-gold" onclick="startIcCheckout({ nestPlusOnly: true })">Add Nest Plus · $5 →</button>
+            <button type="button" class="btn btn-gold" onclick="startIcCheckout({ nestPlusOnly: true })">Add Nest Plus · $7.99/month →</button>
           </div>
           <div id="partner-form">
           <div class="partner-input">
@@ -4524,7 +4524,7 @@ function renderIcUnlock(profile, locked){
   document.getElementById('ic-unlock-title').textContent = locked ? 'Unlock your full read and Nest · $2' : 'Add to your Nest';
   document.getElementById('ic-unlock-lead').textContent = locked
     ? 'This is the short version. The full read goes much deeper, and your Nest keeps it, your Life Canvas and Ask lil\' bird in one place.'
-    : 'Your full read is unlocked. These are optional extras, yours to keep.';
+    : 'Your full read is unlocked. Nest Plus is $7.99 a month. The workbook is a one-time $27.';
   card.dataset.locked = locked ? '1' : '0';
   card.style.display = 'block';
   const btn = document.getElementById('ic-unlock-btn');
@@ -4630,14 +4630,24 @@ function showNestReady(loggedIn){
 function updateIcTotal(){
   const card = document.getElementById('ic-unlock');
   const btn = document.getElementById('ic-unlock-btn');
+  const fine = document.getElementById('ic-unlock-fine');
   if(!card || !btn) return;
   const locked = card.dataset.locked === '1';
   const np = document.getElementById('ic-addon-nest-plus')?.checked;
   const wb = document.getElementById('ic-addon-workbook')?.checked;
-  const total = (locked ? 2 : 0) + (np ? 5 : 0) + (wb ? 27 : 0);
-  if(locked) btn.textContent = 'Unlock my full read · $' + total + ' →';
-  else btn.textContent = total ? 'Add to my Nest · $' + total + ' →' : 'Tick an extra above';
-  btn.disabled = !locked && !total;
+  const once = (locked ? 2 : 0) + (wb ? 27 : 0);
+  const parts = [];
+  if(once) parts.push('$' + once);
+  if(np) parts.push('$7.99/month');
+  const label = parts.join(' + ');
+  if(locked) btn.textContent = 'Unlock my full read · ' + (label || '$2') + ' →';
+  else btn.textContent = label ? 'Add to my Nest · ' + label + ' →' : 'Tick an extra above';
+  btn.disabled = !locked && !once && !np;
+  if(fine){
+    fine.textContent = np
+      ? 'Secure checkout with Stripe. Nest Plus is $7.99 a month. Cancel anytime from your Nest. The read and the workbook are one-time.'
+      : 'Secure checkout with Stripe. The full read is a one-time $2.';
+  }
 }
 
 async function startIcCheckout(opts){
