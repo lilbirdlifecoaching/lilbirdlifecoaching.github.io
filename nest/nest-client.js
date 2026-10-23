@@ -1465,17 +1465,99 @@
     return 'mailto:hello@lilbird.life?subject=' + encodeURIComponent('Tell me when Nest Premium opens') + '&body=' + body;
   }
 
+  function liveClocks(iso) {
+    const date = new Date(iso);
+    if (Number.isNaN(date.getTime())) return '';
+    const pt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Los_Angeles', weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(date);
+    const mel = new Intl.DateTimeFormat('en-AU', { timeZone: 'Australia/Melbourne', weekday: 'short', hour: 'numeric', minute: '2-digit' }).format(date);
+    return pt + ' Pacific · ' + mel + ' Melbourne';
+  }
+
+  async function workerPost(path, payload) {
+    const res = await fetch(SOLO_WORKER_URL + path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
+      body: JSON.stringify(payload || {})
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || 'Something went wrong. Try again.');
+    return data;
+  }
+
   function renderLiveGroup() {
     const el = document.getElementById('sidebar-live-card');
     if (!el) return;
-    const included = entitlements.has('life_change_intensive')
-      ? 'Included with your Intensive for the first year, once booking opens.'
-      : 'A session with Luke and other people in the Nest. You bring what\'s going on. You leave with one next move. $47 a month when booking opens. Includes the Solo course and everything in Nest Plus.';
+    el.innerHTML = `
+      <p class="sidebar-eyebrow">Live group coaching</p>
+      <h4>Live group coaching</h4>
+      <p>Checking the door…</p>`;
+    void loadLiveCard();
+  }
+
+  async function loadLiveCard() {
+    const el = document.getElementById('sidebar-live-card');
+    if (!el) return;
+    let data = null;
+    try {
+      data = await workerPost('/live-status', {});
+    } catch (e) {
+      data = null;
+    }
+    const session = data?.session;
+    const clocks = session ? liveClocks(session.startsAt) : '';
+    if (data?.removed) {
+      el.innerHTML = `
+        <p class="sidebar-eyebrow">Live group coaching</p>
+        <h4>This live is closed for you</h4>
+        <p>You were taken out of this session. Email hello@lilbird.life if that needs a look.</p>`;
+      return;
+    }
+    if (session && data.entitled && session.status === 'live') {
+      el.innerHTML = `
+        <p class="sidebar-eyebrow">Live group coaching</p>
+        <h4>The door is open</h4>
+        <p>${escapeHtml(clocks)}. The room holds ${escapeHtml(String(session.capacity || 15))}.</p>
+        <button type="button" class="btn btn-gold full" id="btn-live-join">Join the live</button>
+        <p id="live-join-status" class="younger-you-status" role="status"></p>`;
+      el.querySelector('#btn-live-join')?.addEventListener('click', () => void joinLive());
+      return;
+    }
+    if (session && data.entitled) {
+      el.innerHTML = `
+        <p class="sidebar-eyebrow">Live group coaching</p>
+        <h4>You're on the list for this live</h4>
+        <p>${escapeHtml(clocks)}. Join appears here when the room opens. Your access is checked at that moment.</p>`;
+      return;
+    }
     el.innerHTML = `
       <p class="sidebar-eyebrow">Live group coaching <span class="soon-tag">Coming soon</span></p>
       <h4>Live group coaching</h4>
-      <p>${included}</p>
-      <a class="btn btn-outline full" href="${premiumMailto()}">Tell me when it opens</a>`;
+      <p>${session ? escapeHtml(clocks) + '. ' : ''}A session with Luke and other people in the Nest. $47 a month when booking opens. Intensive clients are included for the first year.</p>
+      <button type="button" class="btn btn-outline full" id="btn-premium-waitlist">Tell me when it opens</button>
+      <p id="waitlist-status" class="younger-you-status" role="status"></p>`;
+    el.querySelector('#btn-premium-waitlist')?.addEventListener('click', () => void joinWaitlist());
+  }
+
+  async function joinLive() {
+    const status = document.getElementById('live-join-status');
+    if (status) status.textContent = 'Opening the door…';
+    try {
+      const data = await workerPost('/live-join', {});
+      if (data.url) window.open(data.url, '_blank', 'noopener');
+      if (status) status.textContent = 'The room is open in a new tab.';
+    } catch (e) {
+      if (status) status.textContent = e.message;
+    }
+  }
+
+  async function joinWaitlist() {
+    const status = document.getElementById('waitlist-status');
+    try {
+      await workerPost('/premium-waitlist', {});
+      if (status) status.textContent = 'Saved. You will hear when the live opens.';
+    } catch (e) {
+      if (status) status.textContent = e.message;
+    }
   }
 
   function renderSidebarRelationship() {
@@ -1697,6 +1779,218 @@
         </div>`;
     }
     bindYoungerYouUpload();
+    attachAccountTools();
+  }
+
+  function accountToolsHtml() {
+    return `
+      <article class="product-card account-card">
+        <p class="eyebrow">your account</p>
+        <h3>One email for this Nest</h3>
+        <p>If you also have a Nest on another email, bring it here. We email that inbox first. Nothing moves until you confirm the picture of both accounts.</p>
+        <div id="account-reads"></div>
+        <div id="account-pending"></div>
+        <label>Other Nest email
+          <input id="merge-email" type="email" autocomplete="email" placeholder="the other inbox" />
+        </label>
+        <div class="btn-row">
+          <button type="button" class="btn btn-gold" id="btn-merge-start">Email that inbox</button>
+          <button type="button" class="btn btn-outline hidden" id="btn-merge-check">Check the other inbox</button>
+        </div>
+        <div id="account-preview" class="account-preview"></div>
+        <p id="account-status" class="younger-you-status" role="status"></p>
+        <div class="btn-row">
+          <button type="button" class="btn btn-outline" id="btn-account-export">Download my Nest</button>
+          <button type="button" class="btn btn-outline hidden" id="btn-merge-undo">Undo the merge</button>
+        </div>
+        <label>Tell the desk
+          <textarea id="trouble-note" rows="2" placeholder="What happened, and which part of the Nest"></textarea>
+        </label>
+        <button type="button" class="btn btn-outline" id="btn-trouble">Send to the desk</button>
+        <label>Close my Nest
+          <input id="close-confirm" type="text" autocomplete="off" placeholder="close my nest" />
+        </label>
+        <button type="button" class="btn btn-outline" id="btn-account-close">Close my Nest</button>
+      </article>`;
+  }
+
+  function attachAccountTools() {
+    const pane = document.getElementById('pane-profile');
+    if (!pane || pane.querySelector('.account-card')) return;
+    pane.insertAdjacentHTML('beforeend', accountToolsHtml());
+    pane.querySelector('#btn-merge-start')?.addEventListener('click', () => void startMerge());
+    pane.querySelector('#btn-merge-check')?.addEventListener('click', () => void refreshAccountTools(true));
+    pane.querySelector('#btn-account-export')?.addEventListener('click', () => void exportNest());
+    pane.querySelector('#btn-merge-undo')?.addEventListener('click', () => void undoMerge());
+    pane.querySelector('#btn-trouble')?.addEventListener('click', () => void sendTrouble());
+    pane.querySelector('#btn-account-close')?.addEventListener('click', () => void closeNest());
+    void refreshAccountTools(false);
+  }
+
+  function accountStatus(text) {
+    const el = document.getElementById('account-status');
+    if (el) el.textContent = text || '';
+  }
+
+  async function refreshAccountTools(previewIfReady) {
+    let data;
+    try {
+      data = await workerPost('/merge-status', {});
+    } catch (e) {
+      accountStatus(e.message);
+      return;
+    }
+    const reads = document.getElementById('account-reads');
+    if (reads) {
+      const list = data.reads || [];
+      reads.innerHTML = list.length
+        ? '<p>Compass reads on this email</p><ul>' + list.map((read) =>
+          `<li>${escapeHtml(read.nestId)}${read.overall != null ? ' · overall ' + read.overall : ''}${read.primary ? ' · opens first' : ''} ${read.primary ? '' : `<button type="button" class="btn btn-outline" data-primary-nest="${escapeHtml(read.nestId)}">Open this one first</button>`}</li>`
+        ).join('') + '</ul>'
+        : '';
+      reads.querySelectorAll('[data-primary-nest]').forEach((btn) => {
+        btn.addEventListener('click', () => void makePrimary(btn.dataset.primaryNest));
+      });
+    }
+    const pending = document.getElementById('account-pending');
+    const check = document.getElementById('btn-merge-check');
+    if (pending) {
+      pending.textContent = data.pending
+        ? (data.pending.verified
+          ? 'The other inbox is confirmed. Check it, then choose which Compass opens first.'
+          : 'Waiting for ' + data.pending.otherEmail + ' to open the email.')
+        : '';
+    }
+    if (check) check.classList.toggle('hidden', !data.pending);
+    const undo = document.getElementById('btn-merge-undo');
+    if (undo) undo.classList.toggle('hidden', !data.recentMerge);
+    if (previewIfReady && data.pending?.verified) await showMergePreview();
+    const desk = document.getElementById('nav-desk');
+    if (desk) {
+      try {
+        await workerPost('/desk', { action: 'me' });
+        desk.classList.remove('hidden');
+      } catch (e) {
+        desk.classList.add('hidden');
+      }
+    }
+  }
+
+  async function startMerge() {
+    const email = document.getElementById('merge-email')?.value || '';
+    accountStatus('Sending the confirmation…');
+    try {
+      const data = await workerPost('/merge-start', { otherEmail: email });
+      accountStatus('Sent to ' + (data.otherEmail || 'that inbox') + '. Open it there, then come back and check.');
+      await refreshAccountTools(false);
+    } catch (e) {
+      accountStatus(e.message);
+    }
+  }
+
+  function previewList(title, account) {
+    const products = (account.products || []).join(', ') || 'No purchases';
+    const reads = (account.reads || []).map((read) => read.nestId + (read.overall != null ? ' (' + read.overall + ')' : '')).join(', ') || 'No Compass';
+    const subs = (account.subscriptions || []).map((sub) => sub.status).join(', ');
+    return `<div><strong>${escapeHtml(title)}</strong><ul><li>${escapeHtml(account.email || '')}</li><li>${escapeHtml(products)}</li><li>${escapeHtml(reads)}</li>${subs ? `<li>Nest Plus: ${escapeHtml(subs)}</li>` : ''}</ul></div>`;
+  }
+
+  async function showMergePreview() {
+    const box = document.getElementById('account-preview');
+    if (!box) return;
+    try {
+      const data = await workerPost('/merge-preview', {});
+      const nests = [...(data.keeper?.reads || []), ...(data.other?.reads || [])];
+      const choices = nests.map((read) =>
+        `<label class="account-choice"><input type="radio" name="primary-nest" value="${escapeHtml(read.nestId)}" ${read.primary ? 'checked' : ''}/> ${escapeHtml(read.nestId)}${read.overall != null ? ' · ' + read.overall : ''}</label>`
+      ).join('');
+      box.innerHTML = previewList('This email', data.keeper) + previewList('The other email', data.other) +
+        (data.doublePlus ? '<p>Both emails are paying for Nest Plus. The merge will not cancel either charge. We will see both on the desk so one can be cancelled in Stripe.</p>' : '') +
+        (choices ? '<p>Which Compass opens first</p>' + choices : '') +
+        '<button type="button" class="btn btn-gold" id="btn-merge-confirm">Bring it onto this email</button>';
+      box.querySelector('#btn-merge-confirm')?.addEventListener('click', () => void confirmMerge());
+    } catch (e) {
+      accountStatus(e.message);
+    }
+  }
+
+  async function confirmMerge() {
+    const chosen = document.querySelector('input[name="primary-nest"]:checked')?.value || '';
+    accountStatus('Bringing the other Nest across…');
+    try {
+      const data = await workerPost('/merge-confirm', { primaryNestId: chosen });
+      accountStatus(data.doublePlus
+        ? 'Done. Both Nest Plus charges are still active. We can see that on the desk.'
+        : 'Done. The other login is closed. You can undo this for a week.');
+      document.getElementById('account-preview').innerHTML = '';
+      await refreshAccountTools(false);
+    } catch (e) {
+      accountStatus(e.message);
+    }
+  }
+
+  async function makePrimary(nestId) {
+    try {
+      await workerPost('/nest-primary', { nestId });
+      accountStatus('That Compass opens first now. Refresh if the read looks unchanged.');
+      await refreshAccountTools(false);
+    } catch (e) {
+      accountStatus(e.message);
+    }
+  }
+
+  async function undoMerge() {
+    accountStatus('Undoing the merge…');
+    try {
+      await workerPost('/merge-undo', {});
+      accountStatus('Undone. The other login works again.');
+      await refreshAccountTools(false);
+    } catch (e) {
+      accountStatus(e.message);
+    }
+  }
+
+  async function exportNest() {
+    accountStatus('Preparing your download…');
+    try {
+      const data = await workerPost('/account-export', {});
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'lilbird-nest.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      accountStatus('Downloaded.');
+    } catch (e) {
+      accountStatus(e.message);
+    }
+  }
+
+  async function sendTrouble() {
+    const message = document.getElementById('trouble-note')?.value || '';
+    try {
+      await workerPost('/nest-trouble', { message });
+      accountStatus('Sent to the desk.');
+      const note = document.getElementById('trouble-note');
+      if (note) note.value = '';
+    } catch (e) {
+      accountStatus(e.message);
+    }
+  }
+
+  async function closeNest() {
+    const confirmText = document.getElementById('close-confirm')?.value || '';
+    try {
+      const data = await workerPost('/account-close', { confirm: confirmText });
+      if (data.billing) {
+        accountStatus(data.message);
+        return;
+      }
+      accountStatus('This Nest is closed. You can log out.');
+    } catch (e) {
+      accountStatus(e.message);
+    }
   }
 
   function renderSidebar() {
@@ -2471,8 +2765,33 @@
     }
   });
 
+  async function openMergeLink() {
+    const token = new URLSearchParams(window.location.search).get('merge');
+    if (!token) return;
+    const banner = document.getElementById('merge-banner');
+    try {
+      const res = await fetch(SOLO_WORKER_URL + '/merge-open', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token })
+      });
+      const data = await res.json().catch(() => ({}));
+      const text = data.message || data.error || (data.verified ? 'This inbox is confirmed. Log into the Nest you want to keep and finish from My profile.' : '');
+      if (banner && text) {
+        banner.textContent = text;
+        banner.classList.remove('hidden');
+      }
+    } catch (e) {
+      if (banner) {
+        banner.textContent = 'This confirmation link could not be opened. Try it again from the email.';
+        banner.classList.remove('hidden');
+      }
+    }
+  }
+
   (async function init() {
     resetLoginButton();
+    void openMergeLink();
 
     if (wantsLogout) {
       try {

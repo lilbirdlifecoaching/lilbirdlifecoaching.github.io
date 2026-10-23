@@ -729,6 +729,20 @@ body.nest-page { line-height: 1.5; }
 .younger-you-card.is-pulsing { animation: younger-you-pulse 1.1s ease-out 2; }
 
 .nest-tour-action { margin-top: 0.75rem; width: 100%; }
+.account-card { margin-top: 1rem; }
+.account-card textarea, .account-card input[type="email"], .account-card input[type="text"] {
+  width: 100%;
+  margin-top: 0.35rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid rgba(245,200,66,0.2);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+.account-preview { margin-top: 0.8rem; display: grid; gap: 0.65rem; }
+.account-preview div { padding-top: 0.55rem; border-top: 1px solid rgba(245,200,66,0.12); }
+.account-preview ul { margin: 0.25rem 0 0; padding-left: 1.1rem; }
 
 .lc-shell { display: grid; gap: 1rem; }
 .lc-card {

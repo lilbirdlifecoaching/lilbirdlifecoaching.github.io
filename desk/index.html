@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Desk · lil' bird</title>
+  <link rel="stylesheet" href="/css/lilbird-tokens.css" />
+  <link rel="stylesheet" href="/nest/nest-styles.css?v=35" />
+  <link rel="stylesheet" href="./desk.css?v=1" />
+  <script src="/js/vendor/supabase-js-2.117.3.js"></script>
+</head>
+<body class="nest-page">
+  <main class="desk-page">
+    <header class="desk-top">
+      <a class="wordmark" href="/nest/">lil' bird</a>
+      <h1>Desk</h1>
+      <button id="desk-logout" class="btn btn-outline hidden" type="button">Log out</button>
+    </header>
+    <p id="desk-status" class="younger-you-status" role="status"></p>
+
+    <form id="desk-login" class="auth-card">
+      <p class="eyebrow">staff</p>
+      <h2>Log in with your Nest</h2>
+      <label>Email <input id="desk-email" type="email" autocomplete="username" required /></label>
+      <label>Password <input id="desk-password" type="password" autocomplete="current-password" required /></label>
+      <button class="btn btn-gold" type="submit">Log in</button>
+    </form>
+
+    <div id="desk-app" class="hidden">
+      <section>
+        <h2>This live</h2>
+        <form id="desk-session">
+          <label>Starts <input id="live-start" type="datetime-local" required /></label>
+          <label>Room link <input id="live-url" type="url" placeholder="https://zoom.us/j/…" /></label>
+          <label>Seats <input id="live-cap" type="number" min="2" max="40" value="15" /></label>
+          <label>Door
+            <select id="live-status">
+              <option value="scheduled">Scheduled</option>
+              <option value="live">Open</option>
+              <option value="ended">Ended</option>
+            </select>
+          </label>
+          <button class="btn btn-gold" type="submit">Save the live</button>
+        </form>
+        <div id="desk-roster"></div>
+        <form id="desk-remove">
+          <label>Take someone out of this live
+            <input id="remove-email" type="email" placeholder="their Nest email" />
+          </label>
+          <label>Note <input id="remove-note" type="text" placeholder="Why they left the room" /></label>
+          <button class="btn btn-outline" type="submit">Remove from this live</button>
+        </form>
+      </section>
+
+      <section>
+        <h2>People</h2>
+        <form id="desk-search">
+          <label>Nest email <input id="search-email" type="email" required /></label>
+          <button class="btn btn-outline" type="submit">Look up</button>
+        </form>
+        <div id="desk-person"></div>
+      </section>
+
+      <section>
+        <h2>Needs a person</h2>
+        <div id="desk-alerts"></div>
+      </section>
+
+      <section>
+        <h2>Tell me when it opens</h2>
+        <div id="desk-wait"></div>
+      </section>
+
+      <section>
+        <h2>Merge without the other inbox</h2>
+        <form id="desk-merge">
+          <label>Keep this email <input id="keep-email" type="email" required /></label>
+          <label>Bring this email in <input id="other-email" type="email" required /></label>
+          <label>Compass that opens first <input id="primary-nest" type="text" placeholder="nest id, if you are choosing" /></label>
+          <label>Why <input id="merge-note" type="text" required placeholder="They lost the other inbox" /></label>
+          <button class="btn btn-outline" type="submit">Merge onto the kept email</button>
+        </form>
+      </section>
+
+      <section>
+        <h2>Add someone to the desk</h2>
+        <form id="desk-staff">
+          <label>Their Nest email <input id="staff-email" type="email" required /></label>
+          <button class="btn btn-outline" type="submit">Add</button>
+        </form>
+      </section>
+    </div>
+  </main>
+  <script src="./desk.js?v=1"></script>
+</body>
+</html>
