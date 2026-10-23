@@ -177,12 +177,20 @@
 
     list.push(
       {
+        id: 'canvas',
+        tab: 'canvas',
+        selector: '#tab-canvas',
+        title: 'Life Canvas',
+        body: 'Passion, connections, spaces, resources, and energy live on this tab. Check in again and the history graph updates here.',
+        tip: null
+      },
+      {
         id: 'profile',
         tab: 'profile',
         selector: '#tab-profile',
         title: 'My profile',
         body: owns('full_read')
-          ? 'Your full Inner Compass read and Life Canvas live here. Everything else builds on them.'
+          ? 'Your full Inner Compass read lives here. Life Canvas has its own tab.'
           : 'Your Inner Compass lives here. Your two types are free; the full read and Nest unlock for $2 from your read.',
         tip: '» Complete or open Inner Compass from this tab'
       },

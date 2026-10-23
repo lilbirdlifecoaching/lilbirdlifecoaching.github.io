@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.49.0/dist/tabler-icons.min.css" />
-  <link rel="stylesheet" href="./nest-styles.css?v=32" />
+  <link rel="stylesheet" href="./nest-styles.css?v=34" />
   <link rel="stylesheet" href="./nest-tour.css?v=3" />
   <link rel="stylesheet" href="/css/lilbird-nest-theme.css?v=20260917m" />
   <!-- Google Tag Manager -->
@@ -125,6 +125,7 @@
       <div id="dash-loading" class="dash-loading hidden">Loading your Nest…</div>
       <section class="tabs-row">
         <button id="tab-products" class="dash-tab active" type="button"><i class="ti ti-layout-grid"></i> My products</button>
+        <button id="tab-canvas" class="dash-tab" type="button"><i class="ti ti-chart-donut"></i> Life Canvas</button>
         <button id="tab-profile" class="dash-tab" type="button">
           <i class="ti ti-user-circle"></i> My profile
           <span id="profile-dot" class="profile-dot hidden"></span>
@@ -140,6 +141,7 @@
       <div id="dash-grid" class="dash-grid">
         <section class="main-col">
           <div id="pane-products" class="tab-pane active"></div>
+          <div id="pane-canvas" class="tab-pane"></div>
           <div id="pane-profile" class="tab-pane"></div>
           <div id="pane-ask" class="tab-pane">
             <div class="chat-shell">
@@ -177,7 +179,7 @@
   <script src="/js/vendor/supabase-js-2.117.3.js"></script>
   <script src="/js/lilbird-theme.js"></script>
   <script src="/js/lilbird-theme-nav.js"></script>
-  <script src="./nest-tour.js?v=9"></script>
-  <script src="./nest-client.js?v=43"></script>
+  <script src="./nest-tour.js?v=10"></script>
+  <script src="./nest-client.js?v=45"></script>
 </body>
 </html>

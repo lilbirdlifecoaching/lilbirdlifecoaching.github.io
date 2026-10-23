@@ -30,6 +30,22 @@
   let sessionProgress = [];
   let deepProfile = null;
   let deepReadPaid = false;
+  let canvasScores = null;
+  let canvasHistory = [];
+  let canvasSynthesis = '';
+  let canvasTexts = null;
+  let canvasView = 'arc';
+  let canvasHiddenSeries = {};
+  let canvasCheckinOpen = false;
+  let canvasDraft = null;
+  let canvasStatus = '';
+  const CANVAS_DIMS = [
+    { key: 'why', title: 'Passion & Purpose', color: '#F5C842', question: 'How alive does what you\'re doing feel?' },
+    { key: 'who', title: 'Connections', color: '#4adea8', question: 'How held are you by the people around you?' },
+    { key: 'where', title: 'Spaces', color: '#5ab4f0', question: 'Do the places you spend time fit you?' },
+    { key: 'what', title: 'Resources', color: '#e8734a', question: 'Do you have what this season asks of you?' },
+    { key: 'how', title: 'Energy & Wellbeing', color: '#c94aad', question: 'How is your body and your energy holding up?' }
+  ];
 
   // Server enforces all of this; the Nest only uses it to label cards.
   const NEST_PLUS_SOURCES = [
@@ -439,6 +455,10 @@
 
       deepProfile = null;
       deepReadPaid = false;
+      canvasScores = null;
+      canvasHistory = [];
+      canvasSynthesis = '';
+      canvasTexts = null;
 
       if (deepNestId) {
         try {
@@ -449,6 +469,7 @@
             const payload = await res.json();
             deepProfile = parseAssessmentProfile(payload);
             deepReadPaid = payload?.paid === true;
+            applyCanvasPayload(payload);
           }
         } catch (e) {
           console.error('Could not load deep profile:', e);
@@ -463,6 +484,7 @@
       renderNextSteps();
       renderProducts();
       renderProfile();
+      renderLifeCanvas();
       renderSidebar();
       window.__nestAccess = nestAccessSummary();
       if (window.LilBirdNestTour) {
@@ -1073,7 +1095,6 @@
     if (key === 'nest_plus') {
       const src = nestPlusSource();
       const readLink = deepNestId ? '/relationship-dynamic.html?nest=' + encodeURIComponent(deepNestId) + '&from=nest' : '/relationship-dynamic.html?from=nest';
-      const canvasLink = innerCompassHref();
       if (src) {
         return `
           <article class="product-card" data-product="nest_plus">
@@ -1082,7 +1103,7 @@
             <span class="status-badge">${escapeHtml(src)}</span>
             <p>Life Canvas puts passion, connections, spaces, resources, and energy on one page. Roots &amp; Wings is the eight-session workbook from the Intensive. You also get the full Inner Compass read and Relationship Dynamic.</p>
             <div class="btn-row">
-              <a class="btn btn-gold" href="${escapeHtml(canvasLink)}">Life Canvas →</a>
+              <button type="button" class="btn btn-gold" data-open-canvas>Life Canvas →</button>
               <a class="btn btn-outline" href="${workbookHref('life-change')}">Roots &amp; Wings</a>
               <a class="btn btn-outline" href="${escapeHtml(readLink)}">Relationship Dynamic</a>
               ${nestPlusIsSubscription() ? '<button type="button" class="btn btn-outline" data-manage-plus>Manage billing</button>' : ''}
@@ -1244,6 +1265,9 @@
     </div>`;
     productsPane.querySelectorAll('[data-open-ask]').forEach((btn) => {
       btn.addEventListener('click', () => setTab('ask'));
+    });
+    productsPane.querySelectorAll('[data-open-canvas]').forEach((btn) => {
+      btn.addEventListener('click', () => setTab('canvas'));
     });
     productsPane.querySelectorAll('[data-upgrade]').forEach((btn) => {
       btn.addEventListener('click', () => void startUpgrade(btn.dataset.upgrade, btn));
@@ -1773,6 +1797,346 @@
       .replace(/'/g, '&#39;');
   }
 
+  function canvasScoreSet(raw) {
+    if (!raw || typeof raw !== 'object') return null;
+    const scores = {};
+    for (const dim of CANVAS_DIMS) {
+      const n = Number(raw[dim.key]);
+      if (!Number.isFinite(n)) return null;
+      scores[dim.key] = Math.max(0, Math.min(100, Math.round(n)));
+    }
+    return scores;
+  }
+
+  function canvasOverall(scores) {
+    return Math.round(CANVAS_DIMS.reduce((sum, dim) => sum + scores[dim.key], 0) / CANVAS_DIMS.length);
+  }
+
+  function canvasChrono(history) {
+    const time = (iso) => {
+      const t = new Date(iso).getTime();
+      return Number.isNaN(t) ? 0 : t;
+    };
+    return (history || []).slice().sort((a, b) => time(a.date) - time(b.date));
+  }
+
+  function canvasDelta(chrono, key) {
+    if (!chrono || chrono.length < 2) return 0;
+    const first = key === 'overall' ? chrono[0].overall : chrono[0].scores[key];
+    const last = key === 'overall' ? chrono[chrono.length - 1].overall : chrono[chrono.length - 1].scores[key];
+    return last - first;
+  }
+
+  function canvasDeltaColor(d) {
+    if (d > 0) return '#4adea8';
+    if (d < 0) return '#e8734a';
+    return 'currentColor';
+  }
+
+  function canvasDeltaText(d) {
+    return (d > 0 ? '+' : '') + d;
+  }
+
+  function canvasDateLabel(iso) {
+    const date = new Date(iso);
+    if (Number.isNaN(date.getTime())) return '';
+    return date.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  function applyCanvasPayload(payload) {
+    const scores = canvasScoreSet(payload && payload.canvasScores);
+    canvasScores = scores;
+    const history = Array.isArray(payload && payload.canvasHistory) ? payload.canvasHistory : [];
+    canvasHistory = history
+      .map((entry) => {
+        const set = canvasScoreSet(entry && entry.scores);
+        if (!set || !entry.date) return null;
+        return { scores: set, overall: canvasOverall(set), date: entry.date };
+      })
+      .filter(Boolean)
+      .slice(0, 24);
+    const profile = payload && payload.profile && typeof payload.profile === 'object' ? payload.profile : {};
+    canvasSynthesis = typeof profile.canvasSynthesis === 'string' ? profile.canvasSynthesis.trim() : '';
+    canvasTexts = profile.canvasTexts && typeof profile.canvasTexts === 'object' ? profile.canvasTexts : null;
+    if (scores && !canvasHistory.length && deepNestId) {
+      const entry = {
+        scores,
+        overall: canvasOverall(scores),
+        date: (payload && payload.createdAt) || 'canvas-baseline'
+      };
+      canvasHistory = [entry];
+      fetch(ASSESSMENT_WORKER_URL + '/store-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nestId: deepNestId, canvasScores: scores, canvasHistory: [entry] })
+      }).catch(() => {});
+    }
+  }
+
+  function canvasTrendSvg(data, color, height, fill) {
+    const width = 360;
+    const padL = 6;
+    const padR = 6;
+    const padT = 10;
+    const padB = 8;
+    const innerW = width - padL - padR;
+    const innerH = height - padT - padB;
+    const pts = data.map((v, i) => {
+      const x = padL + (i / Math.max(data.length - 1, 1)) * innerW;
+      const y = padT + (1 - v / 100) * innerH;
+      return { x, y };
+    });
+    const line = pts.map((p) => p.x + ',' + p.y).join(' ');
+    const area = fill && pts.length
+      ? '<polygon points="' + line + ' ' + pts[pts.length - 1].x + ',' + (padT + innerH) + ' ' + pts[0].x + ',' + (padT + innerH) + '" fill="' + color + '" fill-opacity="0.14"/>'
+      : '';
+    const dot = pts.length
+      ? '<circle cx="' + pts[pts.length - 1].x + '" cy="' + pts[pts.length - 1].y + '" r="3.5" fill="' + color + '"/>'
+      : '';
+    return '<svg class="lc-chart" viewBox="0 0 ' + width + ' ' + height + '" preserveAspectRatio="none" aria-hidden="true">' +
+      area +
+      '<polyline fill="none" stroke="' + color + '" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" points="' + line + '"/>' +
+      dot +
+      '</svg>';
+  }
+
+  function canvasRadarSvg(scores, compare) {
+    const size = 220;
+    const cx = size / 2;
+    const cy = size / 2;
+    const maxR = 78;
+    const pointSet = (set) => CANVAS_DIMS.map((dim, i) => {
+      const angle = -Math.PI / 2 + (i * 2 * Math.PI) / CANVAS_DIMS.length;
+      const r = (set[dim.key] / 100) * maxR;
+      return (cx + r * Math.cos(angle)) + ',' + (cy + r * Math.sin(angle));
+    }).join(' ');
+    let svg = '<svg class="lc-radar" viewBox="0 0 ' + size + ' ' + size + '" role="img" aria-label="Life Canvas shape">';
+    [0.33, 0.66, 1].forEach((t) => {
+      svg += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (maxR * t) + '" fill="none" stroke="currentColor" stroke-opacity="0.2"/>';
+    });
+    CANVAS_DIMS.forEach((dim, i) => {
+      const angle = -Math.PI / 2 + (i * 2 * Math.PI) / CANVAS_DIMS.length;
+      svg += '<line x1="' + cx + '" y1="' + cy + '" x2="' + (cx + maxR * Math.cos(angle)) + '" y2="' + (cy + maxR * Math.sin(angle)) + '" stroke="currentColor" stroke-opacity="0.16"/>';
+    });
+    if (compare) {
+      svg += '<polygon points="' + pointSet(compare) + '" fill="rgba(160,152,128,0.12)" stroke="rgba(160,152,128,0.7)" stroke-width="1.4"/>';
+    }
+    svg += '<polygon points="' + pointSet(scores) + '" fill="rgba(245,200,66,0.2)" stroke="#F5C842" stroke-width="1.6"/>';
+    CANVAS_DIMS.forEach((dim, i) => {
+      const angle = -Math.PI / 2 + (i * 2 * Math.PI) / CANVAS_DIMS.length;
+      const r = (scores[dim.key] / 100) * maxR;
+      svg += '<circle cx="' + (cx + r * Math.cos(angle)) + '" cy="' + (cy + r * Math.sin(angle)) + '" r="3.4" fill="' + dim.color + '"/>';
+    });
+    return svg + '</svg>';
+  }
+
+  function canvasPatternsSvg(chrono) {
+    const width = 360;
+    const height = 210;
+    const padL = 28;
+    const padR = 12;
+    const padT = 14;
+    const padB = 28;
+    const innerW = width - padL - padR;
+    const innerH = height - padT - padB;
+    const series = [{ name: 'Overall', key: 'overall', color: '#F5C842', width: 2.5 }].concat(
+      CANVAS_DIMS.map((dim) => ({ name: dim.title, key: dim.key, color: dim.color, width: 1.7 }))
+    );
+    let svg = '<svg class="lc-chart" viewBox="0 0 ' + width + ' ' + height + '" aria-hidden="true">';
+    [0.25, 0.5, 0.75].forEach((t) => {
+      const y = padT + innerH * t;
+      svg += '<line x1="' + padL + '" x2="' + (width - padR) + '" y1="' + y + '" y2="' + y + '" stroke="currentColor" stroke-opacity="0.2" stroke-dasharray="3 6"/>';
+    });
+    series.forEach((item) => {
+      if (canvasHiddenSeries[item.key]) return;
+      const pts = chrono.map((entry, i) => {
+        const value = item.key === 'overall' ? entry.overall : entry.scores[item.key];
+        const x = padL + (i / Math.max(chrono.length - 1, 1)) * innerW;
+        const y = padT + (1 - value / 100) * innerH;
+        return x + ',' + y;
+      }).join(' ');
+      svg += '<polyline fill="none" stroke="' + item.color + '" stroke-width="' + item.width + '" stroke-linecap="round" stroke-linejoin="round" points="' + pts + '"/>';
+    });
+    svg += '<text x="' + padL + '" y="' + (height - 8) + '" fill="currentColor" font-size="10">' + escapeHtml(canvasDateLabel(chrono[0].date)) + '</text>';
+    svg += '<text x="' + (width - padR) + '" y="' + (height - 8) + '" fill="currentColor" font-size="10" text-anchor="end">' + escapeHtml(canvasDateLabel(chrono[chrono.length - 1].date)) + '</text></svg>';
+    const legend = series.map((item) => {
+      const hidden = !!canvasHiddenSeries[item.key];
+      const delta = canvasDelta(chrono, item.key);
+      return '<button type="button" class="lc-legend-btn' + (hidden ? ' is-hidden' : '') + '" data-lc-series="' + item.key + '">' +
+        '<span class="lc-swatch" style="background:' + item.color + '"></span>' +
+        '<span>' + escapeHtml(item.name) + '</span>' +
+        '<span style="color:' + canvasDeltaColor(delta) + '">' + canvasDeltaText(delta) + '</span></button>';
+    }).join('');
+    return svg + '<div class="lc-legend">' + legend + '</div>';
+  }
+
+  function canvasHistoryHtml(chrono) {
+    if (chrono.length < 2) {
+      const when = canvasDateLabel(chrono[0] && chrono[0].date);
+      return '<p class="lc-lead">This is your first picture' + (when ? ', from ' + escapeHtml(when) : '') + '. Check in again and the graph starts from here.</p>';
+    }
+    const views = [
+      ['arc', 'Arc'],
+      ['patterns', 'Lines'],
+      ['snapshot', 'Then and now']
+    ].map(([id, label]) =>
+      '<button type="button" class="lc-view' + (canvasView === id ? ' active' : '') + '" data-lc-view="' + id + '">' + label + '</button>'
+    ).join('');
+    let body = '';
+    if (canvasView === 'patterns') {
+      body = '<p class="lc-lead">Tap a line to hide or show it.</p>' + canvasPatternsSvg(chrono);
+    } else if (canvasView === 'snapshot') {
+      const first = chrono[0];
+      const last = chrono[chrono.length - 1];
+      const low = CANVAS_DIMS.reduce((lowest, dim) => last.scores[dim.key] < last.scores[lowest.key] ? dim : lowest, CANVAS_DIMS[0]);
+      const rows = CANVAS_DIMS.map((dim) => {
+        const change = last.scores[dim.key] - first.scores[dim.key];
+        return '<div class="lc-snap-row"><span style="color:' + dim.color + '">' + dim.title + (dim.key === low.key ? ' · lowest today' : '') + '</span>' +
+          '<span style="color:' + canvasDeltaColor(change) + '">' + first.scores[dim.key] + ' → ' + last.scores[dim.key] + ' (' + canvasDeltaText(change) + ')</span></div>';
+      }).join('');
+      body = '<p class="lc-tend"><span style="color:' + low.color + '">' + low.title + '</span> is the lowest area today, at ' + last.scores[low.key] + '. It was ' + first.scores[low.key] + ' on your first picture.</p>' +
+        '<div class="lc-radar-wrap">' + canvasRadarSvg(last.scores, first.scores) + '</div>' +
+        '<div class="lc-date-span"><span>First · ' + first.overall + '</span><span>Today · ' + last.overall + ' (' + canvasDeltaText(last.overall - first.overall) + ')</span></div>' +
+        rows;
+    } else {
+      const overallDelta = canvasDelta(chrono, 'overall');
+      body = canvasTrendSvg(chrono.map((entry) => entry.overall), '#F5C842', 96, true) +
+        '<div class="lc-date-span"><span>' + escapeHtml(canvasDateLabel(chrono[0].date)) + '</span><span>' + canvasDeltaText(overallDelta) + ' since you began</span><span>' + escapeHtml(canvasDateLabel(chrono[chrono.length - 1].date)) + '</span></div>';
+      CANVAS_DIMS.forEach((dim) => {
+        const delta = canvasDelta(chrono, dim.key);
+        const latest = chrono[chrono.length - 1].scores[dim.key];
+        body += '<div class="lc-area"><div class="lc-area-head"><span style="color:' + dim.color + '">' + dim.title + '</span><span>' + latest + ' <span style="color:' + canvasDeltaColor(delta) + '">' + canvasDeltaText(delta) + '</span></span></div>' +
+          canvasTrendSvg(chrono.map((entry) => entry.scores[dim.key]), dim.color, 48, false) + '</div>';
+      });
+    }
+    const record = '<p class="lc-kicker">Record</p>' + chrono.slice().reverse().slice(0, 8).map((entry) =>
+      '<div class="lc-record-row"><span>' + escapeHtml(canvasDateLabel(entry.date) || 'First picture') + '</span><span>' + entry.overall + ' / 100</span></div>'
+    ).join('');
+    const more = chrono.length > 8 ? '<p class="lc-lead">Showing the latest 8 of ' + chrono.length + ' check-ins.</p>' : '';
+    return '<div class="lc-views" role="tablist">' + views + '</div>' + body + '<div class="lc-record">' + record + '</div>' + more;
+  }
+
+  function canvasCheckinHtml(scores) {
+    if (!canvasCheckinOpen) {
+      return '<div class="lc-actions"><button type="button" class="btn btn-gold" data-lc-checkin>Check in again</button>' +
+        '<a class="btn btn-outline" href="' + escapeHtml(innerCompassHref()) + '">Open your Inner Compass</a></div>';
+    }
+    const source = canvasDraft || scores;
+    const sliders = CANVAS_DIMS.map((dim) => {
+      const value = source[dim.key];
+      const note = canvasTexts && canvasTexts[dim.key] ? '<p class="lc-note">' + escapeHtml(canvasTexts[dim.key]) + '</p>' : '';
+      return '<div class="lc-slider"><div class="lc-bar-head"><span class="lc-bar-name" style="color:' + dim.color + '">' + dim.title + '</span><span class="lc-bar-num" data-lc-val="' + dim.key + '">' + value + '</span></div>' +
+        '<p class="lc-note">' + escapeHtml(dim.question) + '</p>' + note +
+        '<input type="range" min="0" max="100" value="' + value + '" data-lc-slider="' + dim.key + '" style="accent-color:' + dim.color + ';color:' + dim.color + '" aria-label="' + escapeHtml(dim.title) + '"></div>';
+    }).join('');
+    return '<div class="lc-checkin"><p class="lc-kicker">Check in</p><h3 class="lc-title">Where are these five today?</h3>' + sliders +
+      '<div class="lc-actions"><button type="button" class="btn btn-gold" data-lc-save>Save this check-in</button><button type="button" class="btn btn-outline" data-lc-cancel>Cancel</button></div></div>';
+  }
+
+  function renderLifeCanvas() {
+    const pane = document.getElementById('pane-canvas');
+    if (!pane) return;
+    if (!deepNestId) {
+      pane.innerHTML = '<div class="lc-shell"><article class="lc-card"><p class="lc-kicker">Life Canvas</p><h2 class="lc-title">Five parts of your life, on one page</h2><p class="lc-lead">Passion and purpose, connections, spaces, resources, and energy. They fill in when you take the Inner Compass, and later check-ins stay on this tab.</p><div class="lc-empty-actions"><a class="btn btn-ember" href="/inner-compass/?from=nest">Take the Inner Compass →</a></div></article></div>';
+      return;
+    }
+    if (!canvasScores) {
+      pane.innerHTML = '<div class="lc-shell"><article class="lc-card"><p class="lc-kicker">Life Canvas</p><h2 class="lc-title">Your Inner Compass is linked</h2><p class="lc-lead">The five scores show up here after the Life Canvas questions in the Inner Compass. Check-ins after that stay on this tab.</p><div class="lc-empty-actions"><a class="btn btn-ember" href="' + escapeHtml(innerCompassHref()) + '">Open the Inner Compass →</a></div></article></div>';
+      return;
+    }
+    const scores = canvasScores;
+    const overall = canvasOverall(scores);
+    const chrono = canvasChrono(canvasHistory);
+    const latest = chrono[chrono.length - 1];
+    const delta = canvasDelta(chrono, 'overall');
+    const bars = CANVAS_DIMS.map((dim) => {
+      const note = canvasTexts && canvasTexts[dim.key] ? '<p class="lc-note">' + escapeHtml(canvasTexts[dim.key]) + '</p>' : '';
+      return '<div><div class="lc-bar-head"><span class="lc-bar-name" style="color:' + dim.color + '">' + dim.title + '</span><span class="lc-bar-num" style="color:' + dim.color + '">' + scores[dim.key] + '</span></div><div class="lc-track"><div class="lc-fill" data-width="' + scores[dim.key] + '" style="background:' + dim.color + '"></div></div>' + note + '</div>';
+    }).join('');
+    const synthesis = canvasSynthesis
+      ? '<p class="lc-note">' + escapeHtml(canvasSynthesis) + '</p>'
+      : (deepReadPaid ? '' : '<p class="lc-note">The written Life Canvas read is part of the full Inner Compass.</p>');
+    const status = canvasStatus
+      ? '<p class="lc-status' + (canvasStatus.indexOf('Could not') === 0 ? ' is-error' : '') + '">' + escapeHtml(canvasStatus) + '</p>'
+      : '';
+    const when = latest ? canvasDateLabel(latest.date) : '';
+    pane.innerHTML = '<div class="lc-shell"><article class="lc-card"><p class="lc-kicker">Life Canvas</p><div class="lc-hero">' +
+      canvasRadarSvg(scores) +
+      '<div><h2 class="lc-title">Today</h2><div class="lc-overall-num">' + overall + '</div><p class="lc-overall-meta">out of 100' +
+      (chrono.length > 1 ? ' · <span class="lc-delta" style="color:' + canvasDeltaColor(delta) + '">' + canvasDeltaText(delta) + ' since you began</span>' : '') +
+      (when ? ' · ' + escapeHtml(when) : '') + '</p></div></div><div class="lc-bars">' + bars + '</div>' + synthesis + status + '</article>' +
+      '<article class="lc-card"><p class="lc-kicker">History</p><h2 class="lc-title">How this has moved</h2>' + canvasHistoryHtml(chrono) + '</article>' +
+      '<article class="lc-card">' + canvasCheckinHtml(scores) + '</article></div>';
+    requestAnimationFrame(() => {
+      if (!pane.isConnected) return;
+      pane.querySelectorAll('.lc-fill').forEach((el) => {
+        el.style.width = (el.dataset.width || '0') + '%';
+      });
+      pane.querySelectorAll('[data-lc-slider]').forEach(paintCanvasSlider);
+    });
+  }
+
+  function paintCanvasSlider(input) {
+    const color = input.style.accentColor || '#F5C842';
+    const pct = Number(input.value);
+    input.style.background = 'linear-gradient(90deg, ' + color + ' ' + pct + '%, rgba(127,127,127,0.22) ' + pct + '%)';
+  }
+
+  function readCanvasDraftFromDom() {
+    const pane = document.getElementById('pane-canvas');
+    if (!pane) return;
+    const inputs = pane.querySelectorAll('[data-lc-slider]');
+    if (!inputs.length) return;
+    canvasDraft = {};
+    inputs.forEach((input) => {
+      canvasDraft[input.dataset.lcSlider] = Number(input.value);
+    });
+  }
+
+  async function saveLifeCanvasCheckin(btn) {
+    if (!deepNestId || !canvasScores) return;
+    const pane = document.getElementById('pane-canvas');
+    const next = {};
+    CANVAS_DIMS.forEach((dim) => {
+      const input = pane && pane.querySelector('[data-lc-slider="' + dim.key + '"]');
+      const n = Number(input && input.value);
+      next[dim.key] = Number.isFinite(n) ? Math.max(0, Math.min(100, Math.round(n))) : canvasScores[dim.key];
+    });
+    const entry = { scores: next, overall: canvasOverall(next), date: new Date().toISOString() };
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
+    }
+    try {
+      const res = await fetch(ASSESSMENT_WORKER_URL + '/store-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
+        body: JSON.stringify({ nestId: deepNestId, canvasScores: next, canvasHistory: [entry] })
+      });
+      if (!res.ok) throw new Error('save failed');
+      canvasScores = next;
+      canvasHistory = [entry].concat(canvasHistory).slice(0, 24);
+      canvasDraft = null;
+      canvasCheckinOpen = false;
+      canvasStatus = 'Saved. This check-in is on your history.';
+      renderLifeCanvas();
+    } catch (err) {
+      canvasStatus = 'Could not save that check-in. Try again.';
+      canvasCheckinOpen = true;
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'Save this check-in';
+      }
+      const status = document.querySelector('#pane-canvas .lc-status');
+      if (status) {
+        status.textContent = canvasStatus;
+        status.classList.add('is-error');
+      } else {
+        renderLifeCanvas();
+      }
+    }
+  }
+
   // tabs
   function setTab(name) {
     document.querySelectorAll('.dash-tab').forEach((el) => el.classList.remove('active'));
@@ -1783,6 +2147,7 @@
     if (pane) pane.classList.add('active');
     const dashGrid = document.getElementById('dash-grid');
     if (dashGrid) dashGrid.classList.toggle('is-ask-tab', name === 'ask');
+    if (name === 'canvas') renderLifeCanvas();
   }
   window.__nestSetTab = setTab;
 
@@ -1796,6 +2161,15 @@
     if (chatWrap) chatWrap.innerHTML = '';
     document.getElementById('pane-products').innerHTML = '';
     document.getElementById('pane-profile').innerHTML = '';
+    const paneCanvas = document.getElementById('pane-canvas');
+    if (paneCanvas) paneCanvas.innerHTML = '';
+    canvasScores = null;
+    canvasHistory = [];
+    canvasSynthesis = '';
+    canvasTexts = null;
+    canvasCheckinOpen = false;
+    canvasDraft = null;
+    canvasStatus = '';
     document.getElementById('sidebar-context-card').innerHTML = '';
     const live = document.getElementById('sidebar-live-card');
     if (live) live.innerHTML = '';
@@ -1811,13 +2185,60 @@
     }
   }
   const tabProducts = document.getElementById('tab-products');
+  const tabCanvas = document.getElementById('tab-canvas');
   const tabProfile = document.getElementById('tab-profile');
   const tabAsk = document.getElementById('tab-ask');
   const btnOpenAsk = document.getElementById('btn-open-ask');
   if (tabProducts) tabProducts.addEventListener('click', () => setTab('products'));
+  if (tabCanvas) tabCanvas.addEventListener('click', () => setTab('canvas'));
   if (tabProfile) tabProfile.addEventListener('click', () => openInnerCompassRead());
   if (tabAsk) tabAsk.addEventListener('click', () => setTab('ask'));
   if (btnOpenAsk) btnOpenAsk.addEventListener('click', () => setTab('ask'));
+  const paneCanvasEl = document.getElementById('pane-canvas');
+  if (paneCanvasEl) {
+    paneCanvasEl.addEventListener('click', (e) => {
+      const view = e.target.closest('[data-lc-view]');
+      if (view) {
+        readCanvasDraftFromDom();
+        canvasView = view.dataset.lcView;
+        renderLifeCanvas();
+        return;
+      }
+      const series = e.target.closest('[data-lc-series]');
+      if (series) {
+        const key = series.dataset.lcSeries;
+        if (canvasHiddenSeries[key]) delete canvasHiddenSeries[key];
+        else canvasHiddenSeries[key] = true;
+        canvasView = 'patterns';
+        renderLifeCanvas();
+        return;
+      }
+      if (e.target.closest('[data-lc-checkin]')) {
+        canvasCheckinOpen = true;
+        canvasDraft = null;
+        canvasStatus = '';
+        renderLifeCanvas();
+        return;
+      }
+      if (e.target.closest('[data-lc-cancel]')) {
+        canvasCheckinOpen = false;
+        canvasDraft = null;
+        renderLifeCanvas();
+        return;
+      }
+      const save = e.target.closest('[data-lc-save]');
+      if (save) void saveLifeCanvasCheckin(save);
+    });
+    paneCanvasEl.addEventListener('input', (e) => {
+      const input = e.target.closest('[data-lc-slider]');
+      if (!input) return;
+      const label = paneCanvasEl.querySelector('[data-lc-val="' + input.dataset.lcSlider + '"]');
+      if (label) label.textContent = input.value;
+      paintCanvasSlider(input);
+      canvasDraft = canvasDraft || {};
+      canvasDraft[input.dataset.lcSlider] = Number(input.value);
+    });
+  }
 
   // chat
   function renderChatMsg(role, content) {
@@ -1894,7 +2315,7 @@
     if (dashView) dashView.classList.add('active');
     resetLoginButton();
     const preferTab = new URLSearchParams(window.location.search).get('tab');
-    setTab(preferTab === 'profile' || preferTab === 'ask' ? preferTab : 'products');
+    setTab(preferTab === 'profile' || preferTab === 'ask' || preferTab === 'canvas' ? preferTab : 'products');
     await hydrateDashboard();
   }
 
