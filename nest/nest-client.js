@@ -809,7 +809,7 @@
       });
       steps.push({ done: paidDone, text: 'Open Roots & Wings workbook before session one', href: workbookHref('life-change') });
       if (!youngerYouPhotoUrl()) {
-        steps.push({ done: false, text: 'Add your Nest picture in My profile', action: 'photo' });
+        steps.push({ done: false, text: 'Add your Nest picture on Inner Compass', action: 'photo' });
       }
     } else {
       steps.push({
@@ -845,7 +845,7 @@
         done: !!youngerYouPhotoUrl(),
         text: youngerYouPhotoUrl()
           ? 'Nest picture added'
-          : 'Add your Nest picture in My profile',
+          : 'Add your Nest picture on Inner Compass',
         action: youngerYouPhotoUrl() ? '' : 'photo'
       });
     }
@@ -1751,7 +1751,7 @@
         <div class="product-grid">
           ${youngerCard}
           <article class="product-card">
-            <p class="eyebrow">my profile</p>
+            <p class="eyebrow">inner compass</p>
             <h3>Inner Compass profile</h3>
             <span class="status-badge pending">connect your read</span>
             <p>Paste your results link from email on the Inner Compass card (Products tab), or open your read below.</p>
@@ -1771,7 +1771,7 @@
           ${youngerCard}
           <article class="product-card locked">
             <span class="lock-pill"><i class="ti ti-lock"></i> not yet unlocked</span>
-            <p class="eyebrow">my profile</p>
+            <p class="eyebrow">inner compass</p>
             <h3>Inner Compass profile</h3>
             <p>Take your Inner Compass read first. Your profile will appear here once unlocked.</p>
             <div class="btn-row"><a class="btn btn-ember" href="/inner-compass/?from=nest">Take the Inner Compass →</a></div>
@@ -2776,7 +2776,7 @@
         body: JSON.stringify({ token })
       });
       const data = await res.json().catch(() => ({}));
-      const text = data.message || data.error || (data.verified ? 'This inbox is confirmed. Log into the Nest you want to keep and finish from My profile.' : '');
+      const text = data.message || data.error || (data.verified ? 'This inbox is confirmed. Log into the Nest you want to keep and finish from Inner Compass.' : '');
       if (banner && text) {
         banner.textContent = text;
         banner.classList.remove('hidden');

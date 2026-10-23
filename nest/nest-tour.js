@@ -188,7 +188,7 @@
         id: 'profile',
         tab: 'profile',
         selector: '#tab-profile',
-        title: 'My profile',
+        title: 'Inner Compass',
         body: owns('full_read')
           ? 'Your full Inner Compass read lives here. Life Canvas has its own tab.'
           : 'Your Inner Compass lives here. Your two types are free; the full read and Nest unlock for $2 from your read.',
