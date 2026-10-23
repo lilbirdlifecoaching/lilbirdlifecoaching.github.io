@@ -9,9 +9,34 @@
   const loginForm = document.getElementById('desk-login');
   const app = document.getElementById('desk-app');
 
-  function say(text) {
+  function say(text, kind) {
     statusEl.textContent = text || '';
+    statusEl.classList.toggle('visible', !!text);
+    statusEl.classList.toggle('success', kind === 'success');
+    statusEl.classList.toggle('error', kind === 'error');
   }
+
+  const KIND_LABELS = {
+    gap: 'Paid, and the Nest did not unlock',
+    cancel: 'Nest Plus set to end',
+    failed: 'A payment failed',
+    left: 'Checkout left unfinished',
+    dispute: 'A card dispute',
+    trouble: 'Note from the Nest',
+    'double-plus': 'Two Nest Plus charges',
+    'staff-merge': 'Two Nests merged from the desk',
+    note: 'Note'
+  };
+
+  const PRODUCT_LABELS = {
+    nest_plus: 'Nest Plus',
+    inner_compass: 'Inner Compass',
+    lcs_workbook: 'Roots & Wings workbook',
+    solo_course: 'Solo course',
+    first_flight: 'First Flight',
+    coaching: 'Coaching',
+    life_change_intensive: 'Life Change Intensive'
+  };
 
   async function post(payload) {
     const { data } = await sb.auth.getSession();
@@ -39,32 +64,64 @@
     }
     const roster = document.getElementById('desk-roster');
     roster.innerHTML = (home.roster || []).map((row) =>
-      '<div class="desk-row"><span>' + escapeHtml(row.email || '') + '</span><span>' + escapeHtml(row.status) + (row.note ? ' · ' + escapeHtml(row.note) : '') + '</span></div>'
-    ).join('') || '<p>No one has joined this live.</p>';
+      '<div class="desk-row"><span>' + escapeHtml(row.email || '') + '</span><span class="desk-meta">' + escapeHtml(rosterStatus(row.status)) + (row.note ? ' · ' + escapeHtml(row.note) : '') + '</span></div>'
+    ).join('') || '<p class="desk-empty">No one has joined this live.</p>';
 
     const alerts = document.getElementById('desk-alerts');
     alerts.innerHTML = (home.alerts || []).map((row) =>
-      '<div class="desk-row"><span><strong>' + escapeHtml(row.kind) + '</strong> · ' + escapeHtml(row.email || '') + '<br>' + escapeHtml(detailText(row.detail)) + '</span><button type="button" class="btn btn-outline" data-resolve="' + escapeHtml(row.id) + '">Done</button></div>'
-    ).join('') || '<p>Nothing waiting.</p>';
+      '<div class="desk-row"><span><strong class="desk-kind">' + escapeHtml(KIND_LABELS[row.kind] || row.kind) + '</strong>' + escapeHtml(row.email || '') + '<br><span class="desk-meta">' + escapeHtml(detailText(row.detail)) + '</span></span><button type="button" class="btn btn-outline" data-resolve="' + escapeHtml(row.id) + '">Done</button></div>'
+    ).join('') || '<p class="desk-empty">Nothing waiting.</p>';
     alerts.querySelectorAll('[data-resolve]').forEach((btn) => {
       btn.addEventListener('click', async () => {
         try {
           await post({ action: 'resolve', alertId: btn.getAttribute('data-resolve') });
           await load();
-        } catch (e) { say(e.message); }
+        } catch (e) { say(e.message, 'error'); }
       });
     });
 
     const wait = document.getElementById('desk-wait');
     wait.innerHTML = (home.waitlist || []).map((row) =>
-      '<div class="desk-row"><span>' + escapeHtml(row.email) + '</span><span>' + escapeHtml(new Date(row.created_at).toLocaleDateString()) + '</span></div>'
-    ).join('') || '<p>No one has asked yet.</p>';
+      '<div class="desk-row"><span>' + escapeHtml(row.email) + '</span><span class="desk-meta">' + escapeHtml(new Date(row.created_at).toLocaleDateString()) + '</span></div>'
+    ).join('') || '<p class="desk-empty">No one has asked to be told yet.</p>';
+  }
+
+  function rosterStatus(status) {
+    if (status === 'in') return 'In the room';
+    if (status === 'removed') return 'Taken out';
+    return status || '';
+  }
+
+  function productName(value) {
+    return PRODUCT_LABELS[value] || String(value || '').replace(/_/g, ' ');
+  }
+
+  function money(amount, currency) {
+    const code = String(currency || 'usd').toUpperCase();
+    const number = Number(amount);
+    if (!Number.isFinite(number)) return '';
+    try {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: code }).format(number / 100);
+    } catch (e) {
+      return (number / 100).toFixed(2) + ' ' + code;
+    }
   }
 
   function detailText(detail) {
     if (!detail || typeof detail !== 'object') return '';
     if (detail.message) return detail.message;
-    return Object.entries(detail).map(([k, v]) => k + ': ' + v).join(' · ');
+    const bits = [];
+    if (detail.product) bits.push(productName(detail.product));
+    if (detail.amount != null) bits.push(money(detail.amount, detail.currency));
+    if (detail.reason) bits.push(String(detail.reason).replace(/_/g, ' '));
+    if (detail.until) {
+      const until = new Date(Number(detail.until) * 1000);
+      if (!Number.isNaN(until.getTime())) bits.push('access through ' + until.toLocaleDateString());
+    }
+    if (detail.otherEmail) bits.push('other email ' + detail.otherEmail);
+    if (detail.note) bits.push(detail.note);
+    if (detail.actor) bits.push('by ' + detail.actor);
+    return bits.join(' · ');
   }
 
   function escapeHtml(value) {
@@ -86,8 +143,8 @@
     const email = document.getElementById('desk-email').value;
     const password = document.getElementById('desk-password').value;
     const { error } = await sb.auth.signInWithPassword({ email, password });
-    if (error) { say(error.message); return; }
-    try { await load(); } catch (err) { say(err.message); }
+    if (error) { say(error.message, 'error'); return; }
+    try { await load(); } catch (err) { say(err.message, 'error'); }
   });
 
   document.getElementById('desk-logout').addEventListener('click', async () => {
@@ -106,18 +163,18 @@
         capacity: Number(document.getElementById('live-cap').value),
         status: document.getElementById('live-status').value
       });
-      say('Live saved.');
+      say('Live saved.', 'success');
       await load();
-    } catch (err) { say(err.message); }
+    } catch (err) { say(err.message, 'error'); }
   });
 
   document.getElementById('desk-remove').addEventListener('submit', async (e) => {
     e.preventDefault();
     try {
       await post({ action: 'remove', email: document.getElementById('remove-email').value, note: document.getElementById('remove-note').value });
-      say('Removed from this live.');
+      say('Removed from this live.', 'success');
       await load();
-    } catch (err) { say(err.message); }
+    } catch (err) { say(err.message, 'error'); }
   });
 
   document.getElementById('desk-search').addEventListener('submit', async (e) => {
@@ -125,12 +182,12 @@
     try {
       const person = await post({ action: 'search', email: document.getElementById('search-email').value });
       const box = document.getElementById('desk-person');
-      if (!person.found) { box.textContent = 'No Nest on that email.'; return; }
-      const products = (person.products || []).join(', ') || 'No purchases';
-      const reads = (person.reads || []).map((r) => r.nestId + (r.primary ? ' (opens first)' : '')).join(', ') || 'No Compass';
-      box.innerHTML = '<p>' + escapeHtml(person.email) + '</p><p>' + escapeHtml(products) + '</p><p>' + escapeHtml(reads) + '</p>' +
-        (person.intensivePaidAt ? '<p>Intensive paid ' + escapeHtml(person.intensivePaidAt) + '</p>' : '');
-    } catch (err) { say(err.message); }
+      if (!person.found) { box.innerHTML = '<p class="desk-empty">No Nest on that email.</p>'; return; }
+      const products = (person.products || []).map(productName).join(', ') || 'No purchases';
+      const reads = (person.reads || []).map((r) => r.nestId + (r.primary ? ' (opens first)' : '')).join(', ') || 'No Compass yet';
+      box.innerHTML = '<div class="desk-person"><p><strong>' + escapeHtml(person.email) + '</strong></p><p>Purchases: ' + escapeHtml(products) + '</p><p>Compass reads: ' + escapeHtml(reads) + '</p>' +
+        (person.intensivePaidAt ? '<p>Intensive paid ' + escapeHtml(new Date(person.intensivePaidAt).toLocaleDateString()) + '</p>' : '') + '</div>';
+    } catch (err) { say(err.message, 'error'); }
   });
 
   document.getElementById('desk-merge').addEventListener('submit', async (e) => {
@@ -143,19 +200,19 @@
         primaryNestId: document.getElementById('primary-nest').value,
         note: document.getElementById('merge-note').value
       });
-      say(result.doublePlus ? 'Merged. Both Nest Plus charges are still active.' : 'Merged. The other login is closed.');
-    } catch (err) { say(err.message); }
+      say(result.doublePlus ? 'Merged. Both Nest Plus charges are still active. Cancel the spare in Stripe.' : 'Merged. The other login is closed.', 'success');
+    } catch (err) { say(err.message, 'error'); }
   });
 
   document.getElementById('desk-staff').addEventListener('submit', async (e) => {
     e.preventDefault();
     try {
       await post({ action: 'add-staff', email: document.getElementById('staff-email').value });
-      say('Added to the desk.');
-    } catch (err) { say(err.message); }
+      say('Added to the desk.', 'success');
+    } catch (err) { say(err.message, 'error'); }
   });
 
   sb.auth.getSession().then(({ data }) => {
-    if (data.session) load().catch((err) => say(err.message));
+    if (data.session) load().catch((err) => say(err.message, 'error'));
   });
 })();

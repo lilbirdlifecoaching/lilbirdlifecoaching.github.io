@@ -1,12 +1,40 @@
-.desk-page { max-width: 880px; margin: 0 auto; padding: 1.2rem; }
-.desk-top { display: flex; flex-wrap: wrap; gap: 0.8rem; align-items: center; margin-bottom: 1rem; }
-.desk-top h1 { font-family: Georgia, serif; font-weight: 500; font-size: 1.8rem; margin: 0; flex: 1; }
-.desk-page section { margin: 1.4rem 0; padding-top: 1rem; border-top: 1px solid rgba(245,200,66,0.16); }
-.desk-page h2 { font-family: Georgia, serif; font-weight: 500; font-size: 1.35rem; margin: 0 0 0.6rem; }
-.desk-page label { display: grid; gap: 0.25rem; margin: 0.45rem 0; }
+.desk-page { max-width: 760px; margin: 0 auto; padding: 1.2rem 1.2rem 3rem; }
+.desk-top { display: flex; flex-wrap: wrap; gap: 0.8rem; align-items: center; margin-bottom: 0.4rem; }
+.desk-top h1 { font-family: "Playfair Display", Georgia, serif; font-weight: 500; font-size: 1.8rem; margin: 0; flex: 1; }
+.desk-lead { max-width: 40rem; margin: 0 0 0.4rem; color: var(--text-muted); }
+.desk-lead strong { color: var(--text-main); font-weight: 500; }
+.desk-band { margin-top: 1.8rem; }
+.desk-band > .eyebrow { margin-bottom: 0.25rem; }
+.desk-band > h2 { font-family: "Playfair Display", Georgia, serif; font-weight: 500; font-size: 1.7rem; margin: 0; }
+.desk-band > p { color: var(--text-muted); margin: 0.35rem 0 0.2rem; max-width: 40rem; }
+.desk-card {
+  background: var(--dark-card);
+  border: 1px solid var(--dark-border);
+  border-radius: 14px;
+  padding: 1rem 1.1rem 1.15rem;
+  margin-top: 0.85rem;
+}
+.desk-card h3 { font-family: "Playfair Display", Georgia, serif; font-weight: 500; font-size: 1.2rem; margin: 0 0 0.3rem; }
+.desk-help { color: var(--text-muted); font-size: 0.92rem; margin: 0 0 0.75rem; }
+.desk-page label { display: grid; gap: 0.25rem; margin: 0.45rem 0; font-size: 0.92rem; }
 .desk-page input, .desk-page select {
-  font: inherit; color: inherit; padding: 0.5rem 0.65rem;
+  font: inherit; color: inherit; padding: 0.55rem 0.7rem;
   border-radius: 8px; border: 1px solid rgba(245,200,66,0.22); background: transparent;
 }
-.desk-row { display: flex; justify-content: space-between; gap: 0.75rem; padding: 0.45rem 0; border-bottom: 1px solid rgba(245,200,66,0.1); }
+.desk-live-grid, .desk-split { display: grid; grid-template-columns: 1fr 1fr; gap: 0.15rem 0.8rem; }
+.desk-live-grid .span-2, .desk-split .span-2 { grid-column: 1 / -1; }
+.desk-inline { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: end; }
+.desk-inline label { flex: 1; min-width: 14rem; margin: 0; }
+.desk-inline .btn { margin-bottom: 0.05rem; }
+.desk-row { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; padding: 0.55rem 0; border-bottom: 1px solid rgba(245,200,66,0.1); }
+.desk-row:last-child { border-bottom: 0; }
+.desk-kind { display: block; color: var(--gold); font-size: 0.92rem; }
+.desk-meta { color: var(--text-muted); font-size: 0.88rem; }
+.desk-empty { color: var(--text-muted); margin: 0; }
+.desk-person p { margin: 0.2rem 0; }
 .desk-page .auth-card { max-width: 420px; }
+.desk-page .younger-you-status { margin-top: 0.4rem; }
+@media (max-width: 640px) {
+  .desk-live-grid, .desk-split { grid-template-columns: 1fr; }
+  .desk-live-grid .span-2, .desk-split .span-2 { grid-column: auto; }
+}
