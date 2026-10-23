@@ -35,7 +35,6 @@
   const NEST_PLUS_SOURCES = [
     ['life_change_intensive', 'Included with your Intensive'],
     ['coaching', 'Included with your coaching'],
-    ['solo_course', 'Included with Solo'],
     ['first_flight', 'Included with First Flight'],
     ['nest_plus', 'Nest Plus']
   ];
@@ -501,9 +500,6 @@
   }
 
   function nestPlusSource() {
-    if (hasSoloCourseAccess() && !entitlements.has('life_change_intensive') && !entitlements.has('coaching')) {
-      return 'Included with Solo';
-    }
     const hit = NEST_PLUS_SOURCES.find(([key]) => entitlements.has(key));
     return hit ? hit[1] : '';
   }
@@ -1098,7 +1094,7 @@
           <span class="lock-pill"><i class="ti ti-lock"></i> $7.99/month</span>
           <p class="eyebrow">nest plus</p>
           <h3>The Intensive workbook, on your own time</h3>
-          <p>Life Canvas puts passion, connections, spaces, resources, and energy on one page. Roots &amp; Wings is the eight-session workbook from the Intensive. You also get the full Inner Compass read and Relationship Dynamic. Cancel anytime. Included with coaching, Solo, or the Intensive.</p>
+          <p>Life Canvas puts passion, connections, spaces, resources, and energy on one page. Roots &amp; Wings is the eight-session workbook from the Intensive. You also get the full Inner Compass read and Relationship Dynamic. Cancel anytime. Included with coaching or the Intensive.</p>
           <div class="btn-row"><button type="button" class="btn btn-ember" data-upgrade="nest_plus">Add Nest Plus · $7.99/month →</button></div>
         </article>`;
     }

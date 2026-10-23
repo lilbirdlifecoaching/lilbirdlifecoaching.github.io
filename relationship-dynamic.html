@@ -390,7 +390,7 @@
   <section class="card rd-locked" id="rd-locked" hidden>
     <p class="rd-lock-pill">🔒 Nest Plus</p>
     <h2 class="card-title">The Relationship Dynamic is part of Nest Plus</h2>
-    <p class="card-hint">Nest Plus is $7.99 a month. It includes Life Canvas, the full Inner Compass read, and the Roots &amp; Wings workbook. Cancel anytime. Already included with any coaching, Solo or Intensive purchase.</p>
+    <p class="card-hint">Nest Plus is $7.99 a month. It includes Life Canvas, the full Inner Compass read, and the Roots &amp; Wings workbook. Cancel anytime. Already included with coaching or the Intensive.</p>
     <div class="rd-actions" id="rd-actions-in">
       <button type="button" class="btn-primary" id="rd-upgrade-btn">Add Nest Plus · $7.99/month →</button>
     </div>
@@ -506,7 +506,7 @@
   }
   const SOLO_WORKER_URL = 'https://worker-solo.cwwq46sn7m.workers.dev';
   // Server enforces access on /partner-dynamic; this only decides what to show first.
-  const NEST_PLUS_PRODUCTS = ['nest_plus', 'first_flight', 'solo_course', 'coaching', 'life_change_intensive'];
+  const NEST_PLUS_PRODUCTS = ['nest_plus', 'first_flight', 'coaching', 'life_change_intensive'];
 
   async function currentSession() {
     if (!sb) return null;
