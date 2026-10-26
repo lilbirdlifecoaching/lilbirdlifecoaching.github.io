@@ -913,5 +913,12 @@ body.nest-page { line-height: 1.5; }
   color: var(--gold-dim);
 }
 .journey-reflection header { display: flex; justify-content: space-between; gap: 0.75rem; align-items: baseline; }
+.journey-card-step { margin: 0; }
+.journey-reflection details { display: grid; gap: 0.45rem; }
+.journey-reflection summary {
+  cursor: pointer;
+  color: var(--gold);
+  width: fit-content;
+}
 .journey-empty, .journey-status { color: var(--text-muted); margin: 0; }
 .journey-back { justify-self: start; }

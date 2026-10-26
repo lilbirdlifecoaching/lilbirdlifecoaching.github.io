@@ -5,12 +5,13 @@ import {
   cleanAnswers,
   fallbackInsight,
 } from './journey-reflect.js';
+import { createJourneySession, saveOutcome } from './journey-session.js';
 
 const STAGES = [
   {
     key: 'situation',
     kicker: '1 of 5 · Situation',
-    title: 'What is going on?',
+    title: 'Where does this feel tangled?',
     prompt: 'Who is this with, and what keeps happening?',
     placeholder: 'A person, and the pattern between you...',
   },
@@ -43,6 +44,8 @@ const STAGES = [
     placeholder: 'One action, with a time...',
   },
 ];
+
+const session = createJourneySession();
 
 const state = {
   mode: 'home',
@@ -83,6 +86,12 @@ function formatWhen(iso) {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return '';
   return date.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function currentMemberId() {
+  const api = host();
+  const member = api && api.getUser ? api.getUser() : null;
+  return member && member.id ? member.id : '';
 }
 
 async function loadRows() {
@@ -150,8 +159,8 @@ function homeHtml() {
       '<section class="journey-block"><h3>Your Reflections</h3>' + reflections + '</section>' +
       '<section class="journey-block">' +
         '<h3>Your Life Canvas</h3>' +
-        '<p>Life Canvas stays on its own tab. It is the read already linked to this Nest. My Journey does not keep a second copy, and it does not look up a canvas from an id in the address bar.</p>' +
-        '<button type="button" class="btn btn-outline" data-open-canvas>Open Life Canvas</button>' +
+        '<p>Life changes, and so do we. Your Life Canvas is a place to notice what\'s shifting and what might need a little attention.</p>' +
+        '<button type="button" class="btn btn-outline" data-open-canvas>Visit My Life Canvas</button>' +
       '</section>' +
     '</div>'
   );
@@ -159,19 +168,22 @@ function homeHtml() {
 
 function reflectionHtml(row) {
   const answers = row.answers || {};
+  const step = answers.nextStep || row.next_step || '';
   const lines = [
     ['Situation', answers.situation],
     ['Difficulty', answers.difficulty],
     ['Need', answers.need],
     ['Boundary', answers.boundary],
-    ['Next step', answers.nextStep || row.next_step],
+    ['Next step', step],
   ].filter((pair) => pair[1]);
   const body = lines.map((pair) => '<p><span>' + escapeHtml(pair[0]) + '</span> ' + escapeHtml(pair[1]) + '</p>').join('');
   const note = row.insight ? '<p class="journey-note"><span>Coaching note</span> ' + escapeHtml(row.insight) + '</p>' : '';
+  const stepLine = '<p class="journey-card-step"><span>Next step</span> ' + escapeHtml(step || 'Not named') + '</p>';
   return (
     '<article class="journey-reflection">' +
       '<header><h4>' + escapeHtml(BOUNDARY_UNTANGLER.title) + '</h4><time>' + escapeHtml(formatWhen(row.created_at)) + '</time></header>' +
-      body + note +
+      stepLine +
+      '<details><summary>Revisit</summary>' + body + note + '</details>' +
       '<button type="button" class="btn btn-outline" data-delete-reflection="' + escapeHtml(row.id) + '">Delete</button>' +
     '</article>'
   );
@@ -208,8 +220,8 @@ function completionHtml() {
   return (
     '<div class="journey-exercise">' +
       '<p class="journey-kicker">boundary untangler</p>' +
-      '<h2>Here is what you named</h2>' +
-      '<p class="journey-lead">This stays on this page until you save it. Closing now leaves nothing stored.</p>' +
+      '<h2>A little more clarity.</h2>' +
+      '<p class="journey-lead">You\'ve taken a moment to untangle something that matters. Here\'s what you\'ve discovered, and one small step you might take from here.</p>' +
       '<div class="journey-summary">' + lines + '</div>' +
       note +
       (state.status ? '<p class="journey-status" role="status">' + escapeHtml(state.status) + '</p>' : '') +
@@ -241,16 +253,19 @@ function readStage() {
 }
 
 function startTool() {
+  session.invalidate();
   state.mode = 'exercise';
   state.stage = 0;
   state.draft = emptyDraft();
   state.insight = '';
   state.insightFromModel = false;
+  state.busy = false;
   state.status = '';
   render();
 }
 
 function closeExercise() {
+  session.invalidate();
   state.mode = 'home';
   state.stage = 0;
   state.draft = emptyDraft();
@@ -283,72 +298,99 @@ function clip(value) {
   return String(value || '').trim();
 }
 
+function reflectStillCurrent(ticket, memberId) {
+  return session.reflectApplies(ticket) && currentMemberId() === memberId;
+}
+
 async function reflect() {
   const api = host();
-  const user = api && api.getUser ? api.getUser() : null;
-  if (!answersReady(state.draft)) return;
+  const memberId = currentMemberId();
+  if (!answersReady(state.draft) || state.busy) return;
+  const answers = cleanAnswers(state.draft);
+  const ticket = session.beginReflect();
+  const timer = setTimeout(() => ticket.abort(), 12000);
   state.busy = true;
   state.status = 'Reading what you wrote...';
   render();
-  const fallback = fallbackInsight(state.draft);
-  if (!api || !user?.id) {
-    state.insight = fallback;
-    state.insightFromModel = false;
-    state.busy = false;
-    state.status = '';
-    render();
-    return;
-  }
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 12000);
+  const fallback = fallbackInsight(answers);
   try {
+    if (!api || !memberId) {
+      if (!reflectStillCurrent(ticket, memberId)) return;
+      state.insight = fallback;
+      state.insightFromModel = false;
+      return;
+    }
     const headers = await api.authHeaders();
+    if (!reflectStillCurrent(ticket, memberId)) return;
     const res = await fetch(api.workerUrl.replace(/\/$/, '') + '/journey/reflect', {
       method: 'POST',
       headers: Object.assign({ 'Content-Type': 'application/json' }, headers),
       body: JSON.stringify({
         toolId: BOUNDARY_UNTANGLER.id,
         toolVersion: BOUNDARY_UNTANGLER.version,
-        answers: cleanAnswers(state.draft),
+        answers,
       }),
-      signal: controller.signal,
+      signal: ticket.signal,
     });
+    if (!reflectStillCurrent(ticket, memberId)) return;
     if (!res.ok) throw new Error('reflect failed');
     const data = await res.json();
+    if (!reflectStillCurrent(ticket, memberId)) return;
     state.insight = data && data.insight && data.degraded !== true ? data.insight : fallback;
     state.insightFromModel = !!(data && data.insight && data.degraded !== true);
   } catch (e) {
+    if (!reflectStillCurrent(ticket, memberId)) return;
     state.insight = fallback;
     state.insightFromModel = false;
   } finally {
     clearTimeout(timer);
-    state.busy = false;
-    state.status = '';
-    render();
+    if (reflectStillCurrent(ticket, memberId)) {
+      state.busy = false;
+      state.status = '';
+      render();
+    }
   }
 }
 
 async function saveReflection() {
   const api = host();
-  const user = api && api.getUser ? api.getUser() : null;
-  if (!api || !user?.id || !answersReady(state.draft)) return;
+  const memberId = currentMemberId();
+  if (!api || !memberId || !answersReady(state.draft) || state.busy) return;
+  const lock = session.tryBeginSave(memberId);
+  if (!lock) return;
   state.busy = true;
   state.status = 'Saving...';
   render();
-  const row = buildInsertRow(user.id, state.draft, state.insight);
-  const result = await api.sb.from('journey_reflections').insert(row).select('id');
-  state.busy = false;
-  if (result.error) {
-    state.status = 'Nothing was saved. You can copy your next step before you leave, and try again once storage is ready.';
+  try {
+    let failed = false;
+    try {
+      const row = buildInsertRow(memberId, state.draft, state.insight);
+      const result = await api.sb.from('journey_reflections').insert(row).select('id');
+      if (result && result.error) failed = true;
+    } catch (e) {
+      failed = true;
+    }
+    const outcome = saveOutcome(session.saveApplies(lock, currentMemberId()), failed);
+    if (!outcome.updateScreen) return;
+    if (outcome.keepAnswers) {
+      state.busy = false;
+      state.status = outcome.message;
+      render();
+      return;
+    }
+    if (session.generation() !== lock.sessionGeneration || currentMemberId() !== lock.memberId) return;
+    state.draft = emptyDraft();
+    state.insight = '';
+    state.insightFromModel = false;
+    state.mode = 'home';
+    state.busy = false;
+    state.status = 'Saved. You can do this exercise again. The earlier one stays.';
+    await loadRows();
+    if (session.generation() !== lock.sessionGeneration || currentMemberId() !== lock.memberId) return;
     render();
-    return;
+  } finally {
+    session.finishSave(lock);
   }
-  state.draft = emptyDraft();
-  state.insight = '';
-  state.mode = 'home';
-  state.status = 'Saved. You can do this exercise again. The earlier one stays.';
-  await loadRows();
-  render();
 }
 
 async function deleteReflection(id) {
@@ -393,10 +435,16 @@ document.addEventListener('click', onClick);
 
 window.LilbirdJourney = {
   async refresh() {
-    if (!host()?.getUser()?.id) {
+    if (!currentMemberId()) {
+      session.invalidate();
       state.rows = [];
       state.mode = 'home';
+      state.stage = 0;
       state.draft = emptyDraft();
+      state.insight = '';
+      state.insightFromModel = false;
+      state.busy = false;
+      state.status = '';
       renderPreview();
       return;
     }
@@ -405,10 +453,12 @@ window.LilbirdJourney = {
     else renderPreview();
   },
   reset() {
+    session.invalidate();
     state.mode = 'home';
     state.stage = 0;
     state.draft = emptyDraft();
     state.insight = '';
+    state.insightFromModel = false;
     state.rows = [];
     state.status = '';
     state.busy = false;

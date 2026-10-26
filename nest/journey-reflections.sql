@@ -1,5 +1,5 @@
--- My Journey reflections. Proposed migration only.
--- Do not run this in production until it is explicitly approved.
+-- My Journey reflections.
+-- Applied in Supabase on 26 Oct 2026. Do not run this file again.
 -- The Nest worker must not write this table. Members insert and delete their own rows.
 
 create table if not exists public.journey_reflections (

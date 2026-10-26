@@ -199,7 +199,7 @@ Tools for the Tangle, milestone 1, is one card on My Journey: Boundary Untangler
 
 Stages, in `nest/journey.js`:
 
-1. Situation. What is going on? Who is this with, and what keeps happening? (`situation`)
+1. Situation. Where does this feel tangled? Who is this with, and what keeps happening? (`situation`)
 2. Difficulty. What makes it hard? What gets in the way of saying what you need? (`difficulty`)
 3. Underlying need. What do you need underneath? Under the friction, what are you actually needing? (`need`)
 4. Possible boundary. What boundary could you hold? Say it in a way that is clear and still kind. (`boundary`)
