@@ -1,66 +1,42 @@
 import {
-  BOUNDARY_UNTANGLER,
   answersReady,
   buildInsertRow,
   cleanAnswers,
   fallbackInsight,
-} from './journey-reflect.js';
+  stageValueOk,
+} from './journey-reflect.js?v=4';
 import { createJourneySession, saveOutcome } from './journey-session.js';
-
-const STAGES = [
-  {
-    key: 'situation',
-    kicker: '1 of 5 · Situation',
-    title: 'Where does this feel tangled?',
-    prompt: 'Who is this with, and what keeps happening?',
-    placeholder: 'A person, and the pattern between you...',
-  },
-  {
-    key: 'difficulty',
-    kicker: '2 of 5 · Difficulty',
-    title: 'What makes it hard?',
-    prompt: 'What gets in the way of saying what you need?',
-    placeholder: 'The worry, the habit, the loyalty...',
-  },
-  {
-    key: 'need',
-    kicker: '3 of 5 · Underlying need',
-    title: 'What do you need underneath?',
-    prompt: 'Under the friction, what are you actually needing?',
-    placeholder: 'Rest, respect, time, clarity...',
-  },
-  {
-    key: 'boundary',
-    kicker: '4 of 5 · Possible boundary',
-    title: 'What boundary could you hold?',
-    prompt: 'Say it in a way that is clear and still kind.',
-    placeholder: 'I can... and I will not...',
-  },
-  {
-    key: 'nextStep',
-    kicker: '5 of 5 · Next step',
-    title: 'What is one realistic step?',
-    prompt: 'One thing you could do in the next week. Small enough to happen.',
-    placeholder: 'One action, with a time...',
-  },
-];
+import {
+  CATEGORIES,
+  categoryLabel,
+  recommendTools,
+  reflectionView,
+  resolveToolLink,
+  searchTools,
+  toolById,
+} from './journey-tools.js?v=1';
 
 const session = createJourneySession();
+let linkHandled = false;
+
+if (new URLSearchParams(window.location.search).has('tool')) {
+  window.__nestSkipTourForTool = true;
+}
 
 const state = {
   mode: 'home',
+  toolId: '',
   stage: 0,
-  draft: emptyDraft(),
+  draft: {},
   insight: '',
   insightFromModel: false,
   rows: [],
   status: '',
   busy: false,
+  query: '',
+  category: 'all',
+  recommendText: '',
 };
-
-function emptyDraft() {
-  return { situation: '', difficulty: '', need: '', boundary: '', nextStep: '' };
-}
 
 function host() {
   return window.__nestJourneyHost || null;
@@ -94,6 +70,19 @@ function currentMemberId() {
   return member && member.id ? member.id : '';
 }
 
+function currentTool() {
+  return toolById(state.toolId);
+}
+
+function emptyDraft(tool) {
+  const draft = {};
+  if (!tool) return draft;
+  tool.stages.forEach((stage) => {
+    draft[stage.key] = '';
+  });
+  return draft;
+}
+
 async function loadRows() {
   const api = host();
   const user = api && api.getUser ? api.getUser() : null;
@@ -122,19 +111,56 @@ function renderPreview() {
   if (!card) return;
   const steps = state.rows.filter((row) => row.next_step);
   const latest = steps[0];
-  card.innerHTML = latest
-    ? '<p class="sidebar-eyebrow">my journey</p><h4>Your next step</h4><p>' +
-      escapeHtml(latest.next_step) +
-      '</p><button type="button" class="btn btn-outline full" data-open-journey>Open My Journey</button>'
-    : '<p class="sidebar-eyebrow">my journey</p><h4>Tools for the Tangle</h4><p>A short exercise can leave you with one next step. Saving is optional.</p><button type="button" class="btn btn-outline full" data-open-journey>Open My Journey</button>';
+  if (!latest) {
+    card.innerHTML = '<p class="sidebar-eyebrow">my journey</p><h4>Tools for the Tangle</h4><p>A short exercise can leave you with one next step. Saving is optional.</p><button type="button" class="btn btn-outline full" data-open-journey>Open My Journey</button>';
+    return;
+  }
+  const view = reflectionView(latest);
+  card.innerHTML = '<p class="sidebar-eyebrow">my journey</p><h4>Your next step</h4><p>' +
+    escapeHtml(latest.next_step) +
+    '</p><p>' + escapeHtml(view.title) + '</p><button type="button" class="btn btn-outline full" data-open-journey>Open My Journey</button>';
+}
+
+function toolCardHtml(item) {
+  return (
+    '<article class="journey-tool-card">' +
+      '<p class="journey-kicker">' + escapeHtml(categoryLabel(item.category)) + ' · ' + escapeHtml(item.minutes) + '</p>' +
+      '<h3>' + escapeHtml(item.title) + '</h3>' +
+      '<p>' + escapeHtml(item.description) + '</p>' +
+      '<button type="button" class="btn btn-gold" data-start-tool="' + escapeHtml(item.id) + '">Begin</button>' +
+    '</article>'
+  );
+}
+
+function libraryResultsHtml() {
+  const found = searchTools(state.query, state.category);
+  if (!found.length) {
+    return '<p class="journey-empty">Nothing matches that yet. Try another phrase, or look through All.</p>';
+  }
+  return '<div class="journey-tool-grid">' + found.map(toolCardHtml).join('') + '</div>';
+}
+
+function recommendResultsHtml() {
+  const result = recommendTools(state.recommendText);
+  if (result.status === 'empty') return '';
+  const lead = result.status === 'broad'
+    ? 'Nothing lines up closely. Here are a few tools people often find useful. You can ignore them and browse the library.'
+    : 'A few that might fit. You still choose.';
+  return '<p class="journey-lead">' + lead + '</p>' + libraryCards(result.tools);
+}
+
+function libraryCards(list) {
+  return '<div class="journey-tool-grid">' + list.map(toolCardHtml).join('') + '</div>';
 }
 
 function homeHtml() {
-  const steps = state.rows.filter((row) => row.next_step);
+  const steps = state.rows.filter((row) => row.next_step || (row.answers && row.answers.nextStep));
   const stepItems = steps.length
-    ? steps.slice(0, 6).map((row) => {
-        return '<li><p>' + escapeHtml(row.next_step) + '</p><span>' +
-          escapeHtml(BOUNDARY_UNTANGLER.title) + ' · ' + escapeHtml(formatWhen(row.created_at)) +
+    ? steps.slice(0, 8).map((row) => {
+        const view = reflectionView(row);
+        return '<li><button type="button" class="journey-step-link" data-open-reflection="' + escapeHtml(row.id) + '">' +
+          escapeHtml(view.nextStep) + '</button><span>' +
+          escapeHtml(view.title) + ' · ' + escapeHtml(formatWhen(row.created_at)) +
           '</span></li>';
       }).join('')
     : '<li class="journey-empty">Saved next steps will show up here.</li>';
@@ -143,20 +169,33 @@ function homeHtml() {
     ? state.rows.map((row) => reflectionHtml(row)).join('')
     : '<p class="journey-empty">Nothing saved yet. You can finish an exercise and leave it unsaved.</p>';
 
+  const filters = CATEGORIES.map((item) => {
+    const active = item.id === state.category ? ' is-active' : '';
+    const pressed = item.id === state.category ? 'true' : 'false';
+    return '<button type="button" class="btn btn-outline' + active + '" data-filter="' + escapeHtml(item.id) + '" aria-pressed="' + pressed + '">' +
+      escapeHtml(item.label) + '</button>';
+  }).join('');
+
   return (
     '<div class="journey-home">' +
       '<p class="journey-kicker">tools for the tangle</p>' +
-      '<h2>My Journey</h2>' +
-      '<p class="journey-lead">Short exercises for a tangle you are in. About five to ten minutes. Save only if you want to come back to it.</p>' +
+      '<h2>Find a little clarity</h2>' +
+      '<p class="journey-lead">Whatever feels tangled today, there’s a place to begin.</p>' +
       (state.status ? '<p class="journey-status" role="status">' + escapeHtml(state.status) + '</p>' : '') +
-      '<article class="journey-tool-card">' +
-        '<p class="journey-kicker">5 to 10 minutes</p>' +
-        '<h3>Boundary Untangler</h3>' +
-        '<p>Name a difficult boundary, what makes it hard, what you need, a kinder way to hold it, and one step you can actually take.</p>' +
-        '<button type="button" class="btn btn-gold" data-start-tool>Begin</button>' +
-      '</article>' +
-      '<section class="journey-block"><h3>Your Next Steps</h3><ul class="journey-steps">' + stepItems + '</ul></section>' +
-      '<section class="journey-block"><h3>Your Reflections</h3>' + reflections + '</section>' +
+      '<label class="journey-kicker" for="journey-search">Search</label>' +
+      '<input id="journey-search" class="journey-search" type="search" maxlength="160" placeholder="What’s on your mind?" value="' + escapeHtml(state.query) + '">' +
+      '<div class="journey-filters" role="group" aria-label="Categories">' + filters + '</div>' +
+      '<div id="journey-library-results">' + libraryResultsHtml() + '</div>' +
+      '<section class="journey-block">' +
+        '<h3>Not sure where to begin?</h3>' +
+        '<p>Tell us a little about what’s going on.</p>' +
+        '<textarea id="journey-recommend" class="journey-recommend-input" rows="3" maxlength="400" placeholder="A few words is enough. This stays on this page.">' +
+        escapeHtml(state.recommendText) + '</textarea>' +
+        '<p class="journey-empty">This stays on this page. It is not saved.</p>' +
+        '<div id="journey-recommend-results">' + recommendResultsHtml() + '</div>' +
+      '</section>' +
+      '<section class="journey-block"><h3>Your next steps</h3><ul class="journey-steps">' + stepItems + '</ul></section>' +
+      '<section class="journey-block" id="journey-reflections"><h3>Your reflections</h3>' + reflections + '</section>' +
       '<section class="journey-block">' +
         '<h3>Your Life Canvas</h3>' +
         '<p>Life changes, and so do we. Your Life Canvas is a place to notice what\'s shifting and what might need a little attention.</p>' +
@@ -167,21 +206,13 @@ function homeHtml() {
 }
 
 function reflectionHtml(row) {
-  const answers = row.answers || {};
-  const step = answers.nextStep || row.next_step || '';
-  const lines = [
-    ['Situation', answers.situation],
-    ['Difficulty', answers.difficulty],
-    ['Need', answers.need],
-    ['Boundary', answers.boundary],
-    ['Next step', step],
-  ].filter((pair) => pair[1]);
-  const body = lines.map((pair) => '<p><span>' + escapeHtml(pair[0]) + '</span> ' + escapeHtml(pair[1]) + '</p>').join('');
-  const note = row.insight ? '<p class="journey-note"><span>Coaching note</span> ' + escapeHtml(row.insight) + '</p>' : '';
-  const stepLine = '<p class="journey-card-step"><span>Next step</span> ' + escapeHtml(step || 'Not named') + '</p>';
+  const view = reflectionView(row);
+  const body = view.fields.map((field) => '<p><span>' + escapeHtml(field.label) + '</span> ' + escapeHtml(field.value) + '</p>').join('');
+  const note = view.insight ? '<p class="journey-note"><span>Coaching note</span> ' + escapeHtml(view.insight) + '</p>' : '';
+  const stepLine = '<p class="journey-card-step"><span>Next step</span> ' + escapeHtml(view.nextStep || 'Not named') + '</p>';
   return (
-    '<article class="journey-reflection">' +
-      '<header><h4>' + escapeHtml(BOUNDARY_UNTANGLER.title) + '</h4><time>' + escapeHtml(formatWhen(row.created_at)) + '</time></header>' +
+    '<article class="journey-reflection" id="reflection-' + escapeHtml(row.id) + '">' +
+      '<header><h4>' + escapeHtml(view.title) + '</h4><time>' + escapeHtml(formatWhen(row.created_at)) + '</time></header>' +
       stepLine +
       '<details><summary>Revisit</summary>' + body + note + '</details>' +
       '<button type="button" class="btn btn-outline" data-delete-reflection="' + escapeHtml(row.id) + '">Delete</button>' +
@@ -189,39 +220,59 @@ function reflectionHtml(row) {
   );
 }
 
-function exerciseHtml() {
-  const stage = STAGES[state.stage];
-  const value = state.draft[stage.key] || '';
+function introHtml(tool) {
   return (
     '<div class="journey-exercise">' +
       '<button type="button" class="btn btn-outline journey-back" data-close-exercise>Close without saving</button>' +
-      '<p class="journey-kicker">' + escapeHtml(stage.kicker) + '</p>' +
+      '<p class="journey-kicker">' + escapeHtml(categoryLabel(tool.category)) + '</p>' +
+      '<h2>' + escapeHtml(tool.title) + '</h2>' +
+      '<p class="journey-lead">' + escapeHtml(tool.intro) + '</p>' +
+      '<div class="journey-actions">' +
+        '<button type="button" class="btn btn-gold" data-begin-stages>Begin</button>' +
+        '<button type="button" class="btn btn-outline" data-close-exercise>Close without saving</button>' +
+      '</div>' +
+    '</div>'
+  );
+}
+
+function exerciseHtml(tool) {
+  const stage = tool.stages[state.stage];
+  const value = state.draft[stage.key] || '';
+  const optional = stage.optional ? '<p class="journey-empty">Optional. Leave this blank if nothing comes.</p>' : '';
+  return (
+    '<div class="journey-exercise">' +
+      '<button type="button" class="btn btn-outline journey-back" data-close-exercise>Close without saving</button>' +
+      '<p class="journey-kicker">' + escapeHtml((state.stage + 1) + ' of ' + tool.stages.length + ' · ' + stage.label) + '</p>' +
       '<h2>' + escapeHtml(stage.title) + '</h2>' +
       '<p class="journey-lead">' + escapeHtml(stage.prompt) + '</p>' +
+      optional +
       '<textarea id="journey-stage-input" rows="6" maxlength="2000" placeholder="' + escapeHtml(stage.placeholder) + '">' +
       escapeHtml(value) + '</textarea>' +
       (state.status ? '<p class="journey-status" role="status">' + escapeHtml(state.status) + '</p>' : '') +
       '<div class="journey-actions">' +
         (state.stage > 0 ? '<button type="button" class="btn btn-outline" data-stage-back>Back</button>' : '') +
         '<button type="button" class="btn btn-gold" data-stage-next>' +
-        (state.stage === STAGES.length - 1 ? 'See what I wrote' : 'Next') +
+        (state.stage === tool.stages.length - 1 ? 'See what I wrote' : 'Next') +
         '</button>' +
       '</div>' +
     '</div>'
   );
 }
 
-function completionHtml() {
-  const clean = cleanAnswers(state.draft);
-  const lines = STAGES.map((stage) => '<p><span>' + escapeHtml(stage.title) + '</span> ' + escapeHtml(clean[stage.key]) + '</p>').join('');
+function completionHtml(tool) {
+  const clean = cleanAnswers(state.draft, tool);
+  const lines = tool.stages
+    .filter((stage) => clean[stage.key])
+    .map((stage) => '<p><span>' + escapeHtml(stage.label) + '</span> ' + escapeHtml(clean[stage.key]) + '</p>')
+    .join('');
   const note = state.insight
     ? '<div class="journey-note"><span>' + (state.insightFromModel ? 'Coaching note' : 'A note you can keep') + '</span><p>' + escapeHtml(state.insight) + '</p></div>'
     : '';
   return (
     '<div class="journey-exercise">' +
-      '<p class="journey-kicker">boundary untangler</p>' +
-      '<h2>A little more clarity.</h2>' +
-      '<p class="journey-lead">You\'ve taken a moment to untangle something that matters. Here\'s what you\'ve discovered, and one small step you might take from here.</p>' +
+      '<p class="journey-kicker">' + escapeHtml(tool.title) + '</p>' +
+      '<h2>' + escapeHtml(tool.completionTitle) + '</h2>' +
+      '<p class="journey-lead">' + escapeHtml(tool.completionLead) + '</p>' +
       '<div class="journey-summary">' + lines + '</div>' +
       note +
       (state.status ? '<p class="journey-status" role="status">' + escapeHtml(state.status) + '</p>' : '') +
@@ -237,9 +288,14 @@ function completionHtml() {
 function render() {
   const el = pane();
   if (!el) return;
-  if (state.mode === 'exercise') el.innerHTML = exerciseHtml();
-  else if (state.mode === 'done') el.innerHTML = completionHtml();
-  else el.innerHTML = homeHtml();
+  const tool = currentTool();
+  if ((state.mode === 'intro' || state.mode === 'exercise' || state.mode === 'done') && tool) {
+    if (state.mode === 'intro') el.innerHTML = introHtml(tool);
+    else if (state.mode === 'exercise') el.innerHTML = exerciseHtml(tool);
+    else el.innerHTML = completionHtml(tool);
+  } else {
+    el.innerHTML = homeHtml();
+  }
   renderPreview();
   const input = document.getElementById('journey-stage-input');
   if (input) input.focus();
@@ -247,19 +303,39 @@ function render() {
 
 function readStage() {
   const input = document.getElementById('journey-stage-input');
-  if (!input) return;
-  const stage = STAGES[state.stage];
+  const tool = currentTool();
+  if (!input || !tool) return;
+  const stage = tool.stages[state.stage];
   state.draft[stage.key] = input.value.slice(0, 2000);
 }
 
-function startTool() {
+function startTool(toolId) {
   session.invalidate();
-  state.mode = 'exercise';
-  state.stage = 0;
-  state.draft = emptyDraft();
+  const tool = toolById(toolId);
   state.insight = '';
   state.insightFromModel = false;
   state.busy = false;
+  state.stage = 0;
+  if (!tool) {
+    state.mode = 'home';
+    state.toolId = '';
+    state.draft = {};
+    state.status = 'That exercise is not in the library. Choose one below.';
+    render();
+    return;
+  }
+  state.toolId = tool.id;
+  state.mode = 'intro';
+  state.draft = emptyDraft(tool);
+  state.status = '';
+  state.recommendText = '';
+  render();
+}
+
+function beginStages() {
+  if (!currentTool()) return;
+  state.mode = 'exercise';
+  state.stage = 0;
   state.status = '';
   render();
 }
@@ -268,7 +344,8 @@ function closeExercise() {
   session.invalidate();
   state.mode = 'home';
   state.stage = 0;
-  state.draft = emptyDraft();
+  state.toolId = '';
+  state.draft = {};
   state.insight = '';
   state.insightFromModel = false;
   state.busy = false;
@@ -277,15 +354,19 @@ function closeExercise() {
 }
 
 function nextStage() {
+  const tool = currentTool();
+  if (!tool) return;
   readStage();
-  const stage = STAGES[state.stage];
-  if (clip(state.draft[stage.key]).length < 2) {
-    state.status = 'Add a little more before you go on.';
+  const stage = tool.stages[state.stage];
+  if (!stageValueOk(stage, state.draft[stage.key])) {
+    state.status = stage.optional
+      ? 'Add a little more, or clear this one. It is optional.'
+      : 'Add a little more before you go on.';
     render();
     return;
   }
   state.status = '';
-  if (state.stage < STAGES.length - 1) {
+  if (state.stage < tool.stages.length - 1) {
     state.stage += 1;
     render();
     return;
@@ -294,25 +375,22 @@ function nextStage() {
   render();
 }
 
-function clip(value) {
-  return String(value || '').trim();
-}
-
 function reflectStillCurrent(ticket, memberId) {
   return session.reflectApplies(ticket) && currentMemberId() === memberId;
 }
 
 async function reflect() {
   const api = host();
+  const tool = currentTool();
   const memberId = currentMemberId();
-  if (!answersReady(state.draft) || state.busy) return;
-  const answers = cleanAnswers(state.draft);
+  if (!tool || !answersReady(state.draft, tool) || state.busy) return;
+  const answers = cleanAnswers(state.draft, tool);
   const ticket = session.beginReflect();
   const timer = setTimeout(() => ticket.abort(), 12000);
   state.busy = true;
   state.status = 'Reading what you wrote...';
   render();
-  const fallback = fallbackInsight(answers);
+  const fallback = fallbackInsight(answers, tool);
   try {
     if (!api || !memberId) {
       if (!reflectStillCurrent(ticket, memberId)) return;
@@ -326,8 +404,8 @@ async function reflect() {
       method: 'POST',
       headers: Object.assign({ 'Content-Type': 'application/json' }, headers),
       body: JSON.stringify({
-        toolId: BOUNDARY_UNTANGLER.id,
-        toolVersion: BOUNDARY_UNTANGLER.version,
+        toolId: tool.id,
+        toolVersion: tool.version,
         answers,
       }),
       signal: ticket.signal,
@@ -354,8 +432,9 @@ async function reflect() {
 
 async function saveReflection() {
   const api = host();
+  const tool = currentTool();
   const memberId = currentMemberId();
-  if (!api || !memberId || !answersReady(state.draft) || state.busy) return;
+  if (!api || !tool || !memberId || !answersReady(state.draft, tool) || state.busy) return;
   const lock = session.tryBeginSave(memberId);
   if (!lock) return;
   state.busy = true;
@@ -364,7 +443,7 @@ async function saveReflection() {
   try {
     let failed = false;
     try {
-      const row = buildInsertRow(memberId, state.draft, state.insight);
+      const row = buildInsertRow(memberId, state.draft, state.insight, tool);
       const result = await api.sb.from('journey_reflections').insert(row).select('id');
       if (result && result.error) failed = true;
     } catch (e) {
@@ -379,9 +458,10 @@ async function saveReflection() {
       return;
     }
     if (session.generation() !== lock.sessionGeneration || currentMemberId() !== lock.memberId) return;
-    state.draft = emptyDraft();
+    state.draft = {};
     state.insight = '';
     state.insightFromModel = false;
+    state.toolId = '';
     state.mode = 'home';
     state.busy = false;
     state.status = 'Saved. You can do this exercise again. The earlier one stays.';
@@ -409,6 +489,45 @@ async function deleteReflection(id) {
   render();
 }
 
+function openReflection(id) {
+  const card = document.getElementById('reflection-' + id);
+  if (!card) return;
+  const details = card.querySelector('details');
+  if (details) details.open = true;
+  card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function clearToolParam() {
+  const url = new URL(window.location.href);
+  if (!url.searchParams.has('tool')) return;
+  url.searchParams.delete('tool');
+  window.history.replaceState(null, '', url.pathname + url.search + url.hash);
+}
+
+function maybeOpenDeepLink() {
+  if (linkHandled || !currentMemberId()) return false;
+  const params = new URLSearchParams(window.location.search);
+  if (!params.has('tool')) {
+    linkHandled = true;
+    return false;
+  }
+  const resolved = resolveToolLink(params.get('tool'));
+  window.__nestSkipTourForTool = true;
+  clearToolParam();
+  linkHandled = true;
+  if (!resolved.ok) {
+    state.mode = 'home';
+    state.toolId = '';
+    state.status = 'That exercise is not in the library. Choose one below.';
+    host()?.setTab('journey');
+    render();
+    return true;
+  }
+  host()?.setTab('journey');
+  startTool(resolved.tool.id);
+  return true;
+}
+
 function onClick(event) {
   const target = event.target.closest('button');
   if (!target || !pane()?.contains(target) && !preview()?.contains(target)) return;
@@ -417,7 +536,8 @@ function onClick(event) {
     return;
   }
   if (!pane()?.contains(target)) return;
-  if ('startTool' in target.dataset) startTool();
+  if ('startTool' in target.dataset) startTool(target.dataset.startTool);
+  else if ('beginStages' in target.dataset) beginStages();
   else if ('closeExercise' in target.dataset) closeExercise();
   else if ('stageNext' in target.dataset) nextStage();
   else if ('stageBack' in target.dataset) {
@@ -425,13 +545,35 @@ function onClick(event) {
     state.stage = Math.max(0, state.stage - 1);
     state.status = '';
     render();
+  } else if ('filter' in target.dataset) {
+    state.category = target.dataset.filter || 'all';
+    state.status = '';
+    render();
   } else if ('openCanvas' in target.dataset) host()?.setTab('canvas');
   else if ('reflect' in target.dataset) void reflect();
   else if ('save' in target.dataset) void saveReflection();
   else if (target.dataset.deleteReflection) void deleteReflection(target.dataset.deleteReflection);
+  else if (target.dataset.openReflection) openReflection(target.dataset.openReflection);
+}
+
+function onInput(event) {
+  const input = event.target;
+  if (!input || !pane()?.contains(input)) return;
+  if (input.id === 'journey-search') {
+    state.query = input.value.slice(0, 160);
+    const box = document.getElementById('journey-library-results');
+    if (box) box.innerHTML = libraryResultsHtml();
+    return;
+  }
+  if (input.id === 'journey-recommend') {
+    state.recommendText = input.value.slice(0, 400);
+    const box = document.getElementById('journey-recommend-results');
+    if (box) box.innerHTML = recommendResultsHtml();
+  }
 }
 
 document.addEventListener('click', onClick);
+document.addEventListener('input', onInput);
 
 window.LilbirdJourney = {
   async refresh() {
@@ -440,15 +582,19 @@ window.LilbirdJourney = {
       state.rows = [];
       state.mode = 'home';
       state.stage = 0;
-      state.draft = emptyDraft();
+      state.toolId = '';
+      state.draft = {};
       state.insight = '';
       state.insightFromModel = false;
       state.busy = false;
       state.status = '';
+      state.recommendText = '';
+      linkHandled = false;
       renderPreview();
       return;
     }
     await loadRows();
+    if (maybeOpenDeepLink()) return;
     if (state.mode === 'home') render();
     else renderPreview();
   },
@@ -456,12 +602,15 @@ window.LilbirdJourney = {
     session.invalidate();
     state.mode = 'home';
     state.stage = 0;
-    state.draft = emptyDraft();
+    state.toolId = '';
+    state.draft = {};
     state.insight = '';
     state.insightFromModel = false;
     state.rows = [];
     state.status = '';
     state.busy = false;
+    state.recommendText = '';
+    linkHandled = false;
     const el = pane();
     if (el) el.innerHTML = '';
     const card = preview();

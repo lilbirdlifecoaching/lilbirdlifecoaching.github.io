@@ -1,6 +1,6 @@
 # Nest Toolkit — architecture for Tools for the Tangle and My Journey
 
-Status: Milestone 1 is implemented on `feature/nest-toolkit`. `nest/journey-reflections.sql` is applied in Supabase. The Nest worker is already live at `v1.28-journey`, including `POST /journey/reflect`. This website branch is unpublished, so My Journey stays off lilbird.life until you ask to publish it. Local `main` still holds the unpublished Nest claim and was left as it is.
+Status: Milestone 1 is live on lilbird.life (merge `0389ffb`). Milestone 2, the fifteen-tool library, is on `feature/tangle-library` and is not merged or deployed. `nest/journey-reflections.sql` is already applied. Do not run it again. The live worker is still `v1.28-journey`. It reflects Boundary Untangler only. Multi-tool reflect support is prepared in `nest/journey-reflect.js` and `nest/journey-tools.js` and waits for an approved worker deploy. Local `main` still holds the unpublished Nest claim and is not in this branch.
 
 Reviewed from commit `5542ac0`, then built on that branch. The Pages repository is the Nest front end. The Nest worker source stays outside this repository, in the iCloud copy of `solo/worker-solo.js`, with `journey-reflect.js` beside it. Those worker files are not part of this branch.
 
@@ -9,7 +9,7 @@ What is already in place:
 1. The table `public.journey_reflections` exists. A signed-in member can select, insert, and delete their own rows. There is no update policy.
 2. The live worker answers `POST /journey/reflect` for a logged-in member and uses the existing model key. No new secret.
 
-Publishing this branch is the remaining step before members see the new tab.
+Milestone 1 is already on lilbird.life. Milestone 2 stays off the live site until this branch is reviewed and you ask to publish it.
 
 The Pages repository is the Nest, Solo, and Inner Compass front end. The Cloudflare Workers that authenticate API calls and store the Inner Compass live outside this repository, in the iCloud project copies of `solo/worker-solo.js` (Solo worker) and `Deep-profile Cursor Project/lilbird-assessment.js` (assessment worker). Findings below name which tree they come from.
 
@@ -239,9 +239,7 @@ After the decisions in section 7 are answered:
 5. Add `POST /journey/reflect` behind the optional button. Ship the exercise so it still saves when that call fails.
 6. Check the flow while logged in: products, Life Canvas, Inner Compass, and Ask still behave as they do now. Check a logged-out visit stays on the auth screen. Check mobile width for the new tab.
 
-The SQL and the worker are done. The site is still unpublished. Do not merge to `main` until this branch has been reviewed.
-
-Out of milestone 1: the other Tangle tools, the 26 letters, Nest Plus gating, and any change to Solo `tool_outputs`.
+Milestone 1 has since shipped. The paragraph above is the plan that produced it. The other Tangle tools are Milestone 2, in section 9. Still out of scope: the 26 letters, Nest Plus gating, and any change to Solo `tool_outputs`.
 
 ---
 
@@ -258,3 +256,55 @@ Out of milestone 1: the other Tangle tools, the 26 letters, Nest Plus gating, an
 ## 8. Boundary Untangler and the letters
 
 The ten-note sequence already talks about a stuck place, two layers of a read, attachment, and one relationship. Boundary Untangler is the first exercise that can sit beside a later letter without a new personality test. It collects five stages: the situation, what makes it hard, the underlying need, a possible boundary, and one next step. None of that exists on the Inner Compass or in `tool_outputs`.
+
+---
+
+## 9. Milestone 2 — the fifteen tools
+
+Built on `feature/tangle-library` from published `main` (`0389ffb`). Not merged. Not deployed. No change to the Supabase table.
+
+### Tools
+
+All fifteen live in `nest/journey-tools.js`. Each is version 1. A later edit should bump that tool’s version. Old rows keep the version they were saved with, and the page still shows any answer key that the current stages no longer ask. Saves are inserts. Nothing is overwritten.
+
+| Tool | Id | Category | Stages |
+|---|---|---|---|
+| Boundary Untangler | `boundary-untangler` | Relationships | 5, all required. Same questions as Milestone 1. |
+| Communication Reset | `communication-reset` | Relationships | 6, one optional |
+| Connection Check | `connection-check` | Relationships | 6, one optional |
+| Expectations Audit | `expectations-audit` | Relationships | 6, one optional |
+| Shadows & Sparks | `shadows-sparks` | Myself | 6, one optional |
+| Identity Reflection | `identity-reflection` | Myself | 5, one optional |
+| Courage Compass | `courage-compass` | Myself | 5, one optional |
+| Decision Clarity | `decision-clarity` | Change & Decisions | 6, one optional |
+| Transition Map | `transition-map` | Change & Decisions | 5, one optional |
+| Energy Inventory | `energy-inventory` | Life Rhythms | 5, one optional |
+| Rhythm Reset | `rhythm-reset` | Life Rhythms | 5, one optional |
+| Rest or Escape? | `rest-or-escape` | Life Rhythms | 6, one optional |
+| Family Expectations | `family-expectations` | Family | 5, one optional |
+| Responsibility Inventory | `responsibility-inventory` | Family | 5, one optional |
+| Workload Reset | `workload-reset` | Work & Purpose | 5, one optional |
+
+Courage Compass borrows the Solo directions (toward, what holds you, what you leave, what you need) and then asks for a next step. Shadows & Sparks borrows the Solo distinction between fear pushing and care pulling. Neither tool writes `tool_outputs` or uses the Solo session return.
+
+Every tool has an introduction, a completion summary, a member-written next step, Reflect with lil' bird, Save to My Journey, and Close without saving. Closing, logging out, or starting again drops unsaved answers and aborts a pending reflection. The same save lock and member check from Milestone 1 still apply.
+
+### Search, categories, and recommendations
+
+The library is the top of the existing My Journey tab. Search compares the typed words with the title, description, introduction, category, and a list of everyday phrases. Category chips filter that list: All, Relationships, Myself, Change & Decisions, Life Rhythms, Family, Work & Purpose. On a narrow screen the chips wrap and the cards stay one column.
+
+“Not sure where to begin?” calls `recommendTools()` in the browser. It returns at most three tools. If nothing scores as a real match, it offers Boundary Untangler, Decision Clarity, and Energy Inventory, and says they are general starting points. The typed note is kept only in page memory so the suggestions can render. It is not written to Supabase, `localStorage`, the URL, logs, or the reflection request. Logout clears it.
+
+### Your next steps
+
+Saved `next_step` values are listed with the tool name and date. Choosing one opens that reflection. They are read-only. There are no reminders, streaks, or due dates. The schema did not change.
+
+### Deep links
+
+`/nest/?tool=courage-compass` opens that tool after sign-in. The id is checked against the catalog. An unknown or malformed id stays on the library with a short message. The parameter is removed from the address bar after it is read, so a reload does not discard an exercise in progress, and answers are never put in the URL. A tool link skips the automatic welcome video and tour so the tour does not send the member back to My products. Replay of the tour still works.
+
+### Worker
+
+`POST /journey/reflect` on the live worker still rejects every tool id except `boundary-untangler` at version 1. The page treats that refusal like any other reflect failure and shows `fallbackInsight()` for the tool in hand. Boundary Untangler still sends the Milestone 1 body, so the live model can answer it.
+
+The updated `nest/journey-reflect.js` accepts all fifteen ids at their current version, ignores a browser-supplied user id, clips each answer, and still does not write the database. On an approved deploy, copy `nest/journey-reflect.js` and `nest/journey-tools.js` beside `worker-solo.js`. Do not deploy that copy for this review. No new secret. No route change. The worker version string stays `v1.28-journey` until that deploy.
