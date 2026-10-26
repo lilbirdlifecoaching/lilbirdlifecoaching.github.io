@@ -1,16 +1,15 @@
 # Nest Toolkit — architecture for Tools for the Tangle and My Journey
 
-Status: Milestone 1 is implemented on `feature/nest-toolkit` and has not been deployed. The migration has not been applied. Local `main` still holds the unpublished Nest claim and was not edited.
+Status: Milestone 1 is implemented on `feature/nest-toolkit`. `nest/journey-reflections.sql` is applied in Supabase. The Nest worker is already live at `v1.28-journey`, including `POST /journey/reflect`. This website branch is unpublished, so My Journey stays off lilbird.life until you ask to publish it. Local `main` still holds the unpublished Nest claim and was left as it is.
 
-Reviewed from commit `5542ac0`, then built on that branch. The Pages repository is the Nest front end. The Nest worker lives outside this repository. `POST /journey/reflect` is wired in that worker source and was not deployed.
+Reviewed from commit `5542ac0`, then built on that branch. The Pages repository is the Nest front end. The Nest worker source stays outside this repository, in the iCloud copy of `solo/worker-solo.js`, with `journey-reflect.js` beside it. Those worker files are not part of this branch.
 
-Before reflections can be stored on lilbird.life, and before the model note can replace the on-page fallback:
+What is already in place:
 
-1. Approve and run `nest/journey-reflections.sql` in the Supabase SQL editor.
-2. Deploy the Nest worker from its source folder, including `journey-reflect.js` beside `worker-solo.js`. It uses the existing model key. No new secret.
-3. Publish this branch only when you ask.
+1. The table `public.journey_reflections` exists. A signed-in member can select, insert, and delete their own rows. There is no update policy.
+2. The live worker answers `POST /journey/reflect` for a logged-in member and uses the existing model key. No new secret.
 
-Until the table exists, Save reports that nothing was stored. Until the worker is deployed, Reflect keeps the on-page note. The exercise can be finished either way.
+Publishing this branch is the remaining step before members see the new tab.
 
 The Pages repository is the Nest, Solo, and Inner Compass front end. The Cloudflare Workers that authenticate API calls and store the Inner Compass live outside this repository, in the iCloud project copies of `solo/worker-solo.js` (Solo worker) and `Deep-profile Cursor Project/lilbird-assessment.js` (assessment worker). Findings below name which tree they come from.
 
@@ -117,7 +116,7 @@ No service-role key, model key, or Stripe secret was found in the Pages tree. No
 
 ## 3. Recommended database schema
 
-Do not run this until it is approved. Proposed table `public.journey_reflections`:
+Applied on 26 Oct 2026 from `nest/journey-reflections.sql`. The sketch below is the review proposal. The live columns are `tool_id` and `tool_version`, recorded in that file.
 
 ```sql
 create table public.journey_reflections (
@@ -160,16 +159,16 @@ Rules this shape is meant to keep:
 - `insight` is null when they saved without AI, or when AI failed and they saved the exercise anyway.
 - `next_step` is the one line My Journey lists under Your Next Steps. It is copied from the answers at save time so the list does not have to parse `answers`.
 
-Indexes to add in the same approved migration: `(user_id, created_at desc)` and `(user_id, tool_slug, created_at desc)`.
+Applied indexes: `(user_id, created_at desc)` and `(user_id, tool_id, created_at desc)`.
 
-`answers` for Boundary Untangler:
+`answers` for Boundary Untangler, one field for each of the five stages:
 
 ```json
 {
-  "who": "A teammate",
-  "boundary": "I need evenings off the work chat.",
-  "hardBecause": "I worry the project will stall if I am not available.",
-  "response": "I can answer in the morning and still care about the work.",
+  "situation": "A teammate, and the evening chat that keeps going.",
+  "difficulty": "I worry the project will stall if I am not available.",
+  "need": "Evenings that are actually off.",
+  "boundary": "I can answer in the morning and still care about the work.",
   "nextStep": "Turn off chat notifications after 7pm this week."
 }
 ```
@@ -187,7 +186,7 @@ Stay inside the Nest. Add files rather than folding a long exercise into `nest-c
 | Preview card | new `renderJourneyPreview()` called from `hydrateDashboard()` | Latest next step, count of saved reflections, button to the tab. Empty state: one line and “Try a tool”. |
 | Journey screen | new `nest/journey.js` | Three blocks: Your Next Steps, Your Reflections, Your Life Canvas. |
 | Exercise runner | `nest/journey.js` | Opens a tool by slug, holds answers in memory, Save and Delete. |
-| First tool | `nest/tools/boundary-untangler.js` | The four prompts below. Registered in a `TANGLE_TOOLS` list so later tools are another file, not a new tab. |
+| Exercise | `nest/journey.js` | Boundary Untangler, five stages, held in memory until Save. |
 | Styles | `nest/nest-styles.css` | Reuse `.sidebar-card`, `.btn-gold`, `.btn-outline`, `.dash-tab`. |
 
 My Journey contents:
@@ -198,12 +197,13 @@ My Journey contents:
 
 Tools for the Tangle, milestone 1, is one card on My Journey: Boundary Untangler, about five to ten minutes.
 
-Prompts:
+Stages, in `nest/journey.js`:
 
-1. Who is this with, and what is the boundary you need?
-2. What makes saying it hard?
-3. What could you say that is clear and still kind?
-4. What is one realistic next step in the next week?
+1. Situation. What is going on? Who is this with, and what keeps happening? (`situation`)
+2. Difficulty. What makes it hard? What gets in the way of saying what you need? (`difficulty`)
+3. Underlying need. What do you need underneath? Under the friction, what are you actually needing? (`need`)
+4. Possible boundary. What boundary could you hold? Say it in a way that is clear and still kind. (`boundary`)
+5. Next step. What is one realistic step? One thing you could do in the next week. (`nextStep`)
 
 Buttons: “Reflect with lil’ bird” (optional), “Save to My Journey”, “Close without saving”. Save stays available when the reflection call fails. The insight, if it returns, is shown on the exercise and stored only if they then save.
 
@@ -218,7 +218,7 @@ Add one route on the Solo worker, which already has `getAuthUser()` and is the N
 `POST /journey/reflect`
 
 - Require `getAuthUser()`. 401 when the token is missing. Any logged-in Nest member may call it. Solo access is not required.
-- Body: `{ "toolSlug": "boundary-untangler", "answers": { } }`. Reject an unknown slug and an oversized body.
+- Body: `{ "toolId": "boundary-untangler", "toolVersion": 1, "answers": { "situation", "difficulty", "need", "boundary", "nextStep" } }`. Reject an unknown tool or version, and an oversized body. Each stage needs at least two characters.
 - Call the model with a short system prompt: two or three sentences, one detail from their words, no advice list, no clinical claims. `max_tokens` around 400, same family as `handleToolReturn()`.
 - On model failure, return `200` with `{ "insight": null, "degraded": true }`. The page tells them the exercise is still theirs to save.
 - Do not write `journey_reflections`. The browser inserts the row through Supabase after an explicit Save, with the member JWT, so RLS applies.
@@ -239,7 +239,7 @@ After the decisions in section 7 are answered:
 5. Add `POST /journey/reflect` behind the optional button. Ship the exercise so it still saves when that call fails.
 6. Check the flow while logged in: products, Life Canvas, Inner Compass, and Ask still behave as they do now. Check a logged-out visit stays on the auth screen. Check mobile width for the new tab.
 
-Do not deploy the worker or the site as part of milestone 1 until that check is accepted. Do not merge to `main`.
+The SQL and the worker are done. The site is still unpublished. Do not merge to `main` until this branch has been reviewed.
 
 Out of milestone 1: the other Tangle tools, the 26 letters, Nest Plus gating, and any change to Solo `tool_outputs`.
 
@@ -257,4 +257,4 @@ Out of milestone 1: the other Tangle tools, the 26 letters, Nest Plus gating, an
 
 ## 8. Boundary Untangler and the letters
 
-The ten-note sequence already talks about a stuck place, two layers of a read, attachment, and one relationship. Boundary Untangler is the first exercise that can sit beside a later letter without a new personality test. It collects a person, a boundary, the difficulty, a sentence they might say, and one next step. None of that exists on the Inner Compass or in `tool_outputs`.
+The ten-note sequence already talks about a stuck place, two layers of a read, attachment, and one relationship. Boundary Untangler is the first exercise that can sit beside a later letter without a new personality test. It collects five stages: the situation, what makes it hard, the underlying need, a possible boundary, and one next step. None of that exists on the Inner Compass or in `tool_outputs`.
