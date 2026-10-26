@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.49.0/dist/tabler-icons.min.css" />
-  <link rel="stylesheet" href="./nest-styles.css?v=35" />
+  <link rel="stylesheet" href="./nest-styles.css?v=37" />
   <link rel="stylesheet" href="./nest-tour.css?v=3" />
   <link rel="stylesheet" href="/css/lilbird-nest-theme.css?v=20260917m" />
   <!-- Google Tag Manager -->
@@ -132,6 +132,7 @@
           <i class="ti ti-compass"></i> Inner Compass
           <span id="profile-dot" class="profile-dot hidden"></span>
         </button>
+        <button id="tab-journey" class="dash-tab" type="button"><i class="ti ti-map-2"></i> My Journey</button>
         <button id="tab-ask" class="dash-tab" type="button"><i class="ti ti-message-circle"></i> Ask lil' bird</button>
       </section>
 
@@ -145,6 +146,7 @@
           <div id="pane-products" class="tab-pane active"></div>
           <div id="pane-canvas" class="tab-pane"></div>
           <div id="pane-profile" class="tab-pane"></div>
+          <div id="pane-journey" class="tab-pane"></div>
           <div id="pane-ask" class="tab-pane">
             <div class="chat-shell">
               <div class="chat-head">
@@ -166,6 +168,7 @@
         <aside class="side-col">
           <article id="sidebar-live-card" class="sidebar-card premium"></article>
           <article id="sidebar-context-card" class="sidebar-card ember"></article>
+          <article class="sidebar-card" id="sidebar-journey-card"></article>
           <article class="sidebar-card" id="sidebar-relationship-card"></article>
           <article class="sidebar-card hint">
             <p class="sidebar-eyebrow">chat hint</p>
@@ -182,6 +185,7 @@
   <script src="/js/lilbird-theme.js"></script>
   <script src="/js/lilbird-theme-nav.js"></script>
   <script src="./nest-tour.js?v=11"></script>
-  <script src="./nest-client.js?v=47"></script>
+  <script src="./nest-client.js?v=48"></script>
+  <script type="module" src="./journey.js?v=3"></script>
 </body>
 </html>

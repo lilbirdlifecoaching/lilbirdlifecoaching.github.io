@@ -868,3 +868,57 @@ body.nest-page { line-height: 1.5; }
   .lc-hero { grid-template-columns: 1fr; }
   .lc-radar { max-width: 220px; }
 }
+
+.journey-home, .journey-exercise { display: grid; gap: 0.85rem; max-width: 720px; }
+.journey-kicker {
+  font-family: "DM Mono", monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  margin: 0;
+}
+.journey-home h2, .journey-exercise h2, .journey-block h3, .journey-tool-card h3, .journey-reflection h4 {
+  font-family: "Playfair Display", serif;
+  font-weight: 400;
+  margin: 0;
+}
+.journey-lead, .journey-tool-card p, .journey-block p { color: var(--text-muted); margin: 0; }
+.journey-tool-card, .journey-block, .journey-reflection, .journey-summary, .journey-note {
+  background: var(--dark-card);
+  border: 1px solid var(--dark-border);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+}
+.journey-tool-card, .journey-reflection, .journey-summary { display: grid; gap: 0.55rem; }
+.journey-actions { display: flex; flex-wrap: wrap; gap: 0.55rem; }
+.journey-exercise textarea, .journey-home textarea {
+  width: 100%;
+  min-height: 140px;
+  background: var(--dark-mid);
+  border: 1px solid rgba(245,200,66,0.14);
+  border-radius: 10px;
+  color: var(--text-main);
+  padding: 0.75rem;
+  font: inherit;
+  line-height: 1.5;
+}
+.journey-steps { list-style: none; display: grid; gap: 0.7rem; margin: 0.4rem 0 0; padding: 0; }
+.journey-steps li { display: grid; gap: 0.2rem; }
+.journey-steps span, .journey-summary span, .journey-reflection span, .journey-note span, .journey-reflection time {
+  font-family: "DM Mono", monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+}
+.journey-reflection header { display: flex; justify-content: space-between; gap: 0.75rem; align-items: baseline; }
+.journey-card-step { margin: 0; }
+.journey-reflection details { display: grid; gap: 0.45rem; }
+.journey-reflection summary {
+  cursor: pointer;
+  color: var(--gold);
+  width: fit-content;
+}
+.journey-empty, .journey-status { color: var(--text-muted); margin: 0; }
+.journey-back { justify-self: start; }

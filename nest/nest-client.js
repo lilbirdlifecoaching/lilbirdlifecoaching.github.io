@@ -486,6 +486,7 @@
       renderProfile();
       renderLifeCanvas();
       renderSidebar();
+      refreshJourney();
       window.__nestAccess = nestAccessSummary();
       if (window.LilBirdNestTour) {
         window.LilBirdNestTour.bindReplayButton();
@@ -2442,6 +2443,7 @@
     const dashGrid = document.getElementById('dash-grid');
     if (dashGrid) dashGrid.classList.toggle('is-ask-tab', name === 'ask');
     if (name === 'canvas') renderLifeCanvas();
+    if (name === 'journey' && window.LilbirdJourney) window.LilbirdJourney.show();
   }
   window.__nestSetTab = setTab;
 
@@ -2472,20 +2474,35 @@
     document.getElementById('nav-plan')?.classList.add('hidden');
     const rdCard = document.getElementById('sidebar-relationship-card');
     if (rdCard) rdCard.innerHTML = '';
+    if (window.LilbirdJourney) window.LilbirdJourney.reset();
     const btn = document.getElementById('btn-nav-profile');
     if (btn) {
       btn.classList.remove('has-photo');
       btn.innerHTML = '<i class="ti ti-user"></i>';
     }
   }
+  window.__nestJourneyHost = {
+    sb,
+    authHeaders,
+    setTab,
+    workerUrl: SOLO_WORKER_URL,
+    getUser() { return currentUser; },
+  };
+  function refreshJourney() {
+    if (window.LilbirdJourney) void window.LilbirdJourney.refresh();
+  }
+  document.addEventListener('lilbird-journey-ready', refreshJourney);
+
   const tabProducts = document.getElementById('tab-products');
   const tabCanvas = document.getElementById('tab-canvas');
   const tabProfile = document.getElementById('tab-profile');
+  const tabJourney = document.getElementById('tab-journey');
   const tabAsk = document.getElementById('tab-ask');
   const btnOpenAsk = document.getElementById('btn-open-ask');
   if (tabProducts) tabProducts.addEventListener('click', () => setTab('products'));
   if (tabCanvas) tabCanvas.addEventListener('click', () => setTab('canvas'));
   if (tabProfile) tabProfile.addEventListener('click', () => openInnerCompassRead());
+  if (tabJourney) tabJourney.addEventListener('click', () => setTab('journey'));
   if (tabAsk) tabAsk.addEventListener('click', () => setTab('ask'));
   if (btnOpenAsk) btnOpenAsk.addEventListener('click', () => setTab('ask'));
   const paneCanvasEl = document.getElementById('pane-canvas');
