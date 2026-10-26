@@ -586,6 +586,7 @@
   }
 
   function maybeAutoStart() {
+    if (window.__nestSkipTourForTool) return;
     if (running || videoOpen) return;
     var params = new URLSearchParams(window.location.search);
     if (params.get('tour') === '0') return;

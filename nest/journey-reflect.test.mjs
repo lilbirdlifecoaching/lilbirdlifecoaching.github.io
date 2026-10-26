@@ -303,16 +303,66 @@ test('another member cannot read, insert, or delete these reflections', async ()
 
 test('the page drops stale requests and shows the reviewed wording', () => {
   const page = readFileSync(new URL('./journey.js', import.meta.url), 'utf8');
-  assert.match(page, /function startTool\(\) \{\n  session\.invalidate\(\)/);
+  const tools = readFileSync(new URL('./journey-tools.js', import.meta.url), 'utf8');
+  assert.match(page, /function startTool\(toolId\) \{\n  session\.invalidate\(\)/);
   assert.match(page, /function closeExercise\(\) \{\n  session\.invalidate\(\)/);
   assert.match(page, /reset\(\) \{\n    session\.invalidate\(\)/);
   assert.match(page, /if \(!currentMemberId\(\)\) \{\n      session\.invalidate\(\)/);
   assert.match(page, /signal: ticket\.signal/);
   assert.match(page, /catch \(e\) \{\n      failed = true;/);
-  assert.match(page, /Where does this feel tangled\?/);
-  assert.match(page, /A little more clarity\./);
+  assert.match(tools, /Where does this feel tangled\?/);
+  assert.match(tools, /A little more clarity\./);
   assert.match(page, /Visit My Life Canvas/);
   assert.match(page, /<details><summary>Revisit<\/summary>/);
   assert.match(page, /Close without saving/);
   assert.match(page, /Save to My Journey/);
+  assert.match(page, /Find a little clarity/);
+  assert.match(page, /What’s on your mind\?/);
+  assert.match(page, /Your next steps/);
+  assert.equal(page.includes('localStorage'), false);
+  assert.equal(page.includes('sessionStorage'), false);
+  assert.equal((page.match(/fetch\(/g) || []).length, 1);
+});
+
+test('other tools can be reflected without writing, and an unknown tool is still refused', async () => {
+  const courage = (await import('./journey-tools.js')).toolById('courage-compass');
+  const answers = {};
+  courage.stages.forEach((stage) => {
+    answers[stage.key] = stage.optional ? '' : 'A real note for ' + stage.label;
+  });
+  answers.nextStep = 'Send the email on Thursday morning.';
+  const prepared = prepareJourneyReflect({
+    toolId: courage.id,
+    toolVersion: 1,
+    answers,
+    userId: 'someone-else',
+  });
+  assert.equal(prepared.error, undefined);
+  assert.equal(prepared.userId, undefined);
+  assert.equal(prepared.answers.need, '');
+  const writes = [];
+  const response = await handleJourneyReflect({
+    request: new Request('https://worker.test/journey/reflect'),
+    body: { toolId: courage.id, toolVersion: 1, answers, userId: 'forged' },
+    env: {},
+    origin: 'http://localhost:8765',
+    respond(body, status) {
+      return { status, body };
+    },
+    respondError(message, status) {
+      return { status, error: message };
+    },
+    getAuthUser: async () => ({ id: 'member-1' }),
+    write: (row) => writes.push(row),
+  });
+  assert.equal(response.status, 200);
+  assert.equal(response.body.degraded, true);
+  assert.match(response.body.insight, /Thursday morning/);
+  assert.equal(writes.length, 0);
+  const row = buildInsertRow('member-1', answers, response.body.insight, courage);
+  assert.equal(row.tool_id, 'courage-compass');
+  assert.equal(row.tool_version, 1);
+  assert.equal(row.answers.need, '');
+  assert.equal(prepareJourneyReflect({ toolId: 'not-a-tool', toolVersion: 1, answers }).status, 400);
+  assert.equal(prepareJourneyReflect({ toolId: courage.id, toolVersion: 2, answers }).status, 400);
 });
