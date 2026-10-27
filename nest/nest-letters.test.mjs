@@ -82,6 +82,8 @@ test('all 26 letters use live tool deep links', () => {
     assert.deepEqual(auditEmail(message, { expectTool: true }), []);
     assert.match(message.html, new RegExp(`/nest/\\?tool=${letter.toolId}`));
     assert.match(message.text, /Hello Sam,/);
+    assert.doesNotMatch(message.html, /Note \d+ of \d+/);
+    assert.doesNotMatch(message.text, /Note \d+ of \d+/);
     assert.equal(message.from, "lil' bird <hello@lilbird.life>");
     assert.equal(message.headers['List-Unsubscribe-Post'], 'List-Unsubscribe=One-Click');
   }
@@ -91,7 +93,12 @@ test('all 26 letters use live tool deep links', () => {
   for (const note of CHECKINS) {
     const message = renderNote(note, { unsubUrl: 'https://lilbird.life/unsub', mailingAddress: 'PO Box 1' });
     assert.deepEqual(auditEmail(message, { expectCanvas: true }), []);
+    assert.doesNotMatch(message.html, /Note \d+ of \d+/);
+    assert.doesNotMatch(message.text, /Note \d+ of \d+/);
   }
+  const welcome = renderNote(WELCOME, { unsubUrl: 'https://lilbird.life/unsub', mailingAddress: 'PO Box 1' });
+  assert.doesNotMatch(welcome.html, /Note \d+ of \d+/);
+  assert.doesNotMatch(welcome.text, /Note \d+ of \d+/);
 });
 
 test('name and Inner Compass personalization fall back without blocking', () => {
@@ -356,6 +363,15 @@ test('the invitation honors a finished welcome series and a prior unsubscribe', 
   assert.match(prefs, /Product coaching emails/);
   assert.match(prefs, /lilbird\.beehiiv\.com/);
   assert.match(prefs, /does not add or remove you/);
+  assert.match(prefs, /data-letters-done/);
+  assert.doesNotMatch(prefs, /Preferences saved/);
+  const confirmed = preferenceCard(
+    { verified: true, status: 'active', nestCoaching: true, productCoaching: false, needsReaffirm: false, userId: 'a' },
+    { open: true, notice: 'Preferences saved' },
+  );
+  assert.match(confirmed, /Preferences saved/);
+  assert.match(confirmed, /letters-dialog is-open/);
+  assert.match(confirmed, /data-pref="product"(?! checked)/);
 });
 
 test('the durable store refuses a second lock, and auth keeps the confirmed email', async () => {

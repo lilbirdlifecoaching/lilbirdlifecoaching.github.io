@@ -84,7 +84,33 @@ body.nest-page { line-height: 1.5; }
 .letters-choice { display: flex; gap: 0.7rem; align-items: flex-start; margin: 0.75rem 0; line-height: 1.5; }
 .letters-choice strong { color: var(--text-main); font-weight: 500; }
 .letters-quiet { font-size: 0.86rem; }
-.letters-status { min-height: 1.2rem; color: var(--gold); }
+.letters-status { min-height: 1.2rem; color: var(--gold); margin: 0.4rem 0 0.8rem; }
+.letters-dialog {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(10, 10, 12, 0.62);
+  padding: 0;
+}
+.letters-dialog.is-open { display: flex; }
+.letters-dialog-panel {
+  width: 100%;
+  max-height: min(92vh, 40rem);
+  overflow: auto;
+  background: var(--dark-mid);
+  border: 1px solid rgba(245, 200, 66, 0.2);
+  border-radius: 18px 18px 0 0;
+  padding: 1.25rem 1.1rem calc(1.2rem + env(safe-area-inset-bottom));
+}
+.letters-dialog-panel h2 { font-family: var(--font-display); font-weight: 400; font-style: italic; font-size: 1.6rem; margin: 0 0 0.8rem; }
+.letters-done { width: 100%; min-height: 48px; margin-top: 0.4rem; }
+@media (min-width: 720px) {
+  .letters-dialog { align-items: center; padding: 1.5rem; }
+  .letters-dialog-panel { max-width: 32rem; border-radius: 18px; }
+}
 .auth-form input {
   background: var(--dark-mid);
   border: 1px solid rgba(245,200,66,0.15);
@@ -880,6 +906,8 @@ body.nest-page { line-height: 1.5; }
 }
 
 .journey-home, .journey-exercise { display: grid; gap: 0.85rem; max-width: 720px; }
+.journey-saved { border-color: rgba(245, 200, 66, 0.35); }
+.journey-saved h3 { color: var(--gold); }
 .journey-kicker {
   font-family: "DM Mono", monospace;
   font-size: 0.66rem;
