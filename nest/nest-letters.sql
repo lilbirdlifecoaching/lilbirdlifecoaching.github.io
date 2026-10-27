@@ -1,4 +1,5 @@
--- Nest coaching letters. Do not apply until the letters release is approved.
+-- Nest coaching letters.
+-- Applied in production on 26 Oct 2026. Do not run this file again.
 -- Cloudflare KV cannot lock two cron runs safely. This table is the delivery record.
 -- Service role only. Members change preferences through the assessment worker.
 

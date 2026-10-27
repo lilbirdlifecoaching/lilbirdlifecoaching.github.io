@@ -24,7 +24,7 @@ Three tracks:
 - Track B, product support. The existing First Flight, coaching, Solo, Intensive, quiz, Glow Map, and checkout flows stay where they are.
 - Track C, the Beehiiv newsletter. No new subscribe or unsubscribe call.
 
-Track A is stored per Nest account in Postgres, proposed in `nest/nest-letters.sql`. Do not apply that file until a release is approved. KV cannot lock two cron runs: both can read the same key before either write lands. The SQL adds a conditional lock and a unique delivery id. Two runs cannot both insert that id. The sequence step moves only after the send is recorded as sent.
+Track A is stored per Nest account in Postgres. `nest/nest-letters.sql` was applied in production on 26 Oct 2026. Do not run that file again. KV cannot lock two cron runs: both can read the same key before either write lands. The SQL adds a conditional lock and a unique delivery id. Two runs cannot both insert that id. The sequence step moves only after the send is recorded as sent.
 
 If Resend accepts the message and the Worker stops before that record is saved, the step stays where it was. The next attempt uses the same delivery id as the `Idempotency-Key` on `POST https://api.resend.com/emails`. That header is documented for this endpoint. Keys expire after 24 hours and may be at most 256 characters. These letters are not sent through `/emails/batch`, because a batch uses one key for the whole request.
 
@@ -143,7 +143,7 @@ Do not run either update while this release is still unapproved, and do not run 
 
 ## Safe release, when you ask for it
 
-1. Apply `nest/nest-letters.sql` in the Supabase project. Do not run it before then.
+1. `nest/nest-letters.sql` is already applied. Do not run it again.
 2. Copy `nest-letters-copy.js`, `nest-letters.js`, `nest-letters-delivery.js`, and `nest-letters-worker.js` beside `lilbird-assessment.js`.
 3. In that worker only, route `/nest-letters/preference` and `/nest-letters/unsubscribe` through `routeNestLetters`, with `getUser: letterUserFromRequest` and `flags: letterFlags`. Use `createSupabaseLetterStore` as the store.
 4. Call `runNestLetterCron` from the existing daily cron. Leave `NEST_LETTERS_ENABLED` unset. The cron will skip.
