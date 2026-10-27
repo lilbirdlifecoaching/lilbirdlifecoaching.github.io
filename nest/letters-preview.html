@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Nest letter preview</title>
+  <style>
+    body { margin: 0; background: #111; color: #eee; font-family: Georgia, serif; }
+    header { padding: 16px; display: flex; gap: 12px; align-items: center; }
+    button { font: inherit; padding: 8px 12px; }
+    .frame { width: min(720px, 100%); margin: 0 auto 28px; background: #fff; }
+    .frame.mobile { width: 390px; }
+    iframe { width: 100%; height: 760px; border: 0; background: #1a1c23; }
+    h2 { font-weight: 400; font-size: 16px; margin: 0 0 8px; padding: 0 12px; }
+  </style>
+</head>
+<body>
+  <header>
+    <strong>Nest letters</strong>
+    <button type="button" id="width">Mobile width</button>
+  </header>
+  <main id="list"></main>
+  <script type="module">
+    import { renderPreviewSet } from './nest-letters.js';
+    const profile = { likelyCoreArchetypePlain: 'Steady Gardener' };
+    const only = new URLSearchParams(location.search).get('one') || '';
+    const items = renderPreviewSet(profile).filter((item) => !only || item.id === only);
+    const list = document.getElementById('list');
+    for (const item of items) {
+      const block = document.createElement('section');
+      block.className = 'frame';
+      const title = document.createElement('h2');
+      title.textContent = item.title;
+      const frame = document.createElement('iframe');
+      frame.title = item.title;
+      frame.srcdoc = item.message.html;
+      block.append(title, frame);
+      list.append(block);
+    }
+    document.getElementById('width').addEventListener('click', () => {
+      document.querySelectorAll('.frame').forEach((node) => node.classList.toggle('mobile'));
+    });
+  </script>
+</body>
+</html>

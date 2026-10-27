@@ -234,6 +234,13 @@
           : (error.message || 'Could not create the Nest. Try again.');
         return;
       }
+      const acceptLetters = document.getElementById('signup-letters')?.checked !== false;
+      const signedUp = data?.session?.user || data?.user || null;
+      if (signedUp) {
+        document.dispatchEvent(new CustomEvent('lilbird-letters-signup', {
+          detail: { user: signedUp, accept: acceptLetters }
+        }));
+      }
       if (data?.session?.user) {
         signupInFlight = false;
         await showDashboard(data.session.user);
@@ -498,6 +505,7 @@
         }
       }
       void handlePurchaseReturn();
+      document.dispatchEvent(new CustomEvent('lilbird-nest-ready', { detail: { user: currentUser } }));
     } catch (err) {
       console.error('Nest hydrateDashboard:', err);
       if (token === dashboardHydrateToken) {
@@ -2470,6 +2478,9 @@
     const live = document.getElementById('sidebar-live-card');
     if (live) live.innerHTML = '';
     document.getElementById('next-steps-list').innerHTML = '';
+    const lettersHost = document.getElementById('nest-letters');
+    if (lettersHost) lettersHost.innerHTML = '';
+    document.dispatchEvent(new CustomEvent('lilbird-nest-logout'));
     document.getElementById('nav-user-name').textContent = '';
     document.getElementById('nav-plan')?.classList.add('hidden');
     const rdCard = document.getElementById('sidebar-relationship-card');

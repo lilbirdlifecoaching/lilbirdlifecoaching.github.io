@@ -75,6 +75,16 @@ body.nest-page { line-height: 1.5; }
 .auth-tab.active { color: var(--gold); border-color: rgba(245,200,66,0.3); }
 .auth-form { display: grid; gap: 0.6rem; }
 .auth-form label { color: var(--text-main); font-size: 0.9rem; margin-top: 0.3rem; }
+.letters-opt { display: flex; gap: 0.65rem; align-items: flex-start; color: var(--text-muted); font-size: 0.86rem; line-height: 1.5; }
+.letters-opt input { margin-top: 0.2rem; }
+.nest-letters { max-width: 760px; margin: 0 auto 1rem; }
+.nest-letters-card { background: var(--dark-mid); border: 1px solid rgba(245,200,66,0.16); border-radius: 14px; padding: 1.1rem 1.15rem; }
+.nest-letters-card h2 { font-family: var(--font-display); font-weight: 400; font-style: italic; font-size: 1.45rem; margin: 0 0 0.55rem; }
+.nest-letters-card p { color: var(--text-muted); line-height: 1.6; margin: 0 0 0.8rem; }
+.letters-choice { display: flex; gap: 0.7rem; align-items: flex-start; margin: 0.75rem 0; line-height: 1.5; }
+.letters-choice strong { color: var(--text-main); font-weight: 500; }
+.letters-quiet { font-size: 0.86rem; }
+.letters-status { min-height: 1.2rem; color: var(--gold); }
 .auth-form input {
   background: var(--dark-mid);
   border: 1px solid rgba(245,200,66,0.15);

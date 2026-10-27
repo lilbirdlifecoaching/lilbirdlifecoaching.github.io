@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.49.0/dist/tabler-icons.min.css" />
-  <link rel="stylesheet" href="./nest-styles.css?v=39" />
+  <link rel="stylesheet" href="./nest-styles.css?v=40" />
   <link rel="stylesheet" href="./nest-tour.css?v=3" />
   <link rel="stylesheet" href="/css/lilbird-nest-theme.css?v=20260917m" />
   <!-- Google Tag Manager -->
@@ -56,6 +56,10 @@
           <input id="signup-email" type="email" placeholder="you@example.com" autocomplete="email" required />
           <label>Password</label>
           <input id="signup-password" type="password" placeholder="at least 8 characters" autocomplete="new-password" required />
+          <label class="letters-opt" for="signup-letters">
+            <input id="signup-letters" type="checkbox" checked />
+            <span>Send me a short coaching note every two weeks, then a quarterly Life Canvas check-in. Untick this if you would rather not. Your Nest is free either way, and you can change it later.</span>
+          </label>
           <button id="btn-signup" class="btn btn-gold" type="submit">Create my free Nest →</button>
           <p id="signup-error" class="auth-error"></p>
           <button id="btn-show-login" class="btn btn-outline" type="button">Already have one? Log in</button>
@@ -140,6 +144,7 @@
         <p class="banner-title">Next steps</p>
         <ul id="next-steps-list" class="steps-list"></ul>
       </section>
+      <section id="nest-letters" class="nest-letters" aria-live="polite"></section>
 
       <div id="dash-grid" class="dash-grid">
         <section class="main-col">
@@ -185,7 +190,8 @@
   <script src="/js/lilbird-theme.js"></script>
   <script src="/js/lilbird-theme-nav.js"></script>
   <script src="./nest-tour.js?v=12"></script>
-  <script src="./nest-client.js?v=48"></script>
+  <script src="./nest-client.js?v=49"></script>
+  <script type="module" src="./nest-letters-ui.js?v=1"></script>
   <script type="module" src="./journey.js?v=4"></script>
 </body>
 </html>
