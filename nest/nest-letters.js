@@ -97,7 +97,7 @@ function htmlShell({ preheader, kicker, subject, paragraphs, action, unsubUrl, p
 <tr><td align="center" style="padding:0 16px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;">
 <tr><td style="padding:28px 8px 12px;font-family:${FONT_SERIF};font-style:italic;font-size:18px;color:#F5C842;">lil' bird</td></tr>
-<tr><td style="padding:8px 8px 0;font-family:${FONT_SANS};font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:#c9a130;">${esc(kicker)}</td></tr>
+${kicker ? `<tr><td style="padding:8px 8px 0;font-family:${FONT_SANS};font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:#c9a130;">${esc(kicker)}</td></tr>` : ''}
 <tr><td style="padding:10px 8px 22px;">
 ${body}
 <p style="margin:8px 0 0;font-family:${FONT_SERIF};font-style:italic;font-size:18px;line-height:1.5;color:#F5C842;">${esc(SIGNATURE)}</p>
@@ -115,7 +115,7 @@ ${esc(mailingAddress || '')}
 }
 
 function textBody({ kicker, paragraphs, action, unsubUrl, prefsUrl, mailingAddress }) {
-  const lines = [kicker, '', ...paragraphs.flatMap((p) => [p, '']), SIGNATURE];
+  const lines = [...(kicker ? [kicker, ''] : []), ...paragraphs.flatMap((p) => [p, '']), SIGNATURE];
   if (action) lines.push('', `${action.label}: ${action.url}`);
   lines.push('', `Email preferences: ${prefsUrl}`, `Unsubscribe: ${unsubUrl}`, mailingAddress || '');
   return lines.join('\n');
@@ -129,11 +129,7 @@ export function renderNote(note, options = {}) {
     : note.key && String(note.key).startsWith('canvas')
       ? { eyebrow: 'Your Life Canvas', label: 'Open Life Canvas', url: options.canvasUrl || canvasUrl() }
       : { eyebrow: 'Your Nest', label: 'Open your Nest', url: options.nestUrl || `${NEST_ORIGIN}/nest/` };
-  const kicker = note.n
-    ? `Note ${note.n} of ${LETTER_COUNT}`
-    : note.key === 'welcome'
-      ? 'Welcome'
-      : 'Life Canvas';
+  const kicker = note.n ? '' : (note.key === 'welcome' ? 'Welcome' : 'Life Canvas');
   const unsubUrl = options.unsubUrl || `${NEST_ORIGIN}/nest/#email-preferences`;
   const prefsUrl = options.prefsUrl || preferencesUrl();
   const mailingAddress = options.mailingAddress || '';
@@ -173,6 +169,7 @@ export function auditEmail(message, { expectTool = false, expectCanvas = false }
   if (expectCanvas && !html.includes('/nest/?tab=canvas')) problems.push('missing canvas link');
   if (/\b(honest|genuinely|one next move|living picture|join the room)\b/i.test(`${message.subject} ${text}`)) problems.push('banned phrase');
   if (text.includes('—') || html.includes('—')) problems.push('em dash');
+  if (/Note \d+ of \d+/.test(html) || /Note \d+ of \d+/.test(text)) problems.push('sequence number');
   const widths = [...html.matchAll(/width="(\d+)"/g)].map((m) => Number(m[1]));
   if (widths.some((w) => w > 600)) problems.push('oversized fixed width');
   return problems;

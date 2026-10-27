@@ -130,6 +130,12 @@ test('the page keeps recommendation text out of storage and out of the reflectio
   const page = readFileSync(new URL('./journey.js', import.meta.url), 'utf8');
   const styles = readFileSync(new URL('./nest-styles.css', import.meta.url), 'utf8');
   const tour = readFileSync(new URL('./nest-tour.js', import.meta.url), 'utf8');
+  assert.match(page, /id="journey-reflections"/);
+  assert.match(page, /Saved to My Journey\./);
+  assert.match(page, /data-view-saved/);
+  assert.match(page, /Open this reflection/);
+  assert.match(page, /\.eq\('user_id', user\.id\)/);
+  assert.match(page, /Another perspective/);
   assert.match(page, /id="journey-recommend"/);
   assert.match(page, /recommendTools\(state\.recommendText\)/);
   assert.equal(page.includes('localStorage'), false);

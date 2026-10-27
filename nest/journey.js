@@ -30,6 +30,9 @@ const state = {
   draft: {},
   insight: '',
   insightFromModel: false,
+  savedId: '',
+  savedTitle: '',
+  highlightId: '',
   rows: [],
   status: '',
   busy: false,
@@ -182,6 +185,12 @@ function homeHtml() {
       '<h2>Find a little clarity</h2>' +
       '<p class="journey-lead">Whatever feels tangled today, there’s a place to begin.</p>' +
       (state.status ? '<p class="journey-status" role="status">' + escapeHtml(state.status) + '</p>' : '') +
+      '<section class="journey-block journey-saved" id="journey-reflections"><h3>Saved reflections</h3>' +
+        (state.rows.length
+          ? '<p class="journey-lead">' + state.rows.length + (state.rows.length === 1 ? ' saved reflection. Open it to read it again.</p>' : ' saved reflections. Open one to read it again.</p>')
+          : '') +
+        reflections + '</section>' +
+      '<section class="journey-block"><h3>Your next steps</h3><ul class="journey-steps">' + stepItems + '</ul></section>' +
       '<label class="journey-kicker" for="journey-search">Search</label>' +
       '<input id="journey-search" class="journey-search" type="search" maxlength="160" placeholder="What’s on your mind?" value="' + escapeHtml(state.query) + '">' +
       '<div class="journey-filters" role="group" aria-label="Categories">' + filters + '</div>' +
@@ -194,8 +203,6 @@ function homeHtml() {
         '<p class="journey-empty">This stays on this page. It is not saved.</p>' +
         '<div id="journey-recommend-results">' + recommendResultsHtml() + '</div>' +
       '</section>' +
-      '<section class="journey-block"><h3>Your next steps</h3><ul class="journey-steps">' + stepItems + '</ul></section>' +
-      '<section class="journey-block" id="journey-reflections"><h3>Your reflections</h3>' + reflections + '</section>' +
       '<section class="journey-block">' +
         '<h3>Your Life Canvas</h3>' +
         '<p>Life changes, and so do we. Your Life Canvas is a place to notice what\'s shifting and what might need a little attention.</p>' +
@@ -214,7 +221,7 @@ function reflectionHtml(row) {
     '<article class="journey-reflection" id="reflection-' + escapeHtml(row.id) + '">' +
       '<header><h4>' + escapeHtml(view.title) + '</h4><time>' + escapeHtml(formatWhen(row.created_at)) + '</time></header>' +
       stepLine +
-      '<details><summary>Revisit</summary>' + body + note + '</details>' +
+      '<details' + (state.highlightId === row.id ? ' open' : '') + '><summary>Open this reflection</summary>' + body + note + '</details>' +
       '<button type="button" class="btn btn-outline" data-delete-reflection="' + escapeHtml(row.id) + '">Delete</button>' +
     '</article>'
   );
@@ -266,8 +273,9 @@ function completionHtml(tool) {
     .map((stage) => '<p><span>' + escapeHtml(stage.label) + '</span> ' + escapeHtml(clean[stage.key]) + '</p>')
     .join('');
   const note = state.insight
-    ? '<div class="journey-note"><span>' + (state.insightFromModel ? 'Coaching note' : 'A note you can keep') + '</span><p>' + escapeHtml(state.insight) + '</p></div>'
+    ? '<div class="journey-note"><span>' + (state.insightFromModel ? 'Coaching note' : 'A note you can keep') + '</span><p>' + escapeHtml(state.insight) + '</p><p class="journey-empty">Saving keeps this note. Another perspective replaces it.</p></div>'
     : '';
+  const reflectLabel = state.insight ? 'Another perspective' : 'Reflect with lil\' bird';
   return (
     '<div class="journey-exercise">' +
       '<p class="journey-kicker">' + escapeHtml(tool.title) + '</p>' +
@@ -277,9 +285,23 @@ function completionHtml(tool) {
       note +
       (state.status ? '<p class="journey-status" role="status">' + escapeHtml(state.status) + '</p>' : '') +
       '<div class="journey-actions">' +
-        '<button type="button" class="btn btn-outline" data-reflect ' + (state.busy ? 'disabled' : '') + '>Reflect with lil\' bird</button>' +
+        '<button type="button" class="btn btn-outline" data-reflect ' + (state.busy ? 'disabled' : '') + '>' + reflectLabel + '</button>' +
         '<button type="button" class="btn btn-gold" data-save ' + (state.busy ? 'disabled' : '') + '>Save to My Journey</button>' +
         '<button type="button" class="btn btn-outline" data-close-exercise>Close without saving</button>' +
+      '</div>' +
+    '</div>'
+  );
+}
+
+function savedHtml() {
+  return (
+    '<div class="journey-exercise">' +
+      '<p class="journey-kicker">' + escapeHtml(state.savedTitle || 'My Journey') + '</p>' +
+      '<h2>Saved to My Journey.</h2>' +
+      '<p class="journey-lead">It is at the top of My Journey, with your other saved reflections. Only you can open it.</p>' +
+      '<div class="journey-actions">' +
+        '<button type="button" class="btn btn-gold" data-view-saved>View saved reflection</button>' +
+        '<button type="button" class="btn btn-outline" data-close-exercise>Back to the tools</button>' +
       '</div>' +
     '</div>'
   );
@@ -289,7 +311,9 @@ function render() {
   const el = pane();
   if (!el) return;
   const tool = currentTool();
-  if ((state.mode === 'intro' || state.mode === 'exercise' || state.mode === 'done') && tool) {
+  if (state.mode === 'saved') {
+    el.innerHTML = savedHtml();
+  } else if ((state.mode === 'intro' || state.mode === 'exercise' || state.mode === 'done') && tool) {
     if (state.mode === 'intro') el.innerHTML = introHtml(tool);
     else if (state.mode === 'exercise') el.innerHTML = exerciseHtml(tool);
     else el.innerHTML = completionHtml(tool);
@@ -314,6 +338,7 @@ function startTool(toolId) {
   const tool = toolById(toolId);
   state.insight = '';
   state.insightFromModel = false;
+  state.highlightId = '';
   state.busy = false;
   state.stage = 0;
   if (!tool) {
@@ -442,10 +467,12 @@ async function saveReflection() {
   render();
   try {
     let failed = false;
+    let savedId = '';
     try {
       const row = buildInsertRow(memberId, state.draft, state.insight, tool);
       const result = await api.sb.from('journey_reflections').insert(row).select('id');
-      if (result && result.error) failed = true;
+      savedId = result && result.data && result.data[0] && result.data[0].id;
+      if (!result || result.error || !savedId) failed = true;
     } catch (e) {
       failed = true;
     }
@@ -458,19 +485,33 @@ async function saveReflection() {
       return;
     }
     if (session.generation() !== lock.sessionGeneration || currentMemberId() !== lock.memberId) return;
+    state.savedId = savedId;
+    state.savedTitle = tool.title;
+    state.highlightId = savedId;
     state.draft = {};
     state.insight = '';
     state.insightFromModel = false;
     state.toolId = '';
-    state.mode = 'home';
+    state.mode = 'saved';
     state.busy = false;
-    state.status = 'Saved. You can do this exercise again. The earlier one stays.';
+    state.status = '';
     await loadRows();
     if (session.generation() !== lock.sessionGeneration || currentMemberId() !== lock.memberId) return;
     render();
   } finally {
     session.finishSave(lock);
   }
+}
+
+async function viewSaved() {
+  const id = state.savedId || state.highlightId;
+  state.mode = 'home';
+  state.highlightId = id;
+  state.status = '';
+  state.busy = false;
+  await loadRows();
+  render();
+  openReflection(id);
 }
 
 async function deleteReflection(id) {
@@ -552,6 +593,7 @@ function onClick(event) {
   } else if ('openCanvas' in target.dataset) host()?.setTab('canvas');
   else if ('reflect' in target.dataset) void reflect();
   else if ('save' in target.dataset) void saveReflection();
+  else if ('viewSaved' in target.dataset) void viewSaved();
   else if (target.dataset.deleteReflection) void deleteReflection(target.dataset.deleteReflection);
   else if (target.dataset.openReflection) openReflection(target.dataset.openReflection);
 }

@@ -313,7 +313,9 @@ test('the page drops stale requests and shows the reviewed wording', () => {
   assert.match(tools, /Where does this feel tangled\?/);
   assert.match(tools, /A little more clarity\./);
   assert.match(page, /Visit My Life Canvas/);
-  assert.match(page, /<details><summary>Revisit<\/summary>/);
+  assert.match(page, /<summary>Open this reflection<\/summary>/);
+  assert.match(page, /Saved to My Journey\./);
+  assert.match(page, /id="journey-reflections"/);
   assert.match(page, /Close without saving/);
   assert.match(page, /Save to My Journey/);
   assert.match(page, /Find a little clarity/);
