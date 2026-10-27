@@ -215,7 +215,7 @@ export async function runNestLetterCron(env, deps) {
         unsubUrl: await unsubscribeUrl(env, state.userId),
         mailingAddress: env.MAILING_ADDRESS,
       });
-      message.headers['X-Entity-Ref-ID'] = deliveryId;
+      message.headers['Idempotency-Key'] = deliveryId;
       return deps.deliver(message);
     },
   });

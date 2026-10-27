@@ -4,6 +4,11 @@
  * State lives per Nest account, not on a shared calendar.
  * A purchase does not read or write this state.
  * Progress moves only after a send is recorded as sent.
+ * A provider acceptance that is never recorded does not move the sequence.
+ * The same delivery id is the Resend Idempotency-Key, so a retry inside
+ * 24 hours does not create a second email. This is not an exactly-once guarantee:
+ * if that record is still missing after the idempotency window, the letter is held
+ * and is not sent again on its own.
  *
  * Cloudflare KV is not the store. Two cron runs can read the same key
  * before either write lands, so a letter could go out twice or a step
@@ -16,6 +21,8 @@ export const DAY_MS = 24 * 60 * 60 * 1000;
 export const HOUR_MS = 60 * 60 * 1000;
 export const CLAIM_TTL_MS = 15 * 60 * 1000;
 export const LOCK_TTL_MS = 2 * 60 * 1000;
+/** Resend keeps an Idempotency-Key for 24 hours. After that the same key can send again. */
+export const IDEMPOTENCY_WINDOW_MS = 24 * HOUR_MS;
 
 export const DEFAULT_SCHEDULE = {
   introDelayDays: 2,
@@ -234,7 +241,20 @@ export function advanceAfterSend(state, now, schedule = DEFAULT_SCHEDULE) {
 export function scheduleRetry(state, now, schedule = DEFAULT_SCHEDULE) {
   const attempt = (state.attempt || 0) + 1;
   const hours = schedule.retryHours[Math.min(attempt - 1, schedule.retryHours.length - 1)] || 24;
-  return { ...state, attempt, nextAt: now + hours * HOUR_MS, updatedAt: now };
+  return { ...state, attempt, nextAt: now + hours * HOUR_MS, updatedAt: now, step: state.step, welcomeSent: state.welcomeSent };
+}
+
+/** A provider result we cannot confirm. Same letter, no step change, and a retry inside the idempotency window. */
+export function scheduleUncertain(state, now) {
+  const attempt = (state.attempt || 0) + 1;
+  const gaps = [1, 6, 12];
+  const hours = gaps[Math.min(attempt - 1, gaps.length - 1)];
+  const nextAt = now + hours * HOUR_MS;
+  const started = state.deliveryClaimedAt || now;
+  if (attempt > gaps.length || nextAt - started > IDEMPOTENCY_WINDOW_MS) {
+    return { ...state, attempt, nextAt: null, deliveryHold: true, updatedAt: now };
+  }
+  return { ...state, attempt, nextAt, deliveryClaimedAt: started, updatedAt: now };
 }
 
 export function preferenceView(user, record, flags = {}) {
@@ -288,18 +308,31 @@ export function createMemoryStore() {
     async claim(id, now) {
       const row = deliveries.get(id);
       if (row?.status === 'sent') return { alreadySent: true, row };
-      if (row?.status === 'claimed' && now - row.claimedAt < CLAIM_TTL_MS) return { inProgress: true, row };
-      const next = { id, status: 'claimed', claimedAt: now };
+      const started = row?.firstClaimedAt || null;
+      if (started && now - started > IDEMPOTENCY_WINDOW_MS) return { held: true, row };
+      if (row && (row.status === 'claimed' || row.status === 'uncertain') && now - row.claimedAt < CLAIM_TTL_MS) {
+        return { inProgress: true, row };
+      }
+      const next = {
+        id,
+        status: 'claimed',
+        claimedAt: now,
+        firstClaimedAt: started || now,
+      };
       deliveries.set(id, next);
       return { claimed: true, row: next };
     },
     async markSent(id, now) {
-      const row = deliveries.get(id) || { id };
+      const row = deliveries.get(id) || { id, firstClaimedAt: now };
       deliveries.set(id, { ...row, status: 'sent', sentAt: now });
     },
     async markFailed(id, now) {
       const row = deliveries.get(id) || { id };
       deliveries.set(id, { ...row, status: 'failed', failedAt: now });
+    },
+    async markUncertain(id, now) {
+      const row = deliveries.get(id) || { id, firstClaimedAt: now };
+      deliveries.set(id, { ...row, status: 'uncertain', uncertainAt: now, firstClaimedAt: row.firstClaimedAt || now });
     },
     snapshot() {
       return { states: [...states.values()], deliveries: [...deliveries.values()] };
@@ -310,7 +343,7 @@ export function createMemoryStore() {
 export async function runTick({ store, now, schedule = DEFAULT_SCHEDULE, loadContext, send, otherMailDue }) {
   const locked = await store.withLock(async () => {
     const due = await store.dueStates(now);
-    const summary = { sent: 0, deferred: 0, failed: 0, repaired: 0, skipped: 0 };
+    const summary = { sent: 0, deferred: 0, failed: 0, repaired: 0, skipped: 0, uncertain: 0, held: 0, unrecorded: 0 };
     for (const state of due) {
       const ctx = loadContext ? await loadContext(state) : {};
       if (ctx.suppressed) {
@@ -335,21 +368,48 @@ export async function runTick({ store, now, schedule = DEFAULT_SCHEDULE, loadCon
         summary.skipped += 1;
         continue;
       }
+      if (claim.held) {
+        await store.saveState({ ...state, nextAt: null, deliveryHold: true, updatedAt: now });
+        summary.held += 1;
+        continue;
+      }
       if (claim.alreadySent) {
         await store.saveState(advanceAfterSend(state, now, schedule));
         summary.repaired += 1;
         continue;
       }
+      let outcome;
       try {
-        const result = await send({ state, letterKey: plan.letterKey, deliveryId: id, context: ctx });
-        if (!result || result.ok !== true) throw new Error('send failed');
-        await store.markSent(id, now);
-        await store.saveState(advanceAfterSend(state, now, schedule));
-        summary.sent += 1;
+        outcome = await send({ state, letterKey: plan.letterKey, deliveryId: id, context: ctx });
       } catch {
+        outcome = { uncertain: true };
+      }
+      if (outcome?.uncertain) {
+        await store.markUncertain(id, now);
+        await store.saveState(scheduleUncertain({ ...state, deliveryClaimedAt: claim.row?.firstClaimedAt || now }, now));
+        summary.uncertain += 1;
+        continue;
+      }
+      if (!outcome || outcome.ok !== true) {
         await store.markFailed(id, now);
         await store.saveState(scheduleRetry(state, now, schedule));
         summary.failed += 1;
+        continue;
+      }
+      try {
+        await store.markSent(id, now);
+      } catch {
+        await store.markUncertain(id, now);
+        await store.saveState(scheduleUncertain({ ...state, deliveryClaimedAt: claim.row?.firstClaimedAt || now }, now));
+        summary.uncertain += 1;
+        continue;
+      }
+      try {
+        await store.saveState(advanceAfterSend(state, now, schedule));
+        summary.sent += 1;
+      } catch {
+        summary.repaired += 0;
+        summary.unrecorded += 1;
       }
     }
     return summary;
@@ -444,40 +504,59 @@ export function createSupabaseLetterStore(env, fetchImpl = fetch) {
     },
     async claim(id, now) {
       const split = id.indexOf(':');
-      const body = {
-        delivery_id: id,
-        user_id: id.slice(0, split),
-        letter_key: id.slice(split + 1),
-        status: 'claimed',
-        claimed_at: new Date(now).toISOString(),
-      };
-      const res = await send('/nest_letter_deliveries', {
-        method: 'POST',
-        headers: { Prefer: 'return=representation' },
-        body: JSON.stringify(body),
-      });
-      if (res.status === 201 || res.status === 200) return { claimed: true };
-      const existing = await send(`/nest_letter_deliveries?delivery_id=eq.${encodeURIComponent(id)}&select=*`);
-      const row = existing.ok ? (await existing.json())[0] : null;
-      if (row?.status === 'sent') return { alreadySent: true, row };
-      if (row?.status === 'claimed' && now - Date.parse(row.claimed_at) < CLAIM_TTL_MS) return { inProgress: true, row };
+      const existingRes = await send(`/nest_letter_deliveries?delivery_id=eq.${encodeURIComponent(id)}&select=*`);
+      const existing = existingRes.ok ? (await existingRes.json())[0] : null;
+      if (existing?.status === 'sent') return { alreadySent: true, row: existing };
+      const started = existing?.first_claimed_at ? Date.parse(existing.first_claimed_at) : null;
+      if (started && now - started > IDEMPOTENCY_WINDOW_MS) return { held: true, row: existing };
+      if (existing && (existing.status === 'claimed' || existing.status === 'uncertain') && now - Date.parse(existing.claimed_at) < CLAIM_TTL_MS) {
+        return { inProgress: true, row: existing };
+      }
+      if (!existing) {
+        const body = {
+          delivery_id: id,
+          user_id: id.slice(0, split),
+          letter_key: id.slice(split + 1),
+          status: 'claimed',
+          claimed_at: new Date(now).toISOString(),
+          first_claimed_at: new Date(now).toISOString(),
+        };
+        const res = await send('/nest_letter_deliveries', {
+          method: 'POST',
+          headers: { Prefer: 'return=representation' },
+          body: JSON.stringify(body),
+        });
+        if (res.status === 201 || res.status === 200) return { claimed: true, row: { firstClaimedAt: now } };
+        const again = await send(`/nest_letter_deliveries?delivery_id=eq.${encodeURIComponent(id)}&select=*`);
+        const row = again.ok ? (await again.json())[0] : null;
+        if (row?.status === 'sent') return { alreadySent: true, row };
+        return { inProgress: true, row };
+      }
       await send(`/nest_letter_deliveries?delivery_id=eq.${encodeURIComponent(id)}`, {
         method: 'PATCH',
         body: JSON.stringify({ status: 'claimed', claimed_at: new Date(now).toISOString() }),
       });
-      return { claimed: true };
+      return { claimed: true, row: { firstClaimedAt: started || now } };
     },
     async markSent(id, now) {
-      await send(`/nest_letter_deliveries?delivery_id=eq.${encodeURIComponent(id)}`, {
+      const res = await send(`/nest_letter_deliveries?delivery_id=eq.${encodeURIComponent(id)}`, {
         method: 'PATCH',
         body: JSON.stringify({ status: 'sent', sent_at: new Date(now).toISOString() }),
       });
+      if (!res.ok) throw new Error('Could not record the send');
     },
     async markFailed(id) {
       await send(`/nest_letter_deliveries?delivery_id=eq.${encodeURIComponent(id)}`, {
         method: 'PATCH',
         body: JSON.stringify({ status: 'failed' }),
       });
+    },
+    async markUncertain(id, now) {
+      const res = await send(`/nest_letter_deliveries?delivery_id=eq.${encodeURIComponent(id)}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status: 'uncertain', uncertain_at: new Date(now).toISOString() }),
+      });
+      if (!res.ok) throw new Error('Could not record an uncertain send');
     },
   };
 }

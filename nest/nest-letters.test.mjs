@@ -12,8 +12,10 @@ import {
   consumeIntent,
   createMemoryStore,
   createSupabaseLetterStore,
+  deliveryKey,
   emailVerified,
   enroll,
+  IDEMPOTENCY_WINDOW_MS,
   letterStartAt,
   planSend,
   preferenceView,
@@ -390,3 +392,148 @@ test('retry keeps the letter number', () => {
   assert.equal(noteForKey('n26').n, 26);
   assert.equal(noteForKey('q0-0').key, 'canvas-1');
 });
+
+test('signup consent starts unticked and declining still leaves a Nest choice', () => {
+  const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
+  const box = html.slice(html.indexOf('id="signup-letters"'), html.indexOf('id="signup-letters"') + 80);
+  assert.match(box, /type="checkbox"/);
+  assert.doesNotMatch(box, /checked/);
+  assert.doesNotMatch(html, /signup-letters[\s\S]{0,40}required/);
+  assert.match(html, /fortnightly coaching notes/);
+  assert.match(html, /quarterly Life Canvas check-ins/);
+  assert.match(html, /Leaving this unticked still creates your Nest/);
+  const client = readFileSync(new URL('./nest-client.js', import.meta.url), 'utf8');
+  const signupAt = client.indexOf('sb.auth.signUp');
+  const choiceAt = client.indexOf("getElementById('signup-letters')?.checked === true");
+  assert.ok(signupAt > 0 && choiceAt > signupAt);
+  assert.doesNotMatch(client, /if \(!acceptLetters\) return/);
+  const declined = enroll({ user: user(), choice: 'no', now });
+  assert.equal(declined.ok, true);
+  assert.equal(declined.state.status, 'declined');
+  assert.equal(declined.state.nestCoaching, false);
+  assert.equal(declined.state.nextAt, null);
+});
+
+test('provider acceptance followed by a crash does not advance, and the retry reuses the key', async () => {
+  const store = createMemoryStore();
+  const starting = enroll({ user: user(), choice: 'yes', now }).state;
+  starting.welcomeSent = true;
+  starting.phase = 'letters';
+  starting.step = 4;
+  await store.saveState(starting);
+  let crash = true;
+  const keys = [];
+  const original = store.markSent.bind(store);
+  store.markSent = async (id, at) => {
+    if (crash) throw new Error('worker stopped after the provider accepted');
+    return original(id, at);
+  };
+  const send = async ({ deliveryId }) => {
+    keys.push(deliveryId);
+    return { ok: true };
+  };
+  const first = await runTick({ store, now, send });
+  assert.equal(first.uncertain, 1);
+  assert.equal(first.sent, 0);
+  let saved = await store.getState(user().id);
+  assert.equal(saved.step, 4);
+  assert.equal(saved.phase, 'letters');
+  crash = false;
+  const second = await runTick({ store, now: saved.nextAt, send });
+  assert.equal(second.sent, 1);
+  saved = await store.getState(user().id);
+  assert.equal(saved.step, 5);
+  assert.equal(keys.length, 2);
+  assert.equal(keys[0], keys[1]);
+  assert.equal(keys[0], deliveryKey(user().id, 'n05'));
+});
+
+test('a second claim cannot take a letter the first claim still holds', async () => {
+  const memory = createMemoryStore();
+  const id = deliveryKey(user().id, 'welcome');
+  const first = await memory.claim(id, now);
+  const second = await memory.claim(id, now);
+  assert.equal(first.claimed, true);
+  assert.equal(second.inProgress, true);
+
+  let posts = 0;
+  const fetchImpl = async (url, options = {}) => {
+    const method = options.method || 'GET';
+    if (String(url).includes('nest_letter_deliveries') && method === 'GET') {
+      return { ok: true, status: 200, json: async () => [] };
+    }
+    if (method === 'POST') {
+      posts += 1;
+      if (posts > 1) return { ok: false, status: 409, json: async () => ({ code: '23505' }) };
+      return { ok: true, status: 201, json: async () => [{}] };
+    }
+    return { ok: true, status: 200, json: async () => [] };
+  };
+  const remote = createSupabaseLetterStore(
+    { SUPABASE_URL: 'https://example.supabase.co', SUPABASE_SERVICE_KEY: 'service' },
+    fetchImpl,
+  );
+  const won = await remote.claim(id, now);
+  const lost = await remote.claim(id, now);
+  assert.equal(won.claimed, true);
+  assert.equal(lost.inProgress, true);
+  assert.equal(lost.claimed, undefined);
+});
+
+test('an uncertain delivery past the provider window is held instead of sent again', async () => {
+  const store = createMemoryStore();
+  const starting = enroll({ user: user(), choice: 'yes', now }).state;
+  starting.welcomeSent = true;
+  starting.phase = 'letters';
+  starting.step = 2;
+  await store.saveState(starting);
+  const id = deliveryKey(user().id, 'n03');
+  await store.claim(id, now - IDEMPOTENCY_WINDOW_MS - 1000);
+  let calls = 0;
+  const result = await runTick({
+    store,
+    now,
+    send: async () => {
+      calls += 1;
+      return { ok: true };
+    },
+  });
+  assert.equal(result.held, 1);
+  assert.equal(calls, 0);
+  const saved = await store.getState(user().id);
+  assert.equal(saved.step, 2);
+  assert.equal(saved.nextAt, null);
+  assert.equal(saved.deliveryHold, true);
+});
+
+test('the cron asks Resend to dedupe on the delivery id', async () => {
+  const store = createMemoryStore();
+  await store.saveState(enroll({ user: user(), choice: 'yes', now }).state);
+  let header = '';
+  const env = { NEST_LETTERS_ENABLED: 'true', MAILING_ADDRESS: 'PO Box 1', UNSUBSCRIBE_SECRET: 'test-secret' };
+  const result = await runNestLetterCron(env, {
+    store,
+    now: () => now,
+    loadContext: async () => ({ profile: null, suppressed: false }),
+    deliver: async (message) => {
+      header = message.headers['Idempotency-Key'];
+      return { ok: true };
+    },
+  });
+  assert.equal(result.sent, 1);
+  assert.equal(header, deliveryKey(user().id, 'welcome'));
+});
+
+test('the review document contains every note without requiring the source file', () => {
+  const review = readFileSync(new URL('../docs/NEST-LETTER-REVIEW.md', import.meta.url), 'utf8');
+  assert.match(review, /Welcome/);
+  for (const letter of LETTERS) {
+    assert.match(review, new RegExp(letter.subject.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+    assert.match(review, new RegExp(`/nest/\\?tool=${letter.toolId}`));
+  }
+  for (const note of CHECKINS) assert.match(review, new RegExp(note.subject.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  assert.match(review, /\{\{firstName\}\}/);
+  assert.match(review, /\{\{archetype\}\}/);
+  assert.match(review, /tab=canvas/);
+});
+

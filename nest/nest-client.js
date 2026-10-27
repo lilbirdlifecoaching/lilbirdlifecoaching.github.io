@@ -234,7 +234,7 @@
           : (error.message || 'Could not create the Nest. Try again.');
         return;
       }
-      const acceptLetters = document.getElementById('signup-letters')?.checked !== false;
+      const acceptLetters = document.getElementById('signup-letters')?.checked === true;
       const signedUp = data?.session?.user || data?.user || null;
       if (signedUp) {
         document.dispatchEvent(new CustomEvent('lilbird-letters-signup', {

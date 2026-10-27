@@ -24,13 +24,15 @@ Three tracks:
 - Track B, product support. The existing First Flight, coaching, Solo, Intensive, quiz, Glow Map, and checkout flows stay where they are.
 - Track C, the Beehiiv newsletter. No new subscribe or unsubscribe call.
 
-Track A is stored per Nest account in Postgres, proposed in `nest/nest-letters.sql`. Do not apply that file until a release is approved. KV cannot lock two cron runs: both can read the same key before either write lands. The SQL adds a conditional lock and a unique delivery id so a letter cannot be claimed twice, and the step moves only after the send is recorded.
+Track A is stored per Nest account in Postgres, proposed in `nest/nest-letters.sql`. Do not apply that file until a release is approved. KV cannot lock two cron runs: both can read the same key before either write lands. The SQL adds a conditional lock and a unique delivery id. Two runs cannot both insert that id. The sequence step moves only after the send is recorded as sent.
+
+If Resend accepts the message and the Worker stops before that record is saved, the step stays where it was. The next attempt uses the same delivery id as Resend's `Idempotency-Key`. Within 24 hours Resend returns the original acceptance and does not create a second email. The step then moves once. If the success is still unrecorded after that 24-hour window, the letter is held and is not sent again by the cron. This is not exactly-once delivery. It is a single sequence step, with provider deduplication inside the window, and a stop rather than a blind resend after the window.
 
 `runNestLetterCron` returns `{ skipped: 'disabled' }` unless `NEST_LETTERS_ENABLED` is exactly `true`. This branch does not set that variable and does not deploy the worker.
 
 ## Enrollment
 
-Signup explains the notes and includes a checkbox, ticked by default, that is not required to create a Nest. The choice is stored in the browser under the new account id. The server accepts it only from a verified signed-in member, and it refuses a body that tries to name some other email.
+Signup explains the notes and includes an optional checkbox that starts unticked. Leaving it unticked still creates the Nest. The choice is stored in the browser under the new account id. The server accepts it only from a verified signed-in member, and it refuses a body that tries to name some other email.
 
 Existing members see an invitation. Nobody is enrolled by this branch going live. If they finished the day-24 note, or they already unsubscribed, the invitation says so and asks for a fresh yes. Turning the notes back on does not restart a sequence that already has progress.
 
@@ -40,7 +42,7 @@ If another nonessential email is already due the same day, the Nest letter waits
 
 ## Letters and tools
 
-The 26 letters are in `nest/nest-letters-copy.js`. Each one links to a live tool at `https://lilbird.life/nest/?tool=<id>`.
+The full wording for review, including subjects, preview text, tool links, and personalization placeholders, is in `docs/NEST-LETTER-REVIEW.md`.
 
 | Letter | Tool |
 | --- | --- |

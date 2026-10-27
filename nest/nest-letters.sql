@@ -24,7 +24,9 @@ create table if not exists public.nest_letter_deliveries (
   letter_key text not null,
   status text not null,
   claimed_at timestamptz not null default now(),
+  first_claimed_at timestamptz not null default now(),
   sent_at timestamptz,
+  uncertain_at timestamptz,
   unique (user_id, letter_key)
 );
 
