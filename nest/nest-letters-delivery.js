@@ -5,8 +5,10 @@
  * A purchase does not read or write this state.
  * Progress moves only after a send is recorded as sent.
  * A provider acceptance that is never recorded does not move the sequence.
- * The same delivery id is the Resend Idempotency-Key, so a retry inside
- * 24 hours does not create a second email. This is not an exactly-once guarantee:
+ * The same delivery id is the Resend Idempotency-Key on POST /emails, so a retry
+ * inside 24 hours with the same body does not create a second email. A changed
+ * body returns 409 and is recorded as the original send, still without a second
+ * email. This is not an exactly-once guarantee:
  * if that record is still missing after the idempotency window, the letter is held
  * and is not sent again on its own.
  *
@@ -245,6 +247,48 @@ export function scheduleRetry(state, now, schedule = DEFAULT_SCHEDULE) {
 }
 
 /** A provider result we cannot confirm. Same letter, no step change, and a retry inside the idempotency window. */
+export function letterLabel(letterKey) {
+  if (letterKey === 'welcome') return { kind: 'welcome', number: null };
+  const numbered = /^n(\d+)$/.exec(letterKey || '');
+  if (numbered) return { kind: 'letter', number: Number(numbered[1]) };
+  const checkin = /^q(\d+)-(\d+)$/.exec(letterKey || '');
+  if (checkin) return { kind: 'checkin', number: Number(checkin[2]) + 1, cycle: Number(checkin[1]) };
+  return { kind: 'unknown', number: null };
+}
+
+/** What an administrator may see. No letter body, archetype, or Journey answers. */
+export function heldDeliveryView(delivery, state) {
+  const label = letterLabel(delivery?.letterKey || delivery?.letter_key);
+  return {
+    email: state?.email || null,
+    userId: state?.userId || delivery?.userId || null,
+    letterKey: delivery?.letterKey || delivery?.letter_key || null,
+    letterNumber: label.number,
+    kind: label.kind,
+    deliveryId: delivery?.id || delivery?.delivery_id || null,
+    status: delivery?.status || null,
+    attempt: state?.attempt || 0,
+    firstClaimedAt: delivery?.firstClaimedAt || delivery?.first_claimed_at || null,
+    uncertainAt: delivery?.uncertainAt || delivery?.uncertain_at || null,
+  };
+}
+
+/**
+ * A held delivery is never resent by itself.
+ * mark-sent records the letter as delivered and lets the next cron advance once.
+ * retry is refused unless confirmDuplicate is true, because the first attempt may already have arrived.
+ */
+export function resolveHeldDelivery({ decision, confirmDuplicate, now }) {
+  if (decision === 'mark-sent') {
+    return { ok: true, status: 'sent', nextAt: now, resend: false };
+  }
+  if (decision === 'retry') {
+    if (confirmDuplicate !== true) return { ok: false, reason: 'confirmation required', resend: false };
+    return { ok: true, status: 'released', firstClaimedAt: now, nextAt: now, resend: true, duplicatePossible: true };
+  }
+  return { ok: false, reason: 'decision', resend: false };
+}
+
 export function scheduleUncertain(state, now) {
   const attempt = (state.attempt || 0) + 1;
   const gaps = [1, 6, 12];

@@ -18,6 +18,55 @@ import { letterByNumber, preferredFirstName, renderNote } from './nest-letters.j
 
 const ENABLED = 'true';
 
+/** Single-email endpoint. The batch endpoint is a different call and is not used here. */
+export const RESEND_SEND_URL = 'https://api.resend.com/emails';
+
+/**
+ * Resend dedupes POST /emails when the Idempotency-Key and the JSON body both match,
+ * for 24 hours. A repeated key with a different body returns 409 invalid_idempotent_request
+ * and does not send a second email. A key already in flight returns 409 concurrent_idempotent_requests.
+ */
+export function classifyResendSend(status, body) {
+  const name = body?.name || '';
+  if (status >= 200 && status < 300) return { ok: true };
+  if (status === 409 && name === 'invalid_idempotent_request') return { ok: true, idempotentConflict: true };
+  if (status === 409 && name === 'concurrent_idempotent_requests') return { uncertain: true };
+  if (status === 408 || status === 429 || status >= 500) return { uncertain: true };
+  return { ok: false };
+}
+
+export async function deliverNestLetter(env, message, fetchImpl = fetch) {
+  const key = message?.headers?.['Idempotency-Key'] || '';
+  if (!key || key.length > 256) return { ok: false, reason: 'idempotency-key' };
+  const res = await fetchImpl(RESEND_SEND_URL, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${env.RESEND_API_KEY}`,
+      'Content-Type': 'application/json',
+      'Idempotency-Key': key,
+    },
+    body: JSON.stringify({
+      from: message.from,
+      to: message.to,
+      subject: message.subject,
+      html: message.html,
+      text: message.text,
+      reply_to: message.reply_to,
+      headers: {
+        'List-Unsubscribe': message.headers['List-Unsubscribe'],
+        'List-Unsubscribe-Post': message.headers['List-Unsubscribe-Post'],
+      },
+    }),
+  });
+  let body = null;
+  try {
+    body = await res.json();
+  } catch {
+    body = null;
+  }
+  return classifyResendSend(res.status, body);
+}
+
 function json(body, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -216,7 +265,8 @@ export async function runNestLetterCron(env, deps) {
         mailingAddress: env.MAILING_ADDRESS,
       });
       message.headers['Idempotency-Key'] = deliveryId;
-      return deps.deliver(message);
+      if (deps.deliver) return deps.deliver(message);
+      return deliverNestLetter(env, message, deps.fetch);
     },
   });
 }

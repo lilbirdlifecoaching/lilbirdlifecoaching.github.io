@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { TOOLS } from './journey-tools.js';
-import { CHECKINS, LETTERS } from './nest-letters-copy.js';
+import { CHECKINS, LETTERS, WELCOME } from './nest-letters-copy.js';
 import {
   DAY_MS,
   DEFAULT_SCHEDULE,
@@ -15,6 +15,8 @@ import {
   deliveryKey,
   emailVerified,
   enroll,
+  heldDeliveryView,
+  resolveHeldDelivery,
   IDEMPOTENCY_WINDOW_MS,
   letterStartAt,
   planSend,
@@ -35,7 +37,17 @@ import {
   toolUrl,
 } from './nest-letters.js';
 import { preferenceCard } from './nest-letters-ui.js';
-import { letterFlags, letterUserFromRequest, noteForKey, routeNestLetters, runNestLetterCron, signNestToken } from './nest-letters-worker.js';
+import {
+  RESEND_SEND_URL,
+  classifyResendSend,
+  deliverNestLetter,
+  letterFlags,
+  letterUserFromRequest,
+  noteForKey,
+  routeNestLetters,
+  runNestLetterCron,
+  signNestToken,
+} from './nest-letters-worker.js';
 
 const catalog = new Set(TOOLS.map((tool) => tool.id));
 const day = 24 * 60 * 60 * 1000;
@@ -527,13 +539,128 @@ test('the cron asks Resend to dedupe on the delivery id', async () => {
 test('the review document contains every note without requiring the source file', () => {
   const review = readFileSync(new URL('../docs/NEST-LETTER-REVIEW.md', import.meta.url), 'utf8');
   assert.match(review, /Welcome/);
-  for (const letter of LETTERS) {
-    assert.match(review, new RegExp(letter.subject.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
-    assert.match(review, new RegExp(`/nest/\\?tool=${letter.toolId}`));
+  const notes = [WELCOME, ...LETTERS, ...CHECKINS];
+  for (const note of notes) {
+    assert.ok(review.includes(note.subject), note.subject);
+    assert.ok(review.includes(note.preheader), note.preheader);
+    for (const paragraph of note.paragraphs) assert.ok(review.includes(paragraph), paragraph.slice(0, 48));
+    if (note.toolId) assert.ok(review.includes(`/nest/?tool=${note.toolId}`));
+    if (typeof note.compass === 'function') assert.ok(review.includes(note.compass('{{archetype}}')));
   }
-  for (const note of CHECKINS) assert.match(review, new RegExp(note.subject.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   assert.match(review, /\{\{firstName\}\}/);
-  assert.match(review, /\{\{archetype\}\}/);
   assert.match(review, /tab=canvas/);
+  assert.equal(LETTERS.filter((letter) => letter.compass).length, 6);
+});
+
+test('an archetype line stays optional and does not diagnose', () => {
+  for (const letter of LETTERS.filter((item) => item.compass)) {
+    assert.equal(compassLine(letter, null), '');
+    const line = letter.compass('Quiet Builder');
+    assert.equal(line.includes('you are a'), false);
+    assert.ok(line.length < 320);
+    const message = renderNote(letter, { firstName: '', profile: null, to: 'a@example.com', mailingAddress: 'PO Box 1' });
+    assert.equal(message.text.includes('Quiet Builder'), false);
+    assert.deepEqual(auditEmail(message, { expectTool: true }), []);
+  }
+});
+
+test('Resend dedupes the single-email endpoint, including a changed body', async () => {
+  assert.equal(RESEND_SEND_URL, 'https://api.resend.com/emails');
+  assert.equal(classifyResendSend(409, { name: 'concurrent_idempotent_requests' }).uncertain, true);
+  assert.equal(classifyResendSend(500, {}).uncertain, true);
+  assert.equal(classifyResendSend(422, { name: 'validation_error' }).ok, false);
+  const sent = [];
+  const fetchImpl = async (url, options) => {
+    assert.equal(url, RESEND_SEND_URL);
+    assert.equal(options.method, 'POST');
+    const key = options.headers['Idempotency-Key'];
+    const previous = sent.find((item) => item.key === key);
+    if (previous && previous.body === options.body) return { status: 200, json: async () => ({ id: previous.id }) };
+    if (previous) return { status: 409, json: async () => ({ name: 'invalid_idempotent_request' }) };
+    sent.push({ key, body: options.body, id: 'email_1' });
+    return { status: 200, json: async () => ({ id: 'email_1' }) };
+  };
+  const message = renderNote(WELCOME, { to: 'a@example.com', mailingAddress: 'PO Box 1' });
+  message.headers['Idempotency-Key'] = deliveryKey(user().id, 'welcome');
+  const first = await deliverNestLetter({ RESEND_API_KEY: 'test-key' }, message, fetchImpl);
+  const second = await deliverNestLetter({ RESEND_API_KEY: 'test-key' }, message, fetchImpl);
+  const changed = await deliverNestLetter({ RESEND_API_KEY: 'test-key' }, { ...message, subject: 'A different subject' }, fetchImpl);
+  assert.equal(first.ok, true);
+  assert.equal(second.ok, true);
+  assert.equal(changed.idempotentConflict, true);
+  assert.equal(sent.length, 1);
+  assert.equal(JSON.parse(sent[0].body).subject, WELCOME.subject);
+});
+
+test('a crash after acceptance recovers inside the window without a second email', async () => {
+  const store = createMemoryStore();
+  await store.saveState(enroll({ user: user(), choice: 'yes', now }).state);
+  const sent = [];
+  let record = false;
+  const original = store.markSent.bind(store);
+  store.markSent = async (id, at) => {
+    if (!record) throw new Error('worker stopped');
+    return original(id, at);
+  };
+  const env = { NEST_LETTERS_ENABLED: 'true', MAILING_ADDRESS: 'PO Box 1', UNSUBSCRIBE_SECRET: 'test-secret', RESEND_API_KEY: 'test-key' };
+  const fetchImpl = async (url, options) => {
+    assert.equal(url, 'https://api.resend.com/emails');
+    const key = options.headers['Idempotency-Key'];
+    const previous = sent.find((item) => item.key === key && item.body === options.body);
+    if (previous) return { status: 200, json: async () => ({ id: previous.id }) };
+    sent.push({ key, body: options.body, id: 'email_9' });
+    return { status: 200, json: async () => ({ id: 'email_9' }) };
+  };
+  const first = await runNestLetterCron(env, { store, now: () => now, loadContext: async () => ({ profile: null }), fetch: fetchImpl });
+  assert.equal(first.uncertain, 1);
+  assert.equal((await store.getState(user().id)).welcomeSent, false);
+  record = true;
+  const saved = await store.getState(user().id);
+  const second = await runNestLetterCron(env, { store, now: () => saved.nextAt, loadContext: async () => ({ profile: null }), fetch: fetchImpl });
+  assert.equal(second.sent, 1);
+  assert.equal(sent.length, 1);
+  assert.equal(sent[0].key, deliveryKey(user().id, 'welcome'));
+});
+
+test('a held letter can be marked sent, and a retry needs an explicit duplicate warning', async () => {
+  const store = createMemoryStore();
+  const starting = enroll({ user: user(), choice: 'yes', now }).state;
+  starting.welcomeSent = true;
+  starting.phase = 'letters';
+  starting.step = 3;
+  starting.attempt = 3;
+  await store.saveState(starting);
+  const id = deliveryKey(user().id, 'n04');
+  await store.claim(id, now - IDEMPOTENCY_WINDOW_MS - 1000);
+  let calls = 0;
+  const held = await runTick({ store, now, send: async () => { calls += 1; return { ok: true }; } });
+  assert.equal(held.held, 1);
+  assert.equal(calls, 0);
+  const view = heldDeliveryView(
+    { id, letterKey: 'n04', status: 'uncertain', firstClaimedAt: now - IDEMPOTENCY_WINDOW_MS, uncertainAt: now },
+    await store.getState(user().id),
+  );
+  assert.equal(view.email, user().email);
+  assert.equal(view.letterNumber, 4);
+  assert.equal(view.deliveryId, id);
+  assert.equal(Object.hasOwn(view, 'paragraphs'), false);
+  const refused = resolveHeldDelivery({ decision: 'retry', now });
+  assert.equal(refused.ok, false);
+  assert.equal(refused.resend, false);
+  const marked = resolveHeldDelivery({ decision: 'mark-sent', now });
+  assert.equal(marked.resend, false);
+  await store.markSent(id, now);
+  await store.saveState({ ...(await store.getState(user().id)), nextAt: now });
+  const repaired = await runTick({ store, now, send: async () => { calls += 1; return { ok: true }; } });
+  assert.equal(calls, 0);
+  assert.equal(repaired.repaired, 1);
+  assert.equal((await store.getState(user().id)).step, 4);
+  const retry = resolveHeldDelivery({ decision: 'retry', confirmDuplicate: true, now });
+  assert.equal(retry.duplicatePossible, true);
+  const guide = readFileSync(new URL('../docs/NEST-LETTERS.md', import.meta.url), 'utf8');
+  assert.match(guide, /Idempotency-Key/);
+  assert.match(guide, /https:\/\/api\.resend\.com\/emails/);
+  assert.match(guide, /duplicate is acceptable/);
+  assert.match(guide, /does not show the letter text/);
 });
 

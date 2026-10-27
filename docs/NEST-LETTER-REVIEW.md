@@ -1,6 +1,6 @@
 # Nest coaching emails
 
-For review of the writing. This is the current copy. It is not a rewrite.
+This is the exact wording a member would receive. The greeting name and the Inner Compass line are filled in only when we have them.
 
 Every note is from lil' bird, at hello@lilbird.life. Each one stands on its own. The member does not have to open a link for the note to be useful.
 
@@ -42,13 +42,13 @@ Luke & the lil' bird team
 
 Hello {{firstName}},
 
-Some weeks arrive already spoken for. The calendar looks reasonable on Sunday, and by Wednesday the edges have gone. Meals happen over the sink. The thing you meant to think about gets pushed into a later that never quite shows up.
+Wednesday, late. The good mug is still in the sink from breakfast. You ate standing up, and the thing you meant to think about has become tomorrow's problem. On Sunday the calendar had looked perfectly reasonable.
 
-Full is not the same as meaningful. A day can be packed with things that matter and still leave you strangely untouched, because nothing in it had room to land. The tangle is rarely the list itself. It is the missing margin around the list.
+Full is not the same as meaningful. A day can be packed with things that matter and still leave you strangely untouched, because nothing in it had room to land. What goes missing is the margin around the list.
 
-Try this, small enough for a crowded week. Name three things that took energy in the last few days, and one thing that gave a little back. You do not have to fix the three. Just see them written in a row.
+Here is a small experiment for a crowded week. Before bed one night, name three things that took energy, and one thing that gave a little back. You do not have to fix the three. You are only finding the edge of the day.
 
-If you want a place to set that down, Energy Inventory is in your Nest. The note is complete without it. The noticing is the work.
+Energy Inventory is in your Nest if you want those four names on a page. The note is complete without it.
 
 Luke & the lil' bird team
 
@@ -114,7 +114,7 @@ Luke & the lil' bird team
 
 **Inner Compass, only when a short archetype name is on file:**
 
-Your Inner Compass used the name {{archetype}} for a pattern you already live with. Treat it as a mirror for pace, not a grade. Some patterns move slowly on purpose.
+If the Inner Compass offered the name {{archetype}}, you might hear a pace in it. Treat that as a hint you can set down. It is not a grade.
 
 Hello {{firstName}},
 
@@ -166,13 +166,13 @@ Luke & the lil' bird team
 
 Hello {{firstName}},
 
-Some relationships cost more than they return, and the cost is hard to see because it is paid in small coins. You prepare a mood before you see them. You edit stories. You need a long walk afterwards just to come back to size.
+There is a particular kind of tired that shows up in the car park afterwards. You were perfectly pleasant. You laughed in the right places. And you need the drive home just to come back to your own size.
 
-Draining does not always mean cruel. Sometimes it means the shape no longer fits, and both of you are still performing an older version. Noticing that is not a verdict. It is information about where your energy actually goes.
+Draining does not always mean cruel. Sometimes the shape no longer fits, and both of you are still performing an older version. Noticing that is not a verdict. It is information about where your energy goes.
 
-Think of one relationship, close or casual. After you spend time together, do you feel more like yourself, or less? If the answer is less, what is one true adjustment: a shorter visit, a clearer topic, a little more distance?
+One question is enough. After time with this person, do you feel more like yourself, or less? If the answer is less, what is one true adjustment: a shorter visit, a clearer topic, a little more distance?
 
-Connection Check walks that question without forcing a dramatic ending. The adjustment can be tiny and still be true.
+Connection Check can walk that question with you, without forcing a dramatic ending. The adjustment can be tiny and still be true.
 
 Luke & the lil' bird team
 
@@ -190,13 +190,13 @@ Luke & the lil' bird team
 
 Hello {{firstName}},
 
-People ask what you want, and the answer is a fog. You can list what you should want. You can list what would look good. The want itself stays just out of sentence range. That is more common than the advice columns suggest.
+What if the first clue is not a dream, but a flinch?
 
-Wanting often shows up first as a no. You know the meeting you dread, the plan that makes your shoulders rise, the version of the future that feels like a costume. The yes is hiding behind those nos. You do not have to produce a five-year plan to take the next clue seriously.
+People ask what you want, and the answer is a fog. You can list what you should want, and what would look good. The want itself stays just out of sentence range. That is more common than anyone admits over coffee.
 
-Finish this line, twice: "I think I want less of ___." Then once, even if it is clumsy: "I might want more of ___." Keep the second one small enough to test this month.
+Wanting often shows up first as a no. The meeting you dread. The plan that lifts your shoulders. The future that feels like a costume. You do not need a five-year plan to take the next clue seriously.
 
-Decision Clarity is built for exactly this fog. Use it when you want company with the question. The three lines already moved it.
+Finish this twice: "I think I want less of ___." Then once, even if it is clumsy: "I might want more of ___." Keep the second one small enough to try this month. Decision Clarity is there if you want company with the fog. The three lines have already moved it.
 
 Luke & the lil' bird team
 
@@ -214,7 +214,7 @@ Luke & the lil' bird team
 
 **Inner Compass, only when a short archetype name is on file:**
 
-Your read used the name {{archetype}}. Notice whether that pattern makes a quick yes feel safer than a true one. You do not have to agree with the name for the question to be useful.
+If a read of yours used the name {{archetype}}, hold it lightly. A quick yes can feel safer than a true one. That may have nothing to do with the name.
 
 Hello {{firstName}},
 
@@ -290,13 +290,13 @@ Luke & the lil' bird team
 
 Hello {{firstName}},
 
-Work has a way of expanding to the size of your worry. If you are employed, it might be the inbox after dinner. If you are studying, caring, building something of your own, or between roles, it might be the task that follows you into bed. The shape differs. The takeover feels similar.
+Work can move in like a guest who was only staying the night. First the kitchen table. Then the evening. Then the last thought before sleep. A job, a course, care for someone, a thing you are building: the guest looks different. The takeover feels the same.
 
-The tangle is not that the work matters. It is that everything else starts to live in the cracks. Rest becomes what is left over, and what is left over is rarely enough to be called rest.
+The trouble is not that the work matters. It is that everything else starts to live in the cracks, and rest becomes whatever the guest did not eat.
 
-Name one piece of work that could wait, shrink, or be shared, and one evening this fortnight that you will protect before the work claims it. Put the protection in first. The work will argue. That is how you know the line is real.
+Try this once, as an experiment rather than a new rule for your life. Name one piece of work that could wait, shrink, or be shared. Then put one evening on the calendar before the work can claim it. The work will argue. That is how you know the evening is real.
 
-Workload Reset helps you sort the plate from the panic. You can do the two names above in the margin of this email and stop there.
+Workload Reset can help you sort the plate from the panic. The two names above are enough if you would rather stay in this note.
 
 Luke & the lil' bird team
 
@@ -338,7 +338,7 @@ Luke & the lil' bird team
 
 **Inner Compass, only when a short archetype name is on file:**
 
-The name on your Inner Compass was {{archetype}}. Change can press right on the part of you that keeps things steady. Steadiness is a gift. It does not have to be a lock.
+The Inner Compass once offered {{archetype}}. If you read steadiness in that name, change might press there. It also might not. The name is a guess you can edit.
 
 Hello {{firstName}},
 
@@ -346,7 +346,7 @@ Change asks you to set down a way of being that once kept you safe. No wonder yo
 
 You do not have to leap to take change seriously. Most real changes start as a smaller bravery: a conversation, a visit, a day organized differently, a truth said once out loud. The door gets less mythical every time you touch the handle.
 
-What is one change you have been orbiting? And what is the smallest version of it you could try without burning the life you already have? Small is allowed. Small is how wings get tested.
+What is one change you have been orbiting? And what is the smallest version of it you could try without burning the life you already have? Small is allowed. Small is how you find out whether the ground holds.
 
 Courage Compass is built for that smaller bravery. Open it if you want a companion. Naming the smallest version is already a turn toward the door.
 
@@ -390,13 +390,13 @@ Luke & the lil' bird team
 
 Hello {{firstName}},
 
-You reach the end of the day and disappear into a screen, a scroll, a snack, a nap that is really a hide. Sometimes that is mercy. Sometimes you come back more gone than when you left. Rest returns you to yourself. Escape just pauses the bill.
+The day ends, and your thumb finds the same glowing rectangle, as if it had an appointment. A little later you are three videos deep into a stranger's kitchen, and you could not say what you came looking for.
 
-Neither one needs a lecture. You are allowed to want out. The discovery is noticing which one you actually got. A walk that brings your shoulders down is rest. Ninety minutes you cannot remember is usually escape, and it is asking for a kinder plan, not a scolding.
+That is not a failing. It is a door. Sometimes you needed out, and the scroll was the nearest exit. Rest is the exit that brings you back. Escape pauses the bill and can leave you more gone than when you left.
 
-Tonight, or the next time you feel the pull to vanish, pause for one breath and choose on purpose. If you need to leave the day, leave for twenty minutes with a clear end. If you need rest, pick the thing that brings you back rather than the thing that erases you.
+Tonight, or the next time the pull shows up, try twenty minutes with a clear end. If you need to leave the day, leave on purpose: a walk around the block, one song, a sit on the step. If you need rest, pick the thing that returns you, not the thing that erases you.
 
-Rest or Escape? is the tool for sorting those two. The pause itself is already the practice.
+Rest or Escape? can help you tell those two apart later. The experiment tonight is the whole practice.
 
 Luke & the lil' bird team
 
@@ -438,13 +438,13 @@ Luke & the lil' bird team
 
 Hello {{firstName}},
 
-There is a conversation sitting on the edge of your week. You can feel it when the name lights up your phone. You tell yourself you will do it when you are less tired, more certain, better worded. The date moves, and the knot stays.
+Their name lights up the phone, and your stomach answers before you do. You turn the phone over. You will write when you are less tired, more certain, better worded. The date moves. The knot does not.
 
-Difficult does not have to mean explosive. Most of the ones we avoid are simply true. The cost of waiting is that the other person is living inside a guess, and so are you. A short true sentence beats a perfect speech that never leaves the drafts.
+Most of the conversations we postpone are not explosions waiting to happen. They are one true thing, still sitting in drafts. The other person is living inside a guess. So are you.
 
-Write the first two sentences only. Not the evidence, not the ending. How you will open, and the one thing you need them to understand. If you want, put a day next to it. A day is kinder than "soon."
+Write only the first two sentences. How you will open, and the one thing you need them to understand. Leave the evidence for another day. If you can, put an actual day next to it. A day is kinder than "soon."
 
-Communication Reset will help you hear the sentence before you send it. Writing the opening is the part that unsticks the week.
+Communication Reset will let you hear the opening before anyone else does. Writing it is the part that unsticks the week.
 
 Luke & the lil' bird team
 
@@ -462,13 +462,13 @@ Luke & the lil' bird team
 
 **Inner Compass, only when a short archetype name is on file:**
 
-Your Inner Compass called one pattern {{archetype}}. For a pattern like that, confidence is often quieter than a pep talk. It looks like one true thing done at your own size.
+If {{archetype}} showed up on an Inner Compass, leave it as a name rather than a description of who you are. Confidence can be quiet either way: one true thing, at a size that still feels like you.
 
 Hello {{firstName}},
 
 Confidence rarely returns as a feeling you wait for. It returns as evidence. You do a thing at the edge of your comfort, you survive it, and some quiet part of you updates the file. The feeling walks in later, if it walks in at all.
 
-If you have been small for a while, do not ask yourself to become dazzling. Ask for one repatriation. A opinion you speak. A piece of work you show before it is perfect. A plan you make without polling the room. Size comes back in those errands.
+If you have been small for a while, do not ask yourself to become dazzling. Ask for one repatriation. An opinion you speak. A piece of work you show before it is perfect. A plan you make without polling the room. Size comes back in those errands.
 
 Choose one place this fortnight where you will act half a step before you feel ready. Write down what "half a step" means, so it cannot inflate overnight into a personality transplant.
 
@@ -538,13 +538,13 @@ Luke & the lil' bird team
 
 Hello {{firstName}},
 
-Some choices do not offer a painless door. Staying costs something. Leaving costs something else. The search for the option with no grief can keep you frozen longer than either choice would have.
+If both doors cost you something, which cost would you rather explain to yourself a year from now?
 
-A good decision is not the one that feels clean. It is the one that tells the truth about what you are willing to carry. You can mourn the road you do not take. Mourning is not evidence that you chose wrong. It is evidence that both roads were real.
+Some choices do not offer a painless way through. Staying costs one thing. Leaving costs another. Searching for the option with no grief can keep you in the hallway longer than either room would have.
 
-If a decision is in front of you, write what each option protects, and what each option costs. Then ask which cost you would rather be responsible for a year from now. If no decision is waiting, practice on a small one you have been dithering over.
+A wise decision can still ache. You can mourn the road you do not take. The ache is not proof you chose wrong. It is proof both roads were real.
 
-Decision Clarity holds that table for you. The four lines, two protections and two costs, are enough to see the shape.
+If a decision is in front of you, write what each option protects and what each option costs. Four lines. If nothing large is waiting, practice on a small choice you have been circling. Decision Clarity can hold the table. The four lines are enough to see the shape.
 
 Luke & the lil' bird team
 
@@ -562,13 +562,13 @@ Luke & the lil' bird team
 
 Hello {{firstName}},
 
-A friendship can loosen without a betrayal. Someone moves, has a child, falls into a demanding season, or simply becomes a person whose days no longer rhyme with yours. The grief surprises you, because nothing officially ended.
+Two people used to send each other the odd thing from the day. A song. A ridiculous sign. A "you will not believe this." Then the messages got shorter, then useful, then rare. Nobody slammed a door. The weeks just stopped rhyming.
 
-You do not have to force it back to the old shape to honor what it was. Some friendships become a smaller, truer thing. Some need a conversation. Some have completed their work. All three can be respectful.
+A friendship can loosen without a betrayal. Someone moves, has a child, falls into a demanding season, or simply becomes a person whose days no longer overlap with yours. The grief can still surprise you, because nothing officially ended.
 
-Think of one friendship that has changed. What do you miss, specifically? And what form of contact, if any, would feel alive now rather than like a reenactment? It is all right if the answer is "a little less, with less pretending."
+You do not have to force the old shape in order to honor it. Some friendships become smaller and truer. Some need one real conversation. Some have finished their work. All three can be respectful.
 
-Connection Check can help you tell those apart. Missing them is already a form of respect. You do not have to solve the friendship before dinner.
+Think of one friendship that has changed. What do you miss, specifically? What form of contact, if any, would feel alive now? It is all right if the answer is a little less, with less pretending. Connection Check can help you tell those apart. Missing them is already a kind of respect.
 
 Luke & the lil' bird team
 
@@ -586,7 +586,7 @@ Luke & the lil' bird team
 
 **Inner Compass, only when a short archetype name is on file:**
 
-You have a name on your Inner Compass: {{archetype}}. It describes a pattern, not a box. The useful question is which part still feels like you, and which part you have outgrown.
+You may have seen the name {{archetype}} on an Inner Compass. It points at a pattern, not a box. Which part, if any, still feels like you?
 
 Hello {{firstName}},
 
@@ -640,7 +640,7 @@ Hello {{firstName}},
 
 Beginning again has a bad reputation. It can sound like failure, or like those Mondays that collapse by noon. A truer version is quieter. You keep what you learned, you set down what made you small, and you let the next stretch have its own rhythm.
 
-You do not have to reject the last chapter to open this one. The last chapter got you here, including the parts you would not repeat. Wings are not a denial of the ground you already covered. They are what you do with it.
+You do not have to reject the last chapter to open this one. The last chapter got you here, including the parts you would not repeat. A new stretch can use what you learned without pretending the earlier ground was a mistake.
 
 What wants to begin, in a size you could still be doing in a month? Not a new personality. A rhythm. A bedtime, a walk, a piece of work, a way of speaking to someone you love. Put it on a specific day.
 
@@ -662,11 +662,11 @@ Luke & the lil' bird team
 
 **Inner Compass, only when a short archetype name is on file:**
 
-When your read offered the name {{archetype}}, it was a snapshot, not a sentence. A year on, you get to say which part still fits.
+If a read once offered the name {{archetype}}, that was a snapshot from that day. A year on, you get to say which part still fits, and which part you have outgrown.
 
 Hello {{firstName}},
 
-This is the last of the fortnightly notes. Twenty-six letters is a year of small returns to yourself. You do not have to have transformed. If you noticed a little more, chose a little more honestly, or put one thing down that was never yours, that is growth with its work clothes on.
+This is the last of the fortnightly notes. Twenty-six letters is a year of small returns to yourself. You do not have to have transformed. If you noticed a little more, chose a little more of what was true, or put one thing down that was never yours, that is growth with its work clothes on.
 
 Looking back is not a performance review. It is a chance to see the path your feet actually took, which is often kinder and stranger than the plan. Some things dimmed. Some things sparked. Both belong in the picture.
 

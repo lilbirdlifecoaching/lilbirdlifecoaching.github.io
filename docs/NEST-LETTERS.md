@@ -26,7 +26,11 @@ Three tracks:
 
 Track A is stored per Nest account in Postgres, proposed in `nest/nest-letters.sql`. Do not apply that file until a release is approved. KV cannot lock two cron runs: both can read the same key before either write lands. The SQL adds a conditional lock and a unique delivery id. Two runs cannot both insert that id. The sequence step moves only after the send is recorded as sent.
 
-If Resend accepts the message and the Worker stops before that record is saved, the step stays where it was. The next attempt uses the same delivery id as Resend's `Idempotency-Key`. Within 24 hours Resend returns the original acceptance and does not create a second email. The step then moves once. If the success is still unrecorded after that 24-hour window, the letter is held and is not sent again by the cron. This is not exactly-once delivery. It is a single sequence step, with provider deduplication inside the window, and a stop rather than a blind resend after the window.
+If Resend accepts the message and the Worker stops before that record is saved, the step stays where it was. The next attempt uses the same delivery id as the `Idempotency-Key` on `POST https://api.resend.com/emails`. That header is documented for this endpoint. Keys expire after 24 hours and may be at most 256 characters. These letters are not sent through `/emails/batch`, because a batch uses one key for the whole request.
+
+Resend returns the original acceptance only when the key and the JSON body both match. A repeated key with a different body returns `409 invalid_idempotent_request` and does not create a second email. The worker treats that response as the original send and records it, so the sequence can move on. A key that is already in flight returns `409 concurrent_idempotent_requests`. That stays uncertain, the step does not move, and the same key is used again later. A timeout, `429`, or `5xx` is also uncertain. A definite rejection can be retried with the same key.
+
+If the success is still unrecorded after that 24-hour window, the letter is held and is not sent again by the cron. This is not exactly-once delivery. It is a single sequence step, with provider deduplication inside the window, and a stop rather than a blind resend after the window.
 
 `runNestLetterCron` returns `{ skipped: 'disabled' }` unless `NEST_LETTERS_ENABLED` is exactly `true`. This branch does not set that variable and does not deploy the worker.
 
@@ -80,6 +84,62 @@ The sender is `lil' bird <hello@lilbird.life>`. The signature is Luke & the lil'
 ## Preferences
 
 Inside the Nest, a member can turn Nest coaching notes on or off, and product notes on or off. The newsletter section links to Beehiiv and does not change that subscription. A coaching unsubscribe link stops Nest notes and quarterly check-ins. It does not by itself turn off product notes. The older global unsubscribe still stops both.
+
+## A held delivery
+
+The cron never resends a letter whose first claim is older than 24 hours and whose row is still not `sent`. Find those rows in the Supabase SQL editor. This query shows the member, the letter, the delivery id, and the last attempt. It does not show the letter text, an archetype, or anything from My Journey.
+
+```sql
+select s.email,
+       s.user_id,
+       d.letter_key,
+       d.delivery_id,
+       d.status,
+       s.attempt,
+       d.first_claimed_at,
+       d.uncertain_at,
+       s.step,
+       s.phase
+from public.nest_letter_deliveries d
+join public.nest_letter_state s on s.user_id = d.user_id
+where d.sent_at is null
+  and d.status in ('claimed', 'uncertain', 'failed')
+  and d.first_claimed_at < now() - interval '24 hours'
+order by d.first_claimed_at;
+```
+
+`letter_key` is `welcome`, `n01` through `n26`, or a check-in such as `q0-0`.
+
+To record that the member already received it, mark the row sent and wake the schedule. The next cron sees the sent row and moves the sequence once. It does not send again. Do not also change `step` by hand.
+
+```sql
+update public.nest_letter_deliveries
+set status = 'sent', sent_at = now()
+where delivery_id = 'PASTE THE DELIVERY ID'
+  and sent_at is null;
+
+update public.nest_letter_state
+set next_at = now()
+where user_id = 'PASTE THE USER ID'
+  and next_at is null;
+```
+
+To send it again, first decide that a duplicate is acceptable. The first attempt may already be in the inbox, and Resend will not block a new send once the 24-hour key has expired. Only then reset the claim and wake the schedule. There is no automatic retry for a held row.
+
+```sql
+update public.nest_letter_deliveries
+set status = 'released',
+    first_claimed_at = now(),
+    claimed_at = now()
+where delivery_id = 'PASTE THE DELIVERY ID'
+  and sent_at is null;
+
+update public.nest_letter_state
+set next_at = now()
+where user_id = 'PASTE THE USER ID';
+```
+
+Do not run either update while this release is still unapproved, and do not run them against a real member until a letter has actually been held.
 
 ## Safe release, when you ask for it
 
