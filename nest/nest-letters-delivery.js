@@ -384,12 +384,16 @@ export function createMemoryStore() {
   };
 }
 
-export async function runTick({ store, now, schedule = DEFAULT_SCHEDULE, loadContext, send, otherMailDue }) {
+export async function runTick({ store, now, schedule = DEFAULT_SCHEDULE, loadContext, send, otherMailDue, allowUser }) {
   const locked = await store.withLock(async () => {
     const due = await store.dueStates(now);
     const summary = { sent: 0, deferred: 0, failed: 0, repaired: 0, skipped: 0, uncertain: 0, held: 0, unrecorded: 0 };
     for (const state of due) {
       const ctx = loadContext ? await loadContext(state) : {};
+      if (typeof allowUser === 'function' && !allowUser(state)) {
+        summary.skipped += 1;
+        continue;
+      }
       if (ctx.suppressed) {
         await store.saveState({ ...state, nestCoaching: false, status: 'unsubscribed', nextAt: null, updatedAt: now });
         summary.skipped += 1;

@@ -1,7 +1,8 @@
 /**
  * Assessment-worker adapter for Nest letters.
  * Wire this only into lilbird-assessment. Do not also call it from worker-solo.
- * runNestLetterCron does nothing unless NEST_LETTERS_ENABLED === "true".
+ * runNestLetterCron does nothing unless NEST_LETTERS_ENABLED === "true"
+ * and NEST_LETTERS_ALLOWLIST includes that member's user id.
  * This file does not subscribe anyone to the newsletter.
  */
 
@@ -17,6 +18,16 @@ import {
 import { letterByNumber, preferredFirstName, renderNote } from './nest-letters.js';
 
 const ENABLED = 'true';
+
+/** Comma- or whitespace-separated Nest user ids. An empty list sends to nobody. */
+export function parseLetterAllowlist(value) {
+  return new Set(
+    String(value || '')
+      .split(/[\s,]+/)
+      .map((item) => item.trim().toLowerCase())
+      .filter(Boolean),
+  );
+}
 
 /** Single-email endpoint. The batch endpoint is a different call and is not used here. */
 export const RESEND_SEND_URL = 'https://api.resend.com/emails';
@@ -240,8 +251,11 @@ async function handleUnsubscribe(request, env, deps, url) {
 
 export async function runNestLetterCron(env, deps) {
   if (env.NEST_LETTERS_ENABLED !== ENABLED) return { skipped: 'disabled' };
+  const allow = parseLetterAllowlist(env.NEST_LETTERS_ALLOWLIST);
+  if (!allow.size) return { skipped: 'allowlist' };
   if (!env.MAILING_ADDRESS) return { skipped: 'address' };
   return runTick({
+    allowUser: (state) => allow.has(String(state.userId || '').trim().toLowerCase()),
     store: deps.store,
     now: deps.now(),
     schedule: deps.schedule,

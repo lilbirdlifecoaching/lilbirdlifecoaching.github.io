@@ -32,7 +32,7 @@ Resend returns the original acceptance only when the key and the JSON body both 
 
 If the success is still unrecorded after that 24-hour window, the letter is held and is not sent again by the cron. This is not exactly-once delivery. It is a single sequence step, with provider deduplication inside the window, and a stop rather than a blind resend after the window.
 
-`runNestLetterCron` returns `{ skipped: 'disabled' }` unless `NEST_LETTERS_ENABLED` is exactly `true`. This branch does not set that variable and does not deploy the worker.
+`runNestLetterCron` returns `{ skipped: 'disabled' }` unless `NEST_LETTERS_ENABLED` is exactly `true`. Turning that flag on is not enough. `NEST_LETTERS_ALLOWLIST` must list Nest user ids, comma-separated. An empty allowlist returns `{ skipped: 'allowlist' }` and sends nothing. A member who is not on the list is left unsent, and the sequence does not move.
 
 ## Enrollment
 

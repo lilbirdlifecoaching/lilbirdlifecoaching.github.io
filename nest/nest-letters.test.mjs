@@ -44,6 +44,7 @@ import {
   letterFlags,
   letterUserFromRequest,
   noteForKey,
+  parseLetterAllowlist,
   routeNestLetters,
   runNestLetterCron,
   signNestToken,
@@ -522,7 +523,12 @@ test('the cron asks Resend to dedupe on the delivery id', async () => {
   const store = createMemoryStore();
   await store.saveState(enroll({ user: user(), choice: 'yes', now }).state);
   let header = '';
-  const env = { NEST_LETTERS_ENABLED: 'true', MAILING_ADDRESS: 'PO Box 1', UNSUBSCRIBE_SECRET: 'test-secret' };
+  const env = {
+    NEST_LETTERS_ENABLED: 'true',
+    NEST_LETTERS_ALLOWLIST: user().id,
+    MAILING_ADDRESS: 'PO Box 1',
+    UNSUBSCRIBE_SECRET: 'test-secret',
+  };
   const result = await runNestLetterCron(env, {
     store,
     now: () => now,
@@ -602,7 +608,13 @@ test('a crash after acceptance recovers inside the window without a second email
     if (!record) throw new Error('worker stopped');
     return original(id, at);
   };
-  const env = { NEST_LETTERS_ENABLED: 'true', MAILING_ADDRESS: 'PO Box 1', UNSUBSCRIBE_SECRET: 'test-secret', RESEND_API_KEY: 'test-key' };
+  const env = {
+    NEST_LETTERS_ENABLED: 'true',
+    NEST_LETTERS_ALLOWLIST: user().id,
+    MAILING_ADDRESS: 'PO Box 1',
+    UNSUBSCRIBE_SECRET: 'test-secret',
+    RESEND_API_KEY: 'test-key',
+  };
   const fetchImpl = async (url, options) => {
     assert.equal(url, 'https://api.resend.com/emails');
     const key = options.headers['Idempotency-Key'];
@@ -662,5 +674,28 @@ test('a held letter can be marked sent, and a retry needs an explicit duplicate 
   assert.match(guide, /https:\/\/api\.resend\.com\/emails/);
   assert.match(guide, /duplicate is acceptable/);
   assert.match(guide, /does not show the letter text/);
+});
+
+test('the enable flag cannot send without the test allowlist', async () => {
+  const store = createMemoryStore();
+  await store.saveState(enroll({ user: user(), choice: 'yes', now }).state);
+  let calls = 0;
+  const send = async () => {
+    calls += 1;
+    return { ok: true };
+  };
+  const base = { MAILING_ADDRESS: 'PO Box 1', UNSUBSCRIBE_SECRET: 'test-secret' };
+  const deps = { store, now: () => now, loadContext: async () => ({ profile: null }), deliver: send };
+  const off = await runNestLetterCron({ ...base, NEST_LETTERS_ENABLED: 'false', NEST_LETTERS_ALLOWLIST: user().id }, deps);
+  assert.equal(off.skipped, 'disabled');
+  const open = await runNestLetterCron({ ...base, NEST_LETTERS_ENABLED: 'true' }, deps);
+  assert.equal(open.skipped, 'allowlist');
+  const outsider = await runNestLetterCron({ ...base, NEST_LETTERS_ENABLED: 'true', NEST_LETTERS_ALLOWLIST: '22222222-2222-4222-8222-222222222222' }, deps);
+  assert.equal(outsider.sent || 0, 0);
+  assert.equal((await store.getState(user().id)).welcomeSent, false);
+  const allowed = await runNestLetterCron({ ...base, NEST_LETTERS_ENABLED: 'true', NEST_LETTERS_ALLOWLIST: ` ${user().id.toUpperCase()} ` }, deps);
+  assert.equal(allowed.sent, 1);
+  assert.equal(calls, 1);
+  assert.equal(parseLetterAllowlist('a, b').size, 2);
 });
 
