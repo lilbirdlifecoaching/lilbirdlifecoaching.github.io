@@ -58,6 +58,7 @@
   let intensiveEnrolment = null;
   let lciSessions = [];
   let chatMsgs = [];
+  let guideOffered = [];
   let suppressDashboard = false;
   let dashboardHydrateToken = 0;
 
@@ -505,6 +506,9 @@
         }
       }
       void handlePurchaseReturn();
+      const arrival = new URLSearchParams(window.location.search);
+      if (!arrival.get('tab') && !arrival.get('tool') && hasNestPlus()) setTab('ask');
+      else syncGuideAccess();
       document.dispatchEvent(new CustomEvent('lilbird-nest-ready', { detail: { user: currentUser } }));
     } catch (err) {
       console.error('Nest hydrateDashboard:', err);
@@ -1110,7 +1114,7 @@
             <p class="eyebrow">nest plus</p>
             <h3>The Intensive workbook, on your own time</h3>
             <span class="status-badge">${escapeHtml(src)}</span>
-            <p>Life Canvas puts passion, connections, spaces, resources, and energy on one page. Roots &amp; Wings is the eight-session workbook from the Intensive. You also get the full Inner Compass read and Relationship Dynamic.</p>
+            <p>Life Canvas puts passion, connections, spaces, resources, and energy on one page. lil' bird guide is a conversation in Luke's manner. Roots &amp; Wings is the eight-session workbook from the Intensive. You also get the full Inner Compass read and Relationship Dynamic.</p>
             <div class="btn-row">
               <button type="button" class="btn btn-gold" data-open-canvas>Life Canvas →</button>
               <a class="btn btn-outline" href="${workbookHref('life-change')}">Roots &amp; Wings</a>
@@ -1124,7 +1128,7 @@
           <span class="lock-pill"><i class="ti ti-lock"></i> $7.99/month</span>
           <p class="eyebrow">nest plus</p>
           <h3>The Intensive workbook, on your own time</h3>
-          <p>Life Canvas puts passion, connections, spaces, resources, and energy on one page. Roots &amp; Wings is the eight-session workbook from the Intensive. You also get the full Inner Compass read and Relationship Dynamic. Cancel anytime. Included with coaching or the Intensive.</p>
+          <p>lil' bird guide is a conversation in Luke's manner. Life Canvas, the full Inner Compass read, Relationship Dynamic, and the Roots &amp; Wings workbook are here too. Cancel anytime. Included with coaching or the Intensive.</p>
           <div class="btn-row"><button type="button" class="btn btn-ember" data-upgrade="nest_plus">Add Nest Plus · $7.99/month →</button></div>
         </article>`;
     }
@@ -2451,6 +2455,7 @@
     const dashGrid = document.getElementById('dash-grid');
     if (dashGrid) dashGrid.classList.toggle('is-ask-tab', name === 'ask');
     if (name === 'canvas') renderLifeCanvas();
+    if (name === 'ask') bootGuide();
     if (name === 'journey' && window.LilbirdJourney) window.LilbirdJourney.show();
   }
   window.__nestSetTab = setTab;
@@ -2461,6 +2466,7 @@
     setDashError('');
     setDashLoading(false);
     chatMsgs = [];
+    guideOffered = [];
     const chatWrap = document.getElementById('chat-messages');
     if (chatWrap) chatWrap.innerHTML = '';
     document.getElementById('pane-products').innerHTML = '';
@@ -2514,8 +2520,6 @@
   if (tabCanvas) tabCanvas.addEventListener('click', () => setTab('canvas'));
   if (tabProfile) tabProfile.addEventListener('click', () => openInnerCompassRead());
   if (tabJourney) tabJourney.addEventListener('click', () => setTab('journey'));
-  if (tabAsk) tabAsk.addEventListener('click', () => setTab('ask'));
-  if (btnOpenAsk) btnOpenAsk.addEventListener('click', () => setTab('ask'));
   const paneCanvasEl = document.getElementById('pane-canvas');
   if (paneCanvasEl) {
     paneCanvasEl.addEventListener('click', (e) => {
@@ -2563,22 +2567,50 @@
   }
 
   // chat
-  function renderChatMsg(role, content) {
+  function syncGuideAccess() {
+    const open = hasNestPlus();
+    const stage = document.getElementById('guide-stage');
+    if (stage) stage.classList.toggle('is-locked', !open);
+    const copy = document.getElementById('guide-side-copy');
+    if (copy) {
+      copy.textContent = open
+        ? "A conversation in Luke's manner. One question at a time."
+        : "A conversation in Luke's manner. Part of Nest Plus.";
+    }
+  }
+  function renderChatMsg(role, content, tool) {
     const row = document.createElement('div');
     row.className = `msg ${role === 'user' ? 'user' : 'bot'}`;
-    row.textContent = content;
+    const text = document.createElement('p');
+    text.textContent = content;
+    row.appendChild(text);
+    if (tool && tool.id && tool.title) {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'guide-tool';
+      const title = document.createElement('strong');
+      title.textContent = tool.title;
+      const meta = document.createElement('span');
+      meta.textContent = tool.minutes ? tool.minutes + ' in My Journey' : 'Open in My Journey';
+      card.append(title, meta);
+      card.addEventListener('click', () => {
+        if (window.LilbirdJourney && window.LilbirdJourney.openTool) window.LilbirdJourney.openTool(tool.id);
+      });
+      row.appendChild(card);
+    }
     const wrap = document.getElementById('chat-messages');
     wrap.appendChild(row);
     wrap.scrollTop = wrap.scrollHeight;
   }
-  function bootChat() {
-    if (chatMsgs.length) return;
-    const greet = "Hey, it's lil' bird. Ask me anything about your next step, products, or where to start.";
+  function bootGuide() {
+    syncGuideAccess();
+    if (!hasNestPlus() || chatMsgs.length) return;
+    const greet = "I'm here with you. Tell me what's in front of you, and we'll stay with one thing.";
     chatMsgs.push({ role: 'assistant', content: greet });
     renderChatMsg('assistant', greet);
   }
-  if (tabAsk) tabAsk.addEventListener('click', bootChat);
-  if (btnOpenAsk) btnOpenAsk.addEventListener('click', bootChat);
+  if (tabAsk) tabAsk.addEventListener('click', () => setTab('ask'));
+  if (btnOpenAsk) btnOpenAsk.addEventListener('click', () => setTab('ask'));
   const chatSend = document.getElementById('chat-send');
   const chatInput = document.getElementById('chat-input');
   if (chatSend) chatSend.addEventListener('click', sendChat);
@@ -2590,7 +2622,50 @@
       }
     });
   }
+  const guideUpgrade = document.getElementById('guide-upgrade');
+  if (guideUpgrade) guideUpgrade.addEventListener('click', (e) => void startUpgrade('nest_plus', e.currentTarget));
 
+  async function sendChat() {
+    if (!hasNestPlus()) {
+      syncGuideAccess();
+      return;
+    }
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    chatMsgs.push({ role: 'user', content: text });
+    renderChatMsg('user', text);
+    const portrait = document.getElementById('luke-portrait');
+    if (portrait) portrait.classList.add('is-thinking');
+    try {
+      const response = await fetch(CHAT_WORKER_URL + 'guide', {
+        method: 'POST',
+        headers: Object.assign({ 'Content-Type': 'application/json' }, await authHeaders()),
+        body: JSON.stringify({ messages: chatMsgs.slice(-12), offered: guideOffered.slice() })
+      });
+      let data = null;
+      try { data = await response.json(); } catch (_) { data = null; }
+      if (data && data.error === 'nest_plus_required') {
+        const stage = document.getElementById('guide-stage');
+        if (stage) stage.classList.add('is-locked');
+        return;
+      }
+      const msg = response.ok && !(data && data.error) ? textFromChatPayload(data) : '';
+      if (!msg) {
+        renderChatMsg('assistant', "I couldn't get a reply just now. Try again in a moment.");
+        return;
+      }
+      chatMsgs.push({ role: 'assistant', content: msg });
+      const tool = data && data.tool && data.tool.id ? data.tool : null;
+      if (tool) guideOffered.push(tool.id);
+      renderChatMsg('assistant', msg, tool);
+    } catch (e) {
+      renderChatMsg('assistant', "I couldn't reach the guide just now. Try again in a moment.");
+    } finally {
+      if (portrait) portrait.classList.remove('is-thinking');
+    }
+  }
   function textFromChatPayload(data) {
     if (!data || typeof data !== 'object') return '';
     const blocks = Array.isArray(data.content) ? data.content : [];
@@ -2604,33 +2679,6 @@
     if (typeof data.reply === 'string' && data.reply.trim()) return data.reply.trim();
     if (typeof data.message === 'string' && data.message.trim()) return data.message.trim();
     return '';
-  }
-
-  async function sendChat() {
-    const input = document.getElementById('chat-input');
-    const text = input.value.trim();
-    if (!text) return;
-    input.value = '';
-    chatMsgs.push({ role: 'user', content: text });
-    renderChatMsg('user', text);
-    try {
-      const response = await fetch(CHAT_WORKER_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: chatMsgs.slice(-12) })
-      });
-      let data = null;
-      try { data = await response.json(); } catch (_) { data = null; }
-      const msg = response.ok && !(data && data.error) ? textFromChatPayload(data) : '';
-      if (!msg) {
-        renderChatMsg('assistant', "I couldn't get a reply just now. Try again in a moment.");
-        return;
-      }
-      chatMsgs.push({ role: 'assistant', content: msg });
-      renderChatMsg('assistant', msg);
-    } catch (e) {
-      renderChatMsg('assistant', "I couldn't reach the chat worker just now. Try again in a moment.");
-    }
   }
 
   async function showDashboard(preloadedUser) {

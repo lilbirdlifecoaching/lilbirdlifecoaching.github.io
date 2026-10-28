@@ -661,6 +661,10 @@ window.LilbirdJourney = {
   show() {
     if (state.mode === 'home') render();
   },
+  openTool(toolId) {
+    host()?.setTab('journey');
+    startTool(toolId);
+  },
 };
 
 document.dispatchEvent(new Event('lilbird-journey-ready'));
