@@ -182,6 +182,7 @@ async function showFor(user) {
   if (location.hash === '#email-preferences') dialogOpen = true;
   paint(view);
   if (location.hash === '#email-preferences') {
+    document.getElementById('nest-settings')?.classList.remove('hidden');
     document.getElementById('email-preferences')?.scrollIntoView({ block: 'start' });
   }
 }
