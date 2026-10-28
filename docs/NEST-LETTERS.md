@@ -32,7 +32,9 @@ Resend returns the original acceptance only when the key and the JSON body both 
 
 If the success is still unrecorded after that 24-hour window, the letter is held and is not sent again by the cron. This is not exactly-once delivery. It is a single sequence step, with provider deduplication inside the window, and a stop rather than a blind resend after the window.
 
-`runNestLetterCron` returns `{ skipped: 'disabled' }` unless `NEST_LETTERS_ENABLED` is exactly `true`. Turning that flag on is not enough. `NEST_LETTERS_ALLOWLIST` must list Nest user ids, comma-separated. An empty allowlist returns `{ skipped: 'allowlist' }` and sends nothing. A member who is not on the list is left unsent, and the sequence does not move.
+`runNestLetterCron` sends only when `NEST_LETTERS_ENABLED` is exactly `true` and `NEST_LETTERS_MODE` is exactly `test` or `general`. Setting the flag to `false` stops the next run immediately. An unset mode, or any other value, also sends nobody. `test` sends only to the ids in `NEST_LETTERS_ALLOWLIST`, and an empty list sends nobody. `general` sends to members who already opted in. A non-empty allowlist still limits a general run. An empty allowlist does not, by itself, turn delivery on.
+
+The live worker at `v8.4.0-nest-live` is older than this rule. It treats a missing allowlist as general delivery while the flag is true. Do not deploy this file over that worker until `NEST_LETTERS_MODE` is set to `general` in the same change. Without that secret, the next cron would send nobody.
 
 ## Enrollment
 
@@ -87,26 +89,22 @@ Inside the Nest, a member can turn Nest coaching notes on or off, and product no
 
 ## A held delivery
 
-The cron never resends a letter whose first claim is older than 24 hours and whose row is still not `sent`. Find those rows in the Supabase SQL editor. This query shows the member, the letter, the delivery id, and the last attempt. It does not show the letter text, an archetype, or anything from My Journey.
+The cron never resends a letter whose first claim is older than 24 hours and whose row is still not `sent`. It also never resends a row left `uncertain` or `failed` on its own. Find the rows that need a person in the Supabase SQL editor. This list has the delivery id, the letter, and the status. It does not show the letter text, an email address, a user id, an archetype, or anything from My Journey.
 
 ```sql
-select s.email,
-       s.user_id,
+select d.delivery_id,
        d.letter_key,
-       d.delivery_id,
        d.status,
-       s.attempt,
        d.first_claimed_at,
        d.uncertain_at,
-       s.step,
-       s.phase
+       d.sent_at
 from public.nest_letter_deliveries d
-join public.nest_letter_state s on s.user_id = d.user_id
-where d.sent_at is null
-  and d.status in ('claimed', 'uncertain', 'failed')
-  and d.first_claimed_at < now() - interval '24 hours'
+where d.status in ('claimed', 'uncertain', 'failed')
+  and d.sent_at is null
 order by d.first_claimed_at;
 ```
+
+When you are ready to resolve one delivery, look up that single `delivery_id`. Do not export the whole member list.
 
 `letter_key` is `welcome`, `n01` through `n26`, or a check-in such as `q0-0`.
 
@@ -141,7 +139,23 @@ where user_id = 'PASTE THE USER ID';
 
 Do not run either update while this release is still unapproved, and do not run them against a real member until a letter has actually been held.
 
+## How to review a delivery day
+
+After 15:00 UTC, read the last run from the assessment worker's KV binding. The value is counts only.
+
+```
+wrangler kv key get --binding NEST_PROFILES "nest-letters:last-run"
+```
+
+`completed: true` means that cron finished a pass. `due` is how many letters were due. `accepted` is how many Resend accepted. `failed`, `held`, and `uncertain` are the ones that need a person. `finishedAt` before that day's 15:00 UTC means the cron did not write a new report.
+
+The cron does not resend a held or uncertain letter. For a failed row, the existing retry schedule still applies inside the same delivery id. For a held row, use the update below only after you have decided what happened to that one delivery. Nothing in the report starts another send.
+
+This report is written by the worker on this branch. The live `v8.4.0-nest-live` worker does not write it yet.
+
 ## Safe release, when you ask for it
+
+The steps below are the original rollout. They are already done. The current gate is the mode section above. Do not deploy this branch's worker until `NEST_LETTERS_MODE=general` is set in the same change.
 
 1. `nest/nest-letters.sql` is already applied. Do not run it again.
 2. Copy `nest-letters-copy.js`, `nest-letters.js`, `nest-letters-delivery.js`, and `nest-letters-worker.js` beside `lilbird-assessment.js`.
@@ -154,7 +168,7 @@ Do not add this cron to `worker-solo`. Do not enroll existing members by a backf
 
 ## Limits
 
-The worker wiring is in the Pages repository so it can be reviewed. It is not copied into the live worker, and this branch does not deploy it.
+The live sender is `v8.4.0-nest-live`. This branch prepares the next worker and does not deploy it.
 
 `letters-preview.html` is an unindexed review page. It renders every note in the browser. It does not send mail.
 

@@ -2506,6 +2506,7 @@
       </div>
     </div>
     <p id="intro-retake-hint" class="intro-retake-hint" hidden>You're starting a fresh read. Your earlier read stays saved at its own link.</p>
+    <p id="saved-read-note" class="intro-lead" hidden>This saved read opens when you are logged in as its owner.</p>
     <details class="know-fields-toggle">
       <summary>Already know your types? (optional)</summary>
       <div class="know-fields" id="know-type-fields">
@@ -3351,6 +3352,14 @@ async function dpAuthHeaders(){
   const token = session && session.access_token;
   return token ? { Authorization: 'Bearer ' + token } : {};
 }
+function canvasSessionHeaders(id){
+  let token = '';
+  try { token = sessionStorage.getItem('lilbird_canvas_' + (id || nestId)) || ''; } catch (_) {}
+  return token ? { 'X-Canvas-Token': token } : {};
+}
+async function canvasWriteHeaders(id){
+  return Object.assign({ 'Content-Type': 'application/json' }, await dpAuthHeaders(), canvasSessionHeaders(id));
+}
 
 const PROGRESS = {
   'screen-intro':0,
@@ -3685,6 +3694,9 @@ async function runAnalysis(){
     try{
       const out = JSON.parse(raw);
       profileData = out.profile;
+      if (out.canvasToken && nestId) {
+        try { sessionStorage.setItem('lilbird_canvas_' + nestId, out.canvasToken); } catch (_) {}
+      }
       hasPaid = out.paid === true;
       hasNestPlus = out.nestPlus === true;
       if(!profileData) throw new Error('empty');
@@ -3833,7 +3845,7 @@ async function submitEmail(){
   if(wantNewsletter){
     try{
       const subRes = await fetch(`${WORKER_URL}/subscribe-email`, {
-        method: 'POST', headers: {'Content-Type':'application/json'},
+        method: 'POST', headers: await canvasWriteHeaders(nestId),
         body: JSON.stringify({
           email,
           pubId: BEEHIIV_PUB_ID,
@@ -3857,10 +3869,12 @@ async function submitEmail(){
   }
 
   if(nestId){
-    fetch(WORKER_URL + '/nest-preferences', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nestId, email }),
+    canvasWriteHeaders(nestId).then(function (headers) {
+      return fetch(WORKER_URL + '/nest-preferences', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({ nestId, email }),
+      });
     }).catch(function(){});
   }
 
@@ -3892,7 +3906,7 @@ async function unlockFullRead(){
   try{
     await fetch(`${WORKER_URL}/store-profile`,{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers: await canvasWriteHeaders(nestId),
       body:JSON.stringify({
         nestId,
         canvasScores,
@@ -3905,7 +3919,7 @@ async function unlockFullRead(){
 
     const unlockRes = await fetch(`${WORKER_URL}/lead-unlock`,{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers: await canvasWriteHeaders(nestId),
       body:JSON.stringify({ nestId, email: emailVal }),
     });
     if(!unlockRes.ok){
@@ -3919,8 +3933,8 @@ async function unlockFullRead(){
     try{
       await fetch(`${WORKER_URL}/send-profile-email`,{
         method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({ email: emailVal, nestId, profile: profileData }),
+        headers: await canvasWriteHeaders(nestId),
+        body:JSON.stringify({ email: emailVal, nestId }),
       });
     }catch(emailErr){
       console.warn('Nest link email failed (non-fatal):', emailErr);
@@ -4705,7 +4719,7 @@ async function startIcCheckout(opts){
 async function loadAccessFromServer(){
   if(!nestId) return null;
   try{
-    const r = await fetch(`${WORKER_URL}/get-profile?nestId=${encodeURIComponent(nestId)}`, { headers: await dpAuthHeaders() });
+    const r = await fetch(`${WORKER_URL}/get-profile?nestId=${encodeURIComponent(nestId)}`, { headers: Object.assign(await dpAuthHeaders(), canvasSessionHeaders(nestId)) });
     if(!r.ok) return null;
     const data = await r.json();
     if(data.profile) profileData = data.profile;
@@ -6283,16 +6297,17 @@ function seedCanvasHistoryBaseline(opts){
   var overall = Math.round(dims.reduce(function(s,k){ return s + scores[k]; }, 0) / dims.length);
   canvasHistory = [{ scores: scores, overall: overall, date: opts.date || new Date().toISOString() }];
   if(opts.persist && nestId && profileData){
-    fetch(WORKER_URL + '/store-profile', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        nestId,
-        profile: profileData,
-        canvasHistory: canvasHistory,
-        canvasScores: scores,
-        email: userEmail || undefined,
-      }),
+    canvasWriteHeaders(nestId).then(function (headers) {
+      return fetch(WORKER_URL + '/store-profile', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({
+          nestId,
+          canvasHistory: canvasHistory,
+          canvasScores: scores,
+          email: userEmail || undefined,
+        }),
+      });
     }).catch(function(){});
   }
   return true;
@@ -6333,8 +6348,8 @@ async function saveCanvasUpdate(){
     try{
       const stored = { profile: profileData, paid: hasPaid, canvasHistory, canvasScores: newScores, email: userEmail };
       await fetch(`${WORKER_URL}/store-profile`, {
-        method: 'POST', headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({nestId, profile: profileData, canvasHistory, canvasScores: newScores})
+        method: 'POST', headers: await canvasWriteHeaders(nestId),
+        body: JSON.stringify({nestId, canvasHistory, canvasScores: newScores})
       });
     }catch(e){ console.warn('Canvas save failed:', e); }
   }
@@ -6812,7 +6827,12 @@ window.addEventListener('DOMContentLoaded', function() {
   // Fetch the existing profile
   (async function() {
     try {
-      const r = await fetch(`${WORKER_URL}/get-profile?nestId=${encodeURIComponent(existingNest)}`, { headers: await dpAuthHeaders() });
+      const r = await fetch(`${WORKER_URL}/get-profile?nestId=${encodeURIComponent(existingNest)}`, { headers: Object.assign(await dpAuthHeaders(), canvasSessionHeaders(existingNest)) });
+      if (r.status === 401 || r.status === 403) {
+        const savedNote = document.getElementById('saved-read-note');
+        if (savedNote) savedNote.hidden = false;
+        return;
+      }
       if (!r.ok) return;
       const data = await r.json();
       if (data.profile) {

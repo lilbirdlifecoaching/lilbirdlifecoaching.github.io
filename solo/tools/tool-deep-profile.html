@@ -441,7 +441,9 @@
         .eq('user_id', currentUser.id)
         .maybeSingle();
       if (link.error || !link.data || !link.data.nest_id) return;
-      const res = await fetch(ASSESSMENT_WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(link.data.nest_id));
+      const res = await fetch(ASSESSMENT_WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(link.data.nest_id), {
+        headers: _tok2 ? { Authorization: 'Bearer ' + _tok2 } : {}
+      });
       if (!res.ok) return;
       const payload = await res.json();
       linkedProfile = parseAssessmentProfilePayload(payload);

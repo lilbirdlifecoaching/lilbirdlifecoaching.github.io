@@ -1,8 +1,13 @@
 /**
  * Assessment-worker adapter for Nest letters.
  * Wire this only into lilbird-assessment. Do not also call it from worker-solo.
- * runNestLetterCron does nothing unless NEST_LETTERS_ENABLED === "true"
- * and NEST_LETTERS_ALLOWLIST includes that member's user id.
+ * runNestLetterCron sends only when NEST_LETTERS_ENABLED is exactly "true"
+ * and NEST_LETTERS_MODE is exactly "test" or "general".
+ * An unset or any other mode sends nobody.
+ * "test" sends only to a non-empty NEST_LETTERS_ALLOWLIST.
+ * "general" sends to members who already opted in. A non-empty allowlist
+ * still limits that run. An empty allowlist does not, by itself, turn
+ * general delivery on.
  * This file does not subscribe anyone to the newsletter.
  */
 
@@ -19,7 +24,7 @@ import { letterByNumber, preferredFirstName, renderNote } from './nest-letters.j
 
 const ENABLED = 'true';
 
-/** Comma- or whitespace-separated Nest user ids. An empty list sends to nobody. */
+/** Comma- or whitespace-separated Nest user ids. An empty list is not a mode. */
 export function parseLetterAllowlist(value) {
   return new Set(
     String(value || '')
@@ -75,7 +80,12 @@ export async function deliverNestLetter(env, message, fetchImpl = fetch) {
   } catch {
     body = null;
   }
-  return classifyResendSend(res.status, body);
+  const result = classifyResendSend(res.status, body);
+  result.providerStatus = res.status;
+  result.providerName = typeof body?.name === 'string' ? body.name : null;
+  result.providerMessage = typeof body?.message === 'string' ? body.message.slice(0, 240) : null;
+  if (body && typeof body.id === 'string') result.providerId = body.id;
+  return result;
 }
 
 function json(body, status = 200) {
@@ -249,13 +259,65 @@ async function handleUnsubscribe(request, env, deps, url) {
   return page('You are unsubscribed', 'No more Nest coaching notes or quarterly check-ins. Your Nest is still there.');
 }
 
-export async function runNestLetterCron(env, deps) {
-  if (env.NEST_LETTERS_ENABLED !== ENABLED) return { skipped: 'disabled' };
+export function resolveLetterDelivery(env) {
+  if (env?.NEST_LETTERS_ENABLED !== ENABLED) return { send: false, skipped: 'disabled' };
+  const mode = String(env?.NEST_LETTERS_MODE || '').trim().toLowerCase();
+  if (mode !== 'test' && mode !== 'general') return { send: false, skipped: 'mode' };
+  if (!env.MAILING_ADDRESS) return { send: false, skipped: 'address' };
   const allow = parseLetterAllowlist(env.NEST_LETTERS_ALLOWLIST);
-  if (!allow.size) return { skipped: 'allowlist' };
-  if (!env.MAILING_ADDRESS) return { skipped: 'address' };
-  return runTick({
-    allowUser: (state) => allow.has(String(state.userId || '').trim().toLowerCase()),
+  if (mode === 'test' && allow.size === 0) return { send: false, skipped: 'allowlist' };
+  return {
+    send: true,
+    mode,
+    allowUser: allow.size
+      ? (state) => allow.has(String(state.userId || '').trim().toLowerCase())
+      : undefined,
+  };
+}
+
+export function deliveryReport(mode, summary) {
+  const finishedAt = new Date().toISOString();
+  if (!summary || typeof summary.skipped === 'string') {
+    return { completed: false, skipped: summary?.skipped || 'unknown', mode: mode || null, finishedAt };
+  }
+  return {
+    completed: true,
+    mode,
+    finishedAt,
+    due: summary.due || 0,
+    accepted: summary.sent || 0,
+    failed: summary.failed || 0,
+    held: summary.held || 0,
+    uncertain: summary.uncertain || 0,
+    deferred: summary.deferred || 0,
+    skipped: summary.skipped || 0,
+  };
+}
+
+export const LAST_RUN_KEY = 'nest-letters:last-run';
+
+export async function recordDeliveryReport(env, report) {
+  if (!report?.completed || !env?.NEST_PROFILES?.put) return;
+  const body = {
+    completed: true,
+    mode: report.mode,
+    finishedAt: report.finishedAt,
+    due: report.due,
+    accepted: report.accepted,
+    failed: report.failed,
+    held: report.held,
+    uncertain: report.uncertain,
+    deferred: report.deferred,
+    skipped: report.skipped,
+  };
+  await env.NEST_PROFILES.put(LAST_RUN_KEY, JSON.stringify(body));
+}
+
+export async function runNestLetterCron(env, deps) {
+  const gate = resolveLetterDelivery(env);
+  if (!gate.send) return { skipped: gate.skipped };
+  const summary = await runTick({
+    allowUser: gate.allowUser,
     store: deps.store,
     now: deps.now(),
     schedule: deps.schedule,
@@ -283,6 +345,14 @@ export async function runNestLetterCron(env, deps) {
       return deliverNestLetter(env, message, deps.fetch);
     },
   });
+  const report = deliveryReport(gate.mode, summary);
+  try {
+    if (deps.recordRun) await deps.recordRun(report);
+    else await recordDeliveryReport(env, report);
+  } catch {
+    // Reporting must not change who was sent or advance a sequence.
+  }
+  return summary;
 }
 
 export function accountEventLeavesLetters(state) {

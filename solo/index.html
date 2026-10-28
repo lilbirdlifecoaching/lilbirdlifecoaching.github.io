@@ -1079,7 +1079,7 @@
     //   2. Assessment frontend POSTs back to the worker with that token + nestId,
     //      which writes deep_profile_links { user_id → nest_id }.
     //   3. Dashboard reads deep_profile_links and fetches the live profile JSON
-    //      via GET /get-profile?nestId=… (no auth — nestId is unguessable).
+    //      via GET /get-profile?nestId=… with the signed-in session. A nest id alone is not access.
     const ASSESSMENT_WORKER_URL = 'https://lilbird-assessment.cwwq46sn7m.workers.dev';
     let deepProfileState = { loaded: false, nestId: null, profile: null };
 
@@ -1429,7 +1429,7 @@
           .maybeSingle();
         if (link.error || !link.data) { deepProfileState = { loaded: true, nestId: null, profile: null }; return; }
         const nestId = link.data.nest_id;
-        const res = await fetch(ASSESSMENT_WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(nestId));
+        const res = await fetch(ASSESSMENT_WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(nestId), { headers: await workerHeaders() });
         if (!res.ok) { deepProfileState = { loaded: true, nestId, profile: null }; return; }
         const payload = await res.json();
         const profile = parseAssessmentProfile(payload);

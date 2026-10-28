@@ -2168,11 +2168,11 @@
         date: (payload && payload.createdAt) || 'canvas-baseline'
       };
       canvasHistory = [entry];
-      fetch(ASSESSMENT_WORKER_URL + '/store-profile', {
+      authHeaders().then((headers) => fetch(ASSESSMENT_WORKER_URL + '/store-profile', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...headers },
         body: JSON.stringify({ nestId: deepNestId, canvasScores: scores, canvasHistory: [entry] })
-      }).catch(() => {});
+      })).catch(() => {});
     }
   }
 
