@@ -207,8 +207,8 @@
         id: 'ask',
         tab: 'ask',
         selector: '#tab-ask',
-        title: 'Ask lil’ bird',
-        body: 'Stuck or curious? Ask the same guide anything about your work, right here in your Nest.',
+        title: 'lil’ bird guide',
+        body: 'A conversation in Luke’s manner. One question at a time, and an exercise only when it would help.',
         tip: null
       },
       {

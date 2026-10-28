@@ -674,6 +674,7 @@ body.nest-page { line-height: 1.5; }
 .chat-avatar { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; background: var(--gold-faint); }
 .chat-messages { padding: 1rem; min-height: 260px; max-height: 460px; overflow-y: auto; display: grid; gap: 0.7rem; }
 .msg { max-width: 88%; padding: 0.55rem 0.7rem; border-radius: 10px; line-height: 1.55; font-size: 0.9rem; }
+.msg p { margin: 0; }
 .msg.user { justify-self: end; background: var(--gold-faint); border: 1px solid rgba(245,200,66,0.25); }
 .msg.bot { justify-self: start; background: var(--dark-mid); border: 1px solid rgba(245,200,66,0.12); color: var(--text-main); }
 .chat-input-row { border-top: 1px solid rgba(255,255,255,0.06); padding: 0.75rem; display: flex; gap: 0.55rem; }
@@ -685,6 +686,103 @@ body.nest-page { line-height: 1.5; }
   color: var(--text-main);
   padding: 0.55rem 0.65rem;
   resize: vertical;
+}
+
+.guide-stage {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 1rem;
+  align-items: stretch;
+}
+.guide-presence,
+.guide-talk {
+  background: var(--dark-card);
+  border: 1px solid var(--dark-border);
+  border-radius: 16px;
+}
+.guide-presence { padding: 1rem 0.9rem 1.1rem; text-align: center; }
+.guide-kicker {
+  margin: 0;
+  color: var(--gold-dim);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+}
+.guide-presence h3 {
+  font-family: "Playfair Display", serif;
+  font-weight: 400;
+  margin: 0.15rem 0 0.4rem;
+}
+.guide-note { color: var(--text-muted); font-size: 0.82rem; margin: 0; }
+.guide-talk { display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+.guide-stage .chat-messages { flex: 1; min-height: 340px; max-height: 560px; }
+.guide-lock { display: none; padding: 1.4rem 1.2rem 1.5rem; }
+.guide-lock p { color: var(--text-muted); }
+.guide-stage.is-locked #guide-composer,
+.guide-stage.is-locked .chat-messages { display: none; }
+.guide-stage.is-locked .guide-lock { display: block; }
+.guide-tool {
+  display: grid;
+  gap: 0.15rem;
+  width: 100%;
+  margin-top: 0.7rem;
+  padding: 0.65rem 0.7rem;
+  text-align: left;
+  color: inherit;
+  background: rgba(201, 161, 48, 0.1);
+  border: 1px solid rgba(201, 161, 48, 0.45);
+  border-radius: 10px;
+  cursor: pointer;
+}
+.guide-tool span { color: var(--text-muted); font-size: 0.78rem; }
+.luke-portrait {
+  position: relative;
+  width: min(100%, 188px);
+  aspect-ratio: 1;
+  margin: 0 auto 0.85rem;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.28);
+  animation: luke-breathe 6.5s ease-in-out infinite;
+}
+.luke-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform-origin: 50% 35%;
+  animation: luke-sway 9s ease-in-out infinite;
+}
+.luke-light {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 32%, rgba(255,255,255,0.16) 50%, transparent 68%);
+  background-size: 220% 100%;
+  animation: luke-sheen 8.5s ease-in-out infinite;
+}
+.luke-portrait.is-thinking { animation-duration: 2.6s; }
+.luke-portrait-mini { width: 72px; margin: 0 0 0.7rem; }
+.guide-side { text-align: left; }
+@keyframes luke-breathe {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+@keyframes luke-sway {
+  0%, 100% { transform: scale(1.05) rotate(-0.35deg); }
+  50% { transform: scale(1.08) rotate(0.45deg); }
+}
+@keyframes luke-sheen {
+  0%, 100% { background-position: 130% 0; }
+  50% { background-position: -30% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .luke-portrait,
+  .luke-portrait img,
+  .luke-light { animation: none; }
+}
+@media (max-width: 800px) {
+  .guide-stage { grid-template-columns: 1fr; }
+  .luke-portrait { width: 148px; }
 }
 
 @media (max-width: 920px) {

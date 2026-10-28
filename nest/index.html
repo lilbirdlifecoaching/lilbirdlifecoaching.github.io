@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.49.0/dist/tabler-icons.min.css" />
-  <link rel="stylesheet" href="./nest-styles.css?v=41" />
+  <link rel="stylesheet" href="./nest-styles.css?v=42" />
   <link rel="stylesheet" href="./nest-tour.css?v=3" />
   <link rel="stylesheet" href="/css/lilbird-nest-theme.css?v=20260917m" />
   <!-- Google Tag Manager -->
@@ -137,7 +137,7 @@
           <span id="profile-dot" class="profile-dot hidden"></span>
         </button>
         <button id="tab-journey" class="dash-tab" type="button"><i class="ti ti-map-2"></i> My Journey</button>
-        <button id="tab-ask" class="dash-tab" type="button"><i class="ti ti-message-circle"></i> Ask lil' bird</button>
+        <button id="tab-ask" class="dash-tab" type="button"><i class="ti ti-feather"></i> Guide</button>
       </section>
 
       <section class="next-steps-banner">
@@ -153,18 +153,26 @@
           <div id="pane-profile" class="tab-pane"></div>
           <div id="pane-journey" class="tab-pane"></div>
           <div id="pane-ask" class="tab-pane">
-            <div class="chat-shell">
-              <div class="chat-head">
-                <div class="chat-avatar">🪶</div>
-                <div>
-                  <h3>Ask lil' bird</h3>
-                  <p>Same guide voice, inside your Nest.</p>
+            <div class="guide-stage is-locked" id="guide-stage">
+              <aside class="guide-presence">
+                <div class="luke-portrait" id="luke-portrait">
+                  <img src="./luke-guide.jpg" alt="Portrait of Luke" width="960" height="960" />
+                  <span class="luke-light"></span>
                 </div>
-              </div>
-              <div id="chat-messages" class="chat-messages"></div>
-              <div class="chat-input-row">
-                <textarea id="chat-input" rows="1" placeholder="What's on your mind today?"></textarea>
-                <button id="chat-send" class="btn btn-gold" type="button">Send</button>
+                <p class="guide-kicker">lil' bird guide</p>
+                <h3>Luke</h3>
+                <p class="guide-note">A guide in Luke's manner. He is not on the other end of this chat.</p>
+              </aside>
+              <div class="guide-talk">
+                <div id="chat-messages" class="chat-messages"></div>
+                <div class="guide-lock" id="guide-lock">
+                  <p>lil' bird guide is part of Nest Plus. A conversation in Luke's manner, and one exercise when it would actually help.</p>
+                  <button type="button" class="btn btn-ember" id="guide-upgrade" data-upgrade="nest_plus">Add Nest Plus · $7.99/month →</button>
+                </div>
+                <div class="chat-input-row" id="guide-composer">
+                  <textarea id="chat-input" rows="2" placeholder="What's in front of you?"></textarea>
+                  <button id="chat-send" class="btn btn-gold" type="button">Send</button>
+                </div>
               </div>
             </div>
           </div>
@@ -175,10 +183,14 @@
           <article id="sidebar-context-card" class="sidebar-card ember"></article>
           <article class="sidebar-card" id="sidebar-journey-card"></article>
           <article class="sidebar-card" id="sidebar-relationship-card"></article>
-          <article class="sidebar-card hint">
-            <p class="sidebar-eyebrow">chat hint</p>
-            <p>Questions? The lil' bird chat knows this ecosystem cold.</p>
-            <button id="btn-open-ask" class="btn btn-outline full" type="button"><i class="ti ti-message-circle"></i> Open Ask lil' bird</button>
+          <article class="sidebar-card hint guide-side" id="guide-side-card">
+            <div class="luke-portrait luke-portrait-mini" aria-hidden="true">
+              <img src="./luke-guide.jpg" alt="" width="960" height="960" />
+              <span class="luke-light"></span>
+            </div>
+            <p class="sidebar-eyebrow">lil' bird guide</p>
+            <p id="guide-side-copy">A conversation in Luke's manner. Part of Nest Plus.</p>
+            <button id="btn-open-ask" class="btn btn-outline full" type="button">Open the guide</button>
           </article>
         </aside>
       </div>
@@ -189,9 +201,9 @@
   <script src="/js/vendor/supabase-js-2.117.3.js"></script>
   <script src="/js/lilbird-theme.js"></script>
   <script src="/js/lilbird-theme-nav.js"></script>
-  <script src="./nest-tour.js?v=12"></script>
-  <script src="./nest-client.js?v=50"></script>
+  <script src="./nest-tour.js?v=13"></script>
+  <script src="./nest-client.js?v=51"></script>
   <script type="module" src="./nest-letters-ui.js?v=2"></script>
-  <script type="module" src="./journey.js?v=5"></script>
+  <script type="module" src="./journey.js?v=6"></script>
 </body>
 </html>
