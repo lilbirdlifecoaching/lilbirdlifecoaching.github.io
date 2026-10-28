@@ -1114,7 +1114,7 @@
             <p class="eyebrow">nest plus</p>
             <h3>The Intensive workbook, on your own time</h3>
             <span class="status-badge">${escapeHtml(src)}</span>
-            <p>Life Canvas puts passion, connections, spaces, resources, and energy on one page. lil' bird guide is a conversation in Luke's manner. Roots &amp; Wings is the eight-session workbook from the Intensive. You also get the full Inner Compass read and Relationship Dynamic.</p>
+            <p>lil' bird guide is the next best thing to being in the room with Luke. Life Canvas, the full Inner Compass read, Relationship Dynamic, and the Roots &amp; Wings workbook are here too.</p>
             <div class="btn-row">
               <button type="button" class="btn btn-gold" data-open-canvas>Life Canvas →</button>
               <a class="btn btn-outline" href="${workbookHref('life-change')}">Roots &amp; Wings</a>
@@ -1128,7 +1128,7 @@
           <span class="lock-pill"><i class="ti ti-lock"></i> $7.99/month</span>
           <p class="eyebrow">nest plus</p>
           <h3>The Intensive workbook, on your own time</h3>
-          <p>lil' bird guide is a conversation in Luke's manner. Life Canvas, the full Inner Compass read, Relationship Dynamic, and the Roots &amp; Wings workbook are here too. Cancel anytime. Included with coaching or the Intensive.</p>
+          <p>The next best thing to being in the room with Luke. Life Canvas, the full Inner Compass read, Relationship Dynamic, and the Roots &amp; Wings workbook are here too. Cancel anytime. Included with coaching or the Intensive.</p>
           <div class="btn-row"><button type="button" class="btn btn-ember" data-upgrade="nest_plus">Add Nest Plus · $7.99/month →</button></div>
         </article>`;
     }
@@ -2573,9 +2573,7 @@
     if (stage) stage.classList.toggle('is-locked', !open);
     const copy = document.getElementById('guide-side-copy');
     if (copy) {
-      copy.textContent = open
-        ? "A conversation in Luke's manner. One question at a time."
-        : "A conversation in Luke's manner. Part of Nest Plus.";
+      copy.textContent = "The next best thing to being in the room with Luke.";
     }
   }
   function renderChatMsg(role, content, tool) {

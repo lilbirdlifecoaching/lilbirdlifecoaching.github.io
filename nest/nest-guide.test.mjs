@@ -36,6 +36,7 @@ test('the guide prompt coaches and does not sell a booking', () => {
   const prompt = buildGuidePrompt('Ada');
   assert.match(prompt, /with Ada/);
   assert.match(prompt, /Ask one question/);
+  assert.match(prompt, /the next best thing to being in the room with Luke/);
   assert.match(prompt, /\[TOOL:decision-clarity\]/);
   assert.doesNotMatch(prompt, /IMREADY|lb-book-trigger|First Flight/);
   assert.doesNotMatch(prompt, /<a /);
