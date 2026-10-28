@@ -81,13 +81,13 @@
         var src = access().nestPlusSource;
         return {
           title: 'Nest Plus' + (src && src !== 'Nest Plus' ? ' · ' + src.toLowerCase() : ''),
-          body: 'Life Canvas, Relationship Dynamic, and the Roots & Wings workbook are here. The First Flight workbook is already in your free Nest.',
+          body: 'lil\' bird guide, Life Canvas, Relationship Dynamic, and the Roots & Wings workbook are here. The First Flight workbook is already in your free Nest.',
           tip: '» Open Roots & Wings when you’re ready'
         };
       },
       locked: {
         title: 'Nest Plus · $7.99/month',
-        body: 'Adds Life Canvas, the full Inner Compass read, Relationship Dynamic, and the Roots & Wings workbook. $7.99 a month. Cancel anytime from your Nest. Included with coaching or the Intensive.',
+        body: 'Adds lil\' bird guide, Life Canvas, the full Inner Compass read, Relationship Dynamic, and the Roots & Wings workbook. $7.99 a month. Cancel anytime from your Nest. Included with coaching or the Intensive.',
         tip: null,
         action: { label: 'Add Nest Plus · $7.99/month →', upgrade: 'nest_plus' }
       }
@@ -103,7 +103,7 @@
       },
       locked: {
         title: 'Life Change Sessions workbook · $27',
-        body: 'The complete eight-session workbook to work through on your own. It’s included with the Life Change Intensive.',
+        body: 'The full Intensive workbook, on your own. Included with Nest Plus. On the free Nest, buy it once for $27.',
         tip: null,
         action: { label: 'Get the workbook · $27 →', upgrade: 'lcs_workbook' }
       }
@@ -119,7 +119,7 @@
       },
       locked: {
         title: 'Life Change Sessions: Solo · $197',
-        body: 'Eight self-guided sessions with an AI coaching guide. Unlock it from this card. Nest Plus is separate.',
+        body: 'Eight self-guided sessions with an AI coaching guide. Included with Nest Premium, or buy it once for $197.',
         tip: null
       }
     },

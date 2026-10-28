@@ -3,7 +3,7 @@
  * The website chat widget stays a separate help desk.
  */
 
-export const GUIDE_PRODUCTS = ['nest_plus', 'first_flight', 'coaching', 'life_change_intensive'];
+export const GUIDE_PRODUCTS = ['nest_plus', 'coaching', 'life_change_intensive'];
 
 export const GUIDE_TOOLS = [
   { id: 'boundary-untangler', title: 'Boundary Untangler', minutes: '5 to 10 minutes', when: 'a boundary, a no, or people-pleasing is the tangle they are actually in' },

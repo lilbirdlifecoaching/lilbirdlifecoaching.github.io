@@ -352,7 +352,27 @@ body.nest-page { line-height: 1.5; }
   align-items: center;
   cursor: pointer;
 }
-.dash-tab.active { color: var(--gold); border-color: rgba(245,200,66,0.28); }
+.dash-tab > i:first-of-type {
+  width: 1.85rem;
+  height: 1.85rem;
+  border-radius: 42% 58% 48% 52%;
+  display: inline-grid;
+  place-items: center;
+  font-size: 1.15rem;
+  box-shadow: inset 0 0 0 1.5px currentColor;
+}
+#tab-products > i:first-of-type { background: rgba(245,200,66,0.28); color: var(--gold); }
+#tab-canvas > i:first-of-type { background: rgba(90,180,240,0.24); color: #3d8ec4; }
+#tab-profile > i:first-of-type { background: rgba(232,115,74,0.24); color: var(--ember); }
+#tab-journey > i:first-of-type { background: rgba(157,191,138,0.32); color: var(--green); }
+#tab-live > i:first-of-type { background: rgba(176,156,214,0.32); color: #8d74c4; }
+#tab-ask > i:first-of-type { background: rgba(245,176,96,0.3); color: #d08a3a; }
+.dash-tab.active {
+  color: var(--text-main);
+  background: var(--dark-card);
+  border-color: rgba(245,200,66,0.45);
+  box-shadow: 0 8px 18px rgba(30, 24, 16, 0.08);
+}
 .profile-dot {
   width: 8px; height: 8px;
   border-radius: 50%;
