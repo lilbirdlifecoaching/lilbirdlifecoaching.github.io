@@ -2591,6 +2591,21 @@
     });
   }
 
+  function textFromChatPayload(data) {
+    if (!data || typeof data !== 'object') return '';
+    const blocks = Array.isArray(data.content) ? data.content : [];
+    const fromBlocks = blocks
+      .filter((block) => block && block.type === 'text' && typeof block.text === 'string')
+      .map((block) => block.text.trim())
+      .filter(Boolean)
+      .join('\n')
+      .trim();
+    if (fromBlocks) return fromBlocks;
+    if (typeof data.reply === 'string' && data.reply.trim()) return data.reply.trim();
+    if (typeof data.message === 'string' && data.message.trim()) return data.message.trim();
+    return '';
+  }
+
   async function sendChat() {
     const input = document.getElementById('chat-input');
     const text = input.value.trim();
@@ -2604,8 +2619,13 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: chatMsgs.slice(-12) })
       });
-      const data = await response.json();
-      const msg = data.reply || data.message || "I can help with that. Tell me a bit more.";
+      let data = null;
+      try { data = await response.json(); } catch (_) { data = null; }
+      const msg = response.ok && !(data && data.error) ? textFromChatPayload(data) : '';
+      if (!msg) {
+        renderChatMsg('assistant', "I couldn't get a reply just now. Try again in a moment.");
+        return;
+      }
       chatMsgs.push({ role: 'assistant', content: msg });
       renderChatMsg('assistant', msg);
     } catch (e) {
