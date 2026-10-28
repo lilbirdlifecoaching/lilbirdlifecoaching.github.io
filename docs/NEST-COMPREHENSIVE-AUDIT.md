@@ -374,7 +374,7 @@ Items 3 and 4 need an assessment worker deploy. Item 5 needs a Pages deploy. Ite
 
 ## 7. Production health
 
-The site and both workers answer. Coaching delivery is enabled on purpose. The cron is unchanged. No general send has been recorded yet. Consent counts still match the launch decision: 2 due, 41 not enrolled, 1 historical failed row that is not due.
+The site and both workers answer. Coaching delivery is enabled on purpose. The cron is unchanged. The 28 October 2026 15:00 UTC window has passed on `v8.4.0-nest-live`. Delivery rows were not queried again during the authorization remediation, so the result of that run is unknown. The consent counts below are the 27 October observation: 2 due, 41 not enrolled, 1 historical failed row that is not due.
 
 The service does not need to be disabled for this audit. The rollback remains the flag.
 
@@ -386,69 +386,102 @@ Watch the first general cron, then close the P1 gaps above. Do not start another
 
 A sensible following milestone, after that, is the Nest home a new member sees first: one path from the free account into My Journey, with product tasks and saved exercise steps clearly named. That is polish on a library that already exists, not a fourth build.
 
-## Release A — prepared, not deployed
+## Release A — corrected patch, not deployed
 
-Checked 27 October 2026. The live assessment worker is still `v8.4.0-nest-live`. This section describes the branch. It does not describe a production change.
+Checked 28 October 2026. Commit `b26d2d6` stays undeployed. Production `/ping` still returns `v8.4.0-nest-live` with `nestLetters: enabled`. Coaching delivery was not changed. `nest/release-a-claim.sql` was not applied. Local `main` was not touched.
 
-### Confirmed before the fix
+The first patch closed Canvas reads for a signed-in non-owner, and it left four holes: the canvas secret had no expiry, `POST /link-to-course` could write `deep_profile_links` for any nest id presented with a valid launch token, `POST /analyze` with `retakeOf` could read and update another read, and `POST /partner-dynamic` plus Bridge create/join could use a stored profile when the caller had Nest Plus or only a nest id. This section describes the corrected patch.
 
-Unauthorized Canvas access was possible in the worker source. `handleGetProfile` and `handleStoreProfile` trusted the nest id. A request with no login received canvas scores, canvas history, milestones, the email on the read, and, when `record.paid` was true, the full profile. `readAccess` copied `record.paid` before it checked the caller. `handleStoreProfile`, `handleLeadUnlock`, `handleSendProfileEmail`, and `handleNestPreferences` could write canvas fields or replace the email on an unpaid read with no login. There is no separate canvas delete route. Replacing scores is the delete-and-write, and it used the same unauthenticated path.
+### Ownership
 
-This was not demonstrated against a member's live nest id. The handlers themselves accept the call. Nest ids are in results links (`?nest=`), so the id is not a secret.
+`decideCanvasAccess` is the shared decision. An authenticated caller needs a verified relationship to that assessment. A nest id does not establish ownership. A course launch token does not establish ownership of an arbitrary assessment.
 
-`link_deep_profile_to_user` grants `inner_compass` to any signed-in caller who submits any nest id. It does not check a purchase or an email. That function is still the live database function. The replacement is `nest/release-a-claim.sql`. It has not been run.
+Proof, and what it may do:
 
-### Authorization on the branch
+| Proof | What it is | Read | New link, paid retake, or `nest_owner_emails` |
+| --- | --- | --- | --- |
+| `link` | Existing `deep_profile_links` row for this account and this nest | Yes | Yes, and a course link also needs the bound email to match the course member |
+| `read` | Existing `nest_reads` row for this account and this nest | Yes | Yes, with the same email match for a course link |
+| `email` | Signed-in email matches the email already stored on the read | Yes | No. This match kept current members able to open a read. It could be forged before this patch, so it does not create a link, copy paid status, or write `nest_owner_emails` |
+| Capability | Unexpired token bound to this read, caller signed out | Yes, for two hours | Yes for the browser that just created the read. A signed-in non-owner is refused even with a valid token |
+| Supabase session alone | A logged-in account with none of the rows above | No | No |
+| Course launch token alone | Row in `deep_profile_launches` | No | No |
+| Nest Plus or course enrollment alone | A product on the caller's account | No | No |
 
-Canvas reads and writes (`/get-profile`, `/store-profile`, `/check-paid`, `/lead-unlock`, `/send-profile-email`, `/nest-preferences`) call `canvasAccessDecision`.
+Existing `deep_profile_links` and `nest_reads` rows stay in place. There is no proof column, so a link created while `/link-to-course` accepted any nest id cannot be separated from a link the member actually owned. Those rows were not deleted and were not revoked. They are still treated as `link` ownership. See the review finding below.
 
-- No caller: `401` and `{ error: "Please log in." }`. No canvas, email, or profile.
-- A signed-in account that does not own the nest: `403` and `{ error: "Not allowed" }`.
-- Ownership is a `deep_profile_links` row, a `nest_reads` row, or an exact match between the account email and the email already stored on the read.
-- A signed-in non-owner is refused even if they also send the creating-session token.
-- The browser that just finished `/analyze` receives a `canvasToken` once. That token is stored on the read and in `sessionStorage`. It is not returned by `/get-profile`. It lets that browser save the new read before an account exists. It is not the nest id.
-- A different email never replaces an email already stored.
-- The claim function raises `not allowed` unless `auth.uid()` is set and `auth.jwt() email` matches `nest_owner_emails`. It does not set `active = false` and it does not delete entitlement rows. Existing access stays until a separate review.
+### Assessment capability token
 
-### Worker differences
+The value is an assessment capability token. It is a time-limited secret for the browser that created that one read. It is not a single-use token. The quiz saves the read more than once, so the same token may be presented again until it expires.
 
-Compared with `origin/main`, the live `nest-letters-worker.js` has two differences, and both are kept:
+- 32 cryptographically random bytes, sent as 64 hex characters, compared in constant time.
+- `canvasTokenExpires` is stored on the read. Validity is two hours (`CANVAS_CAPABILITY_TTL_MS`). A missing or unparseable expiry is refused.
+- Every use checks that stamp. A save refreshes the KV lifetime and does not move `canvasTokenExpires`. A paid-retake counter write keeps the original stamp.
+- The token is bound to the read that issued it. It does not open another assessment.
+- It does not override a signed-in ownership check.
+- `/analyze` returns it once. `/get-profile` does not return it.
+- Issued only when the read has no token yet.
 
-- Empty allowlist with the flag on sends to members who already opted in. `origin/main` returns `skipped: allowlist` and sends nobody.
-- `deliverNestLetter` keeps `providerStatus`, `providerName`, `providerMessage`, and `providerId` on the Resend result.
+### Secured routes
 
-`nest-letters.js`, `nest-letters-delivery.js`, and `nest-letters-copy.js` matched the live copies apart from the new `due` count on the run summary.
+These routes load or change a stored assessment only after `decideCanvasAccess`, and the handlers below add the extra rule named:
 
-The branch then makes delivery fail closed. `NEST_LETTERS_MODE` must be `test` or `general`. An unset or invalid mode sends nobody. `test` with an empty allowlist sends nobody. `general` sends only to members who already opted in, and a non-empty allowlist still limits that run. Deploying this worker without setting `NEST_LETTERS_MODE=general` in the same change would stop the next cron. That secret is not set, and this branch is not deployed. Live delivery stays as it is: flag true, no allowlist, general send to opted-in members.
+- `GET /get-profile`, `POST /store-profile`, `GET /check-paid`, `POST /lead-unlock`, `POST /send-profile-email`, `GET /nest-preferences`, `POST /nest-preferences`
+- `POST /link-to-course`: a valid launch token is not enough. `courseLinkDecision` must allow the caller before `deep_profile_links` is written. A refusal does not burn the launch token. The handler returns `403` and `{ error: "Not allowed" }`.
+- `POST /analyze` when `retakeOf` is set: `retakeDecision` must allow the original before its paid flag, email, or retake counter is copied or incremented. A refusal does not save the new read and does not change the original. A nest id that already has any stored record also requires access before a new profile can be written onto it.
+- `POST /partner-dynamic`: ownership is checked before the stored profile is used. Nest Plus is then a product gate on that authorized read (`record.nestPlus` or the caller's own Nest Plus). The partner's details are text the caller types. A missing Nest Plus returns `403` and `{ error: "nest_plus_required" }`.
+- `POST /bridge/couple/create` and `POST /bridge/couple/join`: a profile object in the body is the participant's own disclosure. Loading a stored profile requires access. The old nest-id loader was removed.
+- `POST /subscribe-email` merges an email onto a nest only after access, and only `mayRecordOwnerEmail` may write `nest_owner_emails`.
+- `POST /analyze` for a brand-new id creates that read and may return the capability. It does not read another member's profile unless `retakeOf` passes `retakeDecision`.
 
-### Delivery monitoring
+`POST /preview-read`, `POST /mid-read`, and `POST /acknowledge` score the answers in the request. They do not load a stored assessment. `POST /glow-map-email` emails the scores in the request. `GET /letter-posts` is public letter metadata. Bridge status, check-in, translate, and generate use the couple record or the profiles in the request. They do not load a nest by id.
 
-A completed cron writes KV key `nest-letters:last-run` with counts only: due, accepted, failed, held, uncertain, deferred, skipped, mode, and `finishedAt`. No email and no user id. A reporting failure does not change who was sent. The cron does not resend a held or uncertain letter. The daily review steps are in `docs/NEST-LETTERS.md`. The live worker does not write this key yet.
+A refusal body is `{ error: "Please log in." }` with `401`, or `{ error: "Not allowed" }` with `403` or `404`. It does not include canvas scores, history, milestones, email, or the profile.
 
-### First general send
+### Claim migration
 
-Pending. The run is scheduled for 28 October 2026 at 15:00 UTC. It has not happened. No manual send was made. Coaching delivery stays enabled.
+`nest/release-a-claim.sql` is still the only SQL change, and it is still unapplied. It creates `nest_owner_emails` and replaces `link_deep_profile_to_user`. The function requires `auth.uid()` and a matching email in `nest_owner_emails`. It does not set `active = false` and it does not delete `user_entitlements`. The live function still grants `inner_compass` from a nest id alone. Do not run the file until the reviewed worker is deployed in the same change.
+
+### Legitimate workflows
+
+- A member with a `deep_profile_links` or `nest_reads` row can still open that assessment while signed in, without the capability token.
+- A member whose only proof is the stored email can still open and update that canvas. They cannot start a paid retake, create a course link, or fill `nest_owner_emails` until a strong row exists. That is the migration: paid retakes and new course links need `link` or `read`, or the two-hour capability from the browser that created the read.
+- Inner Compass sends the capability on course link, on a paid retake (the original nest's token), and on Partner Dynamic, and it sends the session when the member is logged in. A course-link `403` clears the launch token only when the error names the launch token.
+- Partner Dynamic and Relationship Dynamic show the Nest Plus offer only when the error is `nest_plus_required`.
+- Bridge stays usable when the participant submits their profile in the body, or when they are allowed to load their own stored profile. There is no Bridge client in this repository. A client that loads by nest id has to send the session or the capability.
+- Coaching email behavior in the unreleased worker matches the branch: explicit `test` or `general` mode, Resend idempotency on the delivery id, the same product sequences, Beehiiv left untouched by the letter files. The iCloud `nest-letters-worker.js` and `nest-letters-delivery.js` match the branch copies. Cron in `wrangler.toml` remains `0 15 * * *`.
+
+### Existing ownership links
+
+No production rows were read in full and none were changed. Successful `/link-to-course` calls were not stored with a proof of ownership. Worker request logs do not retain a history that can show whether a nest id was read or linked by someone other than the member. Classification: insufficient logging to determine whether unauthorized reads or link manipulation occurred. No confirmed misuse was identified, and that is not a finding that none occurred. Suspicious or unverifiable: every current `deep_profile_links` row, because the previous handler could create one from a launch token plus any nest id. Leave them for a separate review. Do not delete them from this patch.
+
+### Worker reconciliation
+
+Live ping on 28 October 2026: `{"ok":true,"version":"v8.4.0-nest-live","nestLetters":"enabled"}`. The file prepared for a later deploy is `v8.5.1-release-a` in the iCloud `Deep-profile Cursor Project`. It is not the running worker. `origin/main`'s letter worker still treats an empty allowlist as send-nobody. Deploying that file would stop general delivery while `/ping` could still say enabled.
+
+`NEST_LETTERS_MODE` is not set in production. The corrected worker sends only when the flag is exactly `true` and the mode is exactly `test` or `general`. Deploying it without setting the mode to `general` in the same change would make the next cron send nobody. Secrets, the KV binding, the Resend idempotency key, delivery records, and the cron were not changed.
 
 ### Tests
 
-57 tests passed on 27 October 2026: `node --test nest/nest-letters.test.mjs nest/canvas-access.test.mjs nest/journey-reflect.test.mjs nest/journey-tools.test.mjs`. That includes the existing Journey, tool, and letter tests, plus cross-account canvas refusal, an unauthenticated canvas request, unauthorized and matching Inner Compass claims, the claim file not revoking entitlements, disabled / test / general delivery, an unset mode, a concurrent cron, and failed or uncertain delivery counts.
+65 tests passed on 28 October 2026: `node --test nest/nest-letters.test.mjs nest/canvas-access.test.mjs nest/journey-reflect.test.mjs nest/journey-tools.test.mjs`. The earlier letter, Journey, and tool tests are included. The canvas file now covers a missing caller, a signed-in non-owner, a valid token that does not override that non-owner, expiry, reuse before expiry, a token presented to a different assessment, course-link refusals, email-only retake refusal, a Nest Plus request for another member's profile, Bridge profile loads, and the claim file. One test reads the iCloud worker source and checks that the route handlers call these decisions before they write.
 
-### Still open in production
+### Remaining risks
 
-- Canvas and claim authorization, until the reviewed worker and `nest/release-a-claim.sql` are deployed together.
-- The first general send.
-- Supabase backup retention was not inspected.
-- Account deletion still has no member-facing control.
-- Letters still do not load the optional Compass sentence.
-- Pre-existing entitlements and links were not revoked.
+- Production still serves `v8.4.0-nest-live`, so the nest-id reads and the live claim function remain until a reviewed deploy.
+- Historical `deep_profile_links` rows stay trusted, and logging cannot show which ones were created through the old handler.
+- A capability leaked during its two-hour window can be reused until that stamp. It cannot be used by a signed-in non-owner, and a later save does not extend it.
+- Email-only members can read and cannot take a paid retake or create a new course link until a `link` or `read` row exists.
+- Bridge status and check-in return the profile summaries already stored on the couple record to a caller who knows the couple id and member id. Create and join no longer load a nest by id alone.
+- The first general send's outcome is unknown. This patch did not query it and did not send mail.
+- Supabase backup retention and a member account-close path remain open from the audit.
 
 ### Deployment is blocked on review
 
-Do not deploy this branch yet. When it is reviewed, the order is:
+Stop here. When the patch is reviewed, the order is:
 
-1. Publish the Pages branch first, so the Nest and Inner Compass send the session or the canvas token. The current worker ignores the token, so this step does not close the hole and does not stop mail.
-2. Apply `nest/release-a-claim.sql` on project `mebqqzbuwkogdxvnihrq`. Do not re-run `nest-letters.sql` or `journey-reflections.sql`. New claims fail closed until the worker writes `nest_owner_emails`. Existing entitlement rows are not changed.
-3. In the same change, set `NEST_LETTERS_MODE` to `general` and deploy the assessment worker from the iCloud `Deep-profile Cursor Project` copies of `lilbird-assessment.js`, `canvas-access.js`, `nest-letters-worker.js`, and `nest-letters-delivery.js`. Leave `NEST_LETTERS_ENABLED` true. Do not change the cron. Do not call the cron by hand.
-4. Confirm `/ping` shows `v8.5.0-release-a` and `nestLetters: enabled`.
+1. Publish this Pages branch first, so Inner Compass sends the session and the capability. The live worker ignores those headers, so this step does not close the hole and does not stop mail.
+2. Apply `nest/release-a-claim.sql` on project `mebqqzbuwkogdxvnihrq`. Do not re-run `nest-letters.sql` or `journey-reflections.sql`. Do not change existing entitlement rows.
+3. In the same change, set `NEST_LETTERS_MODE` to `general` and deploy the iCloud assessment worker (`lilbird-assessment.js`, `canvas-access.js`, `nest-letters-worker.js`, `nest-letters-delivery.js`). Leave `NEST_LETTERS_ENABLED` true. Do not change the cron. Do not call the cron by hand.
+4. Confirm `/ping` shows `v8.5.1-release-a` and `nestLetters: enabled`. Repeat the auth checks with dedicated test records.
 
-Rollback: set `NEST_LETTERS_ENABLED` to `false` if a send must stop. To undo the worker, deploy the previous version `v8.4.0-nest-live` only together with removing `NEST_LETTERS_MODE` or leaving it unset, because that older file treats a missing mode as general delivery when the flag is true. Do not deploy `origin/main`'s worker. It would send nobody while the flag still says enabled. The claim function can be restored from `nest/desk-and-merge.sql` only for that function, and only if the new claims must be relaxed again. Restoring it re-opens the nest-id grant. Do not delete `user_entitlements` rows.
+Rollback: set `NEST_LETTERS_ENABLED` to `false` if a send must stop. To undo the worker, deploy `v8.4.0-nest-live` only together with removing `NEST_LETTERS_MODE`, because that older file treats a missing mode as general delivery when the flag is true. Leave `origin/main`'s worker undeployed. Restoring `link_deep_profile_to_user` from `nest/desk-and-merge.sql` would again grant Inner Compass from a nest id alone. Do not delete `user_entitlements` rows.

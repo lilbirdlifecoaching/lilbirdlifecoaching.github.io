@@ -732,7 +732,12 @@
         })
       });
       if (r.status === 403) {
-        showUpsell();
+        const errBody = await r.json().catch(() => ({}));
+        if (errBody.error === 'nest_plus_required') {
+          showUpsell();
+          return;
+        }
+        showError('This read is not available from this login.');
         return;
       }
       if (!r.ok) throw new Error('request failed');
