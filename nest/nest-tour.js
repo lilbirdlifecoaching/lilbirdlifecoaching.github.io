@@ -153,9 +153,9 @@
       {
         id: 'welcome',
         tab: 'products',
-        selector: '.next-steps-banner',
+        selector: '#next-steps-card',
         title: 'This is your Nest',
-        body: 'One home for what you’ve unlocked and what to do next. Start with the checklist up here.',
+        body: 'One home for what you’ve unlocked and what to do next. The checklist sits on the right. On Inner Compass it tucks away until you open it.',
         tip: null
       },
       {
@@ -196,10 +196,10 @@
       },
       {
         id: 'younger',
-        tab: 'profile',
-        selector: '.younger-you-card',
+        tab: 'products',
+        selector: '#btn-nav-profile',
         title: 'A picture of little you',
-        body: 'Add a photo of you around ages 4–8. It becomes your Nest picture, and it’s a fun one to dig out.',
+        body: 'The best ones are baby pictures, or you around four with a haircut you did not choose. It lives with your email settings, up at your picture.',
         tip: null,
         action: { label: 'Choose a photo →', photo: true }
       },
@@ -301,7 +301,8 @@
         var btn = document.querySelector('#pane-products [data-upgrade="' + action.upgrade + '"]');
         if (btn) btn.click();
       } else if (action.photo) {
-        setTab('profile');
+        var settings = document.getElementById('nest-settings');
+        if (settings) settings.classList.remove('hidden');
         var label = document.querySelector('.younger-you-file-label');
         if (label) label.click();
       }

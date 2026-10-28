@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.49.0/dist/tabler-icons.min.css" />
-  <link rel="stylesheet" href="./nest-styles.css?v=43" />
+  <link rel="stylesheet" href="./nest-styles.css?v=45" />
   <link rel="stylesheet" href="./nest-tour.css?v=3" />
   <link rel="stylesheet" href="/css/lilbird-nest-theme.css?v=20260917m" />
   <!-- Google Tag Manager -->
@@ -120,7 +120,7 @@
           <span class="tour-label-long">Take a tour</span>
           <span class="tour-label-short" aria-hidden="true">Tour</span>
         </button>
-        <button id="btn-nav-profile" class="avatar" type="button" aria-label="Open Inner Compass" title="Inner Compass"><i class="ti ti-user"></i></button>
+        <button id="btn-nav-profile" class="avatar" type="button" aria-label="Picture and email" title="Picture and email"><i class="ti ti-user"></i></button>
         <a id="nav-desk" class="btn btn-outline hidden" href="/desk/">Desk</a>
         <button id="btn-logout" class="btn btn-outline btn-logout" type="button">Log out</button>
       </div>
@@ -137,14 +137,21 @@
           <span id="profile-dot" class="profile-dot hidden"></span>
         </button>
         <button id="tab-journey" class="dash-tab" type="button"><i class="ti ti-map-2"></i> My Journey</button>
+        <button id="tab-live" class="dash-tab" type="button"><i class="ti ti-users"></i> Live <i id="live-tab-lock" class="ti ti-lock live-tab-lock" aria-hidden="true"></i></button>
         <button id="tab-ask" class="dash-tab" type="button"><i class="ti ti-feather"></i> Guide</button>
       </section>
 
-      <section class="next-steps-banner">
-        <p class="banner-title">Next steps</p>
-        <ul id="next-steps-list" class="steps-list"></ul>
+      <section id="nest-settings" class="nest-settings hidden" aria-labelledby="nest-settings-title">
+        <div class="nest-settings-head">
+          <div>
+            <p class="banner-title">Your Nest</p>
+            <h2 id="nest-settings-title">Picture and email</h2>
+          </div>
+          <button id="nest-settings-close" class="btn btn-outline" type="button">Close</button>
+        </div>
+        <div id="nest-settings-photo"></div>
+        <section id="nest-letters" class="nest-letters" aria-live="polite"></section>
       </section>
-      <section id="nest-letters" class="nest-letters" aria-live="polite"></section>
 
       <div id="dash-grid" class="dash-grid">
         <section class="main-col">
@@ -152,6 +159,14 @@
           <div id="pane-canvas" class="tab-pane"></div>
           <div id="pane-profile" class="tab-pane"></div>
           <div id="pane-journey" class="tab-pane"></div>
+          <div id="pane-live" class="tab-pane">
+            <article class="product-card locked" id="live-stage">
+              <span class="lock-pill"><i class="ti ti-lock"></i> Nest Premium</span>
+              <p class="eyebrow">live group coaching</p>
+              <h3>Live group coaching</h3>
+              <p>A session with Luke and other people in the Nest. This opens with Nest Premium.</p>
+            </article>
+          </div>
           <div id="pane-ask" class="tab-pane">
             <div class="guide-stage is-locked" id="guide-stage">
               <aside class="guide-presence">
@@ -179,7 +194,14 @@
         </section>
 
         <aside class="side-col">
-          <article id="sidebar-live-card" class="sidebar-card premium"></article>
+          <details class="sidebar-card next-steps-card" id="next-steps-card" open>
+            <summary>Next steps</summary>
+            <ul id="next-steps-list" class="steps-list"></ul>
+          </details>
+          <details class="sidebar-card side-fold" id="sidebar-help">
+            <summary>Help</summary>
+            <div id="sidebar-account-body"></div>
+          </details>
           <article id="sidebar-context-card" class="sidebar-card ember"></article>
           <article class="sidebar-card" id="sidebar-journey-card"></article>
           <article class="sidebar-card" id="sidebar-relationship-card"></article>
@@ -201,9 +223,9 @@
   <script src="/js/vendor/supabase-js-2.117.3.js"></script>
   <script src="/js/lilbird-theme.js"></script>
   <script src="/js/lilbird-theme-nav.js"></script>
-  <script src="./nest-tour.js?v=14"></script>
-  <script src="./nest-client.js?v=52"></script>
-  <script type="module" src="./nest-letters-ui.js?v=2"></script>
-  <script type="module" src="./journey.js?v=6"></script>
+  <script src="./nest-tour.js?v=15"></script>
+  <script src="./nest-client.js?v=53"></script>
+  <script type="module" src="./nest-letters-ui.js?v=3"></script>
+  <script type="module" src="./journey.js?v=7"></script>
 </body>
 </html>
