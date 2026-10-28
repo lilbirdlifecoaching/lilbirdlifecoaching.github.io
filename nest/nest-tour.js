@@ -208,7 +208,7 @@
         tab: 'ask',
         selector: '#tab-ask',
         title: 'lil’ bird guide',
-        body: 'A conversation in Luke’s manner. One question at a time, and an exercise only when it would help.',
+        body: 'The next best thing to being in the room with Luke. One question at a time, and an exercise only when it would help.',
         tip: null
       },
       {
