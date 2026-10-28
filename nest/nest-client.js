@@ -51,7 +51,6 @@
   const NEST_PLUS_SOURCES = [
     ['life_change_intensive', 'Included with your Intensive'],
     ['coaching', 'Included with your coaching'],
-    ['first_flight', 'Included with First Flight'],
     ['nest_plus', 'Nest Plus']
   ];
   let deepNestId = null;
@@ -560,9 +559,9 @@
     }
     if (hasNestPlus()) {
       const src = nestPlusSource();
-      return { name: 'Nest Plus', note: src === 'Nest Plus' ? 'Full read, Life Canvas, Relationship Dynamic, and the Roots & Wings workbook. $7.99 a month.' : src + '.' };
+      return { name: 'Nest Plus', note: src === 'Nest Plus' ? 'lil\' bird guide, the full read, Life Canvas, Relationship Dynamic, and the Roots & Wings workbook. $7.99 a month.' : src + '.' };
     }
-    return { name: 'Nest', note: 'First Flight workbook, Glow Map, and quizzes. Nest Plus adds the full read, Life Canvas, Relationship Dynamic, and Roots & Wings.' };
+    return { name: 'Nest', note: 'First Flight workbook, Glow Map, and quizzes. Nest Plus adds lil\' bird guide, the full read, Life Canvas, Relationship Dynamic, and Roots & Wings.' };
   }
 
   function nestAccessSummary() {
@@ -662,7 +661,7 @@
 
   /** Solo unlock: Nest entitlement row and/or legacy course_users purchase (same Supabase login). */
   function hasSoloCourseAccess() {
-    return entitlements.has('solo_course') || !!courseProfile?.purchased_at;
+    return entitlements.has('solo_course') || entitlements.has('nest_premium') || !!courseProfile?.purchased_at;
   }
 
   function intensiveProgressFlags() {
@@ -1129,7 +1128,7 @@
           <span class="lock-pill"><i class="ti ti-lock"></i> $7.99/month</span>
           <p class="eyebrow">nest plus</p>
           <h3>The Intensive workbook, on your own time</h3>
-          <p>The next best thing to being in the room with Luke. Life Canvas, the full Inner Compass read, Relationship Dynamic, and the Roots &amp; Wings workbook are here too. Cancel anytime. Included with coaching or the Intensive.</p>
+          <p>lil' bird guide is the next best thing to being in the room with Luke. Life Canvas, the full Inner Compass read, Relationship Dynamic, and the Roots &amp; Wings workbook are here too. Cancel anytime. Included with coaching or the Intensive.</p>
           <div class="btn-row"><button type="button" class="btn btn-ember" data-upgrade="nest_plus">Add Nest Plus · $7.99/month →</button></div>
         </article>`;
     }
@@ -1137,14 +1136,23 @@
     if (key === 'lcs_workbook') {
       if (hasNestPlus()) return '';
       const src = workbookSource();
-      if (!src) return '';
-      return `
+      if (src) {
+        return `
         <article class="product-card" data-product="lcs_workbook">
           <p class="eyebrow">workbook</p>
           <h3>Roots &amp; Wings</h3>
           <span class="status-badge">${escapeHtml(src)}</span>
           <p>Eight sessions in one workbook. Answers save on this device. Download as PDF keeps a copy.</p>
           <div class="btn-row"><a class="btn btn-gold" href="${workbookHref('life-change')}">Open workbook →</a></div>
+        </article>`;
+      }
+      return `
+        <article class="product-card locked" data-product="lcs_workbook">
+          <span class="lock-pill"><i class="ti ti-lock"></i> $27</span>
+          <p class="eyebrow">workbook</p>
+          <h3>Roots &amp; Wings</h3>
+          <p>The full Intensive workbook, on your own. Eight sessions. Yours to keep. It is included with Nest Plus, and you can buy it once for $27.</p>
+          <div class="btn-row"><button type="button" class="btn btn-ember" data-upgrade="lcs_workbook">Get the workbook · $27 →</button></div>
         </article>`;
     }
 
@@ -1177,7 +1185,7 @@
           <span class="lock-pill"><i class="ti ti-lock"></i> not yet unlocked</span>
           <p class="eyebrow">1-to-1 coaching</p>
           <h3>First Flight session</h3>
-          <p>Book a single session with Luke from your Nest and bring your Inner Compass read to talk through.</p>
+          <p>One session with Luke. The First Flight workbook already lives in your free Nest. Bring your Inner Compass read to talk through.</p>
           <div class="btn-row"><a class="btn btn-ember" href="/first-flight/book.html?code=IMREADY">Book First Flight · $149 →</a></div>
         </article>`;
     }
@@ -1227,8 +1235,8 @@
           <span class="lock-pill"><i class="ti ti-lock"></i> not yet unlocked</span>
           <p class="eyebrow">self-guided course</p>
           <h3>Life Change Sessions: Solo</h3>
-          <p>Eight sessions at your own pace. An AI coaching guide that helps you see yourself again.</p>
-          <div class="btn-row"><a class="btn btn-ember" href="/solo/">Unlock · $197 →</a></div>
+          <p>Eight sessions at your own pace, with an AI coaching guide. Included with Nest Premium. Or buy it once for $197.</p>
+          <div class="btn-row"><a class="btn btn-ember" href="/solo/">Buy Solo · $197 →</a></div>
         </article>`;
     }
 
@@ -2099,7 +2107,7 @@
       el.innerHTML = `
         <p class="sidebar-eyebrow">Nest Plus · $7.99/month</p>
         <h4>The Intensive workbook, on your own time</h4>
-        <p>Life Canvas, the full Inner Compass read, Relationship Dynamic, and Roots &amp; Wings. Eight sessions, the same workbook as the Intensive. Cancel anytime.</p>
+        <p>lil' bird guide, Life Canvas, the full Inner Compass read, Relationship Dynamic, and Roots &amp; Wings. Cancel anytime.</p>
         <button type="button" class="btn btn-ember full" id="btn-sidebar-plus">Add Nest Plus · $7.99/month →</button>`;
       el.querySelector('#btn-sidebar-plus')?.addEventListener('click', (e) => void startUpgrade('nest_plus', e.currentTarget));
       return;

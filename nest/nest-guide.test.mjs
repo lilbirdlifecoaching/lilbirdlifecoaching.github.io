@@ -27,7 +27,7 @@ test('a free nest cannot open the guide, and Nest Plus can', () => {
   assert.equal(guideAllowed([]), false);
   assert.equal(guideAllowed(['solo_course']), false);
   assert.equal(guideAllowed(['nest_plus']), true);
-  assert.equal(guideAllowed(['first_flight']), true);
+  assert.equal(guideAllowed(['first_flight']), false);
   assert.equal(guideAllowed(['coaching']), true);
   assert.equal(guideAllowed(['life_change_intensive']), true);
 });
