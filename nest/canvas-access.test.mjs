@@ -4,6 +4,9 @@ import test from 'node:test';
 import {
   CANVAS_CAPABILITY_TTL_MS,
   applyCanvasWrite,
+  bridgeDenial,
+  bridgeMemberSecret,
+  bridgeParticipantDecision,
   bridgeProfileDecision,
   canvasAccessDecision,
   canvasDenial,
@@ -15,6 +18,7 @@ import {
   newCanvasToken,
   partnerProfileDecision,
   retakeDecision,
+  verifiedLinkProof,
 } from './canvas-access.js';
 
 const owner = { id: '11111111-1111-4111-8111-111111111111', email: 'owner@example.com' };
@@ -313,10 +317,117 @@ test('the claim migration refuses a nest id and does not revoke entitlements', (
   assert.match(sql, /Do not run this until the reviewed worker is deployed/);
 });
 
+test('a legacy link is not ownership and does not reveal the stored email', () => {
+  assert.equal(verifiedLinkProof(null), null);
+  assert.equal(verifiedLinkProof(''), null);
+  assert.equal(verifiedLinkProof('email'), null);
+  assert.equal(verifiedLinkProof('capability'), 'capability');
+  assert.equal(verifiedLinkProof('read'), 'read');
+  assert.equal(verifiedLinkProof('owner_email'), 'owner_email');
+
+  const legacy = decide({ user: other, ownership: 'legacy' });
+  assert.equal(legacy.allow, false);
+  assert.equal(legacy.status, 403);
+  assert.equal(legacy.recovery, 'confirm-results-email');
+  const body = canvasDenial(legacy);
+  assert.deepEqual(body, { error: 'Not allowed', recovery: 'confirm-results-email' });
+  assert.equal('email' in body, false);
+
+  assert.equal(retakeDecision(legacy).allow, false);
+  assert.equal(mayRecordOwnerEmail(legacy), false);
+  assert.equal(courseLinkDecision({
+    launchValid: true,
+    access: legacy,
+    boundEmail: 'other@example.com',
+    courseUserEmail: 'other@example.com',
+  }).status, 403);
+
+  const ownEmail = decide({ user: owner, ownership: 'email' });
+  assert.equal(ownEmail.allow, true);
+  assert.equal(ownEmail.via, 'owner');
+  assert.equal(retakeDecision(ownEmail).allow, false);
+  assert.equal(mayRecordOwnerEmail(ownEmail), false);
+});
+
+test('the link migration leaves existing rows and entitlements alone', () => {
+  const sql = readFileSync(new URL('./release-a-links.sql', import.meta.url), 'utf8');
+  assert.match(sql, /add column if not exists ownership_proof text/);
+  assert.match(sql, /ownership_proof = coalesce\(ownership_proof, 'owner_email'\)/);
+  assert.match(sql, /'owner_email'/);
+  assert.doesNotMatch(sql, /delete\s+from\s+public\.deep_profile_links/i);
+  assert.doesNotMatch(sql, /delete\s+from\s+public\.user_entitlements/i);
+  assert.doesNotMatch(sql, /active\s*=\s*false/i);
+  assert.doesNotMatch(sql, /update\s+public\.deep_profile_links\s+set\s+ownership_proof\s*=\s*'owner_email'\s+where\s+ownership_proof\s+is\s+null/i);
+  assert.match(sql, /Do not run this until nest\/release-a-claim\.sql/);
+});
+
+test('Bridge status and check-in need this session, not a couple id', () => {
+  const couple = {
+    id: 'couple-1',
+    members: [
+      { memberId: 'a', name: 'Ada', nestId: 'nest-a', secret: 'a'.repeat(64), profile: { mbti: 'INTJ' } },
+      { memberId: 'b', name: 'Bea', nestId: 'nest-b', secret: 'b'.repeat(64), profile: { mbti: 'ENFP' } },
+    ],
+  };
+  const idsOnly = bridgeParticipantDecision({ couple, memberId: 'a', secret: '', nestAccess: null });
+  assert.equal(idsOnly.allow, false);
+  assert.equal(idsOnly.status, 404);
+  assert.deepEqual(bridgeDenial(), { error: 'Not found' });
+  assert.equal(JSON.stringify(idsOnly).includes('INTJ'), false);
+  assert.equal(JSON.stringify(idsOnly).includes('Ada'), false);
+
+  const wrongSecret = bridgeParticipantDecision({
+    couple,
+    memberId: 'b',
+    secret: 'a'.repeat(64),
+    nestAccess: null,
+  });
+  assert.equal(wrongSecret.allow, false);
+
+  const rightSecret = bridgeParticipantDecision({
+    couple,
+    memberId: 'a',
+    secret: 'a'.repeat(64),
+    nestAccess: null,
+  });
+  assert.equal(rightSecret.allow, true);
+  assert.equal(rightSecret.via, 'secret');
+  assert.equal(rightSecret.memberId, 'a');
+
+  const otherNest = bridgeParticipantDecision({
+    couple,
+    memberId: 'b',
+    secret: '',
+    nestAccess: { allow: true, via: 'owner', nestId: 'nest-a' },
+  });
+  assert.equal(otherNest.allow, false);
+
+  const verifiedNest = bridgeParticipantDecision({
+    couple,
+    memberId: 'a',
+    secret: '',
+    nestAccess: { allow: true, via: 'owner', nestId: 'nest-a' },
+  });
+  assert.equal(verifiedNest.allow, true);
+  assert.equal(verifiedNest.via, 'nest');
+
+  const legacyNest = bridgeParticipantDecision({
+    couple,
+    memberId: 'a',
+    secret: '',
+    nestAccess: { allow: false, via: null, nestId: 'nest-a' },
+  });
+  assert.equal(legacyNest.allow, false);
+
+  const missing = bridgeParticipantDecision({ couple: null, memberId: 'a', secret: 'a'.repeat(64) });
+  assert.equal(missing.status, 404);
+  assert.equal(bridgeMemberSecret().length, 64);
+});
+
 test('the assessment worker wires every private route through the same decisions', () => {
   const workerPath = "/Users/lukehaythorpe/Library/Mobile Documents/com~apple~CloudDocs/_LLC Buisiness Files/Lil' Bird/lilbird site/Deep-profile Cursor Project/lilbird-assessment.js";
   const worker = readFileSync(workerPath, 'utf8');
-  assert.match(worker, /const WORKER_VERSION = 'v8\.5\.1-release-a'/);
+  assert.match(worker, /const WORKER_VERSION = 'v8\.5\.2-release-a'/);
   assert.doesNotMatch(worker, /function bridgeLoadNest/);
 
   const linkFn = worker.slice(
@@ -325,6 +436,7 @@ test('the assessment worker wires every private route through the same decisions
   );
   assert.ok(linkFn.indexOf('courseLinkDecision') > 0);
   assert.ok(linkFn.indexOf('courseLinkDecision') < linkFn.indexOf("rest/v1/deep_profile_links"));
+  assert.match(linkFn, /ownership_proof/);
   assert.match(linkFn, /link-to-course refused/);
 
   const retakeFn = worker.slice(
@@ -355,6 +467,23 @@ test('the assessment worker wires every private route through the same decisions
   assert.match(joinFn, /bridgeProfileForRequest/);
   assert.doesNotMatch(createFn, /bridgeLoadNest/);
   assert.doesNotMatch(joinFn, /bridgeLoadNest/);
+  assert.match(createFn, /participantSecret/);
+  assert.match(joinFn, /participantSecret/);
+
+  const gate = worker.slice(
+    worker.indexOf('async function authorizeBridgeParticipant'),
+    worker.indexOf('function bridgeSecretFrom'),
+  );
+  assert.ok(gate.indexOf('bridgeParticipantDecision') > 0);
+  assert.ok(gate.indexOf('decideCanvasAccess') < gate.indexOf('bridgeParticipantDecision'));
+
+  for (const name of ['handleBridgeCoupleStatus', 'handleBridgeCheckin', 'handleBridgeGenerate']) {
+    const start = worker.indexOf(`async function ${name}`);
+    const slice = worker.slice(start, start + 1400);
+    assert.ok(slice.indexOf('authorizeBridgeParticipant') > 0, name);
+    assert.ok(slice.indexOf('authorizeBridgeParticipant') < slice.indexOf('bridgeCoupleStatus'), name);
+    assert.match(slice, /bridgeDenial\(\)/);
+  }
 
   for (const name of [
     'handleGetProfile',

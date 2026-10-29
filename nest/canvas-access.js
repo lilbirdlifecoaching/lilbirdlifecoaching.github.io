@@ -10,7 +10,12 @@
  * an ownership record. Saving the read does not move canvasTokenExpires.
  *
  * Ownership proof, strongest first:
- * - link: an existing deep_profile_links row for this account and this nest.
+ * - link: a deep_profile_links row whose ownership_proof is one of
+ *   capability, read, or owner_email. A row with no proof is legacy.
+ * - legacy: a deep_profile_links row created before proof was stored.
+ *   It is not deleted. It does not authorize access, a retake, a new link,
+ *   or an entitlement. The member recovers by signing in with the email
+ *   already stored on the read.
  * - read: an existing nest_reads row for this account and this nest.
  * - email: the signed-in email matches the email already stored on the read.
  *   This keeps current members able to open a read. It was forgeable before
@@ -19,6 +24,9 @@
  * - capability: unexpired token bound to this read, and only while the caller
  *   is signed out. A signed-in non-owner is refused even with a valid token.
  */
+
+/** Proofs written only after an independent check. A missing value stays legacy. */
+export const VERIFIED_LINK_PROOFS = ['capability', 'read', 'owner_email'];
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -43,6 +51,11 @@ export function capabilityStillValid(expires, now) {
   return Number.isFinite(stamp) && Number.isFinite(now) && stamp > now;
 }
 
+export function verifiedLinkProof(proof) {
+  const value = String(proof || '');
+  return VERIFIED_LINK_PROOFS.includes(value) ? value : null;
+}
+
 export function tokenMatches(presented, expected) {
   const a = String(presented || '');
   const b = String(expected || '');
@@ -62,13 +75,24 @@ export function canvasAccessDecision({ user, ownership, token, recordToken, toke
   if (!signedIn && fresh && recordExists) {
     return { allow: true, via: 'capability', ownership: null };
   }
+  if (signedIn && ownership === 'legacy' && recordExists) {
+    return {
+      allow: false,
+      status: 403,
+      error: 'Not allowed',
+      recovery: 'confirm-results-email',
+      ownership: 'legacy',
+    };
+  }
   if (!signedIn) return { allow: false, status: 401, error: 'Please log in.', ownership: null };
   if (!recordExists) return { allow: false, status: 404, error: 'Not allowed', ownership: null };
   return { allow: false, status: 403, error: 'Not allowed', ownership: null };
 }
 
 export function canvasDenial(decision) {
-  return { error: decision?.error || 'Not allowed' };
+  const body = { error: decision?.error || 'Not allowed' };
+  if (decision?.recovery === 'confirm-results-email') body.recovery = 'confirm-results-email';
+  return body;
 }
 
 /** Strong enough to write the claim table or create a new ownership row. */
@@ -135,6 +159,43 @@ export function bridgeProfileDecision({ access, suppliedProfile }) {
     return { allow: false, status: access?.status || 403, error: access?.error || 'Not allowed' };
   }
   return { allow: true, via: access.via };
+}
+
+/**
+ * A couple id and a member id are not participation.
+ * A participant secret issued at create or join is. An older session with no
+ * secret stays usable only when this caller can already open the nest stored
+ * on that same member row.
+ * A refusal is the same shape as a missing session and carries no names,
+ * profiles, nest ids, or check-in text.
+ */
+export function bridgeParticipantDecision({ couple, memberId, secret, nestAccess }) {
+  const missing = { allow: false, status: 404, error: 'Not found' };
+  if (!couple || typeof couple !== 'object' || Array.isArray(couple)) return missing;
+  const id = String(memberId || '');
+  if (!id) return missing;
+  const members = Array.isArray(couple.members) ? couple.members : [];
+  const member = members.find((item) => item && String(item.memberId) === id);
+  if (!member) return missing;
+  if (tokenMatches(secret, member.secret)) return { allow: true, via: 'secret', memberId: id };
+  const nestId = String(member.nestId || '');
+  const sameNest = !!(
+    nestAccess
+    && nestAccess.allow
+    && nestId
+    && String(nestAccess.nestId || '') === nestId
+    && (nestAccess.via === 'owner' || nestAccess.via === 'capability')
+  );
+  if (sameNest) return { allow: true, via: 'nest', memberId: id };
+  return missing;
+}
+
+export function bridgeDenial() {
+  return { error: 'Not found' };
+}
+
+export function bridgeMemberSecret() {
+  return newCanvasToken();
 }
 
 /** First email bind only. A different address never replaces one already stored. */
