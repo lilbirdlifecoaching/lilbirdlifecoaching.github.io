@@ -6798,6 +6798,10 @@ async function generatePartnerDynamic(){
         if(result){ result.style.display = 'none'; }
         return;
       }
+      if(errBody.recovery === 'confirm-results-email'){
+        if(result){ result.style.display='block'; result.textContent = 'Sign in with the email that received this read, or write hello@lilbird.life from that address.'; }
+        return;
+      }
       if(result){ result.style.display='block'; result.innerHTML='<p style="color:var(--ember);">This read is not available from this login.</p>'; }
       return;
     }
@@ -6839,7 +6843,14 @@ window.addEventListener('DOMContentLoaded', function() {
       const r = await fetch(`${WORKER_URL}/get-profile?nestId=${encodeURIComponent(existingNest)}`, { headers: Object.assign(await dpAuthHeaders(), canvasSessionHeaders(existingNest)) });
       if (r.status === 401 || r.status === 403) {
         const savedNote = document.getElementById('saved-read-note');
-        if (savedNote) savedNote.hidden = false;
+        let denied = {};
+        try { denied = await r.json(); } catch (_) {}
+        if (savedNote) {
+          if (denied.recovery === 'confirm-results-email') {
+            savedNote.textContent = 'Sign in with the email that received this read, or write hello@lilbird.life from that address.';
+          }
+          savedNote.hidden = false;
+        }
         return;
       }
       if (!r.ok) return;

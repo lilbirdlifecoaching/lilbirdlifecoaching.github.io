@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.49.0/dist/tabler-icons.min.css" />
-  <link rel="stylesheet" href="./nest-styles.css?v=41" />
+  <link rel="stylesheet" href="./nest-styles.css?v=46" />
   <link rel="stylesheet" href="./nest-tour.css?v=3" />
   <link rel="stylesheet" href="/css/lilbird-nest-theme.css?v=20260917m" />
   <!-- Google Tag Manager -->
@@ -81,8 +81,8 @@
 
         <div class="auth-plans" id="auth-plans">
           <div class="auth-plan"><strong>Free Nest</strong><b>Free</b><span>Glow Map, quizzes, letters if you opt in, and the First Flight workbook. Map what's going on and leave with one next move.</span></div>
-          <div class="auth-plan"><strong>Nest Plus</strong><b>$7.99/mo</b><span>Full Inner Compass read, Life Canvas, Relationship Dynamic, and the Roots &amp; Wings workbook. Eight sessions, the same workbook as the Intensive. Cancel anytime.</span></div>
-          <div class="auth-plan is-soon"><strong>Nest Premium</strong><b>Coming soon</b><span>Everything in Plus, the Solo course, and live group coaching with Luke. $47 a month when booking opens.</span></div>
+          <div class="auth-plan"><strong>Nest Plus</strong><b>$7.99/mo</b><span>lil' bird guide, the full Inner Compass read, Life Canvas, Relationship Dynamic, and the Roots &amp; Wings workbook. Cancel anytime. The workbook is also $27 on its own.</span></div>
+          <div class="auth-plan is-soon"><strong>Nest Premium</strong><b>Coming soon</b><span>Everything in Plus, the Solo course, and live group coaching with Luke. Solo is also $197 on its own. $47 a month when booking opens.</span></div>
         </div>
 
         <form id="form-set-password" class="auth-form hidden">
@@ -120,7 +120,7 @@
           <span class="tour-label-long">Take a tour</span>
           <span class="tour-label-short" aria-hidden="true">Tour</span>
         </button>
-        <button id="btn-nav-profile" class="avatar" type="button" aria-label="Open Inner Compass" title="Inner Compass"><i class="ti ti-user"></i></button>
+        <button id="btn-nav-profile" class="avatar" type="button" aria-label="Picture and email" title="Picture and email"><i class="ti ti-user"></i></button>
         <a id="nav-desk" class="btn btn-outline hidden" href="/desk/">Desk</a>
         <button id="btn-logout" class="btn btn-outline btn-logout" type="button">Log out</button>
       </div>
@@ -137,14 +137,21 @@
           <span id="profile-dot" class="profile-dot hidden"></span>
         </button>
         <button id="tab-journey" class="dash-tab" type="button"><i class="ti ti-map-2"></i> My Journey</button>
-        <button id="tab-ask" class="dash-tab" type="button"><i class="ti ti-message-circle"></i> Ask lil' bird</button>
+        <button id="tab-live" class="dash-tab" type="button"><i class="ti ti-users"></i> Live <i id="live-tab-lock" class="ti ti-lock live-tab-lock" aria-hidden="true"></i></button>
+        <button id="tab-ask" class="dash-tab" type="button"><i class="ti ti-feather"></i> Guide</button>
       </section>
 
-      <section class="next-steps-banner">
-        <p class="banner-title">Next steps</p>
-        <ul id="next-steps-list" class="steps-list"></ul>
+      <section id="nest-settings" class="nest-settings hidden" aria-labelledby="nest-settings-title">
+        <div class="nest-settings-head">
+          <div>
+            <p class="banner-title">Your Nest</p>
+            <h2 id="nest-settings-title">Picture and email</h2>
+          </div>
+          <button id="nest-settings-close" class="btn btn-outline" type="button">Close</button>
+        </div>
+        <div id="nest-settings-photo"></div>
+        <section id="nest-letters" class="nest-letters" aria-live="polite"></section>
       </section>
-      <section id="nest-letters" class="nest-letters" aria-live="polite"></section>
 
       <div id="dash-grid" class="dash-grid">
         <section class="main-col">
@@ -152,33 +159,60 @@
           <div id="pane-canvas" class="tab-pane"></div>
           <div id="pane-profile" class="tab-pane"></div>
           <div id="pane-journey" class="tab-pane"></div>
+          <div id="pane-live" class="tab-pane">
+            <article class="product-card locked" id="live-stage">
+              <span class="lock-pill"><i class="ti ti-lock"></i> Nest Premium</span>
+              <p class="eyebrow">live group coaching</p>
+              <h3>Live group coaching</h3>
+              <p>A session with Luke and other people in the Nest. This opens with Nest Premium.</p>
+            </article>
+          </div>
           <div id="pane-ask" class="tab-pane">
-            <div class="chat-shell">
-              <div class="chat-head">
-                <div class="chat-avatar">🪶</div>
-                <div>
-                  <h3>Ask lil' bird</h3>
-                  <p>Same guide voice, inside your Nest.</p>
+            <div class="guide-stage is-locked" id="guide-stage">
+              <aside class="guide-presence">
+                <div class="luke-portrait" id="luke-portrait">
+                  <img src="./luke-avatar.jpg" alt="Illustrated avatar of Luke" width="1024" height="1024" />
+                  <span class="luke-light"></span>
                 </div>
-              </div>
-              <div id="chat-messages" class="chat-messages"></div>
-              <div class="chat-input-row">
-                <textarea id="chat-input" rows="1" placeholder="What's on your mind today?"></textarea>
-                <button id="chat-send" class="btn btn-gold" type="button">Send</button>
+                <p class="guide-kicker">lil' bird guide</p>
+                <h3>Luke</h3>
+                <p class="guide-note">The next best thing to being in the room with Luke.</p>
+              </aside>
+              <div class="guide-talk">
+                <div id="chat-messages" class="chat-messages"></div>
+                <div class="guide-lock" id="guide-lock">
+                  <p>The next best thing to being in the room with Luke. Part of Nest Plus, with one exercise when it would actually help.</p>
+                  <button type="button" class="btn btn-ember" id="guide-upgrade" data-upgrade="nest_plus">Add Nest Plus · $7.99/month →</button>
+                </div>
+                <div class="chat-input-row" id="guide-composer">
+                  <textarea id="chat-input" rows="2" placeholder="What's in front of you?"></textarea>
+                  <button id="chat-send" class="btn btn-gold" type="button">Send</button>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
         <aside class="side-col">
-          <article id="sidebar-live-card" class="sidebar-card premium"></article>
+          <details class="sidebar-card next-steps-card" id="next-steps-card" open>
+            <summary>Next steps</summary>
+            <ul id="next-steps-list" class="steps-list"></ul>
+          </details>
+          <details class="sidebar-card side-fold" id="sidebar-help">
+            <summary>Help</summary>
+            <div id="sidebar-account-body"></div>
+          </details>
           <article id="sidebar-context-card" class="sidebar-card ember"></article>
           <article class="sidebar-card" id="sidebar-journey-card"></article>
           <article class="sidebar-card" id="sidebar-relationship-card"></article>
-          <article class="sidebar-card hint">
-            <p class="sidebar-eyebrow">chat hint</p>
-            <p>Questions? The lil' bird chat knows this ecosystem cold.</p>
-            <button id="btn-open-ask" class="btn btn-outline full" type="button"><i class="ti ti-message-circle"></i> Open Ask lil' bird</button>
+          <article class="sidebar-card hint guide-side" id="guide-side-card">
+            <div class="luke-portrait luke-portrait-mini" aria-hidden="true">
+              <img src="./luke-avatar.jpg" alt="" width="1024" height="1024" />
+              <span class="luke-light"></span>
+            </div>
+            <p class="sidebar-eyebrow">lil' bird guide</p>
+            <p id="guide-side-copy">The next best thing to being in the room with Luke.</p>
+            <button id="btn-open-ask" class="btn btn-outline full" type="button">Open the guide</button>
           </article>
         </aside>
       </div>
@@ -189,9 +223,9 @@
   <script src="/js/vendor/supabase-js-2.117.3.js"></script>
   <script src="/js/lilbird-theme.js"></script>
   <script src="/js/lilbird-theme-nav.js"></script>
-  <script src="./nest-tour.js?v=12"></script>
-  <script src="./nest-client.js?v=50"></script>
-  <script type="module" src="./nest-letters-ui.js?v=2"></script>
-  <script type="module" src="./journey.js?v=5"></script>
+  <script src="./nest-tour.js?v=16"></script>
+  <script src="./nest-client.js?v=55"></script>
+  <script type="module" src="./nest-letters-ui.js?v=3"></script>
+  <script type="module" src="./journey.js?v=7"></script>
 </body>
 </html>

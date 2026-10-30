@@ -7,7 +7,6 @@ import {
 } from './journey-reflect.js?v=4';
 import { createJourneySession, saveOutcome } from './journey-session.js';
 import {
-  CATEGORIES,
   categoryLabel,
   recommendTools,
   reflectionView,
@@ -37,9 +36,18 @@ const state = {
   status: '',
   busy: false,
   query: '',
-  category: 'all',
+  category: '',
   recommendText: '',
 };
+
+const AREAS = [
+  { id: 'relationships', label: 'Relationships', blurb: 'Boundaries, conversations, and the people close in.', icon: 'ti-heart', tone: 'ember' },
+  { id: 'myself', label: 'Myself', blurb: 'The story you tell yourself, and the one you want.', icon: 'ti-feather', tone: 'gold' },
+  { id: 'change', label: 'Change & Decisions', blurb: 'A choice that will not sit still.', icon: 'ti-arrows-shuffle', tone: 'tide' },
+  { id: 'rhythms', label: 'Life Rhythms', blurb: 'Energy, pace, and the shape of a week.', icon: 'ti-sun', tone: 'green' },
+  { id: 'family', label: 'Family', blurb: 'Home, history, and the roles you inherited.', icon: 'ti-home', tone: 'clay' },
+  { id: 'work', label: 'Work & Purpose', blurb: 'What the work is asking of you.', icon: 'ti-briefcase', tone: 'violet' },
+];
 
 function host() {
   return window.__nestJourneyHost || null;
@@ -135,10 +143,38 @@ function toolCardHtml(item) {
   );
 }
 
+function areaGridHtml() {
+  return '<div class="journey-areas">' + AREAS.map((area) => {
+    const count = searchTools('', area.id).length;
+    const tools = count === 1 ? '1 tool' : count + ' tools';
+    return '<button type="button" class="journey-area tone-' + area.tone + '" data-area="' + escapeHtml(area.id) + '">' +
+      '<i class="ti ' + area.icon + '" aria-hidden="true"></i>' +
+      '<span class="journey-area-label">' + escapeHtml(area.label) + '</span>' +
+      '<span class="journey-area-blurb">' + escapeHtml(area.blurb) + '</span>' +
+      '<span class="journey-area-count">' + tools + '</span>' +
+      '</button>';
+  }).join('') + '</div>';
+}
+
+function areaHeading(categoryId) {
+  const area = AREAS.find((item) => item.id === categoryId);
+  const label = area ? area.label : categoryLabel(categoryId);
+  return '<div class="journey-area-head"><p class="journey-kicker">' + escapeHtml(label) + '</p>' +
+    '<button type="button" class="btn btn-outline" data-area="">All areas</button></div>';
+}
+
 function libraryResultsHtml() {
-  const found = searchTools(state.query, state.category);
+  const q = state.query.trim();
+  if (!q && !state.category) return areaGridHtml();
+  if (!q && state.category) {
+    const found = searchTools('', state.category);
+    return areaHeading(state.category) + (found.length
+      ? '<div class="journey-tool-grid">' + found.map(toolCardHtml).join('') + '</div>'
+      : '<p class="journey-empty">Nothing in this area yet.</p>');
+  }
+  const found = searchTools(q, 'all');
   if (!found.length) {
-    return '<p class="journey-empty">Nothing matches that yet. Try another phrase, or look through All.</p>';
+    return '<p class="journey-empty">Nothing matches that yet. Try another phrase, or open an area.</p>';
   }
   return '<div class="journey-tool-grid">' + found.map(toolCardHtml).join('') + '</div>';
 }
@@ -172,13 +208,6 @@ function homeHtml() {
     ? state.rows.map((row) => reflectionHtml(row)).join('')
     : '<p class="journey-empty">Nothing saved yet. You can finish an exercise and leave it unsaved.</p>';
 
-  const filters = CATEGORIES.map((item) => {
-    const active = item.id === state.category ? ' is-active' : '';
-    const pressed = item.id === state.category ? 'true' : 'false';
-    return '<button type="button" class="btn btn-outline' + active + '" data-filter="' + escapeHtml(item.id) + '" aria-pressed="' + pressed + '">' +
-      escapeHtml(item.label) + '</button>';
-  }).join('');
-
   return (
     '<div class="journey-home">' +
       '<p class="journey-kicker">tools for the tangle</p>' +
@@ -193,7 +222,6 @@ function homeHtml() {
       '<section class="journey-block"><h3>Your next steps</h3><ul class="journey-steps">' + stepItems + '</ul></section>' +
       '<label class="journey-kicker" for="journey-search">Search</label>' +
       '<input id="journey-search" class="journey-search" type="search" maxlength="160" placeholder="What’s on your mind?" value="' + escapeHtml(state.query) + '">' +
-      '<div class="journey-filters" role="group" aria-label="Categories">' + filters + '</div>' +
       '<div id="journey-library-results">' + libraryResultsHtml() + '</div>' +
       '<section class="journey-block">' +
         '<h3>Not sure where to begin?</h3>' +
@@ -586,8 +614,9 @@ function onClick(event) {
     state.stage = Math.max(0, state.stage - 1);
     state.status = '';
     render();
-  } else if ('filter' in target.dataset) {
-    state.category = target.dataset.filter || 'all';
+  } else if ('area' in target.dataset) {
+    state.category = target.dataset.area || '';
+    state.query = '';
     state.status = '';
     render();
   } else if ('openCanvas' in target.dataset) host()?.setTab('canvas');
@@ -660,6 +689,10 @@ window.LilbirdJourney = {
   },
   show() {
     if (state.mode === 'home') render();
+  },
+  openTool(toolId) {
+    host()?.setTab('journey');
+    startTool(toolId);
   },
 };
 

@@ -81,13 +81,13 @@
         var src = access().nestPlusSource;
         return {
           title: 'Nest Plus' + (src && src !== 'Nest Plus' ? ' · ' + src.toLowerCase() : ''),
-          body: 'Life Canvas, Relationship Dynamic, and the Roots & Wings workbook are here. The First Flight workbook is already in your free Nest.',
+          body: 'lil\' bird guide, Life Canvas, Relationship Dynamic, and the Roots & Wings workbook are here. The First Flight workbook is already in your free Nest.',
           tip: '» Open Roots & Wings when you’re ready'
         };
       },
       locked: {
         title: 'Nest Plus · $7.99/month',
-        body: 'Adds Life Canvas, the full Inner Compass read, Relationship Dynamic, and the Roots & Wings workbook. $7.99 a month. Cancel anytime from your Nest. Included with coaching or the Intensive.',
+        body: 'Adds lil\' bird guide, Life Canvas, the full Inner Compass read, Relationship Dynamic, and the Roots & Wings workbook. $7.99 a month. Cancel anytime from your Nest. Included with coaching or the Intensive.',
         tip: null,
         action: { label: 'Add Nest Plus · $7.99/month →', upgrade: 'nest_plus' }
       }
@@ -103,7 +103,7 @@
       },
       locked: {
         title: 'Life Change Sessions workbook · $27',
-        body: 'The complete eight-session workbook to work through on your own. It’s included with the Life Change Intensive.',
+        body: 'The full Intensive workbook, on your own. Included with Nest Plus. On the free Nest, buy it once for $27.',
         tip: null,
         action: { label: 'Get the workbook · $27 →', upgrade: 'lcs_workbook' }
       }
@@ -119,7 +119,7 @@
       },
       locked: {
         title: 'Life Change Sessions: Solo · $197',
-        body: 'Eight self-guided sessions with an AI coaching guide. Unlock it from this card. Nest Plus is separate.',
+        body: 'Eight self-guided sessions with an AI coaching guide. Included with Nest Premium, or buy it once for $197.',
         tip: null
       }
     },
@@ -153,9 +153,9 @@
       {
         id: 'welcome',
         tab: 'products',
-        selector: '.next-steps-banner',
+        selector: '#next-steps-card',
         title: 'This is your Nest',
-        body: 'One home for what you’ve unlocked and what to do next. Start with the checklist up here.',
+        body: 'One home for what you’ve unlocked and what to do next. The checklist sits on the right. On Inner Compass it tucks away until you open it.',
         tip: null
       },
       {
@@ -196,10 +196,10 @@
       },
       {
         id: 'younger',
-        tab: 'profile',
-        selector: '.younger-you-card',
+        tab: 'products',
+        selector: '#btn-nav-profile',
         title: 'A picture of little you',
-        body: 'Add a photo of you around ages 4–8. It becomes your Nest picture, and it’s a fun one to dig out.',
+        body: 'The best ones are baby pictures, or you around four with a haircut you did not choose. It lives with your email settings, up at your picture.',
         tip: null,
         action: { label: 'Choose a photo →', photo: true }
       },
@@ -207,8 +207,8 @@
         id: 'ask',
         tab: 'ask',
         selector: '#tab-ask',
-        title: 'Ask lil’ bird',
-        body: 'Stuck or curious? Ask the same guide anything about your work, right here in your Nest.',
+        title: 'lil’ bird guide',
+        body: 'The next best thing to being in the room with Luke. One question at a time, and an exercise only when it would help.',
         tip: null
       },
       {
@@ -301,7 +301,8 @@
         var btn = document.querySelector('#pane-products [data-upgrade="' + action.upgrade + '"]');
         if (btn) btn.click();
       } else if (action.photo) {
-        setTab('profile');
+        var settings = document.getElementById('nest-settings');
+        if (settings) settings.classList.remove('hidden');
         var label = document.querySelector('.younger-you-file-label');
         if (label) label.click();
       }

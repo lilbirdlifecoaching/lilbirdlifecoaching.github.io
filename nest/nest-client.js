@@ -39,6 +39,7 @@
   let canvasCheckinOpen = false;
   let canvasDraft = null;
   let canvasStatus = '';
+  let canvasAccessNote = '';
   const CANVAS_DIMS = [
     { key: 'why', title: 'Passion & Purpose', color: '#F5C842', question: 'How alive does what you\'re doing feel?' },
     { key: 'who', title: 'Connections', color: '#4adea8', question: 'How held are you by the people around you?' },
@@ -51,13 +52,13 @@
   const NEST_PLUS_SOURCES = [
     ['life_change_intensive', 'Included with your Intensive'],
     ['coaching', 'Included with your coaching'],
-    ['first_flight', 'Included with First Flight'],
     ['nest_plus', 'Nest Plus']
   ];
   let deepNestId = null;
   let intensiveEnrolment = null;
   let lciSessions = [];
   let chatMsgs = [];
+  let guideOffered = [];
   let suppressDashboard = false;
   let dashboardHydrateToken = 0;
 
@@ -467,16 +468,19 @@
       canvasSynthesis = '';
       canvasTexts = null;
 
+      canvasAccessNote = '';
       if (deepNestId) {
         try {
           const res = await fetch(ASSESSMENT_WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(deepNestId), {
             headers: await authHeaders()
           });
-          if (res.ok) {
-            const payload = await res.json();
+          const payload = await res.json().catch(() => null);
+          if (res.ok && payload) {
             deepProfile = parseAssessmentProfile(payload);
             deepReadPaid = payload?.paid === true;
             applyCanvasPayload(payload);
+          } else {
+            canvasAccessNote = assessmentDenialMessage(payload, res.status);
           }
         } catch (e) {
           console.error('Could not load deep profile:', e);
@@ -491,6 +495,7 @@
       renderNextSteps();
       renderProducts();
       renderProfile();
+      renderSettingsPhoto();
       renderLifeCanvas();
       renderSidebar();
       refreshJourney();
@@ -505,6 +510,9 @@
         }
       }
       void handlePurchaseReturn();
+      const arrival = new URLSearchParams(window.location.search);
+      if (!arrival.get('tab') && !arrival.get('tool') && hasNestPlus()) setTab('ask');
+      else syncGuideAccess();
       document.dispatchEvent(new CustomEvent('lilbird-nest-ready', { detail: { user: currentUser } }));
     } catch (err) {
       console.error('Nest hydrateDashboard:', err);
@@ -555,9 +563,9 @@
     }
     if (hasNestPlus()) {
       const src = nestPlusSource();
-      return { name: 'Nest Plus', note: src === 'Nest Plus' ? 'Full read, Life Canvas, Relationship Dynamic, and the Roots & Wings workbook. $7.99 a month.' : src + '.' };
+      return { name: 'Nest Plus', note: src === 'Nest Plus' ? 'lil\' bird guide, the full read, Life Canvas, Relationship Dynamic, and the Roots & Wings workbook. $7.99 a month.' : src + '.' };
     }
-    return { name: 'Nest', note: 'First Flight workbook, Glow Map, and quizzes. Nest Plus adds the full read, Life Canvas, Relationship Dynamic, and Roots & Wings.' };
+    return { name: 'Nest', note: 'First Flight workbook, Glow Map, and quizzes. Nest Plus adds lil\' bird guide, the full read, Life Canvas, Relationship Dynamic, and Roots & Wings.' };
   }
 
   function nestAccessSummary() {
@@ -657,7 +665,7 @@
 
   /** Solo unlock: Nest entitlement row and/or legacy course_users purchase (same Supabase login). */
   function hasSoloCourseAccess() {
-    return entitlements.has('solo_course') || !!courseProfile?.purchased_at;
+    return entitlements.has('solo_course') || entitlements.has('nest_premium') || !!courseProfile?.purchased_at;
   }
 
   function intensiveProgressFlags() {
@@ -818,7 +826,7 @@
       });
       steps.push({ done: paidDone, text: 'Open Roots & Wings workbook before session one', href: workbookHref('life-change') });
       if (!youngerYouPhotoUrl()) {
-        steps.push({ done: false, text: 'Add your Nest picture on Inner Compass', action: 'photo' });
+        steps.push({ done: false, text: 'Add a baby picture, or you around four', action: 'photo' });
       }
     } else {
       steps.push({
@@ -853,8 +861,8 @@
       steps.push({
         done: !!youngerYouPhotoUrl(),
         text: youngerYouPhotoUrl()
-          ? 'Nest picture added'
-          : 'Add your Nest picture on Inner Compass',
+          ? 'Little-you picture is up'
+          : 'Add a baby picture, or you around four',
         action: youngerYouPhotoUrl() ? '' : 'photo'
       });
     }
@@ -873,7 +881,7 @@
         return `<li class="${s.done ? 'done' : ''}">${label}</li>`;
       })
       .join('');
-    ul.querySelectorAll('[data-step-photo]').forEach((btn) => btn.addEventListener('click', goToPhoto));
+    ul.querySelectorAll('[data-step-photo]').forEach((btn) => btn.addEventListener('click', () => openSettings(true)));
   }
 
   function parseAssessmentProfile(payload) {
@@ -898,14 +906,22 @@
     return s.replace(/^nest[:\s]+/i, '').trim();
   }
 
+  function assessmentDenialMessage(body, status) {
+    if (body && body.recovery === 'confirm-results-email') {
+      return 'Sign in with the email that received this read, or write hello@lilbird.life from that address.';
+    }
+    if (status === 401 || status === 403) return 'This read is not available from this login.';
+    return '';
+  }
+
   async function fetchAssessmentProfile(nestId) {
     const res = await fetch(
       ASSESSMENT_WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(nestId),
       { headers: await authHeaders() }
     );
-    if (!res.ok) return null;
-    const payload = await res.json();
-    return parseAssessmentProfile(payload);
+    const payload = await res.json().catch(() => null);
+    if (!res.ok) return { profile: null, status: res.status, body: payload };
+    return { profile: parseAssessmentProfile(payload), status: res.status, body: payload };
   }
 
   async function linkInnerCompassToAccount(btn) {
@@ -926,10 +942,12 @@
     setDashError('');
 
     try {
-      const profile = await fetchAssessmentProfile(nestId);
+      const loaded = await fetchAssessmentProfile(nestId);
+      const profile = loaded.profile;
       if (!profile) {
         setDashError(
-          'That link did not load a saved read. Open it in a new tab. If it works there, copy the full URL again. The email on the assessment can differ from your Nest login; that is OK.'
+          assessmentDenialMessage(loaded.body, loaded.status) ||
+          'That link did not load a saved read. Open it in a new tab and copy the full URL again.'
         );
         return;
       }
@@ -937,10 +955,13 @@
       btn.textContent = 'Connecting…';
       const { error } = await sb.rpc('link_deep_profile_to_user', { p_nest_id: nestId });
       if (error) {
+        const message = String(error.message || '');
         setDashError(
-          error.message.includes('another account')
-            ? 'That read is already connected to a different Nest account.'
-            : 'Could not save the link. Try again or email hello@lilbird.life.'
+          /not allowed/i.test(message)
+            ? assessmentDenialMessage({ recovery: 'confirm-results-email' }, 403)
+            : message.includes('another account')
+              ? 'That read is already connected to a different Nest account.'
+              : 'Could not save the link. Try again or email hello@lilbird.life.'
         );
         return;
       }
@@ -1110,7 +1131,7 @@
             <p class="eyebrow">nest plus</p>
             <h3>The Intensive workbook, on your own time</h3>
             <span class="status-badge">${escapeHtml(src)}</span>
-            <p>Life Canvas puts passion, connections, spaces, resources, and energy on one page. Roots &amp; Wings is the eight-session workbook from the Intensive. You also get the full Inner Compass read and Relationship Dynamic.</p>
+            <p>lil' bird guide is the next best thing to being in the room with Luke. Life Canvas, the full Inner Compass read, Relationship Dynamic, and the Roots &amp; Wings workbook are here too.</p>
             <div class="btn-row">
               <button type="button" class="btn btn-gold" data-open-canvas>Life Canvas →</button>
               <a class="btn btn-outline" href="${workbookHref('life-change')}">Roots &amp; Wings</a>
@@ -1124,7 +1145,7 @@
           <span class="lock-pill"><i class="ti ti-lock"></i> $7.99/month</span>
           <p class="eyebrow">nest plus</p>
           <h3>The Intensive workbook, on your own time</h3>
-          <p>Life Canvas puts passion, connections, spaces, resources, and energy on one page. Roots &amp; Wings is the eight-session workbook from the Intensive. You also get the full Inner Compass read and Relationship Dynamic. Cancel anytime. Included with coaching or the Intensive.</p>
+          <p>lil' bird guide is the next best thing to being in the room with Luke. Life Canvas, the full Inner Compass read, Relationship Dynamic, and the Roots &amp; Wings workbook are here too. Cancel anytime. Included with coaching or the Intensive.</p>
           <div class="btn-row"><button type="button" class="btn btn-ember" data-upgrade="nest_plus">Add Nest Plus · $7.99/month →</button></div>
         </article>`;
     }
@@ -1132,14 +1153,23 @@
     if (key === 'lcs_workbook') {
       if (hasNestPlus()) return '';
       const src = workbookSource();
-      if (!src) return '';
-      return `
+      if (src) {
+        return `
         <article class="product-card" data-product="lcs_workbook">
           <p class="eyebrow">workbook</p>
           <h3>Roots &amp; Wings</h3>
           <span class="status-badge">${escapeHtml(src)}</span>
           <p>Eight sessions in one workbook. Answers save on this device. Download as PDF keeps a copy.</p>
           <div class="btn-row"><a class="btn btn-gold" href="${workbookHref('life-change')}">Open workbook →</a></div>
+        </article>`;
+      }
+      return `
+        <article class="product-card locked" data-product="lcs_workbook">
+          <span class="lock-pill"><i class="ti ti-lock"></i> $27</span>
+          <p class="eyebrow">workbook</p>
+          <h3>Roots &amp; Wings</h3>
+          <p>The full Intensive workbook, on your own. Eight sessions. Yours to keep. It is included with Nest Plus, and you can buy it once for $27.</p>
+          <div class="btn-row"><button type="button" class="btn btn-ember" data-upgrade="lcs_workbook">Get the workbook · $27 →</button></div>
         </article>`;
     }
 
@@ -1172,7 +1202,7 @@
           <span class="lock-pill"><i class="ti ti-lock"></i> not yet unlocked</span>
           <p class="eyebrow">1-to-1 coaching</p>
           <h3>First Flight session</h3>
-          <p>Book a single session with Luke from your Nest and bring your Inner Compass read to talk through.</p>
+          <p>One session with Luke. The First Flight workbook already lives in your free Nest. Bring your Inner Compass read to talk through.</p>
           <div class="btn-row"><a class="btn btn-ember" href="/first-flight/book.html?code=IMREADY">Book First Flight · $149 →</a></div>
         </article>`;
     }
@@ -1222,8 +1252,8 @@
           <span class="lock-pill"><i class="ti ti-lock"></i> not yet unlocked</span>
           <p class="eyebrow">self-guided course</p>
           <h3>Life Change Sessions: Solo</h3>
-          <p>Eight sessions at your own pace. An AI coaching guide that helps you see yourself again.</p>
-          <div class="btn-row"><a class="btn btn-ember" href="/solo/">Unlock · $197 →</a></div>
+          <p>Eight sessions at your own pace, with an AI coaching guide. Included with Nest Premium. Or buy it once for $197.</p>
+          <div class="btn-row"><a class="btn btn-ember" href="/solo/">Buy Solo · $197 →</a></div>
         </article>`;
     }
 
@@ -1262,7 +1292,6 @@
         <strong class="plan-badge-name">${escapeHtml(plan.name)}</strong>
         <span class="plan-badge-note">${escapeHtml(plan.note)}</span>
       </div>
-      ${renderPhotoPrompt()}
       ${cardProduct('free_workbook')}
       ${cardProduct('inner_compass')}
       ${cardProduct('nest_plus')}
@@ -1285,7 +1314,7 @@
       btn.addEventListener('click', () => void openNestPlusBilling(btn));
     });
     productsPane.querySelectorAll('[data-go-photo]').forEach((btn) => {
-      btn.addEventListener('click', goToPhoto);
+      btn.addEventListener('click', () => openSettings(true));
     });
     renderSidebarRelationship();
     renderNavPlan();
@@ -1429,22 +1458,28 @@
     if (url) {
       btn.classList.add('has-photo');
       btn.classList.remove('needs-photo');
-      btn.title = 'Change your Nest picture';
-      btn.setAttribute('aria-label', 'Change your Nest picture');
+      btn.title = 'Picture and email';
+      btn.setAttribute('aria-label', 'Picture and email');
       btn.innerHTML =
         '<img src="' + escapeHtml(url) + '" alt="" width="30" height="30" />' +
         '<span class="avatar-edit" aria-hidden="true"><i class="ti ti-camera"></i></span>';
     } else {
       btn.classList.remove('has-photo');
       btn.classList.add('needs-photo');
-      btn.title = 'Add your Nest picture';
-      btn.setAttribute('aria-label', 'Add your Nest picture');
+      btn.title = 'Add a picture of little you';
+      btn.setAttribute('aria-label', 'Add a picture of little you');
       btn.innerHTML = '<i class="ti ti-camera-plus"></i>';
     }
   }
 
-  function goToPhoto() {
-    setTab('profile');
+  function openSettings(focusPhoto) {
+    const panel = document.getElementById('nest-settings');
+    if (!panel) return;
+    panel.classList.remove('hidden');
+    if (!focusPhoto) {
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
     requestAnimationFrame(() => {
       const card = document.querySelector('.younger-you-card');
       if (!card) return;
@@ -1455,17 +1490,8 @@
     });
   }
 
-  function renderPhotoPrompt() {
-    if (youngerYouPhotoUrl()) return '';
-    return `
-      <article class="product-card photo-prompt-card">
-        <span class="photo-prompt-icon" aria-hidden="true"><i class="ti ti-camera-plus"></i></span>
-        <div>
-          <h3>Add a picture of little you</h3>
-          <p>A photo of you around ages 4–8 makes your Nest feel like yours, and it’s a lovely reminder of who you were before the world told you who to be.</p>
-          <div class="btn-row"><button type="button" class="btn btn-outline" data-go-photo>Add my picture →</button></div>
-        </div>
-      </article>`;
+  function closeSettings() {
+    document.getElementById('nest-settings')?.classList.add('hidden');
   }
 
   function premiumMailto() {
@@ -1493,18 +1519,26 @@
     return data;
   }
 
+  function setLiveUnlocked(open) {
+    document.getElementById('live-tab-lock')?.classList.toggle('is-open', !!open);
+  }
+
   function renderLiveGroup() {
-    const el = document.getElementById('sidebar-live-card');
+    const el = document.getElementById('pane-live');
     if (!el) return;
+    setLiveUnlocked(false);
     el.innerHTML = `
-      <p class="sidebar-eyebrow">Live group coaching</p>
-      <h4>Live group coaching</h4>
-      <p>Checking the door…</p>`;
+      <article class="product-card locked" id="live-stage">
+        <span class="lock-pill"><i class="ti ti-lock"></i> Nest Premium</span>
+        <p class="eyebrow">live group coaching</p>
+        <h3>Live group coaching</h3>
+        <p>Checking the door…</p>
+      </article>`;
     void loadLiveCard();
   }
 
   async function loadLiveCard() {
-    const el = document.getElementById('sidebar-live-card');
+    const el = document.getElementById('pane-live');
     if (!el) return;
     let data = null;
     try {
@@ -1514,36 +1548,49 @@
     }
     const session = data?.session;
     const clocks = session ? liveClocks(session.startsAt) : '';
+    const open = !!(data && data.entitled && !data.removed);
+    setLiveUnlocked(open);
     if (data?.removed) {
       el.innerHTML = `
-        <p class="sidebar-eyebrow">Live group coaching</p>
-        <h4>This live is closed for you</h4>
-        <p>You were taken out of this session. Email hello@lilbird.life if that needs a look.</p>`;
+        <article class="product-card">
+          <p class="eyebrow">live group coaching</p>
+          <h3>This live is closed for you</h3>
+          <p>You were taken out of this session. Email hello@lilbird.life if that needs a look.</p>
+        </article>`;
       return;
     }
     if (session && data.entitled && session.status === 'live') {
       el.innerHTML = `
-        <p class="sidebar-eyebrow">Live group coaching</p>
-        <h4>The door is open</h4>
-        <p>${escapeHtml(clocks)}. The room holds ${escapeHtml(String(session.capacity || 15))}.</p>
-        <button type="button" class="btn btn-gold full" id="btn-live-join">Join the live</button>
-        <p id="live-join-status" class="younger-you-status" role="status"></p>`;
+        <article class="product-card">
+          <span class="status-badge">the door is open</span>
+          <p class="eyebrow">live group coaching</p>
+          <h3>Come on in</h3>
+          <p>${escapeHtml(clocks)}. The room holds ${escapeHtml(String(session.capacity || 15))}.</p>
+          <button type="button" class="btn btn-gold" id="btn-live-join">Join the live</button>
+          <p id="live-join-status" class="younger-you-status" role="status"></p>
+        </article>`;
       el.querySelector('#btn-live-join')?.addEventListener('click', () => void joinLive());
       return;
     }
     if (session && data.entitled) {
       el.innerHTML = `
-        <p class="sidebar-eyebrow">Live group coaching</p>
-        <h4>You're on the list for this live</h4>
-        <p>${escapeHtml(clocks)}. Join appears here when the room opens. Your access is checked at that moment.</p>`;
+        <article class="product-card">
+          <span class="status-badge">you're on the list</span>
+          <p class="eyebrow">live group coaching</p>
+          <h3>You're on the list for this live</h3>
+          <p>${escapeHtml(clocks)}. Join appears here when the room opens. Your access is checked at that moment.</p>
+        </article>`;
       return;
     }
     el.innerHTML = `
-      <p class="sidebar-eyebrow">Live group coaching <span class="soon-tag">Coming soon</span></p>
-      <h4>Live group coaching</h4>
-      <p>${session ? escapeHtml(clocks) + '. ' : ''}A session with Luke and other people in the Nest. $47 a month when booking opens. Intensive clients are included for the first year.</p>
-      <button type="button" class="btn btn-outline full" id="btn-premium-waitlist">Tell me when it opens</button>
-      <p id="waitlist-status" class="younger-you-status" role="status"></p>`;
+      <article class="product-card locked" id="live-stage">
+        <span class="lock-pill"><i class="ti ti-lock"></i> Nest Premium</span>
+        <p class="eyebrow">live group coaching <span class="soon-tag">Coming soon</span></p>
+        <h3>Live group coaching</h3>
+        <p>${session ? escapeHtml(clocks) + '. ' : ''}A session with Luke and other people in the Nest. $47 a month when booking opens. Intensive clients are included for the first year.</p>
+        <button type="button" class="btn btn-outline" id="btn-premium-waitlist">Tell me when it opens</button>
+        <p id="waitlist-status" class="younger-you-status" role="status"></p>
+      </article>`;
     el.querySelector('#btn-premium-waitlist')?.addEventListener('click', () => void joinWaitlist());
   }
 
@@ -1622,7 +1669,7 @@
           updateNavAvatar();
           renderNextSteps();
           renderProducts();
-          renderProfile();
+          renderSettingsPhoto();
         } catch (err) {
           console.error('Nest photo remove:', err);
           setYoungerYouStatus(err.message || 'Something went wrong. Try again.', 'error');
@@ -1673,7 +1720,7 @@
         if (saveBtn) saveBtn.classList.add('hidden');
         clearBtn.classList.add('hidden');
         setYoungerYouStatus('');
-        renderProfile();
+        renderSettingsPhoto();
       });
     }
 
@@ -1688,8 +1735,8 @@
           updateNavAvatar();
           renderNextSteps();
           renderProducts();
-          renderProfile();
-          setYoungerYouStatus('Saved. This is your Nest picture.', 'success');
+          renderSettingsPhoto();
+          setYoungerYouStatus('Saved. Little you is on the Nest.', 'success');
         } catch (err) {
           console.error('Nest photo upload:', err);
           setYoungerYouStatus(err.message || 'Something went wrong. Try again.', 'error');
@@ -1712,8 +1759,8 @@
               <span class="younger-you-photo-badge" aria-hidden="true"><i class="ti ti-camera"></i></span>
             </label>
             <div>
-              <h3>Your Nest picture</h3>
-              <p>You around ages 4–8. Shows on your Nest${hasSoloCourseAccess() ? ' and Full Flight Plan' : ''}.</p>
+              <h3>There you are</h3>
+              <p>The small version, keeping an eye on the rest of the Nest${hasSoloCourseAccess() ? ', and on your Full Flight Plan' : ''}.</p>
               <div class="btn-row younger-you-actions">
                 <label class="btn btn-outline younger-you-file-label" for="younger-you-file"><i class="ti ti-camera"></i>&nbsp;Change photo</label>
                 <input id="younger-you-file" class="younger-you-file-input" type="file" accept="image/*" />
@@ -1730,8 +1777,8 @@
     return `
       <article class="product-card younger-you-card">
         <p class="eyebrow">nest picture</p>
-        <h3>Add a picture of little you</h3>
-        <p>Dig out a photo of you around ages 4–8. It becomes your Nest picture${hasSoloCourseAccess() ? ' and sits on your Full Flight Plan' : ''}, a small daily reminder of who you were before anyone told you who to be.</p>
+        <h3>A picture of little you</h3>
+        <p>A baby picture is the best kind. Or you at four, with a haircut you did not choose and jam somewhere on your face. It becomes your Nest picture${hasSoloCourseAccess() ? ' and sits on your Full Flight Plan' : ''}, so the grown-up you remembers who started all this.</p>
         <div class="btn-row younger-you-actions">
           <label class="btn btn-gold younger-you-file-label" for="younger-you-file">Choose a photo</label>
           <input id="younger-you-file" class="younger-you-file-input" type="file" accept="image/*" />
@@ -1740,17 +1787,22 @@
         </div>
         <div id="younger-you-preview" class="younger-you-preview"></div>
         <p id="younger-you-status" class="younger-you-status" role="status"></p>
-        <p class="younger-you-hint">JPG · PNG · HEIC · up to 10 MB. Outdoor light, eyes visible if you can.</p>
+        <p class="younger-you-hint">A scan of a printed photo is perfect. JPG, PNG, or HEIC, up to 10 MB.</p>
       </article>`;
+  }
+
+  function renderSettingsPhoto() {
+    const host = document.getElementById('nest-settings-photo');
+    if (!host) return;
+    host.innerHTML = renderYoungerYouCard();
+    bindYoungerYouUpload();
   }
 
   function renderProfile() {
     const pane = document.getElementById('pane-profile');
-    const youngerCard = renderYoungerYouCard();
     if (hasInnerCompassComplete()) {
       pane.innerHTML = `
         <div class="product-grid">
-          ${youngerCard}
           <article class="product-card ic-snapshot-card ic-snapshot-card--profile">
             ${renderInnerCompassSnapshotMarkup('profile')}
           </article>
@@ -1758,7 +1810,6 @@
     } else if (hasInnerCompassAccess()) {
       pane.innerHTML = `
         <div class="product-grid">
-          ${youngerCard}
           <article class="product-card">
             <p class="eyebrow">inner compass</p>
             <h3>Inner Compass profile</h3>
@@ -1777,7 +1828,6 @@
     } else {
       pane.innerHTML = `
         <div class="product-grid">
-          ${youngerCard}
           <article class="product-card locked">
             <span class="lock-pill"><i class="ti ti-lock"></i> not yet unlocked</span>
             <p class="eyebrow">inner compass</p>
@@ -1787,15 +1837,12 @@
           </article>
         </div>`;
     }
-    bindYoungerYouUpload();
-    attachAccountTools();
   }
 
   function accountToolsHtml() {
     return `
-      <article class="product-card account-card">
-        <p class="eyebrow">your account</p>
-        <h3>One email for this Nest</h3>
+      <article class="account-card">
+        <h4>Merge nest accounts</h4>
         <p>If you also have a Nest on another email, bring it here. We email that inbox first. Nothing moves until you confirm the picture of both accounts.</p>
         <div id="account-reads"></div>
         <div id="account-pending"></div>
@@ -1812,8 +1859,9 @@
           <button type="button" class="btn btn-outline" id="btn-account-export">Download my Nest</button>
           <button type="button" class="btn btn-outline hidden" id="btn-merge-undo">Undo the merge</button>
         </div>
-        <label>Tell the desk
-          <textarea id="trouble-note" rows="2" placeholder="What happened, and which part of the Nest"></textarea>
+        <h4>Tell the desk</h4>
+        <label>What happened
+          <textarea id="trouble-note" rows="2" placeholder="Which part of the Nest, and what you expected"></textarea>
         </label>
         <button type="button" class="btn btn-outline" id="btn-trouble">Send to the desk</button>
         <label>Close my Nest
@@ -1824,7 +1872,7 @@
   }
 
   function attachAccountTools() {
-    const pane = document.getElementById('pane-profile');
+    const pane = document.getElementById('sidebar-account-body');
     if (!pane || pane.querySelector('.account-card')) return;
     pane.insertAdjacentHTML('beforeend', accountToolsHtml());
     pane.querySelector('#btn-merge-start')?.addEventListener('click', () => void startMerge());
@@ -2004,6 +2052,7 @@
 
   function renderSidebar() {
     renderLiveGroup();
+    attachAccountTools();
     const el = document.getElementById('sidebar-context-card');
     const hasIntensive = entitlements.has('life_change_intensive');
     const email = encodeURIComponent(currentUser?.email || '');
@@ -2075,7 +2124,7 @@
       el.innerHTML = `
         <p class="sidebar-eyebrow">Nest Plus · $7.99/month</p>
         <h4>The Intensive workbook, on your own time</h4>
-        <p>Life Canvas, the full Inner Compass read, Relationship Dynamic, and Roots &amp; Wings. Eight sessions, the same workbook as the Intensive. Cancel anytime.</p>
+        <p>lil' bird guide, Life Canvas, the full Inner Compass read, Relationship Dynamic, and Roots &amp; Wings. Cancel anytime.</p>
         <button type="button" class="btn btn-ember full" id="btn-sidebar-plus">Add Nest Plus · $7.99/month →</button>`;
       el.querySelector('#btn-sidebar-plus')?.addEventListener('click', (e) => void startUpgrade('nest_plus', e.currentTarget));
       return;
@@ -2344,7 +2393,12 @@
       return;
     }
     if (!canvasScores) {
-      pane.innerHTML = '<div class="lc-shell"><article class="lc-card"><p class="lc-kicker">Life Canvas</p><h2 class="lc-title">Your Inner Compass is linked</h2><p class="lc-lead">The five scores show up here after the Life Canvas questions in the Inner Compass. Check-ins after that stay on this tab.</p><div class="lc-empty-actions"><a class="btn btn-ember" href="' + escapeHtml(innerCompassHref()) + '">Open the Inner Compass →</a></div></article></div>';
+      const denied = !!canvasAccessNote;
+      const title = denied ? 'This read is not open from this login' : 'Your Inner Compass is linked';
+      const lead = denied
+        ? canvasAccessNote
+        : 'The five scores show up here after the Life Canvas questions in the Inner Compass. Check-ins after that stay on this tab.';
+      pane.innerHTML = '<div class="lc-shell"><article class="lc-card"><p class="lc-kicker">Life Canvas</p><h2 class="lc-title">' + title + '</h2><p class="lc-lead">' + escapeHtml(lead) + '</p><div class="lc-empty-actions"><a class="btn btn-ember" href="' + escapeHtml(innerCompassHref()) + '">Open the Inner Compass →</a></div></article></div>';
       return;
     }
     const scores = canvasScores;
@@ -2416,7 +2470,10 @@
         headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
         body: JSON.stringify({ nestId: deepNestId, canvasScores: next, canvasHistory: [entry] })
       });
-      if (!res.ok) throw new Error('save failed');
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(assessmentDenialMessage(body, res.status) || 'save failed');
+      }
       canvasScores = next;
       canvasHistory = [entry].concat(canvasHistory).slice(0, 24);
       canvasDraft = null;
@@ -2424,7 +2481,9 @@
       canvasStatus = 'Saved. This check-in is on your history.';
       renderLifeCanvas();
     } catch (err) {
-      canvasStatus = 'Could not save that check-in. Try again.';
+      canvasStatus = err && err.message && err.message !== 'save failed'
+        ? err.message
+        : 'Could not save that check-in. Try again.';
       canvasCheckinOpen = true;
       if (btn) {
         btn.disabled = false;
@@ -2450,7 +2509,14 @@
     if (pane) pane.classList.add('active');
     const dashGrid = document.getElementById('dash-grid');
     if (dashGrid) dashGrid.classList.toggle('is-ask-tab', name === 'ask');
+    const steps = document.getElementById('next-steps-card');
+    if (steps && steps.dataset.touched !== 'yes') {
+      if (name === 'profile') steps.removeAttribute('open');
+      else steps.setAttribute('open', '');
+    }
     if (name === 'canvas') renderLifeCanvas();
+    if (name === 'ask') bootGuide();
+    if (name === 'live') void loadLiveCard();
     if (name === 'journey' && window.LilbirdJourney) window.LilbirdJourney.show();
   }
   window.__nestSetTab = setTab;
@@ -2461,6 +2527,7 @@
     setDashError('');
     setDashLoading(false);
     chatMsgs = [];
+    guideOffered = [];
     const chatWrap = document.getElementById('chat-messages');
     if (chatWrap) chatWrap.innerHTML = '';
     document.getElementById('pane-products').innerHTML = '';
@@ -2475,11 +2542,17 @@
     canvasDraft = null;
     canvasStatus = '';
     document.getElementById('sidebar-context-card').innerHTML = '';
-    const live = document.getElementById('sidebar-live-card');
-    if (live) live.innerHTML = '';
+    const livePane = document.getElementById('pane-live');
+    if (livePane) livePane.innerHTML = '';
+    setLiveUnlocked(false);
     document.getElementById('next-steps-list').innerHTML = '';
+    const help = document.getElementById('sidebar-account-body');
+    if (help) help.innerHTML = '';
     const lettersHost = document.getElementById('nest-letters');
     if (lettersHost) lettersHost.innerHTML = '';
+    closeSettings();
+    const photoHost = document.getElementById('nest-settings-photo');
+    if (photoHost) photoHost.innerHTML = '';
     document.dispatchEvent(new CustomEvent('lilbird-nest-logout'));
     document.getElementById('nav-user-name').textContent = '';
     document.getElementById('nav-plan')?.classList.add('hidden');
@@ -2508,14 +2581,14 @@
   const tabCanvas = document.getElementById('tab-canvas');
   const tabProfile = document.getElementById('tab-profile');
   const tabJourney = document.getElementById('tab-journey');
+  const tabLive = document.getElementById('tab-live');
   const tabAsk = document.getElementById('tab-ask');
   const btnOpenAsk = document.getElementById('btn-open-ask');
   if (tabProducts) tabProducts.addEventListener('click', () => setTab('products'));
   if (tabCanvas) tabCanvas.addEventListener('click', () => setTab('canvas'));
   if (tabProfile) tabProfile.addEventListener('click', () => openInnerCompassRead());
   if (tabJourney) tabJourney.addEventListener('click', () => setTab('journey'));
-  if (tabAsk) tabAsk.addEventListener('click', () => setTab('ask'));
-  if (btnOpenAsk) btnOpenAsk.addEventListener('click', () => setTab('ask'));
+  if (tabLive) tabLive.addEventListener('click', () => setTab('live'));
   const paneCanvasEl = document.getElementById('pane-canvas');
   if (paneCanvasEl) {
     paneCanvasEl.addEventListener('click', (e) => {
@@ -2563,22 +2636,48 @@
   }
 
   // chat
-  function renderChatMsg(role, content) {
+  function syncGuideAccess() {
+    const open = hasNestPlus();
+    const stage = document.getElementById('guide-stage');
+    if (stage) stage.classList.toggle('is-locked', !open);
+    const copy = document.getElementById('guide-side-copy');
+    if (copy) {
+      copy.textContent = "The next best thing to being in the room with Luke.";
+    }
+  }
+  function renderChatMsg(role, content, tool) {
     const row = document.createElement('div');
     row.className = `msg ${role === 'user' ? 'user' : 'bot'}`;
-    row.textContent = content;
+    const text = document.createElement('p');
+    text.textContent = content;
+    row.appendChild(text);
+    if (tool && tool.id && tool.title) {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'guide-tool';
+      const title = document.createElement('strong');
+      title.textContent = tool.title;
+      const meta = document.createElement('span');
+      meta.textContent = tool.minutes ? tool.minutes + ' in My Journey' : 'Open in My Journey';
+      card.append(title, meta);
+      card.addEventListener('click', () => {
+        if (window.LilbirdJourney && window.LilbirdJourney.openTool) window.LilbirdJourney.openTool(tool.id);
+      });
+      row.appendChild(card);
+    }
     const wrap = document.getElementById('chat-messages');
     wrap.appendChild(row);
     wrap.scrollTop = wrap.scrollHeight;
   }
-  function bootChat() {
-    if (chatMsgs.length) return;
-    const greet = "Hey, it's lil' bird. Ask me anything about your next step, products, or where to start.";
+  function bootGuide() {
+    syncGuideAccess();
+    if (!hasNestPlus() || chatMsgs.length) return;
+    const greet = "I'm here with you. Tell me what's in front of you, and we'll stay with one thing.";
     chatMsgs.push({ role: 'assistant', content: greet });
     renderChatMsg('assistant', greet);
   }
-  if (tabAsk) tabAsk.addEventListener('click', bootChat);
-  if (btnOpenAsk) btnOpenAsk.addEventListener('click', bootChat);
+  if (tabAsk) tabAsk.addEventListener('click', () => setTab('ask'));
+  if (btnOpenAsk) btnOpenAsk.addEventListener('click', () => setTab('ask'));
   const chatSend = document.getElementById('chat-send');
   const chatInput = document.getElementById('chat-input');
   if (chatSend) chatSend.addEventListener('click', sendChat);
@@ -2590,7 +2689,50 @@
       }
     });
   }
+  const guideUpgrade = document.getElementById('guide-upgrade');
+  if (guideUpgrade) guideUpgrade.addEventListener('click', (e) => void startUpgrade('nest_plus', e.currentTarget));
 
+  async function sendChat() {
+    if (!hasNestPlus()) {
+      syncGuideAccess();
+      return;
+    }
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    chatMsgs.push({ role: 'user', content: text });
+    renderChatMsg('user', text);
+    const portrait = document.getElementById('luke-portrait');
+    if (portrait) portrait.classList.add('is-thinking');
+    try {
+      const response = await fetch(CHAT_WORKER_URL + 'guide', {
+        method: 'POST',
+        headers: Object.assign({ 'Content-Type': 'application/json' }, await authHeaders()),
+        body: JSON.stringify({ messages: chatMsgs.slice(-12), offered: guideOffered.slice() })
+      });
+      let data = null;
+      try { data = await response.json(); } catch (_) { data = null; }
+      if (data && data.error === 'nest_plus_required') {
+        const stage = document.getElementById('guide-stage');
+        if (stage) stage.classList.add('is-locked');
+        return;
+      }
+      const msg = response.ok && !(data && data.error) ? textFromChatPayload(data) : '';
+      if (!msg) {
+        renderChatMsg('assistant', "I couldn't get a reply just now. Try again in a moment.");
+        return;
+      }
+      chatMsgs.push({ role: 'assistant', content: msg });
+      const tool = data && data.tool && data.tool.id ? data.tool : null;
+      if (tool) guideOffered.push(tool.id);
+      renderChatMsg('assistant', msg, tool);
+    } catch (e) {
+      renderChatMsg('assistant', "I couldn't reach the guide just now. Try again in a moment.");
+    } finally {
+      if (portrait) portrait.classList.remove('is-thinking');
+    }
+  }
   function textFromChatPayload(data) {
     if (!data || typeof data !== 'object') return '';
     const blocks = Array.isArray(data.content) ? data.content : [];
@@ -2604,33 +2746,6 @@
     if (typeof data.reply === 'string' && data.reply.trim()) return data.reply.trim();
     if (typeof data.message === 'string' && data.message.trim()) return data.message.trim();
     return '';
-  }
-
-  async function sendChat() {
-    const input = document.getElementById('chat-input');
-    const text = input.value.trim();
-    if (!text) return;
-    input.value = '';
-    chatMsgs.push({ role: 'user', content: text });
-    renderChatMsg('user', text);
-    try {
-      const response = await fetch(CHAT_WORKER_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: chatMsgs.slice(-12) })
-      });
-      let data = null;
-      try { data = await response.json(); } catch (_) { data = null; }
-      const msg = response.ok && !(data && data.error) ? textFromChatPayload(data) : '';
-      if (!msg) {
-        renderChatMsg('assistant', "I couldn't get a reply just now. Try again in a moment.");
-        return;
-      }
-      chatMsgs.push({ role: 'assistant', content: msg });
-      renderChatMsg('assistant', msg);
-    } catch (e) {
-      renderChatMsg('assistant', "I couldn't reach the chat worker just now. Try again in a moment.");
-    }
   }
 
   async function showDashboard(preloadedUser) {
@@ -2798,10 +2913,14 @@
 
   const btnNavProfile = document.getElementById('btn-nav-profile');
   if (btnNavProfile) {
-    btnNavProfile.addEventListener('click', () => {
-      goToPhoto();
-    });
+    btnNavProfile.addEventListener('click', () => openSettings(false));
   }
+  document.getElementById('nest-settings-close')?.addEventListener('click', closeSettings);
+  document.getElementById('next-steps-card')?.querySelector('summary')?.addEventListener('click', () => {
+    const card = document.getElementById('next-steps-card');
+    if (card) card.dataset.touched = 'yes';
+  });
+  if (location.hash === '#email-preferences') openSettings(false);
 
   document.addEventListener('visibilitychange', () => {
     if (
