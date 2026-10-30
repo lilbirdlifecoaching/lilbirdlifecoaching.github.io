@@ -202,7 +202,7 @@ function homeHtml() {
           escapeHtml(view.title) + ' · ' + escapeHtml(formatWhen(row.created_at)) +
           '</span></li>';
       }).join('')
-    : '<li class="journey-empty">Saved next steps will show up here.</li>';
+    : '<li class="journey-empty">Steps you save will show up here.</li>';
 
   const reflections = state.rows.length
     ? state.rows.map((row) => reflectionHtml(row)).join('')
@@ -219,7 +219,7 @@ function homeHtml() {
           ? '<p class="journey-lead">' + state.rows.length + (state.rows.length === 1 ? ' saved reflection. Open it to read it again.</p>' : ' saved reflections. Open one to read it again.</p>')
           : '') +
         reflections + '</section>' +
-      '<section class="journey-block"><h3>Your next steps</h3><ul class="journey-steps">' + stepItems + '</ul></section>' +
+      '<section class="journey-block"><h3>Steps you saved</h3><ul class="journey-steps">' + stepItems + '</ul></section>' +
       '<label class="journey-kicker" for="journey-search">Search</label>' +
       '<input id="journey-search" class="journey-search" type="search" maxlength="160" placeholder="What’s on your mind?" value="' + escapeHtml(state.query) + '">' +
       '<div id="journey-library-results">' + libraryResultsHtml() + '</div>' +
@@ -301,7 +301,7 @@ function completionHtml(tool) {
     .map((stage) => '<p><span>' + escapeHtml(stage.label) + '</span> ' + escapeHtml(clean[stage.key]) + '</p>')
     .join('');
   const note = state.insight
-    ? '<div class="journey-note"><span>' + (state.insightFromModel ? 'Coaching note' : 'A note you can keep') + '</span><p>' + escapeHtml(state.insight) + '</p><p class="journey-empty">Saving keeps this note. Another perspective replaces it.</p></div>'
+    ? '<div class="journey-note"><span>' + (state.insightFromModel ? 'Coaching note' : 'A note you can keep') + '</span><p>' + escapeHtml(state.insight) + '</p><p class="journey-empty">A new perspective changes this note. Reflections you already saved stay saved. Saving this one adds another entry.</p></div>'
     : '';
   const reflectLabel = state.insight ? 'Another perspective' : 'Reflect with lil\' bird';
   return (
