@@ -314,7 +314,7 @@ test('the claim migration refuses a nest id and does not revoke entitlements', (
   assert.match(sql, /raise exception 'not allowed'/);
   assert.doesNotMatch(sql, /delete\s+from\s+public\.user_entitlements/i);
   assert.doesNotMatch(sql, /active\s*=\s*false/i);
-  assert.match(sql, /Do not run this until the reviewed worker is deployed/);
+  assert.match(sql, /Run this before the Worker/);
 });
 
 test('a legacy link is not ownership and does not reveal the stored email', () => {
@@ -358,7 +358,28 @@ test('the link migration leaves existing rows and entitlements alone', () => {
   assert.doesNotMatch(sql, /delete\s+from\s+public\.user_entitlements/i);
   assert.doesNotMatch(sql, /active\s*=\s*false/i);
   assert.doesNotMatch(sql, /update\s+public\.deep_profile_links\s+set\s+ownership_proof\s*=\s*'owner_email'\s+where\s+ownership_proof\s+is\s+null/i);
-  assert.match(sql, /Do not run this until nest\/release-a-claim\.sql/);
+  assert.match(sql, /Run this in the same script as nest\/release-a-claim\.sql/);
+  assert.match(sql, /grant all on public\.deep_profile_links to service_role/);
+  assert.match(sql, /grant select on public\.deep_profile_links to authenticated/);
+});
+
+test('the hotfix is one transaction and does not install the open claim', () => {
+  const sql = readFileSync(new URL('./release-a-hotfix.sql', import.meta.url), 'utf8');
+  assert.match(sql, /^begin;/m);
+  assert.match(sql, /^commit;/m);
+  assert.match(sql, /raise exception 'not allowed'/);
+  assert.match(sql, /ownership_proof/);
+  assert.match(sql, /'owner_email'/);
+  assert.doesNotMatch(sql, /values \(v_uid, v_nest, now\(\), now\(\)\);/);
+  assert.doesNotMatch(sql, /delete\s+from\s+public\.user_entitlements/i);
+  assert.doesNotMatch(sql, /active\s*=\s*false/i);
+  assert.match(sql, /grant all on public\.nest_owner_emails to service_role/);
+
+  const hold = readFileSync(new URL('./release-a-containment.sql', import.meta.url), 'utf8');
+  assert.match(hold, /revoke execute on function public\.link_deep_profile_to_user\(text\) from public, anon, authenticated/);
+  assert.doesNotMatch(hold, /create or replace function/i);
+  assert.doesNotMatch(hold, /grant execute/i);
+  assert.match(hold, /Do not run it after the hotfix/);
 });
 
 test('Bridge status and check-in need this session, not a couple id', () => {

@@ -1,5 +1,5 @@
--- Release A link proof. Do not run this until nest/release-a-claim.sql
--- has been applied and the reviewed worker is deployed in the same change.
+-- Release A link proof. Run this in the same script as nest/release-a-claim.sql,
+-- immediately after it. Do not wait for the Worker. See nest/release-a-hotfix.sql.
 --
 -- Existing deep_profile_links rows are left untouched. A null ownership_proof
 -- is a legacy link and is not proof of assessment ownership.
@@ -66,5 +66,15 @@ begin
   return jsonb_build_object('nest_id', coalesce(v_current, v_nest), 'added', v_nest);
 end;
 $$;
+
+revoke insert, update, delete on public.deep_profile_links from anon, authenticated;
+revoke insert, update, delete on public.nest_reads from anon, authenticated;
+grant select on public.deep_profile_links to authenticated;
+grant select on public.nest_reads to authenticated;
+grant all on public.deep_profile_links to service_role;
+grant all on public.nest_reads to service_role;
+grant all on public.nest_owner_emails to service_role;
+revoke execute on function public.link_deep_profile_to_user(text) from public, anon;
+grant execute on function public.link_deep_profile_to_user(text) to authenticated;
 
 notify pgrst, 'reload schema';

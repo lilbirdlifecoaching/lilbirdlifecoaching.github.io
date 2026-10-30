@@ -1,7 +1,8 @@
--- Release A claim guard. Do not run this until the reviewed worker is deployed
--- in the same change. It does not update, delete, or deactivate existing
--- user_entitlements rows. A claim that fails the email check raises an
--- exception and writes nothing.
+-- Release A claim guard. Run this before the Worker, in the same script as
+-- nest/release-a-links.sql. See nest/release-a-hotfix.sql for that paste.
+-- It does not update, delete, or deactivate existing user_entitlements rows.
+-- A claim that fails the email check raises an exception and writes nothing.
+-- Until a service-role row exists in nest_owner_emails, every claim is refused.
 
 create table if not exists public.nest_owner_emails (
   nest_id text primary key,
