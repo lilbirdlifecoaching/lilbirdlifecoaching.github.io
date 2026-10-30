@@ -1,89 +1,339 @@
 # Nest comprehensive audit
 
-Date: 27 October 2026, afternoon Pacific.
+Refreshed 30 October 2026, after Release A. This replaces the 27 October status. The Release A notes at the end were written before that deploy and stay as the record of the trust model.
 
-This is an evidence review of My Journey, Tools for the Tangle, and Nest coaching emails. No production data was changed. No email was sent. No branch was merged. No worker was deployed. Local `main` is still `443b8baf` and was not checked out.
+No email was sent. The cron was not triggered. No SQL migration was run. No member row was changed. Local `main` is still `443b8baf` and was not checked out.
 
-Release A is prepared on `feature/nest-release-a-security` and is not deployed. The production findings below stay in force until that deploy. See the Release A section at the end.
+Production at this refresh:
 
-Production at the time of the review:
+- Site: GitHub Pages merge `3a3aef12` (pull request 10), https://lilbird.life/nest/
+- Live Nest HTML serves `nest-client.js?v=55` and `journey.js?v=7`. The free-plan sentence is still “Glow Map, quizzes, letters if you opt in, and the First Flight workbook.” The word `checked` does not appear on that page.
+- Assessment worker: `v8.5.2-release-a`, deployment `e5ba2a17-553e-4d1a-b4f3-bec81bbb4163`
+- `/ping`: `{"ok":true,"version":"v8.5.2-release-a","nestLetters":"enabled"}`
+- `NEST_LETTERS_MODE=general`. Cron remains `0 15 * * *`. `NEST_LETTERS_ENABLED` was left in place.
+- Database `mebqqzbuwkogdxvnihrq`, branch main Production. Read-only counts on 30 October: 18 entitlements, all active, 5 active Inner Compass, 5 links, all with a null ownership proof, 0 owner-email rows, 0 reads, 5 deliveries (4 sent, 1 failed), 3 letter-state rows, 2 with coaching on, 0 due.
+- The count-only key `nest-letters:last-run` is absent. Worker `v8.5.2` writes it, and no cron has run on that worker yet. Today’s 15:00 UTC cron ran before the 22:38 UTC deploy, on `v8.4.0-nest-live`.
+- Supabase scheduled backups: the dashboard says the Free plan does not include project backups.
 
-- Site: GitHub Pages `ad7ff21` (pull request 4), https://lilbird.life/nest/
-- Assessment worker: `v8.4.0-nest-live`, deployment `0061f868-3fb0-45c8-8e3a-3d4b101b1641`
-- Solo worker: `v1.29-tangle` at https://worker-solo.cwwq46sn7m.workers.dev/ping
-- Coaching delivery: enabled
-- Daily cron: `0 15 * * *` (8:00 AM Pacific)
-- First general delivery: not yet. See the delivery section.
+Completion counts only the 48 matrix rows. Enhancement rows are excluded. A row is complete only when this refresh could point at production behavior, a production policy or count, or an automated test that executes the rule. A file that merely contains the feature is not enough.
 
-Completion below counts only rows in the requirements matrix. `ENHANCEMENT` rows are excluded. `UNVERIFIED` rows are not treated as complete.
+B1 copy is in the working tree on `feature/nest-release-b` and is not published. The matrix describes production.
 
 ## Requirements matrix
 
-| Requirement | Planned behavior | Actual implementation | Evidence | Status | Severity | Recommended action |
-| --- | --- | --- | --- | --- | --- | --- |
-| My Journey is a Nest tab | A member opens My Journey from the dashboard, with a sidebar card. | `#tab-journey` and `#sidebar-journey-card` are on the live Nest. | `nest/index.html`; live page loads `journey.js?v=5`. | PASS | — | None. |
-| Saved reflections sit at the top | After a save, the note is easy to find above the tool library. | `#journey-reflections` is the first block on the home screen. The save screen says “Saved to My Journey.” and offers “View saved reflection.” | Live `journey.js?v=5` `homeHtml` and `savedHtml`. | PASS | — | None. |
-| A reflection belongs to one member | The row stores that member’s id. Another member cannot read, insert, or delete it. | Insert uses the signed-in id. RLS is select, insert, and delete where `auth.uid() = user_id`. There is no update grant. | `nest/journey-reflections.sql`; `buildInsertRow` in `nest/journey-reflect.js`; journey privacy tests. | PASS | — | None. |
-| Save, then reopen | Save writes one row and the member can open it again. | Save inserts and returns an id. View opens that card. The live script contains this path. | `saveReflection` and `viewSaved` in `nest/journey.js`. A signed-in click was not repeated in this audit. | PASS | — | None. |
-| Delete | The member can remove one of their own rows. | Delete confirms, then deletes by id and user id. The button is on each card. | `deleteReflection` in `nest/journey.js`. | PASS | — | None. |
-| The same tool can be used again | A second completion is a new row. The first remains. | Every save is an insert. The table has no update policy, so a later save cannot replace an earlier id. | `journey_reflections` grants; `saveReflection`. | PASS | — | None. |
-| A second AI read does not erase a saved row | Regenerating changes the note on screen. A later save stores that note as its own row. | `state.insight` is replaced in memory. Save inserts the current note only. An already saved row is left as it was. | `completionHtml` and `saveReflection`. | PASS | — | None. |
-| The regeneration sentence matches that behavior | The member can tell that a new perspective replaces the unsaved note, not an older saved one. | The screen says “Another perspective replaces it.” That is true of the note on screen. It can be read as replacing the saved history. | Live `journey.js` line with that sentence. | PARTIAL | P2 | Say that a new perspective replaces the note on this page, and that an earlier saved reflection stays until it is deleted. No migration. Pages deploy. Retest save, regenerate, save again, and confirm two rows. |
-| Timestamps | A saved reflection shows when it was kept. | `created_at` is stored in Postgres and shown as a date in `en-AU`, without the time of day. | `formatWhen` in `nest/journey.js`. | PARTIAL | P3 | Show the date and time if members need to tell two saves on the same day apart. No migration. Pages deploy. |
-| Empty and failed saves | An empty Journey explains itself. A failed save keeps the answers and can be tried again. | Empty copy is “Nothing saved yet.” A failed insert keeps the draft and shows `SAVE_ERROR`. | `homeHtml`; `saveOutcome` in `nest/journey-session.js`; journey tests. | PASS | — | None. |
-| Account switch and cross-account privacy | A reflection from one session cannot be written onto another member. | In-flight reflect and save checks are dropped when the member id changes. Reads are filtered with `.eq('user_id', user.id)` and by RLS. | `nest/journey-session.js`; `loadRows`; journey tests. | PASS | — | None. |
-| Journey on a phone | The library and reflections fit a narrow screen. | Under 640px the grid is one column and the search field is full width. A signed-in phone pass was not repeated today. The preferences window was checked earlier at 390px. | `nest/nest-styles.css` around the 640px journey rules. | PASS | — | Spot-check one tool on a phone during the next signed-in pass. |
-| Fifteen tools | Boundary Untangler plus fourteen more, each with its own questions. | Fifteen tools, versions all `1`, across six categories: relationships 4, myself 3, change 2, rhythms 3, family 2, work 1. | `TOOLS` in `nest/journey-tools.js`. Inventory in this document. | PASS | — | None. |
-| Each tool can be finished, reflected, and saved | Stages, one next step, a grounded coaching note, a deep link, and a save. | Every tool has a `nextStep` stage. Eight tools have one optional stage. Reflect prompts include the member’s answers and forbid diagnosis. Deep links are `https://lilbird.life/nest/?tool=<id>`. Unknown tools are refused. | Tool inventory script; `journeyReflectSystem`; `nest/journey-tools.test.mjs`. | PASS | — | None. |
-| Live model wording for every tool | The note uses the member’s words and does not make a clinical claim. | The prompt requires one detail from their words and forbids diagnosis. This audit did not send fifteen live model requests. | `journeyReflectSystem` and `journeyReflectPrompt`. | UNVERIFIED | P2 | Read one saved or freshly generated note per tool before calling the library finished. Do not treat the fallback sentence as that review. |
-| Tools are part of the Nest, not a paid add-on | The library is available to a signed-in Nest member. A later decision could gate it. No such decision was made. | `journey.js` does not check Nest Plus. Any signed-in member can open a tool. | No entitlement check in `nest/journey.js`. | PASS | — | None. |
-| The Nest reads as one home | Free Nest, Plus, Premium, Compass, Canvas, Journey, and email preferences are understandable, and a new member knows what to do first. | The tabs and the product cards exist. The free-plan sentence still lists the workbook, Glow Map, and quizzes, and does not mention My Journey. Product “Next steps” and Journey “Your next steps” are different lists with the same kind of name. | `renderPlan` in `nest/nest-client.js`; `#next-steps-list`; Journey home. | PARTIAL | P2 | Name the tools on the free plan, and distinguish product tasks from saved exercise steps. No migration. Pages deploy. |
-| Subscription tiers | Free Nest, Nest Plus at $7.99 a month, Premium marked coming soon. Plus is not the Solo course. | Those prices and the coming-soon Premium card are on the signup screen and the product pane. Solo access is a separate entitlement. This audit did not start a checkout. | `nest/index.html` plan cards; `hasNestPlus` and `hasSoloAccess` in `nest/nest-client.js`. | PASS | — | None. |
-| Welcome, 26 letters, and four check-ins | The approved sequence, subjects, preview text, tool links, voice, sender, and signature. | Render of the welcome, all 26 letters, and all 4 check-ins produced no audit problems and no “Note N of 26.” Sender is `lil' bird <hello@lilbird.life>`. Signature is Luke & the lil' bird team. | Local render of the worker copy of `nest-letters.js`, which matches the file deployed in `v8.4.0-nest-live`. `docs/NEST-LETTER-REVIEW.md` is checked by test. | PASS | — | None. |
-| Letters do not look like a course | No visible sequence number in the header, footer, or progress line. | Numbered letters use an empty kicker. Welcome still says Welcome. Check-ins still say Life Canvas. | `renderNote` kicker rule; render script, `numberedWithSequence: 0`. | PASS | — | None. |
-| Unsubscribe is visible and one-click capable | Each note has an unsubscribe URL, `List-Unsubscribe`, and `List-Unsubscribe-Post`. | The renderer sets those headers. The page explains that product notes are a separate switch. | `nest/nest-letters.js` headers; `handleUnsubscribe` in `nest-letters-worker.js`. | PASS | — | None. |
-| A short Compass line when a name exists | Letters 4, 8, 13, 18, 23, and 26 may add one plain archetype sentence. Scores and clinical language are omitted. | The renderer can do that, and it rejects numbers, attachment, and long clinical text. The live cron always passes `profile: null`, so the sentence is never added. | `compassLine` in `nest/nest-letters.js`; `letterLoadContext` in `lilbird-assessment.js`. | PARTIAL | P2 | Load the member’s linked Compass name in `letterLoadContext`, or remove the promise from the operator notes. Worker deploy. Test a short name, a missing name, and a paragraph that must be dropped. |
-| Inbox rendering of every note | HTML and plain text are readable on a phone. | HTML is a single dark table (`#1a1c23`) with a gold kicker. This audit did not open the notes in Gmail or Apple Mail. Letter 1 was accepted in the earlier live test. | `htmlShell` in `nest/nest-letters.js`. | UNVERIFIED | P3 | Open one numbered letter and one check-in on a phone after the first general send. |
-| Signup consent | The coaching checkbox starts unticked. Leaving it unticked still creates a Nest. | The live checkbox has no `checked` attribute. The client reads it only as `checked === true`. | Live `https://lilbird.life/nest/` lines 59–60; `nest-client.js`. | PASS | — | None. |
-| Existing members are not enrolled by launch | Turning delivery on does not create letter rows. | The cron only reads rows that already have `nest_coaching = true` and a due `next_at`. | `dueStates` in `nest-letters-delivery.js`. Counts below. | PASS | — | None. |
-| A previous unsubscribe stays off until a fresh yes | Global or Nest unsubscribe blocks a new yes unless the member reaffirms. | `enroll` returns `unsubscribed` without `reaffirm`. The preferences window sends that flag when Nest coaching is turned back on. | `enroll` in `nest-letters-delivery.js`; preference tests. | PASS | — | None. |
-| Global unsubscribe | `unsub:{hash}` stops the Nest note and does not by itself change Beehiiv. | At send time a suppressed member is saved as unsubscribed and skipped. The reflect and letter code do not call Beehiiv. | `runTick`; `letterFlags`; worker test `doesNotMatch` for beehiiv. | PASS | — | None. |
-| Product coaching stays independent | Nest off does not turn product notes off. | Unsubscribe keeps `productCoaching` unless that switch was the one changed. Product flow names are unchanged. | `unsubscribe` and `PRODUCT_FLOWS`. | PASS | — | None. |
-| Beehiiv stays separate | Nest signup and Nest preferences do not add or remove a newsletter subscriber. | The preferences window links to `https://lilbird.beehiiv.com/` and says this page does not add or remove anyone. | `nest/nest-letters-ui.js`. | PASS | — | None. |
-| Each member has their own schedule | Welcome, then 14 days, then about 90 days. A purchase does not move the sequence. | `introDelayDays` 2, `intervalDays` 14, `checkinIntervalDays` 90. `applyAccountEvent` returns the same state. | `DEFAULT_SCHEDULE`; `advanceAfterSend`. | PASS | — | None. |
-| One letter per member per step | A delivery id can be accepted once. A second cron does not send it again. Two crons cannot both hold the lock. | Idempotency-Key is the delivery id. Unique `(user_id, letter_key)`. `nest_letter_try_lock` is service-role only. | `nest-letters.sql`; delivery tests. | PASS | — | None. |
-| Failed, uncertain, and held sends | A failure retries the same letter. An uncertain send does not move the step. After 24 hours an unrecorded claim is held, not sent again. | Implemented in `runTick`, `scheduleRetry`, and `claim`. One older unsent row is still `failed`. It belongs to an unsubscribed member, so the cron will not pick it up. | Tests; read-only count on 27 Oct 2026. Recovery steps are in `docs/NEST-LETTERS.md`. | PASS | — | Leave that failed row. Do not mark it sent unless the member actually received it. |
-| Letter address follows the member | Mail goes to the address they use now. | The cron sends to `state.email`, copied at the last preference save. No path updates that address when the login email changes. | `runNestLetterCron` `to: state.email`. | PARTIAL | P2 | On each send, read the current auth email and skip if it is missing. Do not invent a migration. Worker deploy. Test a changed email before the next cron. |
-| Account deletion removes Nest mail and reflections | Closing the account stops letters and deletes saved exercises. | Both tables reference `auth.users` with `on delete cascade`. No member-facing delete flow was found in the Nest page. `account_closes` is a staff table with no member policy. | `nest-letters.sql`; `journey-reflections.sql`; `desk-and-merge.sql`. | PARTIAL | P2 | Confirm the support procedure that deletes `auth.users`, and say so in the operator notes. No new table. |
-| Turning notes back on does not restart the sequence | Step, phase, and welcome flag are kept. The next time becomes due. | `enroll` resumes when `welcomeSent`, `step > 0`, or phase is `checkin`. The test account is still `letters`, step 1, welcome sent. | `enroll`; read-only state check before launch, still consistent with due count 2. | PASS | — | None. |
-| A missed cron sends later, once | If the worker is down at 15:00 UTC, the due row is still due the next day. The step does not skip. | `dueStates` uses `next_at <= now`. The step advances only after a recorded send. | `planSend` and `advanceAfterSend`. | PASS | — | None. |
-| The first general run has been observed | After enabling delivery, one scheduled run is checked for counts only. | Delivery was enabled on 27 Oct 2026 after that day’s 15:00 UTC run. Since 19:00 UTC that day: 0 sent. Sent total is still 1. Unsent is still 1. Two members are due. | `/ping` enabled; read-only SQL. | UNVERIFIED | P1 | Read the worker log after 28 Oct 2026, 8:00 AM Pacific. Expect at most two notes: letter 2 for the test account, and the welcome for the other opted-in member. Do not send by hand. |
-| Journey data rules are enforced in the database | Members can select, insert, and delete only their own rows. They cannot update. The worker does not write the table. | The migration says that, and it was applied on 26 Oct 2026. This audit did not re-list `pg_policies`. The live page inserts from the browser. | `nest/journey-reflections.sql`; live `insert(row)`. | PASS | — | Re-list policies once if a later change touches this table. |
-| Letter rows are not member-writable | Service role only. | Grants to `anon` and `authenticated` are revoked. The preference route writes through the worker. | `nest/nest-letters.sql`. | PASS | — | None. |
-| AI requests stay private | Reflect requires a login. Logs do not include the answers or the note. | `handleJourneyReflect` returns 401 without a user. Logs are `journey/reflect model status` and `model unreachable`. | `nest/journey-reflect.js`, also copied into the Solo worker path. | PASS | — | None. |
-| Canvas writes belong to the signed-in member | A nest id from the request is not enough to replace a Compass or a canvas. | `handleStoreProfile` and `handleGetProfile` still load and save by nest id. Get-profile returns canvas scores and history. Store-profile can replace scores and append history with no login check in that function. | `lilbird-assessment.js` `handleStoreProfile`, `handleGetProfile`. Known before these milestones. | FAIL | P1 | Require the signed-in member’s `deep_profile_links` row before a canvas read or write. No Journey migration. Assessment worker deploy. Test a foreign nest id and expect a refusal. |
-| Linking a Compass does not hand it to the wrong account | A logged-in member should attach only a read that is theirs. | `link_deep_profile_to_user` grants `inner_compass` to whoever submits a nest id. | `nest/desk-and-merge.sql`. Pre-existing. | PARTIAL | P1 | Confirm the support rule for who may submit a nest id. Do not widen this function. |
-| Delivery can be stopped immediately | `NEST_LETTERS_ENABLED=false` skips the run before any send. | The new worker returned disabled before the flag was set, and enabled after. The flag is checked before the allowlist. | `/ping` on 27 Oct 2026; `runNestLetterCron`. | PASS | — | To stop mail, set the flag to `false`. Do not rely on an empty allowlist. |
-| Held mail has a written recovery | A human can see a held row and record it sent only when the member already received it. | `docs/NEST-LETTERS.md` has the select and the guarded update. The cron does not resend after the 24-hour window. | That document; `claim` held branch. | PASS | — | None. |
-| Someone can see a failed run without reading member mail | Failures, holds, and skips are visible as counts. | The cron writes `Nest letters:` to the worker log. There is no alert and no count dashboard. | `handleDailyCron` in `lilbird-assessment.js`. | PARTIAL | P1 | After the first run, save the log summary. Add a count-only alert before relying on the cron unattended. No member content in the alert. |
-| Regression tests exist | Letter, Journey, and tool behavior is covered by automated tests. | 52 tests passed on 27 Oct 2026 before the flag was enabled. They do not prove the live model wording or the inbox. | `node --test` of the three Nest test files. | PASS | — | Keep the tests. Do not treat a green run as the end of the audit. |
-| The published source matches the live sender | The repo that operators read describes the live gate. | Live behavior: flag on and an empty allowlist sends to members who already opted in. `origin/main` still says an empty allowlist sends nobody. The matching edit is only in the local working tree and was not committed. | `git log origin/main`; local `nest/nest-letters-worker.js`; live version `v8.4.0-nest-live`. | PARTIAL | P1 | Commit that gate change from `origin/main`, not from local `main`, and merge it when you want the published notes to match production. Until then, do not redeploy the assessment worker from the git copy of `nest-letters-worker.js`. |
-| Backups | Letter state and reflections can be restored. | Supabase project backups were not inspected. | Not queried. | UNVERIFIED | P2 | Confirm the project’s backup retention in the Supabase dashboard. |
+| # | Requirement | Status | Evidence |
+| --- | --- | --- | --- |
+| 1 | My Journey is a Nest tab | Complete and verified | Live `nest/index.html` has `#tab-journey` and `#sidebar-journey-card`. `journey.js?v=7` is the published script. |
+| 2 | Saved reflections sit at the top | Complete and verified | `homeHtml` in published `nest/journey.js` renders `#journey-reflections` before the exercise steps and the library. |
+| 3 | A reflection belongs to one member | Complete and verified | Production `pg_policies` for `journey_reflections` are DELETE, INSERT, and SELECT. There is no UPDATE policy. `user_id` references `auth.users` on delete cascade. Journey privacy tests pass. |
+| 4 | Save, then reopen | Complete and verified | `saveReflection` inserts and `viewSaved` opens that card. The save tests pass. A signed-in click on the live site was not repeated on 30 October. |
+| 5 | Delete | Complete and verified | `deleteReflection` deletes by id and user id. The delete test passes. A signed-in click was not repeated on 30 October. |
+| 6 | The same tool can be used again | Complete and verified | Every save is an insert. Production grants no update. The two-save test passes. |
+| 7 | A second AI read does not erase a saved row | Complete and verified | `state.insight` is replaced in memory. Save inserts the current note. The tests cover a second row and a late response that must not land. |
+| 8 | The regeneration sentence matches that behavior | Partially implemented | Production `journey.js?v=7` says “Saving keeps this note. Another perspective replaces it.” The insert behavior is correct. The sentence can be read as replacing saved history. B1 changes the sentence on this branch and is not deployed. |
+| 9 | Timestamps | Partially implemented | `created_at` is stored and `formatWhen` shows a date in `en-AU`, without the time of day. Two saves on one day look the same. |
+| 10 | Empty and failed saves | Complete and verified | Empty copy is “Nothing saved yet.” A failed insert keeps the draft. Tests cover the network failure and the retry. |
+| 11 | Account switch and cross-account privacy | Complete and verified | In-flight reflect and save are dropped when the member id changes. Reads filter on `user_id`. Tests pass, and the production policies match. |
+| 12 | Journey on a phone | Complete and verified | Under 640px the published stylesheet makes the grid one column and the search field full width. The B1 browser pass checks the signup card at 390px. A signed-in phone pass of a finished tool was not repeated. |
+| 13 | Fifteen tools | Complete and verified | `TOOLS` in `nest/journey-tools.js` has fifteen tools, version 1, across six categories. The library test passes. |
+| 14 | Each tool can be finished, reflected, and saved | Complete and verified | Every tool has a next-step stage. Reflect prompts forbid diagnosis. Deep links are `https://lilbird.life/nest/?tool=<id>`. Unknown tools are refused. Tool tests pass. |
+| 15 | Live model wording for every tool | Implemented but not verified in production | The prompt requires one detail from the member’s words and forbids diagnosis. This refresh did not send fifteen live model requests. |
+| 16 | Tools are part of the Nest, not a paid add-on | Complete and verified | Published `journey.js` has no Nest Plus check. Any signed-in member can open a tool. |
+| 17 | The Nest reads as one home | Partially implemented | Tabs, prices, and product cards are on the live page. The free-plan sentence omits My Journey. The sidebar checklist and My Journey both use a “next steps” name for different lists. B1 renames them on this branch and is not deployed. |
+| 18 | Subscription tiers | Complete and verified | Live signup cards: Free Nest, Nest Plus at $7.99 a month, Nest Premium marked coming soon. Plus is the guide, full read, Life Canvas, Relationship Dynamic, and Roots & Wings. The Intensive workbook is also $27 on its own. Solo is Nest Premium or $197. First Flight the session is $149 and is not included in Free Nest. The First Flight workbook is. |
+| 19 | Welcome, 26 letters, and four check-ins | Complete and verified | Letter tests render the welcome, all 26 letters, and the check-ins. Sender is `lil' bird <hello@lilbird.life>`. The deployed letter files match the published copies from the Release A deploy. |
+| 20 | Letters do not look like a course | Complete and verified | Numbered letters use an empty kicker. The render test reports no “Note N of 26.” |
+| 21 | Unsubscribe is visible and one-click capable | Complete and verified | The renderer sets the unsubscribe URL, `List-Unsubscribe`, and `List-Unsubscribe-Post`. Preference tests pass. A mailbox was not opened on 30 October. |
+| 22 | A short Compass line when a name exists | Partially implemented | `compassLine` in `nest-letters.js` can add one sentence on letters 4, 8, 13, 18, 23, and 26, and it drops numbers, attachment language, and long text. `letterLoadContext` in the deployed worker returns `profile: null`, so the sentence is never added. The letter still sends. |
+| 23 | Inbox rendering of every note | Implemented but not verified in production | HTML is one dark table and plain text is rendered. Letter 1 was accepted in an earlier test. The other notes were not opened in a mail client during this refresh. |
+| 24 | Signup consent | Complete and verified | The live Nest page has no `checked` attribute. The client treats the box as on only when `checked === true`. The consent test passes. |
+| 25 | Existing members are not enrolled by launch | Complete and verified | The cron reads `nest_coaching = true` and a due `next_at`. Production has 3 letter-state rows, 2 opted in, and 0 due. |
+| 26 | A previous unsubscribe stays off until a fresh yes | Complete and verified | `enroll` returns `unsubscribed` unless the member reaffirms. The preference test passes. |
+| 27 | Global unsubscribe | Complete and verified | `unsub:{hash}` is checked at send time. The letter files do not call Beehiiv. Tests pass. |
+| 28 | Product coaching stays independent | Complete and verified | Unsubscribe keeps `productCoaching` unless that switch was the one changed. Tests pass. |
+| 29 | Beehiiv stays separate | Complete and verified | The preferences window links to Beehiiv and says this page does not add or remove anyone. The worker source test still fails if the letter files call Beehiiv. |
+| 30 | Each member has their own schedule | Complete and verified | Welcome delay 2 days, letters every 14 days, check-ins about every 90 days. `applyAccountEvent` does not move the sequence. Tests pass. |
+| 31 | One letter per member per step | Complete and verified | Idempotency-Key is the delivery id. Unique `(user_id, letter_key)`. The lock is service-role only. A second-cron test passes. |
+| 32 | Failed, uncertain, and held sends | Complete and verified | A failure inside the 24-hour window retries the same letter. After that window `claim` holds the row and does not send it again. An uncertain send does not move the step. Production has one failed row and zero uncertain rows. See the n01 note in Release B. |
+| 33 | Letter address follows the member | Partially implemented | New enrollment stores the confirmed auth email. The cron sends to `state.email` from the last preference write. `letterLoadContext` already loads the auth user and ignores `user.email`. A later confirmed email change is not picked up. |
+| 34 | Account deletion removes Nest mail and reflections | Partially implemented | Several tables cascade from `auth.users`. There is no member-facing close flow and no confirmation message. Delivery rows, owner-email rows, and Cloudflare KV do not follow the auth user. The retention plan is below. It is not built. |
+| 35 | Turning notes back on does not restart the sequence | Complete and verified | `enroll` resumes when the welcome was sent, the step is past zero, or the phase is `checkin`. The test passes. |
+| 36 | A missed cron sends later, once | Complete and verified | `dueStates` uses `next_at <= now`. The step advances only after a recorded send. Tests pass. |
+| 37 | The first general run has been observed | Complete and verified | On 28 October the 15:00 UTC cron on `v8.4.0-nest-live` made two Resend calls, both 200, matching two due letters. Production now has 4 sent and 1 failed. The failed row is the 27 October n01, not a new failure. Nothing was sent by hand on 30 October. |
+| 38 | Journey data rules are enforced in the database | Complete and verified | Production policies on 30 October are DELETE, INSERT, and SELECT. Authenticated grants were not re-listed as a separate privilege string. The policy list is the member surface. |
+| 39 | Letter rows are not member-writable | Complete and verified | `nest-letters.sql` revokes `anon` and `authenticated` and enables RLS. Members change preferences through the worker. Grants were not re-counted on 30 October. No later migration reopens those tables. |
+| 40 | AI requests stay private | Complete and verified | `handleJourneyReflect` returns 401 without a user. Logs are status lines, not the answers. The guide route refuses a stranger and a free member before the model call. Tests pass. |
+| 41 | Canvas writes belong to the signed-in member | Complete and verified | Deployed `decideCanvasAccess` gates get, store, and the other private routes. On 30 October a signed-out read returned 401, a signed-in non-owner read and write returned 403 with no profile, and the matching owner could read and save. Disposable records were removed. |
+| 42 | Linking a Compass does not hand it to the wrong account | Complete and verified | `link_deep_profile_to_user` requires `auth.uid()` and a matching `nest_owner_emails` row. An unauthorized claim returned `not allowed`. A matching disposable claim wrote `ownership_proof = owner_email` and was then removed. Entitlements are back to 18, all active. |
+| 43 | Delivery can be stopped immediately | Complete and verified | `/ping` reports coaching enabled only when the send gate is open. The gate requires `NEST_LETTERS_ENABLED` true, mode `general` or `test`, and a mailing address. The flag was not turned off during this refresh. |
+| 44 | Held mail has a written recovery | Complete and verified | `docs/NEST-LETTERS.md` has the count query and the guarded updates. The cron does not resend a held row. That document still says the live worker is `v8.4.0` and does not write `nest-letters:last-run`. The code in `v8.5.2` does write it. The document is behind the deploy. |
+| 45 | Someone can see a failed run without reading member mail | Partially implemented | The cron logs `Nest letters:`. `v8.5.2` also writes count-only `nest-letters:last-run`. That key is absent because no cron has run since the deploy. There is no alert. The delivery table has no provider-error column. |
+| 46 | Regression tests exist | Complete and verified | 75 tests passed on 30 October across canvas access, the guide, Journey reflect, Journey tools, and letters. They do not prove live model wording or a mail client. |
+| 47 | The published source matches the live sender | Complete and verified | `origin/main` is `3a3aef12`. The deployed worker is the reviewed `v8.5.2-release-a` copy, with mode `general`. An empty allowlist under that mode sends to consented members. Deploying `origin/main` from before pull request 10 would have been the old gate. That is not what is running. |
+| 48 | Backups | Not implemented | The Supabase backups page for this project says the Free plan does not include project backups. Point-in-time recovery was not enabled on that page. Cloudflare KV backups were not found. |
 
-### Enhancements
+## Enhancements
 
-These are not outstanding requirements.
+These are not part of the 48. They stay optional.
 
-| Requirement | Planned behavior | Actual implementation | Evidence | Status | Severity | Recommended action |
-| --- | --- | --- | --- | --- | --- | --- |
-| Time of day on a reflection | Not required. | Date only. | `formatWhen`. | ENHANCEMENT | P3 | Add the time if same-day saves become confusing. |
-| Name the tools on the free plan card | Not required for the library to function. | The card lists other free pieces. | `renderPlan`. | ENHANCEMENT | P3 | One sentence on the free card. |
-| Optional Compass sentence in the letters | The renderer supports it. The cron does not load a profile. | Covered as PARTIAL above. | `letterLoadContext`. | ENHANCEMENT | P3 | Do this only if the sentence is still wanted. |
-| A member-facing account close button | Not part of the three milestones. | Not on the Nest page. | `nest-client.js`. | ENHANCEMENT | P3 | Add it when support wants members to close an account themselves. |
+| Item | Status | Note |
+| --- | --- | --- |
+| Time of day on a reflection | Enhancement. Also row 9, which stays partial. | Add the time only if same-day saves become confusing. Not in B1. |
+| Name My Journey on the free plan | Row 17. B1 does this. | It was optional for the library to function. The home-page requirement already asked for it. |
+| Compass sentence | Row 22. B2, not started. | The renderer is ready. The cron does not load a profile. |
+| A member-facing account close button | Row 34. B4 plan only. | Do not build it until the retention plan is accepted. |
+
+## Completion
+
+48 required rows.
+
+| Status | Rows |
+| --- | --- |
+| Complete and verified | 38 |
+| Partially implemented | 7 |
+| Implemented but not verified in production | 2 |
+| Not implemented | 1 |
+| Superseded by a later product decision | 0 |
+
+Completion is 38 / 48 = 79%. Partial, unverified, and not-implemented rows are not counted as complete.
+
+The seven partial rows are 8, 9, 17, 22, 33, 34, and 45. The two unverified rows are 15 and 23. The missing row is 48, backups.
+
+## What changed since 27 October
+
+Release A closed the two P1 authorization holes. Canvas reads and writes go through `decideCanvasAccess`. A nest id does not grant Inner Compass. The first general letter run happened on 28 October. The published site and the live sender now describe the same gate. Coaching is still on. Entitlements were not reduced.
+
+## Prioritized remaining issues
+
+### P1 — No database backups
+
+The Free plan page says project backups are not included. A mistaken delete, or a project failure, cannot be restored from Supabase. This is an operational risk. It is not a member-facing bug. Do not turn mail off because of it. Decide whether the project should move to a plan that keeps backups before any account-deletion tool exists.
+
+### P1 — A failed letter is still easy to miss
+
+`v8.5.2` can write a count-only report, and that report does not exist yet. There is no alert. The 27 October n01 failure has no stored provider reason. Leave that row alone. Read `nest-letters:last-run` after the 31 October 15:00 UTC cron. Do not trigger the cron to create the key.
+
+### P2 — A legitimate member can open a read and still not claim it
+
+Email match opens that member’s own canvas and does not write `nest_owner_emails`. A legacy link is not trusted. The claim function then refuses. Existing Inner Compass grants stay. The recovery design is in B3. It is not built.
+
+### P2 — An unauthorized paid retake can reach the model
+
+For a brand-new nest id, `handleAnalyze` calls Anthropic before `inheritPaidRetake`. The refusal does not save the profile. An existing partial record is refused before the model call. Move the retake check forward in B3. Do not weaken the decision.
+
+### P2 — Six letters never receive the archetype sentence
+
+`letterLoadContext` returns `profile: null`. The letter is complete without the sentence. B2 may load one short name from a verified record.
+
+### P2 — A changed login email is not the send address
+
+The cron uses `state.email`. B2 may resolve the current confirmed auth email at send time.
+
+### P2 — Free Nest copy and the two next-step labels
+
+Production still omits My Journey and uses one name for two lists. B1 is written on this branch and is not deployed.
+
+### P2 — Account closure is undocumented as a member path and incomplete as a delete
+
+Cascades cover reflections, letter state, entitlements, and links. They do not cover delivery rows, `nest_owner_emails`, or KV. The plan is in B4. No delete button is added.
+
+### P3
+
+- Reflection cards show a date without a time.
+- The full letter set has not been opened in a phone mail client.
+- One live coaching note per tool has not been read.
+- `docs/NEST-LETTERS.md` still describes `v8.4.0` and says the last-run key is not written. Update that note with B2, not by changing send behavior.
+
+## Release B
+
+Release B finishes the existing Nest. It does not add an assessment, a tool, a price, or a subscription tier. It does not weaken Release A.
+
+B1 is in this working tree and is not deployed. B2, B3, and B4 are not implemented.
+
+### B1 — Product polish
+
+Small. Pages only. No migration. No worker. No mail.
+
+- Free Nest, on the signup card and on the signed-in plan note, names My Journey, the Glow Map, quizzes, and the First Flight workbook. Coaching notes are only if the member asked. Nest Plus is described as what Plus adds.
+- The sidebar checklist is “For your Nest.” It is the product list: Compass, bookings, Intensive tasks, and the photo.
+- Saved exercise steps are “Steps you saved.”
+- After a coaching note exists, the page says a new perspective changes that note, saved reflections stay saved, and saving this note adds another entry.
+- `nest-client.js` is `?v=56` and `journey.js` is `?v=8` so a cached copy cannot keep the old sentences.
+
+Review this diff before any Pages deploy. After a reviewed deploy, confirm https://lilbird.life/nest/ serves `v=56` and the new free-plan sentence. Do not deploy the worker with B1.
+
+### B2 — Email reliability
+
+Not started. Small worker change after review. One deploy, with `--keep-vars`, `NEST_LETTERS_MODE=general`, `NEST_LETTERS_ENABLED` left true, and the cron left at `0 15 * * *`. Do not trigger the cron. Confirm deliveries stay 5 and letter states stay 3 immediately after deploy.
+
+#### Archetype sentence
+
+`letterLoadContext` loads the auth user for the greeting and then sets `profile: null`. `compassLine` already refuses anything that is not a short plain name.
+
+Load a profile only for the member whose letter is being sent. Use the same ownership decision as a canvas read: a verified link, a `nest_reads` row, or a stored email that matches that member’s confirmed auth email. Read the name from that member’s own KV record. Pass only the object `archetypeName` already accepts. Do not put scores, history, or another member’s record into the letter context. If the name is missing, long, numeric, or clinical, `compassLine` already returns an empty string and the letter stays as written.
+
+#### Verified email
+
+Enrollment already refuses an unverified address. The send path does not look again.
+
+At send time, read the auth user that `letterLoadContext` already fetches. Use `user.email` only when `email_confirmed_at` or `confirmed_at` is set. Ignore `email_change` and any address from the request. If the confirmed address differs from `state.email`, send to the confirmed address and update that one field on the same `user_id`. Do not insert a second state row. Do not change `nest_coaching`, `product_coaching`, `step`, `phase`, `welcome_sent`, or `next_at`. Do not mark old deliveries sent and do not claim them again.
+
+Suppression stays. Check `unsub:{hash}` for the stored address and for the confirmed address. A suppression on either one skips the send. The unsubscribe token stays bound to the user id, so the link in the new message still turns this member off.
+
+#### The 27 October n01
+
+Read-only, 30 October:
+
+| Fact | Value |
+| --- | --- |
+| Letter | `n01` |
+| Status | `failed` |
+| Claimed | 2026-10-27 |
+| Sent at | empty |
+| Member coaching | off |
+| Sequence status | `unsubscribed` |
+| Next send | empty, so the row is not due |
+
+The table has no provider-error column. `markFailed` stores only `status = failed`. The Resend body was not kept. The 27 October audit called it a rejected test send. Worker logs from that day were not opened, because a log line can contain an address. The reason stored in the database is the status itself.
+
+Why it will not move by itself:
+
+- `dueStates` requires coaching on and a due `next_at`. This member has neither.
+- `claim` holds a row whose `first_claimed_at` is older than 24 hours. It does not send that row again.
+
+Do not retry it. Do not mark it sent. Marking it sent would advance a member who is unsubscribed and who may never have received it.
+
+Safe handling:
+
+- Leave this row failed.
+- After 31 October 15:00 UTC, read `nest-letters:last-run`. It should show counts only. A missing key means that cron did not finish a send pass.
+- Keep using the count query in `docs/NEST-LETTERS.md`. Do not add the address to that query.
+- A later, reviewed change may store a short provider status code on failure. It must not store the letter body or the address. That column is not part of B1, and it should not be migrated until B2 is reviewed.
+- An alert that fires when `failed`, `held`, or `uncertain` is greater than zero is worth adding only after one real last-run report has been seen. The alert body should be counts, not an address.
+
+### B3 — Ownership and the paid retake
+
+Not started. Do not deploy until the trust model and the tests have been reviewed.
+
+#### Trust model
+
+Release A is the floor.
+
+| Proof | May open this member’s canvas | May write `nest_owner_emails` or grant a new Inner Compass |
+| --- | --- | --- |
+| Verified link (`capability`, `read`, `owner_email`) | Yes | Yes |
+| `nest_reads` for this account and this nest | Yes | Yes |
+| Confirmed auth email matches the email already stored on the read | Yes | No. The stored email could have been written before the patch. |
+| Legacy link, null proof | No. Recovery copy, no stored email in the body | No |
+| Nest id, launch token, Nest Plus, or a typed email | No | No |
+| Unexpired capability, signed out, bound to this read | Yes, for two hours | Yes, for the browser that created the read |
+
+What a legitimate member feels today: if they sign in with the address on the results email, the canvas opens. The Nest claim still refuses, because there is no `nest_owner_emails` row. A legacy link does not become trusted. Existing entitlements stay.
+
+Proposed recovery, not built:
+
+1. The member is signed in and presents a nest id or a results link.
+2. If `decideCanvasAccess` allows them because the confirmed session email matches the stored email, the worker may send one confirmation to that stored address. The member does not type the address. A non-match gets the current recovery sentence and no send. The response never includes the stored address.
+3. The message carries a single-use token bound to that user id and that nest id, with a short expiry.
+4. The same signed-in user presents the token. The worker inserts one `nest_owner_emails` row for that nest and that confirmed email. The existing claim function then grants Inner Compass. It still refuses everyone else.
+5. A legacy link is unchanged until that confirmation succeeds. Other entitlements are not updated. No row is deactivated.
+
+Security implications:
+
+- Inbox control of the address already on the read, plus a confirmed login for that same address, is the new proof. A typed email is not.
+- A nest id is not proof, and a legacy link is not proof.
+- The residual risk is historical. If a stored email was forged before Release A, a confirmation to that address confirms the forger. Do not backfill `nest_owner_emails` from email match alone. That would weaken Release A.
+- Rate-limit the confirmation. A refusal stays free of profile fields.
+- Tests to add before any deploy: typed email ignored, nest id alone refused, token for another user refused, expired token refused, one owner row written for the matching account, other entitlements untouched, legacy link still refused until the token succeeds, and the current canvas-access tests still pass.
+
+The early retake check is the other half of B3. In `handleAnalyze`, when `retakeOf` is set, call `inheritPaidRetake` before the Anthropic request. An unauthorized retake returns the current denial and does not save. An authorized retake still copies paid status and still saves. A nest id that already has a record keeps the access check it has now, which already runs before the model call. The 409 for an existing profile can stay as it is: it returns no profile body. Do not move that into a read of the profile.
+
+### B4 — Account closure and retention
+
+Not started. No delete button. No script that deletes users.
+
+#### What happens today
+
+There is no member-facing close action. `account_closes` is a staff table with no member policy. Nothing sends a closure confirmation. Support would have to delete `auth.users` by hand. That delete is not a complete erasure.
+
+#### What cascades from `auth.users`
+
+Production foreign keys with `ON DELETE CASCADE`, read 30 October:
+
+- `journey_reflections.user_id`
+- `nest_letter_state.user_id`
+- `nest_reads.user_id`
+- `deep_profile_links.user_id`
+- `deep_profile_launches.user_id`
+- `user_entitlements.user_id`
+- `intensive_enrolments.user_id`
+- `lci_sessions.user_id`
+- `live_roster.user_id`
+- `course_users.id`
+- `account_merge_tokens.keeper_user_id`
+
+Deleting the auth user therefore removes that member’s reflections, letter schedule, reads, links, launches, entitlements, Intensive rows, live roster row, course user row, and merge tokens.
+
+#### What does not follow
+
+- `nest_letter_deliveries` has `user_id` and no foreign key. The row would remain: delivery id, letter key, status, and timestamps. It does not store the address. It is an orphan operational record.
+- `nest_owner_emails` is keyed by nest and email, not by user id. It would remain.
+- Cloudflare KV `NEST_PROFILES` is not in Postgres. Assessment records live about one year (`expirationTtl` 31536000) under the nest id and can contain the profile, the email, and Life Canvas. `unsub:{hash}` and `seq:{hash}` are keyed by email hash. `bridge:couple:{id}` and `bridge:code:{code}` hold relationship data. None of these delete with the auth user.
+- Stripe is outside this database. A cascade of `user_entitlements` does not cancel a subscription. Invoices live at Stripe.
+- Supabase has no project backup on this plan, so a database delete is not recoverable from Supabase. KV has no backup that this refresh found. A delete should be treated as final for the rows it actually removes.
+
+#### What to delete, what to keep, what to handle specially
+
+Delete with the auth user, once a reviewed flow exists: the auth user, sessions, identities, the cascaded rows above, and then the KV records that this member can be shown to own. Ownership for a KV assessment is the same Release A decision. Do not delete a nest record because a requester knows the id.
+
+Handle specially before the auth delete:
+
+- Cancel the Stripe subscription first, or the member keeps paying after the Nest is gone. Keep Stripe invoices for tax and accounting. Do not depend on `user_entitlements` as the invoice record.
+- Export or retain delivery rows that are needed to show what was sent and when. They can be reduced to letter key, status, and time, with the user id removed, if a dispute or an unsubscribe complaint still needs them. Do not keep the address on that reduced row.
+- Keep a suppression for the confirmed email hash so a later signup with the same address does not silently opt back in. That hash is not the address. Say this in the confirmation.
+- Bridge: delete a couple record only when every participant has closed, or remove this member’s profile and secret and leave the other participant’s half. Do not delete the other person’s assessment.
+- `nest_owner_emails`: delete the row only when it matches an assessment this member verifiably owns.
+
+Retain:
+
+- Stripe invoices and the minimum tax record Stripe already holds.
+- A staff note that a closure was requested and completed, without the profile or the letter body. `account_closes` can hold that if its columns are limited to time, status, and a staff actor.
+- Anonymous counts. Not the member’s answers.
+
+There is no member confirmation today because there is no member action. A future flow should send one message to the confirmed email after the delete succeeds, saying the Nest login is closed and naming what remains (Stripe invoices, the email-hash suppression). If the delete fails partway, send nothing that claims the data is gone. KV deletes should be in the same reviewed procedure, or the confirmation must say the assessment copy expires on its existing one-year timer and has not yet been removed.
+
+Do not implement this until the plan is accepted. The first implementation should be a staff procedure with a checklist, not a button that calls `auth.admin.deleteUser` from the browser.
+
+### Dependencies
+
+- B1 depends on nothing in B2–B4. It is Pages only.
+- B2 depends on the live gate staying `general` and enabled. A deploy without `--keep-vars` can drop plain variables, including the mode.
+- B3 depends on Release A staying as it is. The confirmation token is an addition. Email match must not start writing `nest_owner_emails` by itself.
+- The retake reorder depends on `inheritPaidRetake` staying the same decision. Only its position in `handleAnalyze` changes.
+- B4 depends on a backup decision, a Stripe cancellation step, and a KV ownership check. It should follow B3 so ownership is understood before records are deleted.
+- Local `main` at `443b8baf` still has the unpublished Inner Compass claim. Do not merge it.
+
+### Deployment sequence
+
+1. Review B1. Deploy Pages only. Verify the live sentences and `v=56` / `v=8`. Leave the worker on `v8.5.2-release-a`.
+2. Review B2. Deploy the assessment worker with the mode and the flag preserved. Do not trigger the cron. Read counts before and after. Read `nest-letters:last-run` only after the next scheduled run.
+3. Review the B3 trust model and its tests. Then deploy that worker. Test with disposable accounts. Remove them. Do not use a real member’s read.
+4. Accept or revise the B4 plan. Only then write a staff checklist. A member button waits until that checklist has been used on a disposable account and the KV and Stripe steps are real.
+
+### Complexity
+
+| Stream | Size | Deploy |
+| --- | --- | --- |
+| B1 copy and labels | Small. Done on this branch. Tests included. | Pages, after review |
+| B2 archetype and confirmed email | Small. One worker function and send path. Tests for a missing name, a long name, an unverified change, and an unchanged sequence. | Worker, after review |
+| B2 failure visibility | Small as an operator step: read the key after 31 October. A status-code column or an alert is a separate reviewed change. | None for the read. Worker only if a later alert is approved |
+| B3 recovery token | Medium. New token, rate limit, one owner-email insert, tests, security review. | Worker, after that review |
+| B3 retake order | Small. Move one call above the model request. Existing refusal tests stay. | Can ship with the B3 worker |
+| B4 deletion | Medium to large, and destructive. Not sized for this branch. | None until the plan is accepted |
 
 ## Tool inventory
 
-Each tool is version 1, ends in a next step, and opens at `https://lilbird.life/nest/?tool=<id>`. A question mark marks an optional stage. This audit checked the definitions and the automated tool tests. It did not submit fifteen live model requests.
+Unchanged. Fifteen tools, version 1, each ending in a next step, each at `https://lilbird.life/nest/?tool=<id>`.
 
 | Tool | Category | Stages |
 | --- | --- | --- |
@@ -103,288 +353,15 @@ Each tool is version 1, ends in a next step, and opens at `https://lilbird.life/
 | Responsibility Inventory | Family | yours, picked, if down, who?, next step |
 | Workload Reset | Work & Purpose | plate, needs, wait, for?, next step |
 
-The coaching prompts tell the model to use one detail from the member’s words, ask about the next step they chose, and not diagnose. Fallback text quotes their own step when they wrote one. That is the grounding control. It is not a review of live model output.
-
-## How saved reflections are stored
-
-`public.journey_reflections` is append-only from the member’s point of view.
-
-- Columns: `id`, `user_id`, `tool_id`, `tool_version`, `answers`, `insight`, `next_step`, `created_at`.
-- A save inserts a new id. Repeating a tool adds another row.
-- Generating another perspective replaces `state.insight` on the page. It does not update a previous row.
-- Saving after that second perspective stores only the note that was on screen.
-- If the first perspective was already saved, that row remains. The new save is a second row.
-- If the first perspective was never saved, it is not in the database. That is the intended “nothing is written until Save” rule.
-- There is no edit. A correction is a new save or a delete.
-- The worker does not write this table.
-
-That model supports a history. It does not support editing one saved note in place, and it does not keep an unsaved first perspective beside the second one.
-
 ## Letter sequence
 
-| Piece | Subject or role | Tool |
-| --- | --- | --- |
-| Welcome | A note every two weeks, if you want it | Nest home |
-| 1 | When the day has no edges | Energy Inventory |
-| 2 | A no that still leaves the relationship standing | Boundary Untangler |
-| 3 | When the sentence lands somewhere else | Communication Reset |
-| 4 | The race you did not enter | Transition Map |
-| 5 | The quiet that is not peace | Communication Reset |
-| 6 | The people who leave you smaller | Connection Check |
-| 7 | Wanting, before you can name it | Decision Clarity |
-| 8 | The yes you did not mean | Expectations Audit |
-| 9 | When care starts to feel like a test | Family Expectations |
-| 10 | When two people share a room and miss each other | Connection Check |
-| 11 | The work that ate the evening | Workload Reset |
-| 12 | The plan that did not happen | Shadows & Sparks |
-| 13 | The door you keep circling | Courage Compass |
-| 14 | What was never only yours | Responsibility Inventory |
-| 15 | The difference between rest and leaving | Rest or Escape? |
-| 16 | When your effort goes unseen | Identity Reflection |
-| 17 | The conversation you keep postponing | Communication Reset |
-| 18 | Confidence is a small return | Courage Compass |
-| 19 | The story your family tells about you | Family Expectations |
-| 20 | Standing in the fog | Transition Map |
-| 21 | Choosing without a perfect map | Decision Clarity |
-| 22 | When a friendship changes shape | Connection Check |
-| 23 | Coming back to your own name | Identity Reflection |
-| 24 | The heat under the politeness | Boundary Untangler |
-| 25 | A beginning that does not erase the last one | Rhythm Reset |
-| 26 | A year, seen from here | Shadows & Sparks |
-| Check-ins | Four Life Canvas notes, about every 90 days | Life Canvas |
+Unchanged. Welcome, letters 1–26, then four Life Canvas check-ins. Tool links use the live Nest deep link. Those tools are available to any signed-in Nest member.
 
-Tool links use the live Nest deep link. The linked tools are available to any signed-in Nest member, so a free member who gets a letter can open the tool.
+Letters 4, 8, 13, 18, 23, and 26 may add one archetype sentence. Production does not load the name, so those letters go out without it.
 
-## Delivery and consent counts
+## Release A status
 
-Read-only, 27 October 2026, after delivery was enabled and before the next cron.
-
-| Count | Value |
-| --- | --- |
-| Sent since 19:00 UTC on 27 Oct 2026 | 0 |
-| Sent in total | 1 |
-| Unsent rows | 1, status `failed` |
-| Due now, with an active opt-in | 2 |
-
-The one sent row is the earlier Letter 1 test. The failed row is the earlier rejected test send and is not due, because that member is unsubscribed. The two due members are the internal test account, next note letter 2, and one other member waiting for the welcome. The other 41 Nest members have no due letter.
-
-The next cron is 28 October 2026 at 15:00 UTC (8:00 AM Pacific). This audit did not trigger it.
-
-## Issues
-
-### P1 — Canvas can be read and written with a nest id
-
-- Expected: a canvas change is accepted only for the nest linked to the signed-in member.
-- What happens: `handleStoreProfile` updates scores and history for any nest id that already exists. `handleGetProfile` returns canvas scores and history for that id.
-- Why it matters: someone who learns a nest id can read or replace that Life Canvas. Journey reflections are not in this store.
-- Where: `Deep-profile Cursor Project/lilbird-assessment.js`, `handleStoreProfile` and `handleGetProfile`.
-- Correction: require a logged-in user whose `deep_profile_links` row matches the nest id.
-- Migration: no.
-- Deploy: assessment worker.
-- Test: a signed-in member can update their own canvas. A different nest id is refused. No letter send.
-
-### P1 — Linking a Compass grants the product to the logged-in caller
-
-- Expected: a nest id is attached only when it belongs to that person.
-- What happens: `link_deep_profile_to_user` grants `inner_compass` to the caller who submits the id.
-- Why it matters: a guessed or copied nest id can attach a read and grant the entitlement.
-- Where: `nest/desk-and-merge.sql`.
-- Correction: decide the support rule, then tighten the function if the id is not already known to that member.
-- Migration: replace the function only after that decision. Do not run the whole file again.
-- Deploy: database function only.
-- Test: a foreign nest id does not grant `inner_compass`.
-
-### P1 — The first general run has not been seen
-
-- Expected: one scheduled run, then aggregate counts.
-- What happens: delivery is enabled, and no general send has been recorded.
-- Why it matters: the schedule, the consent filter, and Resend acceptance are not yet proven together on the open allowlist.
-- Where: cron `0 15 * * *` in the assessment worker.
-- Correction: wait for 28 Oct 2026, 8:00 AM Pacific. Read the `Nest letters:` log line and a count-only query.
-- Migration: no. Deploy: no.
-- Test: sent count rises by at most 2. No row is sent twice. The 41 members without consent gain no letter row.
-
-### P1 — Failures are only in the worker log
-
-- Expected: a failed, held, or skipped run is visible without opening member mail.
-- What happens: `console.log('Nest letters:', …)` and `console.error` on a thrown cron error.
-- Why it matters: a held letter or a provider failure can sit until someone happens to look.
-- Where: `handleDailyCron` in `lilbird-assessment.js`.
-- Correction: keep a count summary. Alert when `failed`, `uncertain`, or `held` is greater than zero.
-- Migration: no. Deploy: assessment worker, after the first run is understood.
-- Test: a forced failed send in a non-production store produces the alert and does not include an email address.
-
-### P1 — Published sender source does not match the live gate
-
-- Expected: the repo operators read describes the live rule.
-- What happens: live `v8.4.0-nest-live` sends to opted-in members when the allowlist is empty. `origin/main` still says an empty allowlist sends nobody. The corrected file is an uncommitted local edit.
-- Why it matters: a deploy that copies `nest/nest-letters-worker.js` from `origin/main` into the worker would stop general delivery while `/ping` still says enabled.
-- Where: `nest/nest-letters-worker.js` on `origin/main`, versus the iCloud worker file that was deployed.
-- Correction: commit and merge that gate change from published `main`, not from local `main`.
-- Migration: no. Deploy: no, unless the worker is rebuilt. The live worker already has the new gate.
-- Test: with the flag on and no allowlist, a consented due member is selected. With the flag off, the run returns `disabled`.
-
-### P2 — “Another perspective replaces it”
-
-- Expected: the member can see that a new note replaces the unsaved one, and that older saved notes remain.
-- What happens: the sentence does not say “on this page.”
-- Why it matters: a member may think saving again deletes the earlier reflection.
-- Where: `completionHtml` in `nest/journey.js`.
-- Correction: change the sentence. Do not change the insert.
-- Migration: no. Deploy: Pages.
-- Test: save, start again, generate another note, save, and see two cards.
-
-### P2 — Free Nest copy and two “next steps”
-
-- Expected: a new member can tell that the tools are in My Journey, and that product tasks are not the same list as saved exercise steps.
-- What happens: the free plan line omits the library. The dashboard banner and My Journey both say next steps.
-- Why it matters: the first visit does not point at the library that the letters link to.
-- Where: `renderPlan` in `nest/nest-client.js`; `#next-steps-list`; Journey `Your next steps`.
-- Correction: one sentence on the free card, and a clearer label on one of the lists.
-- Migration: no. Deploy: Pages.
-- Test: a new account sees My Journey named on the free card, and the two lists are visibly different.
-
-### P2 — Compass sentence is never loaded
-
-- Expected: six letters may add one short archetype sentence.
-- What happens: `letterLoadContext` returns `profile: null`.
-- Why it matters: the personalization described in the letter notes does not happen. The letters are otherwise complete.
-- Where: `letterLoadContext` in `lilbird-assessment.js`.
-- Correction: load the linked profile, or drop the sentence from the operator notes.
-- Migration: no. Deploy: assessment worker if the load is added.
-- Test: a short name appears once. A paragraph, a score, or a missing name adds nothing.
-
-### P2 — Letter email can go stale
-
-- Expected: the note uses the member’s current login email.
-- What happens: the cron uses `state.email` from the last preference write.
-- Why it matters: a changed login email can keep receiving, or stop receiving, at the old address.
-- Where: `runNestLetterCron` in `nest-letters-worker.js`.
-- Correction: resolve the current auth email at send time.
-- Migration: no. Deploy: assessment worker.
-- Test: change the auth email, leave the letter row untouched, and confirm the next send uses the new address.
-
-### P2 — Account close is not a member path
-
-- Expected: deleting the account removes letter state and reflections.
-- What happens: the foreign keys cascade if `auth.users` is deleted. The Nest page has no close-account action.
-- Why it matters: support needs a known procedure, or the rows remain.
-- Where: `nest-letters.sql`, `journey-reflections.sql`, `account_closes` in `desk-and-merge.sql`.
-- Correction: document the support deletion. Add a button only if members should do it themselves.
-- Migration: no, while deletion is done by removing the auth user.
-- Deploy: none for the cascade that already exists.
-- Test: deleting a test auth user removes that user’s letter row and reflections.
-
-### P3 — Reflection dates have no time
-
-- Expected: two saves on the same day can be told apart.
-- What happens: the card shows a date only.
-- Where: `formatWhen` in `nest/journey.js`.
-- Correction: append the time.
-- Migration: no. Deploy: Pages.
-- Test: two saves on one day show two different times.
-
-### P3 — Inbox clients were not opened for the full set
-
-- Expected: the dark note is readable as HTML and as plain text on a phone.
-- What happens: the source renders both, and Letter 1 was received in the earlier test. The other 30 notes were not opened in a mail client this audit.
-- Where: `htmlShell` and `textBody` in `nest/nest-letters.js`.
-- Correction: open one fortnightly note and one quarterly note on a phone after the first general run.
-- Migration: no. Deploy: no.
-- Test: no sequence number, the tool or canvas link works, and the unsubscribe link is visible.
-
-## 1. Executive summary
-
-The three milestones are in production and match the plans that were merged. My Journey stores a private history of saved exercises. All fifteen tools are in the library, with their own questions, a next step, and a deep link. The welcome note, 26 letters, and four quarterly check-ins render without course numbers. Coaching delivery is on, and it selects only members who already opted in.
-
-The first open send has not happened. Two members are due at the next cron. Forty-one are not.
-
-The important gaps are older Nest protections and operations, not missing tools or missing letters. Canvas reads and writes still trust a nest id. The published git copy of the sender does not yet describe the live allowlist rule. Nothing alerts a person when a letter is held or rejected. Those should be understood before calling the whole Nest finished. They do not require turning delivery off.
-
-## 2. Requirements completion
-
-Matrix rows, enhancements excluded: 48.
-
-| Status | Rows |
-| --- | --- |
-| PASS | 34 |
-| PARTIAL | 9 |
-| FAIL | 1 |
-| UNVERIFIED | 4 |
-| ENHANCEMENT | 4, excluded |
-
-Completion is 34 / 48 = 71%. Partial, failed, and unverified rows are not counted as complete.
-
-## 3. Verified completed functionality
-
-- My Journey tab, saved reflections at the top, insert-only history, delete, empty and error states, and owner-only access in the schema and tests.
-- Fifteen tools with categories, stages, next steps, non-clinical prompt rules, and Nest deep links. They are not behind Nest Plus.
-- Welcome, letters 1–26, and four check-ins: subjects, preview text, tool or canvas links, dark campfire HTML, plain text, sender, signature, and no visible “Note N of 26.”
-- Unticked signup consent, no automatic enrollment, reaffirm after unsubscribe, independent product coaching, and Beehiiv left as a separate list.
-- Per-member timing: about two days to the first note, 14 days between letters, about 90 days between check-ins. A purchase does not move that timeline. Turning notes back on does not reset the step.
-- Idempotent delivery ids, a cron lock, and hold-after-24-hours behavior, covered by tests.
-- Live flag: `/ping` reports `v8.4.0-nest-live` and coaching delivery enabled. Since enable, sent count is still 1 and new sends are 0.
-- Rollback is `NEST_LETTERS_ENABLED=false`. An empty allowlist does not mean “send nobody” on the live worker.
-
-## 4. Outstanding issues by severity
-
-P1
-
-- Canvas get and store still trust a nest id.
-- Submitting a nest id can grant Inner Compass.
-- The first general cron has not been observed.
-- Failed and held letters are only in the worker log.
-- `origin/main` still documents the old allowlist gate.
-
-P2
-
-- “Another perspective replaces it” can be misread.
-- The free plan copy and the two next-step lists are easy to confuse.
-- The optional Compass sentence is never loaded.
-- A changed login email is not picked up by the letter row.
-- Account deletion depends on removing the auth user, and that procedure is not on the Nest page.
-
-P3
-
-- Reflection cards show a date without a time.
-- The full letter set has not been opened in a phone mail client.
-
-## 5. Recommended fixes before calling the project complete
-
-Do these before a new milestone. Do not turn delivery off to do them, unless a check after the first cron shows the wrong people were mailed.
-
-1. On 28 Oct 2026 after 8:00 AM Pacific, record sent, failed, held, and skipped counts. Confirm the two due members were the only candidates, and that no second copy was sent.
-2. Publish the live allowlist rule into the git repo from `origin/main`, so a later worker deploy cannot silently restore “send nobody.”
-3. Require the signed-in owner for canvas reads and writes.
-4. Add a count-only signal for failed, uncertain, and held letters.
-5. Clarify the regeneration sentence so saved history is obviously kept.
-
-Items 3 and 4 need an assessment worker deploy. Item 5 needs a Pages deploy. Item 2 needs a merge, not a worker deploy, because the live worker already has the new gate. None of these need a new table.
-
-## 6. Optional future improvements
-
-- Show the time on a saved reflection.
-- Mention My Journey on the free plan card, and rename one of the next-step lists.
-- Load a short Compass name into the six letters that can use it, or delete that promise from the notes.
-- Resolve the current auth email at send time.
-- Write down, or build, a member account-close path that deletes the auth user and therefore the cascaded rows.
-- Review the Compass-link function before more people share nest ids.
-- Confirm Supabase backup retention.
-- Read one live coaching note from each tool.
-
-## 7. Production health
-
-The site and both workers answer. Coaching delivery is enabled on purpose. The cron is unchanged. The 28 October 2026 15:00 UTC window has passed on `v8.4.0-nest-live`. Delivery rows were not queried again during the authorization remediation, so the result of that run is unknown. The consent counts below are the 27 October observation: 2 due, 41 not enrolled, 1 historical failed row that is not due.
-
-The service does not need to be disabled for this audit. The rollback remains the flag.
-
-Local `main` at `443b8baf` was not merged and was not deployed.
-
-## 8. Recommended next milestone
-
-Watch the first general cron, then close the P1 gaps above. Do not start another product surface until those counts are in and the canvas write requires the signed-in owner.
-
-A sensible following milestone, after that, is the Nest home a new member sees first: one path from the free account into My Journey, with product tasks and saved exercise steps clearly named. That is polish on a library that already exists, not a fourth build.
+Deployed 30 October 2026. Pages `3a3aef12`. Worker `v8.5.2-release-a`, deployment `e5ba2a17-553e-4d1a-b4f3-bec81bbb4163`. `NEST_LETTERS_MODE=general`. The hotfix is applied. Disposable proof rows from the deploy check were removed. The notes below were written on 28 October, before that deploy. Where they say the patch is not deployed, that was true on that date.
 
 ## Release A — corrected patch, not deployed
 

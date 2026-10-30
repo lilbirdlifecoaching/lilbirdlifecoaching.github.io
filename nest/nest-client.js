@@ -565,7 +565,7 @@
       const src = nestPlusSource();
       return { name: 'Nest Plus', note: src === 'Nest Plus' ? 'lil\' bird guide, the full read, Life Canvas, Relationship Dynamic, and the Roots & Wings workbook. $7.99 a month.' : src + '.' };
     }
-    return { name: 'Nest', note: 'First Flight workbook, Glow Map, and quizzes. Nest Plus adds lil\' bird guide, the full read, Life Canvas, Relationship Dynamic, and Roots & Wings.' };
+    return { name: 'Nest', note: 'My Journey, the Glow Map, quizzes, and the First Flight workbook. Coaching notes only if you asked for them. Nest Plus adds the guide, the full read, Life Canvas, Relationship Dynamic, and Roots & Wings.' };
   }
 
   function nestAccessSummary() {

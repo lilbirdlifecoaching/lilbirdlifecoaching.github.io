@@ -320,7 +320,10 @@ test('the page drops stale requests and shows the reviewed wording', () => {
   assert.match(page, /Save to My Journey/);
   assert.match(page, /Find a little clarity/);
   assert.match(page, /What’s on your mind\?/);
-  assert.match(page, /Your next steps/);
+  assert.match(page, /Steps you saved/);
+  assert.match(page, /A new perspective changes this note/);
+  assert.match(page, /Reflections you already saved stay saved/);
+  assert.match(page, /Saving this one adds another entry/);
   assert.equal(page.includes('localStorage'), false);
   assert.equal(page.includes('sessionStorage'), false);
   assert.equal((page.match(/fetch\(/g) || []).length, 1);
