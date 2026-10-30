@@ -504,6 +504,21 @@
       return {};
     }
   }
+  function canvasCapabilityHeader(id) {
+    let token = '';
+    try { token = sessionStorage.getItem('lilbird_canvas_' + (id || '')) || ''; } catch (_) {}
+    return token ? { 'X-Canvas-Token': token } : {};
+  }
+  async function readHeaders(id) {
+    return Object.assign({}, await authHeaders(), canvasCapabilityHeader(id));
+  }
+  function accessFailureMessage(body, status) {
+    if (body && body.recovery === 'confirm-results-email') {
+      return 'Sign in with the email that received this read, or write hello@lilbird.life from that address.';
+    }
+    if (status === 401 || status === 403) return 'This read is not available from this login.';
+    return '';
+  }
   const SOLO_WORKER_URL = 'https://worker-solo.cwwq46sn7m.workers.dev';
   // Server enforces access on /partner-dynamic; this only decides what to show first.
   const NEST_PLUS_PRODUCTS = ['nest_plus', 'coaching', 'life_change_intensive'];
@@ -645,8 +660,13 @@
   async function loadNest(id) {
     if (!id) return false;
     try {
-      const r = await fetch(WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(id), { headers: await authHeaders() });
-      if (!r.ok) return false;
+      const r = await fetch(WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(id), { headers: await readHeaders(id) });
+      if (!r.ok) {
+        const body = await r.json().catch(() => ({}));
+        const note = accessFailureMessage(body, r.status);
+        if (note) showError(note);
+        return false;
+      }
       const data = await r.json();
       if (!data.profile) return false;
       lastLoadNestPlus = data.nestPlus === true;
@@ -724,15 +744,20 @@
     try {
       const r = await fetch(WORKER_URL + '/partner-dynamic', {
         method: 'POST',
-        headers: Object.assign({ 'Content-Type': 'application/json' }, await authHeaders()),
+        headers: Object.assign({ 'Content-Type': 'application/json' }, await readHeaders(useManualProfile ? '' : nestId)),
         body: JSON.stringify({
           nestId: useManualProfile ? undefined : nestId,
           userProfile: profile,
           partnerInput: { relationship: rel, types, description: desc }
         })
       });
-      if (r.status === 403) {
-        showUpsell();
+      if (r.status === 403 || r.status === 401) {
+        const errBody = await r.json().catch(() => ({}));
+        if (errBody.error === 'nest_plus_required') {
+          showUpsell();
+          return;
+        }
+        showError(accessFailureMessage(errBody, r.status) || 'This read is not available from this login.');
         return;
       }
       if (!r.ok) throw new Error('request failed');

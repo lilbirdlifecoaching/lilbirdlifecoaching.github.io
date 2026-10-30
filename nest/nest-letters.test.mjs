@@ -45,9 +45,12 @@ import {
   letterUserFromRequest,
   noteForKey,
   parseLetterAllowlist,
+  deliveryReport,
+  resolveLetterDelivery,
   routeNestLetters,
   runNestLetterCron,
   signNestToken,
+  LAST_RUN_KEY,
 } from './nest-letters-worker.js';
 
 const catalog = new Set(TOOLS.map((tool) => tool.id));
@@ -541,6 +544,7 @@ test('the cron asks Resend to dedupe on the delivery id', async () => {
   let header = '';
   const env = {
     NEST_LETTERS_ENABLED: 'true',
+    NEST_LETTERS_MODE: 'test',
     NEST_LETTERS_ALLOWLIST: user().id,
     MAILING_ADDRESS: 'PO Box 1',
     UNSUBSCRIBE_SECRET: 'test-secret',
@@ -626,6 +630,7 @@ test('a crash after acceptance recovers inside the window without a second email
   };
   const env = {
     NEST_LETTERS_ENABLED: 'true',
+    NEST_LETTERS_MODE: 'test',
     NEST_LETTERS_ALLOWLIST: user().id,
     MAILING_ADDRESS: 'PO Box 1',
     UNSUBSCRIBE_SECRET: 'test-secret',
@@ -692,26 +697,145 @@ test('a held letter can be marked sent, and a retry needs an explicit duplicate 
   assert.match(guide, /does not show the letter text/);
 });
 
-test('the enable flag cannot send without the test allowlist', async () => {
+test('delivery mode is explicit, and an unset mode sends nobody', async () => {
   const store = createMemoryStore();
   await store.saveState(enroll({ user: user(), choice: 'yes', now }).state);
+  const declined = user({ id: '33333333-3333-4333-8333-333333333333', email: 'declined@example.com' });
+  await store.saveState(enroll({ user: declined, choice: 'no', now }).state);
   let calls = 0;
   const send = async () => {
     calls += 1;
     return { ok: true };
   };
-  const base = { MAILING_ADDRESS: 'PO Box 1', UNSUBSCRIBE_SECRET: 'test-secret' };
+  const saved = [];
+  const base = {
+    MAILING_ADDRESS: 'PO Box 1',
+    UNSUBSCRIBE_SECRET: 'test-secret',
+    NEST_PROFILES: { put: async (key, value) => { saved.push([key, value]); } },
+  };
   const deps = { store, now: () => now, loadContext: async () => ({ profile: null }), deliver: send };
-  const off = await runNestLetterCron({ ...base, NEST_LETTERS_ENABLED: 'false', NEST_LETTERS_ALLOWLIST: user().id }, deps);
+  const off = await runNestLetterCron({ ...base, NEST_LETTERS_ENABLED: 'false', NEST_LETTERS_MODE: 'general' }, deps);
   assert.equal(off.skipped, 'disabled');
-  const open = await runNestLetterCron({ ...base, NEST_LETTERS_ENABLED: 'true' }, deps);
-  assert.equal(open.skipped, 'allowlist');
-  const outsider = await runNestLetterCron({ ...base, NEST_LETTERS_ENABLED: 'true', NEST_LETTERS_ALLOWLIST: '22222222-2222-4222-8222-222222222222' }, deps);
+  const unset = await runNestLetterCron({ ...base, NEST_LETTERS_ENABLED: 'true' }, deps);
+  assert.equal(unset.skipped, 'mode');
+  const invalid = await runNestLetterCron({ ...base, NEST_LETTERS_ENABLED: 'true', NEST_LETTERS_MODE: 'everyone' }, deps);
+  assert.equal(invalid.skipped, 'mode');
+  const testEmpty = await runNestLetterCron({ ...base, NEST_LETTERS_ENABLED: 'true', NEST_LETTERS_MODE: 'test' }, deps);
+  assert.equal(testEmpty.skipped, 'allowlist');
+  const outsider = await runNestLetterCron({
+    ...base,
+    NEST_LETTERS_ENABLED: 'true',
+    NEST_LETTERS_MODE: 'test',
+    NEST_LETTERS_ALLOWLIST: '22222222-2222-4222-8222-222222222222',
+  }, deps);
   assert.equal(outsider.sent || 0, 0);
   assert.equal((await store.getState(user().id)).welcomeSent, false);
-  const allowed = await runNestLetterCron({ ...base, NEST_LETTERS_ENABLED: 'true', NEST_LETTERS_ALLOWLIST: ` ${user().id.toUpperCase()} ` }, deps);
-  assert.equal(allowed.sent, 1);
+  assert.equal(calls, 0);
+  const open = await runNestLetterCron({ ...base, NEST_LETTERS_ENABLED: 'true', NEST_LETTERS_MODE: 'general' }, deps);
+  assert.equal(open.sent, 1);
+  assert.equal(open.due, 1);
   assert.equal(calls, 1);
+  assert.equal((await store.getState(user().id)).welcomeSent, true);
+  assert.equal((await store.getState(declined.id)).status, 'declined');
+  assert.equal((await store.getState(declined.id)).nestCoaching, false);
+  const limited = resolveLetterDelivery({
+    NEST_LETTERS_ENABLED: 'true',
+    NEST_LETTERS_MODE: 'general',
+    MAILING_ADDRESS: 'PO Box 1',
+    NEST_LETTERS_ALLOWLIST: '22222222-2222-4222-8222-222222222222',
+  });
+  assert.equal(limited.allowUser({ userId: user().id }), false);
   assert.equal(parseLetterAllowlist('a, b').size, 2);
+  assert.equal(parseLetterAllowlist('').size, 0);
+  assert.equal(saved.length, 2);
+  assert.equal(saved[1][0], LAST_RUN_KEY);
+  const report = JSON.parse(saved[1][1]);
+  assert.equal(report.completed, true);
+  assert.equal(report.accepted, 1);
+  assert.equal(report.mode, 'general');
+  assert.equal(JSON.stringify(report).includes('@'), false);
+  assert.equal(JSON.stringify(report).includes(user().id), false);
+});
+
+test('failed and uncertain sends stay counted, and a second cron does not send', async () => {
+  let failedReport = null;
+  const failedStore = createMemoryStore();
+  await failedStore.saveState(enroll({ user: user(), choice: 'yes', now }).state);
+  const failed = await runNestLetterCron({
+    MAILING_ADDRESS: 'PO Box 1',
+    UNSUBSCRIBE_SECRET: 'test-secret',
+    NEST_LETTERS_ENABLED: 'true',
+    NEST_LETTERS_MODE: 'general',
+  }, {
+    store: failedStore,
+    now: () => now,
+    loadContext: async () => ({ profile: null }),
+    deliver: async () => ({ ok: false }),
+    recordRun: async (report) => { failedReport = report; },
+  });
+  assert.equal(failed.failed, 1);
+  assert.equal(failedReport.failed, 1);
+  assert.equal(failedReport.accepted, 0);
+  assert.equal(failedReport.completed, true);
+  assert.equal((await failedStore.getState(user().id)).welcomeSent, false);
+  assert.equal(JSON.stringify(failedReport).includes(user().email), false);
+
+  let uncertainReport = null;
+  const uncertainStore = createMemoryStore();
+  await uncertainStore.saveState(enroll({ user: user(), choice: 'yes', now }).state);
+  const uncertain = await runNestLetterCron({
+    MAILING_ADDRESS: 'PO Box 1',
+    UNSUBSCRIBE_SECRET: 'test-secret',
+    NEST_LETTERS_ENABLED: 'true',
+    NEST_LETTERS_MODE: 'general',
+  }, {
+    store: uncertainStore,
+    now: () => now,
+    loadContext: async () => ({ profile: null }),
+    deliver: async () => ({ uncertain: true }),
+    recordRun: async (report) => { uncertainReport = report; },
+  });
+  assert.equal(uncertain.uncertain, 1);
+  assert.equal(uncertainReport.uncertain, 1);
+  assert.equal(uncertainReport.held, 0);
+  assert.equal((await uncertainStore.getState(user().id)).welcomeSent, false);
+
+  const heldView = deliveryReport('general', { due: 1, sent: 0, failed: 0, held: 1, uncertain: 0, skipped: 0, deferred: 0 });
+  assert.equal(heldView.held, 1);
+  assert.equal(heldView.accepted, 0);
+  assert.equal(Object.hasOwn(heldView, 'email'), false);
+
+  const store = createMemoryStore();
+  await store.saveState(enroll({ user: user(), choice: 'yes', now }).state);
+  let release;
+  const gate = new Promise((resolve) => { release = resolve; });
+  let entered = 0;
+  const env = { MAILING_ADDRESS: 'PO Box 1', UNSUBSCRIBE_SECRET: 'test-secret', NEST_LETTERS_ENABLED: 'true', NEST_LETTERS_MODE: 'general' };
+  const deps = {
+    store,
+    now: () => now,
+    loadContext: async () => ({ profile: null }),
+    deliver: async () => {
+      entered += 1;
+      await gate;
+      return { ok: true };
+    },
+  };
+  const first = runNestLetterCron(env, deps);
+  await new Promise((resolve) => setTimeout(resolve, 30));
+  const second = await runNestLetterCron(env, {
+    store,
+    now: () => now,
+    loadContext: async () => ({ profile: null }),
+    deliver: async () => {
+      entered += 1;
+      return { ok: true };
+    },
+  });
+  assert.equal(second.skipped, 'lock');
+  release();
+  const done = await first;
+  assert.equal(done.sent, 1);
+  assert.equal(entered, 1);
 });
 

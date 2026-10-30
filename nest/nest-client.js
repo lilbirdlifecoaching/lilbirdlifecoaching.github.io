@@ -39,6 +39,7 @@
   let canvasCheckinOpen = false;
   let canvasDraft = null;
   let canvasStatus = '';
+  let canvasAccessNote = '';
   const CANVAS_DIMS = [
     { key: 'why', title: 'Passion & Purpose', color: '#F5C842', question: 'How alive does what you\'re doing feel?' },
     { key: 'who', title: 'Connections', color: '#4adea8', question: 'How held are you by the people around you?' },
@@ -467,16 +468,19 @@
       canvasSynthesis = '';
       canvasTexts = null;
 
+      canvasAccessNote = '';
       if (deepNestId) {
         try {
           const res = await fetch(ASSESSMENT_WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(deepNestId), {
             headers: await authHeaders()
           });
-          if (res.ok) {
-            const payload = await res.json();
+          const payload = await res.json().catch(() => null);
+          if (res.ok && payload) {
             deepProfile = parseAssessmentProfile(payload);
             deepReadPaid = payload?.paid === true;
             applyCanvasPayload(payload);
+          } else {
+            canvasAccessNote = assessmentDenialMessage(payload, res.status);
           }
         } catch (e) {
           console.error('Could not load deep profile:', e);
@@ -902,14 +906,22 @@
     return s.replace(/^nest[:\s]+/i, '').trim();
   }
 
+  function assessmentDenialMessage(body, status) {
+    if (body && body.recovery === 'confirm-results-email') {
+      return 'Sign in with the email that received this read, or write hello@lilbird.life from that address.';
+    }
+    if (status === 401 || status === 403) return 'This read is not available from this login.';
+    return '';
+  }
+
   async function fetchAssessmentProfile(nestId) {
     const res = await fetch(
       ASSESSMENT_WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(nestId),
       { headers: await authHeaders() }
     );
-    if (!res.ok) return null;
-    const payload = await res.json();
-    return parseAssessmentProfile(payload);
+    const payload = await res.json().catch(() => null);
+    if (!res.ok) return { profile: null, status: res.status, body: payload };
+    return { profile: parseAssessmentProfile(payload), status: res.status, body: payload };
   }
 
   async function linkInnerCompassToAccount(btn) {
@@ -930,10 +942,12 @@
     setDashError('');
 
     try {
-      const profile = await fetchAssessmentProfile(nestId);
+      const loaded = await fetchAssessmentProfile(nestId);
+      const profile = loaded.profile;
       if (!profile) {
         setDashError(
-          'That link did not load a saved read. Open it in a new tab. If it works there, copy the full URL again. The email on the assessment can differ from your Nest login; that is OK.'
+          assessmentDenialMessage(loaded.body, loaded.status) ||
+          'That link did not load a saved read. Open it in a new tab and copy the full URL again.'
         );
         return;
       }
@@ -941,10 +955,13 @@
       btn.textContent = 'Connecting…';
       const { error } = await sb.rpc('link_deep_profile_to_user', { p_nest_id: nestId });
       if (error) {
+        const message = String(error.message || '');
         setDashError(
-          error.message.includes('another account')
-            ? 'That read is already connected to a different Nest account.'
-            : 'Could not save the link. Try again or email hello@lilbird.life.'
+          /not allowed/i.test(message)
+            ? assessmentDenialMessage({ recovery: 'confirm-results-email' }, 403)
+            : message.includes('another account')
+              ? 'That read is already connected to a different Nest account.'
+              : 'Could not save the link. Try again or email hello@lilbird.life.'
         );
         return;
       }
@@ -2200,11 +2217,11 @@
         date: (payload && payload.createdAt) || 'canvas-baseline'
       };
       canvasHistory = [entry];
-      fetch(ASSESSMENT_WORKER_URL + '/store-profile', {
+      authHeaders().then((headers) => fetch(ASSESSMENT_WORKER_URL + '/store-profile', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...headers },
         body: JSON.stringify({ nestId: deepNestId, canvasScores: scores, canvasHistory: [entry] })
-      }).catch(() => {});
+      })).catch(() => {});
     }
   }
 
@@ -2376,7 +2393,12 @@
       return;
     }
     if (!canvasScores) {
-      pane.innerHTML = '<div class="lc-shell"><article class="lc-card"><p class="lc-kicker">Life Canvas</p><h2 class="lc-title">Your Inner Compass is linked</h2><p class="lc-lead">The five scores show up here after the Life Canvas questions in the Inner Compass. Check-ins after that stay on this tab.</p><div class="lc-empty-actions"><a class="btn btn-ember" href="' + escapeHtml(innerCompassHref()) + '">Open the Inner Compass →</a></div></article></div>';
+      const denied = !!canvasAccessNote;
+      const title = denied ? 'This read is not open from this login' : 'Your Inner Compass is linked';
+      const lead = denied
+        ? canvasAccessNote
+        : 'The five scores show up here after the Life Canvas questions in the Inner Compass. Check-ins after that stay on this tab.';
+      pane.innerHTML = '<div class="lc-shell"><article class="lc-card"><p class="lc-kicker">Life Canvas</p><h2 class="lc-title">' + title + '</h2><p class="lc-lead">' + escapeHtml(lead) + '</p><div class="lc-empty-actions"><a class="btn btn-ember" href="' + escapeHtml(innerCompassHref()) + '">Open the Inner Compass →</a></div></article></div>';
       return;
     }
     const scores = canvasScores;
@@ -2448,7 +2470,10 @@
         headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
         body: JSON.stringify({ nestId: deepNestId, canvasScores: next, canvasHistory: [entry] })
       });
-      if (!res.ok) throw new Error('save failed');
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(assessmentDenialMessage(body, res.status) || 'save failed');
+      }
       canvasScores = next;
       canvasHistory = [entry].concat(canvasHistory).slice(0, 24);
       canvasDraft = null;
@@ -2456,7 +2481,9 @@
       canvasStatus = 'Saved. This check-in is on your history.';
       renderLifeCanvas();
     } catch (err) {
-      canvasStatus = 'Could not save that check-in. Try again.';
+      canvasStatus = err && err.message && err.message !== 'save failed'
+        ? err.message
+        : 'Could not save that check-in. Try again.';
       canvasCheckinOpen = true;
       if (btn) {
         btn.disabled = false;

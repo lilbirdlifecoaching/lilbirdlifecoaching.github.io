@@ -1079,7 +1079,7 @@
     //   2. Assessment frontend POSTs back to the worker with that token + nestId,
     //      which writes deep_profile_links { user_id → nest_id }.
     //   3. Dashboard reads deep_profile_links and fetches the live profile JSON
-    //      via GET /get-profile?nestId=… (no auth — nestId is unguessable).
+    //      via GET /get-profile?nestId=… with the signed-in session. A nest id alone is not access.
     const ASSESSMENT_WORKER_URL = 'https://lilbird-assessment.cwwq46sn7m.workers.dev';
     let deepProfileState = { loaded: false, nestId: null, profile: null };
 
@@ -1429,9 +1429,15 @@
           .maybeSingle();
         if (link.error || !link.data) { deepProfileState = { loaded: true, nestId: null, profile: null }; return; }
         const nestId = link.data.nest_id;
-        const res = await fetch(ASSESSMENT_WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(nestId));
-        if (!res.ok) { deepProfileState = { loaded: true, nestId, profile: null }; return; }
-        const payload = await res.json();
+        const res = await fetch(ASSESSMENT_WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(nestId), { headers: await workerHeaders() });
+        const payload = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          const note = payload && payload.recovery === 'confirm-results-email'
+            ? 'Sign in with the email that received this read, or write hello@lilbird.life from that address.'
+            : '';
+          deepProfileState = { loaded: true, nestId, profile: null, note };
+          return;
+        }
         const profile = parseAssessmentProfile(payload);
         deepProfileState = { loaded: true, nestId, profile };
       } catch (e) {
@@ -1462,7 +1468,7 @@
         if (deepProfileState.nestId) {
           return '<div class="deep-snapshot empty">'
             + '<div class="deep-snap-label">Identity · Inner Compass</div>'
-            + '<div class="deep-snap-empty-text">Your read is linked to this account, but we couldn\'t load the snapshot just now. Open your full read or refresh this page.</div>'
+            + '<div class="deep-snap-empty-text">' + (deepProfileState.note || 'Your read is linked to this account, but we couldn\'t load the snapshot just now. Open your full read or refresh this page.') + '</div>'
             + '<a class="btn-deep-snap-cta" href="https://lilbird.life/inner-compass/?nest=' +
             encodeURIComponent(deepProfileState.nestId) + '" target="_blank" rel="noopener">Open your full read →</a>'
             + '</div>';
