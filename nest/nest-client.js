@@ -924,6 +924,18 @@
     return { profile: parseAssessmentProfile(payload), status: res.status, body: payload };
   }
 
+  async function requestOwnershipRecovery(nestId) {
+    try {
+      const headers = await authHeaders();
+      headers['Content-Type'] = 'application/json';
+      await fetch(ASSESSMENT_WORKER_URL + '/nest-ownership/request', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ nestId: nestId }),
+      });
+    } catch (_) {}
+  }
+
   async function linkInnerCompassToAccount(btn) {
     const hint =
       'Paste your Inner Compass results link from email\n(for example: lilbird.life/inner-compass/?nest=…)\n\nOr paste the nest id only:';
@@ -945,6 +957,11 @@
       const loaded = await fetchAssessmentProfile(nestId);
       const profile = loaded.profile;
       if (!profile) {
+        if (loaded.body && loaded.body.recovery === 'confirm-results-email') {
+          await requestOwnershipRecovery(nestId);
+          setDashError('If this read was saved with the confirmed email on this Nest, a one-time confirmation is on its way. If nothing arrives, write hello@lilbird.life from the address that received the read.');
+          return;
+        }
         setDashError(
           assessmentDenialMessage(loaded.body, loaded.status) ||
           'That link did not load a saved read. Open it in a new tab and copy the full URL again.'
@@ -956,9 +973,10 @@
       const { error } = await sb.rpc('link_deep_profile_to_user', { p_nest_id: nestId });
       if (error) {
         const message = String(error.message || '');
+        if (/not allowed/i.test(message)) await requestOwnershipRecovery(nestId);
         setDashError(
           /not allowed/i.test(message)
-            ? assessmentDenialMessage({ recovery: 'confirm-results-email' }, 403)
+            ? 'If this read was saved with the confirmed email on this Nest, a one-time confirmation is on its way. If nothing arrives, write hello@lilbird.life from the address that received the read.'
             : message.includes('another account')
               ? 'That read is already connected to a different Nest account.'
               : 'Could not save the link. Try again or email hello@lilbird.life.'
