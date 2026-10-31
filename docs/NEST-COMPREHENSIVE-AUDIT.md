@@ -1,23 +1,20 @@
 # Nest comprehensive audit
 
-Refreshed 30 October 2026, after Release A. This replaces the 27 October status. The Release A notes at the end were written before that deploy and stay as the record of the trust model.
+Refreshed 31 October 2026, after Releases A, B1, B2, B3, and B4, and after a payment investigation. Earlier sections below the matrix keep the record of how each release was planned. The matrix is the current status.
 
-No email was sent. The cron was not triggered. No SQL migration was run. No member row was changed. Local `main` is still `443b8baf` and was not checked out.
+No coaching email was sent. The letter cron was not triggered. No SQL migration was run. No member entitlement was changed. No live payment was completed. Disposable checkout logins created for the payment check were removed. Local `main` is still `443b8baf` and was not checked out.
 
 Production at this refresh:
 
-- Site: GitHub Pages merge `3a3aef12` (pull request 10), https://lilbird.life/nest/
-- Live Nest HTML serves `nest-client.js?v=55` and `journey.js?v=7`. The free-plan sentence is still “Glow Map, quizzes, letters if you opt in, and the First Flight workbook.” The word `checked` does not appear on that page.
-- Assessment worker: `v8.5.2-release-a`, deployment `e5ba2a17-553e-4d1a-b4f3-bec81bbb4163`
-- `/ping`: `{"ok":true,"version":"v8.5.2-release-a","nestLetters":"enabled"}`
-- `NEST_LETTERS_MODE=general`. Cron remains `0 15 * * *`. `NEST_LETTERS_ENABLED` was left in place.
-- Database `mebqqzbuwkogdxvnihrq`, branch main Production. Read-only counts on 30 October: 18 entitlements, all active, 5 active Inner Compass, 5 links, all with a null ownership proof, 0 owner-email rows, 0 reads, 5 deliveries (4 sent, 1 failed), 3 letter-state rows, 2 with coaching on, 0 due.
-- The count-only key `nest-letters:last-run` is absent. Worker `v8.5.2` writes it, and no cron has run on that worker yet. Today’s 15:00 UTC cron ran before the 22:38 UTC deploy, on `v8.4.0-nest-live`.
-- Supabase scheduled backups: the dashboard says the Free plan does not include project backups.
+- Site: GitHub Pages merge `fe8752b3d38c718c70fc9899d9a0217fa15b20f8` (pull request 14), https://lilbird.life/nest/
+- Live Nest HTML serves `nest-client.js?v=58`, `nest-styles.css?v=47`, and `journey.js?v=8`. The free-plan sentence names My Journey. Close my account and hello@lilbird.life are on the page. Nest Premium still says coming soon.
+- Assessment worker: `v8.7.0-release-b3`, deployment `286f679b-032e-4a28-a856-857af1dedf8e`. `/ping` returns that version with `nestLetters` enabled. Cron remains `0 15 * * *`.
+- Solo worker: `v1.31-b4-close-held`, deployment `d52431cc-5b21-4a20-a220-cb0daa7f1adb`. `POST /account-close` returns 403 and does not ban. Its 15-minute schedule is unchanged.
+- Database `mebqqzbuwkogdxvnihrq`, branch main Production. Read-only counts after the disposable logins were removed: 46 auth users, 18 entitlements, all active, 0 Nest Plus rows, 0 duplicate user-and-product pairs, 0 `account_closes` rows, 5 deliveries (4 sent, 1 failed), 3 letter-state rows, 2 with Nest coaching on, 1 unsubscribed. Desk alerts: 0 rows.
+- `nest-letters:last-run` is absent in the production KV namespace. B2, which writes that key, was deployed at 01:56 UTC on 31 October. B3 followed at 02:41 UTC. The daily cron is 15:00 UTC, so no scheduled run has happened on either of those workers. The previous run was 30 October 15:00 UTC, before those deploys.
+- Supabase scheduled backups are still not included on the Free plan. A manual encrypted export is described under backups. It has not been run.
 
-Completion counts only the 48 matrix rows. Enhancement rows are excluded. A row is complete only when this refresh could point at production behavior, a production policy or count, or an automated test that executes the rule. A file that merely contains the feature is not enough.
-
-B1 copy is in the working tree on `feature/nest-release-b` and is not published. The matrix describes production.
+Completion counts only the 48 matrix rows. A row is complete only when this refresh can point at production behavior, a production policy or count, or an automated test that executes the rule. Deploying a release does not by itself complete a row.
 
 ## Requirements matrix
 
@@ -30,7 +27,7 @@ B1 copy is in the working tree on `feature/nest-release-b` and is not published.
 | 5 | Delete | Complete and verified | `deleteReflection` deletes by id and user id. The delete test passes. A signed-in click was not repeated on 30 October. |
 | 6 | The same tool can be used again | Complete and verified | Every save is an insert. Production grants no update. The two-save test passes. |
 | 7 | A second AI read does not erase a saved row | Complete and verified | `state.insight` is replaced in memory. Save inserts the current note. The tests cover a second row and a late response that must not land. |
-| 8 | The regeneration sentence matches that behavior | Partially implemented | Production `journey.js?v=7` says “Saving keeps this note. Another perspective replaces it.” The insert behavior is correct. The sentence can be read as replacing saved history. B1 changes the sentence on this branch and is not deployed. |
+| 8 | The regeneration sentence matches that behavior | Complete and verified | Live `journey.js?v=8` says a new perspective changes the note on screen, reflections already saved stay saved, and saving this note adds another entry. The old “replaces it” sentence is not in that file. |
 | 9 | Timestamps | Partially implemented | `created_at` is stored and `formatWhen` shows a date in `en-AU`, without the time of day. Two saves on one day look the same. |
 | 10 | Empty and failed saves | Complete and verified | Empty copy is “Nothing saved yet.” A failed insert keeps the draft. Tests cover the network failure and the retry. |
 | 11 | Account switch and cross-account privacy | Complete and verified | In-flight reflect and save are dropped when the member id changes. Reads filter on `user_id`. Tests pass, and the production policies match. |
@@ -39,12 +36,12 @@ B1 copy is in the working tree on `feature/nest-release-b` and is not published.
 | 14 | Each tool can be finished, reflected, and saved | Complete and verified | Every tool has a next-step stage. Reflect prompts forbid diagnosis. Deep links are `https://lilbird.life/nest/?tool=<id>`. Unknown tools are refused. Tool tests pass. |
 | 15 | Live model wording for every tool | Implemented but not verified in production | The prompt requires one detail from the member’s words and forbids diagnosis. This refresh did not send fifteen live model requests. |
 | 16 | Tools are part of the Nest, not a paid add-on | Complete and verified | Published `journey.js` has no Nest Plus check. Any signed-in member can open a tool. |
-| 17 | The Nest reads as one home | Partially implemented | Tabs, prices, and product cards are on the live page. The free-plan sentence omits My Journey. The sidebar checklist and My Journey both use a “next steps” name for different lists. B1 renames them on this branch and is not deployed. |
-| 18 | Subscription tiers | Complete and verified | Live signup cards: Free Nest, Nest Plus at $7.99 a month, Nest Premium marked coming soon. Plus is the guide, full read, Life Canvas, Relationship Dynamic, and Roots & Wings. The Intensive workbook is also $27 on its own. Solo is Nest Premium or $197. First Flight the session is $149 and is not included in Free Nest. The First Flight workbook is. |
+| 17 | The Nest reads as one home | Complete and verified | The live signup card names My Journey on the free plan. The sidebar checklist is “For your Nest.” My Journey’s own card is “Tools for the Tangle.” |
+| 18 | Subscription tiers | Complete and verified | Live signup cards still show Free Nest, Nest Plus at $7.99 a month, and Nest Premium as coming soon. There is no $47 checkout. A disposable signed-in call opened a live Stripe page for Nest Plus at $7.99 a month, and the Solo pay button opened the $197 card form. No card was charged. The Stripe line for Nest Plus still describes Relationship Dynamic and the First Flight workbook, which is older than the site copy. No Nest Plus entitlement row exists. See the payment section. |
 | 19 | Welcome, 26 letters, and four check-ins | Complete and verified | Letter tests render the welcome, all 26 letters, and the check-ins. Sender is `lil' bird <hello@lilbird.life>`. The deployed letter files match the published copies from the Release A deploy. |
 | 20 | Letters do not look like a course | Complete and verified | Numbered letters use an empty kicker. The render test reports no “Note N of 26.” |
 | 21 | Unsubscribe is visible and one-click capable | Complete and verified | The renderer sets the unsubscribe URL, `List-Unsubscribe`, and `List-Unsubscribe-Post`. Preference tests pass. A mailbox was not opened on 30 October. |
-| 22 | A short Compass line when a name exists | Partially implemented | `compassLine` in `nest-letters.js` can add one sentence on letters 4, 8, 13, 18, 23, and 26, and it drops numbers, attachment language, and long text. `letterLoadContext` in the deployed worker returns `profile: null`, so the sentence is never added. The letter still sends. |
+| 22 | A short Compass line when a name exists | Partially implemented | The deployed worker loads one profile only when the member’s confirmed email has verified ownership of that read. A weaker match adds no sentence. No scheduled send has run since that code deployed, so a live letter with the sentence has not been seen. |
 | 23 | Inbox rendering of every note | Implemented but not verified in production | HTML is one dark table and plain text is rendered. Letter 1 was accepted in an earlier test. The other notes were not opened in a mail client during this refresh. |
 | 24 | Signup consent | Complete and verified | The live Nest page has no `checked` attribute. The client treats the box as on only when `checked === true`. The consent test passes. |
 | 25 | Existing members are not enrolled by launch | Complete and verified | The cron reads `nest_coaching = true` and a due `next_at`. Production has 3 letter-state rows, 2 opted in, and 0 due. |
@@ -55,8 +52,8 @@ B1 copy is in the working tree on `feature/nest-release-b` and is not published.
 | 30 | Each member has their own schedule | Complete and verified | Welcome delay 2 days, letters every 14 days, check-ins about every 90 days. `applyAccountEvent` does not move the sequence. Tests pass. |
 | 31 | One letter per member per step | Complete and verified | Idempotency-Key is the delivery id. Unique `(user_id, letter_key)`. The lock is service-role only. A second-cron test passes. |
 | 32 | Failed, uncertain, and held sends | Complete and verified | A failure inside the 24-hour window retries the same letter. After that window `claim` holds the row and does not send it again. An uncertain send does not move the step. Production has one failed row and zero uncertain rows. See the n01 note in Release B. |
-| 33 | Letter address follows the member | Partially implemented | New enrollment stores the confirmed auth email. The cron sends to `state.email` from the last preference write. `letterLoadContext` already loads the auth user and ignores `user.email`. A later confirmed email change is not picked up. |
-| 34 | Account deletion removes Nest mail and reflections | Partially implemented | Several tables cascade from `auth.users`. There is no member-facing close flow and no confirmation message. Delivery rows, owner-email rows, and Cloudflare KV do not follow the auth user. The retention plan is below. It is not built. |
+| 33 | Letter address follows the member | Partially implemented | The deployed send path can use the confirmed auth email and keep the same sequence. No scheduled run has used that path yet. An unconfirmed address is still skipped. |
+| 34 | Account deletion removes Nest mail and reflections | Partially implemented | Live Nest settings show Close my account and mailto hello@lilbird.life. Opening that section does not change account state. `POST /account-close` returns 403 and does not ban, write `account_closes`, or change billing. Staff still close a login by hand. Delivery rows, owner-email rows, and KV do not follow `auth.users`. Automatic deletion was not built. |
 | 35 | Turning notes back on does not restart the sequence | Complete and verified | `enroll` resumes when the welcome was sent, the step is past zero, or the phase is `checkin`. The test passes. |
 | 36 | A missed cron sends later, once | Complete and verified | `dueStates` uses `next_at <= now`. The step advances only after a recorded send. Tests pass. |
 | 37 | The first general run has been observed | Complete and verified | On 28 October the 15:00 UTC cron on `v8.4.0-nest-live` made two Resend calls, both 200, matching two due letters. Production now has 4 sent and 1 failed. The failed row is the 27 October n01, not a new failure. Nothing was sent by hand on 30 October. |
@@ -67,10 +64,10 @@ B1 copy is in the working tree on `feature/nest-release-b` and is not published.
 | 42 | Linking a Compass does not hand it to the wrong account | Complete and verified | `link_deep_profile_to_user` requires `auth.uid()` and a matching `nest_owner_emails` row. An unauthorized claim returned `not allowed`. A matching disposable claim wrote `ownership_proof = owner_email` and was then removed. Entitlements are back to 18, all active. |
 | 43 | Delivery can be stopped immediately | Complete and verified | `/ping` reports coaching enabled only when the send gate is open. The gate requires `NEST_LETTERS_ENABLED` true, mode `general` or `test`, and a mailing address. The flag was not turned off during this refresh. |
 | 44 | Held mail has a written recovery | Complete and verified | `docs/NEST-LETTERS.md` has the count query and the guarded updates. The cron does not resend a held row. That document still says the live worker is `v8.4.0` and does not write `nest-letters:last-run`. The code in `v8.5.2` does write it. The document is behind the deploy. |
-| 45 | Someone can see a failed run without reading member mail | Partially implemented | The cron logs `Nest letters:`. `v8.5.2` also writes count-only `nest-letters:last-run`. That key is absent because no cron has run since the deploy. There is no alert. The delivery table has no provider-error column. |
-| 46 | Regression tests exist | Complete and verified | 75 tests passed on 30 October across canvas access, the guide, Journey reflect, Journey tools, and letters. They do not prove live model wording or a mail client. |
-| 47 | The published source matches the live sender | Complete and verified | `origin/main` is `3a3aef12`. The deployed worker is the reviewed `v8.5.2-release-a` copy, with mode `general`. An empty allowlist under that mode sends to consented members. Deploying `origin/main` from before pull request 10 would have been the old gate. That is not what is running. |
-| 48 | Backups | Not implemented | The Supabase backups page for this project says the Free plan does not include project backups. Point-in-time recovery was not enabled on that page. Cloudflare KV backups were not found. |
+| 45 | Someone can see a failed run without reading member mail | Partially implemented | The deployed B2 code writes count-only `nest-letters:last-run` and a `desk_alerts` row with counts when a run has failed, held, or uncertain mail. The key is absent and `desk_alerts` has 0 rows because no cron has run since that deploy. The 27 October failed delivery is still the only failed row. It was not retried. |
+| 46 | Regression tests exist | Complete and verified | 97 Nest tests and 2 Solo close-route tests passed on 31 October. They cover Journey, the guide, letters, Release A, B3 recovery, and the B4 closure request. They do not prove a live model reply, a mail client, or a completed card charge. |
+| 47 | The published source matches the live sender | Complete and verified | `origin/main` is `fe8752b3`. The assessment worker is `v8.7.0-release-b3` and `/ping` reports coaching letters enabled. The Solo worker is `v1.31-b4-close-held`. The public Nest page matches that merge, including Close my account and `nest-client.js?v=58`. |
+| 48 | Backups | Not implemented | The Free plan still does not include Supabase backups. A no-cost export procedure is written below. No production export was taken during this refresh. |
 
 ## Enhancements
 
@@ -79,9 +76,9 @@ These are not part of the 48. They stay optional.
 | Item | Status | Note |
 | --- | --- | --- |
 | Time of day on a reflection | Enhancement. Also row 9, which stays partial. | Add the time only if same-day saves become confusing. Not in B1. |
-| Name My Journey on the free plan | Row 17. B1 does this. | It was optional for the library to function. The home-page requirement already asked for it. |
-| Compass sentence | Row 22. B2, not started. | The renderer is ready. The cron does not load a profile. |
-| A member-facing account close button | Row 34. B4 plan only. | Do not build it until the retention plan is accepted. |
+| Name My Journey on the free plan | Done on the live page. Row 17. | The signup card names My Journey. |
+| Compass sentence | Row 22. Deployed, not yet seen in a sent letter. | The worker can load one verified name. No cron has run since that deploy. |
+| A member-facing account close button | The request is live. Row 34 stays partial. | Settings explain closure and write to hello@lilbird.life. Nothing is deleted from the page. |
 
 ## Completion
 
@@ -89,15 +86,89 @@ These are not part of the 48. They stay optional.
 
 | Status | Rows |
 | --- | --- |
-| Complete and verified | 38 |
-| Partially implemented | 7 |
+| Complete and verified | 40 |
+| Partially implemented | 5 |
 | Implemented but not verified in production | 2 |
 | Not implemented | 1 |
 | Superseded by a later product decision | 0 |
 
-Completion is 38 / 48 = 79%. Partial, unverified, and not-implemented rows are not counted as complete.
+Completion is 40 / 48 = 83%. Partial, unverified, and not-implemented rows are not counted as complete.
 
-The seven partial rows are 8, 9, 17, 22, 33, 34, and 45. The two unverified rows are 15 and 23. The missing row is 48, backups.
+The five partial rows are 9, 22, 33, 34, and 45. Rows 8 and 17 moved to complete because the published Journey sentence and the free-plan wording are live. The two unverified rows are still 15 and 23. The missing row is still 48, backups. Documenting an export does not create a backup.
+
+## Payment investigation, 31 October 2026
+
+No live card was charged. Checkout was opened and then left unpaid.
+
+| Path | What happened |
+| --- | --- |
+| Signed-in Nest Plus | `POST /nest-upgrade-checkout` returned 200 and a Stripe hosted page: Nest Plus, $7.99 per month, live mode, card form present. |
+| Signed-out Nest Plus | 401, “Please log in again.” |
+| Workbook | A hosted checkout session was created for $27. It was not paid. |
+| Solo, signed out | The live Pay button opened the embedded card form for $197. `initEmbeddedCheckout` still runs on the current Stripe.js script. Stripe’s March 2026 rename to `createEmbeddedCheckoutPage` also runs. The old name has not been removed from the script this site loads. |
+| First Flight and coaching with no held time | 400, `pick_time_first`. That is the expected gate. |
+| Intensive with no account | 400, user id and email are required. |
+| Nest Premium | The live card says coming soon. There is no $47 checkout. |
+| After the checks | Disposable logins were removed. Entitlements stayed 18, all active. Nest Plus rows stayed 0. Deliveries stayed 5. Close rows stayed 0. |
+
+Releases A through B4 did not remove these checkout routes. The Solo deploy that disabled account closure still creates Nest Plus, workbook, and Solo sessions.
+
+What is actually wrong:
+
+- The live Stripe line says Nest Plus adds Relationship Dynamic and the First Flight workbook. The First Flight workbook is already in the free Nest. The proposed replacement is below. It has not been written to Stripe.
+- No `nest_plus` entitlement has ever been written. A completed Nest Plus payment has not been observed. The grant code and the unique `(user_id, product)` index are in place. This refresh did not pay, so it does not prove the webhook writes the row.
+- Nest Premium cannot be bought. That is the published product state, not a broken button.
+
+No payment code was changed. No worker was deployed. Live Stripe metadata was not changed.
+
+### Proposed Nest Plus description
+
+Do not create a product or a price. Leave the amount at $7.99 a month.
+
+Current checkout line: “Adds the Relationship Dynamic tool and the First Flight workbook to your lil' bird Nest.”
+
+Proposed description, and nothing else:
+
+`lil' bird guide, the full Inner Compass read, Life Canvas, Relationship Dynamic, and the Roots & Wings workbook. Cancel anytime.`
+
+That matches what a Nest Plus entitlement opens today:
+
+- The guide is locked until Nest Plus, coaching, or the Intensive. The guide route returns `nest_plus_required` otherwise.
+- The full read opens for a Nest Plus member when that read is linked to their login and the email matches. The $2 read remains a separate one-time purchase for someone without Nest Plus.
+- Life Canvas scores and check-ins stay on the Nest tab for a linked read. The written canvas note is part of the full read.
+- Relationship Dynamic is refused without Nest Plus.
+- Roots & Wings opens for a `nest_plus` entitlement. It is also $27 on its own.
+- Cancel anytime is the billing-portal setting: cancellation is at period end. Access stays until Stripe marks the subscription canceled, unpaid, or deleted.
+
+Left out on purpose: the First Flight workbook, Solo, live coaching, and Nest Premium. Those are not what this $7.99 price unlocks. The Nest screen does not treat a First Flight entitlement as Nest Plus. The assessment worker source still lists `first_flight` inside its Nest Plus product list, so a First Flight member can receive the full read and Relationship Dynamic from that worker. That is a separate mismatch. It is not a reason to put the First Flight workbook on the Nest Plus line.
+
+### Payment-to-entitlement trace
+
+Production checkout uses live Stripe keys. There is no test-mode price in the worker configuration, so a faithful isolated charge was not run. No live card was charged.
+
+The Solo worker’s `/stripe-webhook` path, read against the current source:
+
+| Check | What the code does |
+| --- | --- |
+| Webhook authentication | The raw body is verified with the webhook secret, HMAC-SHA256, a constant-time compare, and a five-minute replay window. A bad signature returns 400 and grants nothing. |
+| Who receives access | Nest Plus checkout stores the signed-in user id and email on the session. Fulfillment uses that user id when it is a UUID. If it is missing, it finds or creates the account for the session email. |
+| One entitlement | The row is `product = nest_plus`, `active = true`, `granted_by = stripe_sub:` plus the subscription id. The table has a unique index on `(user_id, product)`, and the write is an upsert. |
+| Duplicate delivery | If that subscription already has an active Nest Plus row, fulfillment returns before writing again. A racing second delivery upserts the same user-and-product row. |
+| Failed or abandoned payment | A checkout session grants only when `payment_status` is `paid` or `no_payment_required`. Nest Plus checkout does not offer a promotion code. `invoice.payment_failed` and `checkout.session.expired` record a desk alert and do not grant. |
+| Renewal | `invoice.paid` grants only for `subscription_create`, and only if that subscription does not already have an active row. A later renewal does not insert a second product row. |
+| Cancellation | The portal cancels at period end. `cancel_at_period_end` keeps the entitlement and records a desk alert. Access is turned off when the subscription is deleted or its status is `canceled`, `unpaid`, or `incomplete_expired`. A failed renewal invoice does not itself remove access. |
+| Nest display | After login, the Nest reads `user_entitlements`. Nest Plus is shown when the active product is `nest_plus`, `coaching`, or `life_change_intensive`. A return from checkout polls that read up to eight times. A refresh after the row exists shows Nest Plus. |
+
+Observation checklist for the next real Nest Plus payment. Do this after Stripe metadata is updated, and do not grant the row by hand:
+
+1. The checkout line matches the proposed description, and the amount is still $7.99 a month.
+2. The member pays from the Nest they are signed into.
+3. Stripe shows one paid subscription invoice for that checkout, not a second subscription.
+4. One `user_entitlements` row exists for that user with `product = nest_plus`, `active = true`, and `granted_by` starting with `stripe_sub:`.
+5. A second delivery of the same webhook does not add a second row.
+6. Refreshing the Nest shows Nest Plus, the guide opens, and Roots & Wings opens.
+7. An abandoned checkout leaves no `nest_plus` row.
+8. Cancelling in the billing portal leaves the row active until the period ends, then a later canceled or deleted subscription sets `active` false.
 
 ## What changed since 27 October
 
@@ -105,37 +176,37 @@ Release A closed the two P1 authorization holes. Canvas reads and writes go thro
 
 ## Prioritized remaining issues
 
-### P1 — No database backups
+### P0
 
-The Free plan page says project backups are not included. A mistaken delete, or a project failure, cannot be restored from Supabase. This is an operational risk. It is not a member-facing bug. Do not turn mail off because of it. Decide whether the project should move to a plan that keeps backups before any account-deletion tool exists.
+None found in this refresh. Checkout opens for Nest Plus and Solo. The old close route does not ban. Authorization checks from Release A were not weakened.
 
-### P1 — A failed letter is still easy to miss
+### P1 — Apply the proposed Nest Plus description, then watch one real payment
 
-`v8.5.2` can write a count-only report, and that report does not exist yet. There is no alert. The 27 October n01 failure has no stored provider reason. Leave that row alone. Read `nest-letters:last-run` after the 31 October 15:00 UTC cron. Do not trigger the cron to create the key.
+The proposed description is in the commercial verification section. It is not on the live Stripe product yet. After it is approved, change only that product’s description. Leave the $7.99 price. Then follow the eight-step observation checklist on the next real purchase. Do not grant the entitlement by hand.
 
-### P2 — A legitimate member can open a read and still not claim it
+### P1 — No database backup has been taken
 
-Email match opens that member’s own canvas and does not write `nest_owner_emails`. A legacy link is not trusted. The claim function then refuses. Existing Inner Compass grants stay. The recovery design is in B3. It is not built.
+The Free plan still has no scheduled backup. The procedure below is ready. It has not been run. Take the first encrypted export before any real account closure.
 
-### P2 — An unauthorized paid retake can reach the model
+### P1 — Read the letter monitor after the next cron
 
-For a brand-new nest id, `handleAnalyze` calls Anthropic before `inheritPaidRetake`. The refusal does not save the profile. An existing partial record is refused before the model call. Move the retake check forward in B3. Do not weaken the decision.
+`nest-letters:last-run` is absent because B2 deployed after the 30 October 15:00 UTC run. Read that key after 31 October 15:00 UTC. Do not trigger the cron. Do not retry the 27 October failed delivery. An alert row should appear only if that run has a failed, held, or uncertain count.
 
-### P2 — Six letters never receive the archetype sentence
+### P2 — Account closure is still a staff task
 
-`letterLoadContext` returns `profile: null`. The letter is complete without the sentence. B2 may load one short name from a verified record.
+The member page explains the request. Staff still have to cancel an active subscription in Stripe, then close the login. Merging two Nests can still ban the other login and does not cancel either Nest Plus charge. That merge path was left in place.
 
-### P2 — A changed login email is not the send address
+### P2 — Stripe.js may later remove the old embedded checkout call
 
-The cron uses `state.email`. B2 may resolve the current confirmed auth email at send time.
+Solo, First Flight, coaching, and the Intensive call `initEmbeddedCheckout`. The current script still accepts it, and the renamed `createEmbeddedCheckoutPage` also works. When Stripe removes the old name, those four checkouts will fail until the pages call the new name. Nest Plus and the workbook redirect to a hosted page and do not use that call.
 
-### P2 — Free Nest copy and the two next-step labels
+### P2 — A changed login email and the Compass sentence are deployed and not yet seen in a sent letter
 
-Production still omits My Journey and uses one name for two lists. B1 is written on this branch and is not deployed.
+The worker can send to the confirmed address and can add one sentence from a verified read. No scheduled run has used that code yet. Rows 22 and 33 stay partial until that run is observed.
 
-### P2 — Account closure is undocumented as a member path and incomplete as a delete
+### P2 — An unauthorized paid retake can still reach the model
 
-Cascades cover reflections, letter state, entitlements, and links. They do not cover delivery rows, `nest_owner_emails`, or KV. The plan is in B4. No delete button is added.
+For a brand-new nest id, `handleAnalyze` calls the model before the retake decision. This was left out of B3 on purpose. Do not change it in a payment fix.
 
 ### P3
 
@@ -144,11 +215,48 @@ Cascades cover reflections, letter state, entitlements, and links. They do not c
 - One live coaching note per tool has not been read.
 - `docs/NEST-LETTERS.md` still describes `v8.4.0` and says the last-run key is not written. Update that note with B2, not by changing send behavior.
 
+## Free backup procedure
+
+Approval required before any export. This refresh did not export production data. Do not store a plaintext dump in GitHub or in the site project folder, including iCloud copies of that folder.
+
+Run the export only after a written yes that names the date. Work on the machine that holds the Cloudflare and Supabase logins. Create an encrypted disk image first, for example with Disk Utility, and do every dump inside that image. Unmount it when finished. Keep the passphrase in a password manager. If a plaintext file is created outside the image, delete it in the same sitting.
+
+What to export, at no charge:
+
+1. Postgres, including Auth. From the Supabase dashboard, copy the direct connection string for project `mebqqzbuwkogdxvnihrq`. Do not paste it into the repo or into chat. Run `pg_dump` with `--format=custom` and `--schema=public --schema=auth --schema=storage`. A public-only dump misses passwords and sessions.
+2. Cloudflare KV. From the assessment worker directory, inside the encrypted image, list keys with `npx wrangler kv key list --remote --namespace-id 9eef4f6c6e274eeeaf7ba2bd5ecda24c`, then read them with `npx wrangler kv bulk get` on that key file and the same `--remote` and `--namespace-id` flags. Redirect the output into the image. Those values include assessment records.
+3. Supabase Storage bucket `childhood-photos`. Download the objects from the dashboard into the same encrypted image.
+4. A note of non-secret configuration: worker names, cron schedules, and which secret names exist. Do not copy secret values. Stripe customers and invoices stay in Stripe.
+
+How often: the first approved run, then weekly, and again before any real account closure or schema change. The first run is about an hour. A repeat is shorter.
+
+Export verification, still inside the encrypted image:
+
+- `pg_restore --list` shows `auth.users`, `public.user_entitlements`, and `public.nest_letter_deliveries`.
+- The KV file count is greater than zero, and one known non-member key such as a config key is present. Do not open assessment JSON to check it.
+- The storage folder contains the expected object count from the dashboard, compared as a number only.
+- Record the UTC time, the three counts, and the file sizes in the password manager. Do not record member addresses.
+
+Restore validation, on a machine that is not production, and only with approval to use a copy:
+
+- Restore the custom dump into an empty local Postgres. Confirm the three relations above exist and that `auth.users` count matches the recorded count. Then delete the local cluster.
+- Confirm a KV export file parses as JSON without printing values.
+- Confirm one storage object’s byte size matches the dashboard. Do not publish the file.
+- There is no safe way to rehearse a restore into the live project. Do not restore over production.
+
+Recovery limitations:
+
+- The Free plan has no scheduled backup and no point-in-time recovery. Anything written after the export is gone.
+- KV keys expire. An old export can contain a profile the live store has already dropped, and it can miss one that was saved later.
+- Worker secrets, Stripe cards, Resend history, and Cal.com bookings are not in the dump.
+- An auth restore brings password hashes only when the `auth` schema was included. Sessions should not be reused.
+- A shared Bridge record names more than one person. Restoring it restores the other person’s half as well.
+
 ## Release B
 
 Release B finishes the existing Nest. It does not add an assessment, a tool, a price, or a subscription tier. It does not weaken Release A.
 
-B1 is in this working tree and is not deployed. B2, B3, and B4 are not implemented.
+B1, B2, B3, and B4 are now in production. The notes under each letter are the plan as it was written. The matrix above is the status after those deploys.
 
 ### B1 — Product polish
 
