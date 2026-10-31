@@ -4,7 +4,7 @@ Staff-assisted closure for Lil’ Bird. This release adds the member request in 
 
 Production this note was written against: Pages merge `64a8d9580e2f1d0f98a05bcc16f2c5e6f323b537`, assessment worker `v8.7.0-release-b3`, Supabase Free, coaching letters on. There is no Supabase project backup on this plan.
 
-The member writes to hello@lilbird.life from the confirmed address on the Nest. Staff follow the checklist below. Do not use `POST /account-close` on worker-solo. That route still bans a login for a very long time, writes the address into `account_closes`, and leaves the assessment, the letters, and Stripe where they are.
+The member writes to hello@lilbird.life from the confirmed address on the Nest. Staff follow the checklist below. `POST /account-close` on worker-solo answers any signed-in caller with that same request. It does not ban the login, write `account_closes`, cancel a subscription, or delete data.
 
 ## Member wording
 
@@ -109,7 +109,7 @@ Do this for one requester at a time. Use a disposable account if you are practis
 11. **Storage check.** After the prefix delete, the public photo URL should 404. If `course_users.childhood_photo_url` or `illustration_url` pointed somewhere else, open that URL and remove the object if it is in this project. An illustrator inbox is outside this project. Say so in the confirmation.
 12. **Keep the financial record.** Stripe customer and invoices stay. `nest_letter_deliveries` stay. Do not put assessment answers into either.
 13. **Delete the auth user last.** In the Supabase Auth admin, delete that one user. Cascades then remove reflections, letter state, reads, the primary link, launches, entitlements, Intensive rows, the live roster row, `course_users`, and the keeper’s merge tokens. If the delete is rejected, a child foreign key is still there. Remove that eligible child and retry. Do not delete a different user.
-14. **Record completion.** Write the date and that the closure finished. Do not write the assessment, the letter body, or the address into `account_closes`. Do not call worker-solo `/account-close`.
+14. **Record completion.** Write the date and that the closure finished. Do not write the assessment, the letter body, or the address into `account_closes`. `POST /account-close` only returns the request to write to hello@lilbird.life.
 15. **Confirm to them.** Send one message to the confirmed address after the auth user is gone and their owned KV keys are gone. Say the login is closed, coaching mail has stopped, subscriptions were cancelled, Stripe receipts remain, an email-hash opt-out remains so they are not silently resubscribed, and any backup or third-party copy can remain until that service drops it. If a step failed, do not say the data is gone. Name the part that is still there.
 16. **Check the result.** The auth user is gone. Their coaching `next_at` is gone with the state row. A profile request for their former nest id does not return the read. The other Bridge participant’s nest id still loads for that participant. Legacy links that were not theirs are still five, or still the same rows as before this one closure. No coaching send was triggered by the closure.
 
