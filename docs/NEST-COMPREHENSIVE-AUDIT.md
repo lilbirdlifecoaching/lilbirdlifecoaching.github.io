@@ -250,11 +250,11 @@ The early retake check is the other half of B3. In `handleAnalyze`, when `retake
 
 ### B4 — Account closure and retention
 
-Not started. No delete button. No script that deletes users.
+The member request is on `feature/nest-release-b4` and is not deployed. It is a written request to hello@lilbird.life. It does not delete an account. The staff procedure is `docs/NEST-ACCOUNT-CLOSURE.md`. No script deletes users.
 
 #### What happens today
 
-There is no member-facing close action. `account_closes` is a staff table with no member policy. Nothing sends a closure confirmation. Support would have to delete `auth.users` by hand. That delete is not a complete erasure.
+The Nest settings page now explains closure and asks the member to write to hello@lilbird.life. That page does not delete the account. `account_closes` is still a staff table with no member policy. Deleting `auth.users` by hand is not a complete erasure. The steps are in `docs/NEST-ACCOUNT-CLOSURE.md`.
 
 #### What cascades from `auth.users`
 
@@ -302,7 +302,7 @@ Retain:
 
 There is no member confirmation today because there is no member action. A future flow should send one message to the confirmed email after the delete succeeds, saying the Nest login is closed and naming what remains (Stripe invoices, the email-hash suppression). If the delete fails partway, send nothing that claims the data is gone. KV deletes should be in the same reviewed procedure, or the confirmation must say the assessment copy expires on its existing one-year timer and has not yet been removed.
 
-Do not implement this until the plan is accepted. The first implementation should be a staff procedure with a checklist, not a button that calls `auth.admin.deleteUser` from the browser.
+The first implementation is the staff checklist and a settings request. The browser does not call `auth.admin.deleteUser`.
 
 ### Dependencies
 
