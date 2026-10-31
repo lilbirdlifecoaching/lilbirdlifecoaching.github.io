@@ -18,6 +18,7 @@ import {
   newCanvasToken,
   partnerProfileDecision,
   retakeDecision,
+  verifiedAssessmentNestIds,
   verifiedLinkProof,
 } from './canvas-access.js';
 
@@ -448,7 +449,10 @@ test('Bridge status and check-in need this session, not a couple id', () => {
 test('the assessment worker wires every private route through the same decisions', () => {
   const workerPath = "/Users/lukehaythorpe/Library/Mobile Documents/com~apple~CloudDocs/_LLC Buisiness Files/Lil' Bird/lilbird site/Deep-profile Cursor Project/lilbird-assessment.js";
   const worker = readFileSync(workerPath, 'utf8');
-  assert.match(worker, /const WORKER_VERSION = 'v8\.5\.2-release-a'/);
+  assert.match(worker, /const WORKER_VERSION = 'v8\.6\.0-release-b2'/);
+  assert.match(worker, /verifiedAssessmentNestIds/);
+  assert.match(worker, /confirmedAccountEmail/);
+  assert.doesNotMatch(worker, /return \{ profile: null, suppressed/);
   assert.doesNotMatch(worker, /function bridgeLoadNest/);
 
   const linkFn = worker.slice(
@@ -523,4 +527,15 @@ test('the assessment worker wires every private route through the same decisions
 
   assert.match(worker, /The KV lifetime refreshes with the read\. canvasTokenExpires does not\./);
   assert.match(worker, /issueCanvasCapability/);
+});
+
+test('a legacy link is not a verified assessment', () => {
+  assert.deepEqual(verifiedAssessmentNestIds({
+    links: [{ nestId: 'legacy-nest-id', ownershipProof: null }],
+    reads: [],
+  }), []);
+  assert.deepEqual(verifiedAssessmentNestIds({
+    links: [{ nest_id: 'owned-nest-id', ownership_proof: 'capability' }],
+    reads: [{ nestId: 'read-nest-id' }],
+  }), ['owned-nest-id', 'read-nest-id']);
 });

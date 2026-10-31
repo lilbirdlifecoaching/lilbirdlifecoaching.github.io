@@ -29,8 +29,10 @@ import {
 import {
   LETTER_COUNT,
   archetypeName,
+  archetypeProfileForLetter,
   auditEmail,
   compassLine,
+  selectLetterProfile,
   greeting,
   preferredFirstName,
   renderNote,
@@ -45,13 +47,18 @@ import {
   letterUserFromRequest,
   noteForKey,
   parseLetterAllowlist,
+  applyConfirmedRecipient,
+  confirmedAccountEmail,
   deliveryReport,
   resolveLetterDelivery,
   routeNestLetters,
   runNestLetterCron,
   signNestToken,
+  staffDeliveryAlert,
+  unsubscribeUrl,
   LAST_RUN_KEY,
 } from './nest-letters-worker.js';
+import { verifiedAssessmentNestIds } from './canvas-access.js';
 
 const catalog = new Set(TOOLS.map((tool) => tool.id));
 const day = 24 * 60 * 60 * 1000;
@@ -837,5 +844,241 @@ test('failed and uncertain sends stay counted, and a second cron does not send',
   const done = await first;
   assert.equal(done.sent, 1);
   assert.equal(entered, 1);
+});
+
+test('a verified archetype can add one sentence, and anything weaker stays out', () => {
+  const compassLetter = LETTERS.find((letter) => typeof letter.compass === 'function');
+  const ownId = 'owned-nest-id';
+  const otherId = 'other-nest-id';
+  const legacyOnly = verifiedAssessmentNestIds({
+    links: [{ nestId: 'legacy-nest-id', ownershipProof: null }, { nest_id: otherId, ownership_proof: 'legacy' }],
+    reads: [],
+  });
+  assert.deepEqual(legacyOnly, []);
+  const ids = verifiedAssessmentNestIds({
+    links: [
+      { nestId: 'legacy-nest-id', ownershipProof: null },
+      { nest_id: ownId, ownership_proof: 'owner_email' },
+    ],
+    reads: [{ nestId: 'read-nest-id' }],
+  });
+  assert.deepEqual(ids, [ownId, 'read-nest-id']);
+  const records = {
+    [otherId]: {
+      email: 'other.member@example.com',
+      likelyCoreArchetypePlain: 'Other Name',
+      attachmentDetail: 'private answer',
+    },
+    [ownId]: {
+      email: 'lilbird.review.b2@example.com',
+      likelyCoreArchetypePlain: 'Steady Gardener',
+      attachmentDetail: 'private answer',
+      likelyCoreAttachment: 'kept out',
+    },
+  };
+  assert.equal(selectLetterProfile(records, ['legacy-nest-id', otherId], 'lilbird.review.b2@example.com'), null);
+  const profile = selectLetterProfile(records, ids, 'lilbird.review.b2@example.com');
+  assert.deepEqual(profile, { likelyCoreArchetypePlain: 'Steady Gardener' });
+  assert.equal(JSON.stringify(profile).includes('private'), false);
+  const plain = renderNote(compassLetter, { to: 'lilbird.review.b2@example.com', mailingAddress: 'PO Box 1' });
+  const named = renderNote(compassLetter, { profile, to: 'lilbird.review.b2@example.com', mailingAddress: 'PO Box 1' });
+  assert.equal(plain.text.includes('Steady Gardener'), false);
+  assert.equal(named.text.includes('Steady Gardener'), true);
+  assert.equal(named.text.includes('private answer'), false);
+  assert.equal(named.subject, plain.subject);
+  assert.equal(archetypeProfileForLetter(records[otherId], 'lilbird.review.b2@example.com'), null);
+  assert.equal(compassLine(compassLetter, null), '');
+});
+
+test('a confirmed email change keeps one sequence and does not resend', async () => {
+  const member = user({ id: '44444444-4444-4444-8444-444444444444', email: 'lilbird.review.old@example.com' });
+  const confirmed = user({
+    id: member.id,
+    email: 'lilbird.review.b2@example.com',
+    email_change: 'pending.address@example.com',
+  });
+  assert.equal(confirmedAccountEmail(confirmed), 'lilbird.review.b2@example.com');
+  const store = createMemoryStore();
+  const enrolled = enroll({ user: member, choice: 'yes', now }).state;
+  await store.saveState(enrolled);
+  const sentTo = [];
+  const env = {
+    MAILING_ADDRESS: 'PO Box 1',
+    UNSUBSCRIBE_SECRET: 'test-secret',
+    NEST_LETTERS_ENABLED: 'true',
+    NEST_LETTERS_MODE: 'general',
+  };
+  const first = await runNestLetterCron(env, {
+    store,
+    now: () => now,
+    loadContext: async () => ({ account: confirmed, profile: null, user_metadata: confirmed.user_metadata }),
+    deliver: async (message) => {
+      sentTo.push(message.to[0]);
+      return { ok: true };
+    },
+  });
+  assert.equal(first.sent, 1);
+  assert.deepEqual(sentTo, ['lilbird.review.b2@example.com']);
+  const saved = await store.getState(member.id);
+  assert.equal(saved.email, 'lilbird.review.b2@example.com');
+  assert.equal(saved.nestCoaching, true);
+  assert.equal(saved.welcomeSent, true);
+  assert.equal(saved.step, 0);
+  assert.equal(store.snapshot().states.length, 1);
+  assert.equal(store.snapshot().deliveries.length, 1);
+  const link = await unsubscribeUrl(env, member.id);
+  assert.equal(link.includes('lilbird.review'), false);
+  assert.equal(link.includes(member.id), true);
+  const second = await runNestLetterCron(env, {
+    store,
+    now: () => now,
+    loadContext: async () => ({ account: confirmed }),
+    deliver: async () => {
+      sentTo.push('again');
+      return { ok: true };
+    },
+  });
+  assert.equal(second.due, 0);
+  assert.deepEqual(sentTo, ['lilbird.review.b2@example.com']);
+});
+
+test('an unconfirmed email change does not send and does not move the sequence', async () => {
+  const member = user({ id: '55555555-5555-4555-8555-555555555555', email: 'lilbird.review.old@example.com' });
+  const pending = {
+    id: member.id,
+    email: 'pending.address@example.com',
+    email_confirmed_at: null,
+    confirmed_at: null,
+    email_change: 'pending.address@example.com',
+  };
+  assert.equal(confirmedAccountEmail(pending), '');
+  const prepared = applyConfirmedRecipient({ email: member.email }, { account: pending, profile: { likelyCoreArchetypePlain: 'Steady Gardener' } });
+  assert.equal(prepared.awaitingVerifiedEmail, true);
+  assert.equal(prepared.profile, null);
+  const store = createMemoryStore();
+  await store.saveState(enroll({ user: member, choice: 'yes', now }).state);
+  let calls = 0;
+  const result = await runNestLetterCron({
+    MAILING_ADDRESS: 'PO Box 1',
+    UNSUBSCRIBE_SECRET: 'test-secret',
+    NEST_LETTERS_ENABLED: 'true',
+    NEST_LETTERS_MODE: 'general',
+  }, {
+    store,
+    now: () => now,
+    loadContext: async () => ({ account: pending, profile: { likelyCoreArchetypePlain: 'Steady Gardener' } }),
+    deliver: async () => {
+      calls += 1;
+      return { ok: true };
+    },
+  });
+  assert.equal(calls, 0);
+  assert.equal(result.skipped, 1);
+  const saved = await store.getState(member.id);
+  assert.equal(saved.email, member.email);
+  assert.equal(saved.welcomeSent, false);
+  assert.equal(saved.nextAt, enroll({ user: member, choice: 'yes', now }).state.nextAt);
+  assert.equal(store.snapshot().deliveries.length, 0);
+});
+
+test('unsubscribe on the stored or confirmed address skips the send', async () => {
+  const member = user({ id: '66666666-6666-4666-8666-666666666666', email: 'lilbird.review.old@example.com' });
+  const confirmed = user({ id: member.id, email: 'lilbird.review.b2@example.com' });
+  const store = createMemoryStore();
+  await store.saveState(enroll({ user: member, choice: 'yes', now }).state);
+  let calls = 0;
+  const result = await runTick({
+    store,
+    now,
+    loadContext: async () => ({ recipientEmail: confirmed.email, suppressed: true }),
+    send: async () => {
+      calls += 1;
+      return { ok: true };
+    },
+  });
+  assert.equal(calls, 0);
+  assert.equal(result.skipped, 1);
+  const saved = await store.getState(member.id);
+  assert.equal(saved.status, 'unsubscribed');
+  assert.equal(saved.nestCoaching, false);
+  assert.equal(saved.email, confirmed.email);
+  assert.equal(saved.step, 0);
+});
+
+test('an old failed letter for an unsubscribed member stays failed', async () => {
+  const member = user({ id: '77777777-7777-4777-8777-777777777777', email: 'lilbird.review.old@example.com' });
+  const store = createMemoryStore();
+  const enrolled = enroll({ user: member, choice: 'yes', now }).state;
+  enrolled.nestCoaching = false;
+  enrolled.status = 'unsubscribed';
+  enrolled.nextAt = null;
+  await store.saveState(enrolled);
+  await store.markFailed(`${member.id}:n01`, now);
+  let calls = 0;
+  const result = await runTick({
+    store,
+    now,
+    send: async () => {
+      calls += 1;
+      return { ok: true };
+    },
+  });
+  assert.equal(result.due, 0);
+  assert.equal(calls, 0);
+  assert.equal(store.snapshot().deliveries[0].status, 'failed');
+});
+
+test('failed and held runs are visible as counts, with no member address', async () => {
+  const failed = deliveryReport('general', { due: 2, sent: 0, failed: 1, held: 0, uncertain: 0, skipped: 0, deferred: 0 });
+  const held = deliveryReport('general', { due: 1, sent: 0, failed: 0, held: 1, uncertain: 0, skipped: 0, deferred: 0 });
+  const quiet = deliveryReport('general', { due: 1, sent: 1, failed: 0, held: 0, uncertain: 0, skipped: 0, deferred: 0 });
+  assert.equal(failed.attention, true);
+  assert.equal(held.attention, true);
+  assert.equal(held.failed, 0);
+  assert.equal(quiet.attention, false);
+  const alert = staffDeliveryAlert(failed);
+  assert.equal(alert.kind, 'nest-letters');
+  assert.equal(alert.email, null);
+  assert.equal(alert.user_id, null);
+  assert.equal(JSON.stringify(alert).includes('@'), false);
+  assert.equal(staffDeliveryAlert(quiet), null);
+
+  const member = user({ id: '88888888-8888-4888-8888-888888888888', email: 'lilbird.review.b2@example.com' });
+  const store = createMemoryStore();
+  await store.saveState(enroll({ user: member, choice: 'yes', now }).state);
+  const posts = [];
+  let report = null;
+  await runNestLetterCron({
+    MAILING_ADDRESS: 'PO Box 1',
+    UNSUBSCRIBE_SECRET: 'test-secret',
+    NEST_LETTERS_ENABLED: 'true',
+    NEST_LETTERS_MODE: 'general',
+    SUPABASE_URL: 'https://example.supabase.co',
+    SUPABASE_SERVICE_KEY: 'service-role-test',
+  }, {
+    store,
+    now: () => now,
+    loadContext: async () => ({ profile: null }),
+    deliver: async () => ({ ok: false }),
+    recordRun: async (value) => { report = value; },
+    fetch: async (url, options) => {
+      posts.push({ url, body: options.body });
+      return { ok: true };
+    },
+  });
+  assert.equal(report.attention, true);
+  assert.equal(report.failed, 1);
+  assert.equal(posts.length, 1);
+  assert.equal(posts[0].url, 'https://example.supabase.co/rest/v1/desk_alerts');
+  const body = JSON.parse(posts[0].body);
+  assert.equal(body.kind, 'nest-letters');
+  assert.equal(body.user_id, null);
+  assert.equal(body.detail.failed, 1);
+  assert.equal(body.detail.held, 0);
+  assert.equal(JSON.stringify(body).includes('@'), false);
+  assert.equal(JSON.stringify(body).includes(member.id), false);
+  const guide = readFileSync(new URL('../docs/NEST-LETTERS.md', import.meta.url), 'utf8');
+  assert.match(guide, /desk_alerts/);
+  assert.match(guide, /no address/);
 });
 

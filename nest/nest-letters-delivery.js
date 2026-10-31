@@ -390,7 +390,12 @@ export async function runTick({ store, now, schedule = DEFAULT_SCHEDULE, loadCon
     const summary = { due: due.length, sent: 0, deferred: 0, failed: 0, repaired: 0, skipped: 0, uncertain: 0, held: 0, unrecorded: 0 };
     for (const state of due) {
       const ctx = loadContext ? await loadContext(state) : {};
+      if (typeof ctx.recipientEmail === 'string' && ctx.recipientEmail) state.email = ctx.recipientEmail;
       if (typeof allowUser === 'function' && !allowUser(state)) {
+        summary.skipped += 1;
+        continue;
+      }
+      if (ctx.awaitingVerifiedEmail) {
         summary.skipped += 1;
         continue;
       }
