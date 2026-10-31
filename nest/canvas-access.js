@@ -56,6 +56,28 @@ export function verifiedLinkProof(proof) {
   return VERIFIED_LINK_PROOFS.includes(value) ? value : null;
 }
 
+/**
+ * Nest ids whose archetype may be read for this member's own letter.
+ * A verified link or a nest_reads row is enough. A legacy link is not.
+ * An email match is not an input, so it cannot qualify a nest.
+ */
+export function verifiedAssessmentNestIds({ links = [], reads = [] } = {}) {
+  const ids = [];
+  const seen = new Set();
+  const add = (id) => {
+    const nestId = String(id || '');
+    if (!nestId || seen.has(nestId)) return;
+    seen.add(nestId);
+    ids.push(nestId);
+  };
+  for (const link of links) {
+    const proof = verifiedLinkProof(link?.ownershipProof ?? link?.ownership_proof);
+    if (proof) add(link?.nestId || link?.nest_id);
+  }
+  for (const read of reads) add(read?.nestId || read?.nest_id);
+  return ids;
+}
+
 export function tokenMatches(presented, expected) {
   const a = String(presented || '');
   const b = String(expected || '');

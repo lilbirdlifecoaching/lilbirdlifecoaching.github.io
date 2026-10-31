@@ -20,7 +20,9 @@ import {
   setPreferences,
   unsubscribe,
 } from './nest-letters-delivery.js';
-import { letterByNumber, preferredFirstName, renderNote } from './nest-letters.js';
+import { archetypeProfileForLetter, letterByNumber, preferredFirstName, renderNote } from './nest-letters.js';
+
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const ENABLED = 'true';
 
@@ -275,22 +277,63 @@ export function resolveLetterDelivery(env) {
   };
 }
 
+export function confirmedAccountEmail(user) {
+  if (!emailVerified(user)) return '';
+  const email = String(user.email || '').trim().toLowerCase();
+  return EMAIL.test(email) ? email : '';
+}
+
+/**
+ * A loaded account uses its confirmed address. An unconfirmed account waits.
+ * A missing account leaves the stored address in place, which is the lookup-failure path.
+ * email_change is never read.
+ */
+export function applyConfirmedRecipient(state, context) {
+  const ctx = context && typeof context === 'object' ? { ...context } : {};
+  if (!Object.prototype.hasOwnProperty.call(ctx, 'account')) return ctx;
+  const confirmed = confirmedAccountEmail(ctx.account);
+  if (!confirmed) return { ...ctx, awaitingVerifiedEmail: true, profile: null };
+  return { ...ctx, recipientEmail: confirmed, awaitingVerifiedEmail: false };
+}
+
 export function deliveryReport(mode, summary) {
   const finishedAt = new Date().toISOString();
   if (!summary || typeof summary.skipped === 'string') {
-    return { completed: false, skipped: summary?.skipped || 'unknown', mode: mode || null, finishedAt };
+    return { completed: false, skipped: summary?.skipped || 'unknown', mode: mode || null, finishedAt, attention: false };
   }
+  const failed = summary.failed || 0;
+  const held = summary.held || 0;
+  const uncertain = summary.uncertain || 0;
   return {
     completed: true,
     mode,
     finishedAt,
     due: summary.due || 0,
     accepted: summary.sent || 0,
-    failed: summary.failed || 0,
-    held: summary.held || 0,
-    uncertain: summary.uncertain || 0,
+    failed,
+    held,
+    uncertain,
     deferred: summary.deferred || 0,
     skipped: summary.skipped || 0,
+    attention: failed + held + uncertain > 0,
+  };
+}
+
+/** Service-role desk row. Counts only, so a member address never lands in the alert. */
+export function staffDeliveryAlert(report) {
+  if (!report?.completed || report.attention !== true) return null;
+  return {
+    kind: 'nest-letters',
+    email: null,
+    user_id: null,
+    detail: {
+      finishedAt: report.finishedAt,
+      mode: report.mode,
+      accepted: report.accepted,
+      failed: report.failed,
+      held: report.held,
+      uncertain: report.uncertain,
+    },
   };
 }
 
@@ -309,8 +352,24 @@ export async function recordDeliveryReport(env, report) {
     uncertain: report.uncertain,
     deferred: report.deferred,
     skipped: report.skipped,
+    attention: report.attention === true,
   };
   await env.NEST_PROFILES.put(LAST_RUN_KEY, JSON.stringify(body));
+}
+
+export async function recordStaffDeliveryAlert(env, report, fetchImpl = fetch) {
+  const row = staffDeliveryAlert(report);
+  if (!row || !env?.SUPABASE_URL || !env?.SUPABASE_SERVICE_KEY) return;
+  await fetchImpl(`${env.SUPABASE_URL}/rest/v1/desk_alerts`, {
+    method: 'POST',
+    headers: {
+      apikey: env.SUPABASE_SERVICE_KEY,
+      Authorization: `Bearer ${env.SUPABASE_SERVICE_KEY}`,
+      'Content-Type': 'application/json',
+      Prefer: 'return=minimal',
+    },
+    body: JSON.stringify(row),
+  });
 }
 
 export async function runNestLetterCron(env, deps) {
@@ -324,7 +383,7 @@ export async function runNestLetterCron(env, deps) {
     otherMailDue: deps.otherMailDue,
     loadContext: async (state) => {
       try {
-        return await deps.loadContext(state);
+        return applyConfirmedRecipient(state, await deps.loadContext(state));
       } catch {
         return { profile: null, suppressed: false };
       }
@@ -335,7 +394,7 @@ export async function runNestLetterCron(env, deps) {
       const user = { id: state.userId, email: state.email, user_metadata: context?.user_metadata || {} };
       const message = renderNote(note, {
         firstName: preferredFirstName(user),
-        profile: context?.profile || null,
+        profile: archetypeProfileForLetter(context?.profile, state.email),
         to: state.email,
         unsubUrl: await unsubscribeUrl(env, state.userId),
         mailingAddress: env.MAILING_ADDRESS,
@@ -349,6 +408,8 @@ export async function runNestLetterCron(env, deps) {
   try {
     if (deps.recordRun) await deps.recordRun(report);
     else await recordDeliveryReport(env, report);
+    if (deps.recordAttention) await deps.recordAttention(report);
+    else await recordStaffDeliveryAlert(env, report, deps.fetch);
   } catch {
     // Reporting must not change who was sent or advance a sequence.
   }

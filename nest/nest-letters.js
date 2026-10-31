@@ -62,6 +62,25 @@ export function compassLine(letter, profile) {
   }
 }
 
+/** The name object a letter may see. The rest of the assessment stays out. */
+export function archetypeProfileForLetter(record, recipientEmail) {
+  const name = archetypeName(record);
+  if (!name) return null;
+  const stored = String(record?.email || '').trim().toLowerCase();
+  const recipient = String(recipientEmail || '').trim().toLowerCase();
+  if (stored && recipient && stored !== recipient) return null;
+  if (record.likelyCoreArchetypePlain) return { likelyCoreArchetypePlain: name };
+  return { archetypePlain: name };
+}
+
+export function selectLetterProfile(recordsByNestId, nestIds, recipientEmail) {
+  for (const nestId of nestIds || []) {
+    const profile = archetypeProfileForLetter(recordsByNestId?.[nestId], recipientEmail);
+    if (profile) return profile;
+  }
+  return null;
+}
+
 function escapeHtml(value) {
   return String(value ?? '')
     .replace(/&/g, '&amp;')

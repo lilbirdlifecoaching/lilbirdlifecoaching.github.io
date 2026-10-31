@@ -34,7 +34,11 @@ If the success is still unrecorded after that 24-hour window, the letter is held
 
 `runNestLetterCron` sends only when `NEST_LETTERS_ENABLED` is exactly `true` and `NEST_LETTERS_MODE` is exactly `test` or `general`. Setting the flag to `false` stops the next run immediately. An unset mode, or any other value, also sends nobody. `test` sends only to the ids in `NEST_LETTERS_ALLOWLIST`, and an empty list sends nobody. `general` sends to members who already opted in. A non-empty allowlist still limits a general run. An empty allowlist does not, by itself, turn delivery on.
 
-The live worker at `v8.4.0-nest-live` is older than this rule. It treats a missing allowlist as general delivery while the flag is true. Do not deploy this file over that worker until `NEST_LETTERS_MODE` is set to `general` in the same change. Without that secret, the next cron would send nobody.
+The live worker is `v8.5.2-release-a`. `NEST_LETTERS_MODE` is `general`, and the coaching letters are on. The B2 source is `v8.6.0-release-b2`. It is not deployed. Leave the cron at `0 15 * * *`. Do not trigger it, and do not retry the failed 27 October `n01`.
+
+Six letters can add one archetype sentence. The cron loads that name only from a verified link or a `nest_reads` row for the same account. A legacy link does not qualify, and an email match is not asked. The letter receives the short name and nothing else. With no verified name, the letter goes out as written.
+
+At send time the worker reads the auth user. It uses `user.email` only when `email_confirmed_at` or `confirmed_at` is set. `email_change` is ignored. A confirmed change updates `email` on the same `nest_letter_state` row and sends there. Consent, step, phase, and delivery history stay. An unconfirmed account is skipped for that run, with no delivery row and no change to the sequence. A global unsubscribe on the stored address or the confirmed address skips the send. The unsubscribe link stays bound to the user id.
 
 ## Enrollment
 
@@ -151,7 +155,7 @@ wrangler kv key get --binding NEST_PROFILES "nest-letters:last-run"
 
 The cron does not resend a held or uncertain letter. For a failed row, the existing retry schedule still applies inside the same delivery id. For a held row, use the update below only after you have decided what happened to that one delivery. Nothing in the report starts another send.
 
-This report is written by the worker on this branch. The live `v8.4.0-nest-live` worker does not write it yet.
+`v8.5.2-release-a` writes this report when a cron finishes a send pass. On 30 October 2026 the key was still absent, because no cron had run on that worker yet. Read it after 31 October 2026 15:00 UTC. Do not trigger the cron to create it. `attention` is true only when `failed`, `held`, or `uncertain` is above zero. B2 then writes one `desk_alerts` row of kind `nest-letters`. That row is service-role only, it has counts, and it has no address. Members cannot read `desk_alerts`. The 27 October `n01` stays `failed`.
 
 ## Safe release, when you ask for it
 
@@ -168,7 +172,7 @@ Do not add this cron to `worker-solo`. Do not enroll existing members by a backf
 
 ## Limits
 
-The live sender is `v8.4.0-nest-live`. This branch prepares the next worker and does not deploy it.
+The live sender is `v8.5.2-release-a` until B2 is reviewed and deployed. The prepared sender is `v8.6.0-release-b2`.
 
 `letters-preview.html` is an unindexed review page. It renders every note in the browser. It does not send mail.
 
