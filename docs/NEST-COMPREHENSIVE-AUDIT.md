@@ -2,14 +2,14 @@
 
 Refreshed 31 October 2026, after Releases A, B1, B2, B3, and B4, and after a payment investigation. Earlier sections below the matrix keep the record of how each release was planned. The matrix is the current status.
 
-No coaching email was sent. The letter cron was not triggered. No SQL migration was run. No member entitlement was changed. No live payment was completed. Disposable checkout logins created for the payment check were removed. Local `main` is still `443b8baf` and was not checked out.
+No coaching email was sent. The letter cron was not triggered. No SQL migration was run. No member entitlement was changed. No live payment was completed. Disposable checkout logins created for the payment check were removed. Local `main` is still `443b8baf` and was not checked out. On 31 October the existing Nest Plus product description was updated, and the Solo worker grant fix was deployed as `v1.32-nest-plus-grant`, deployment `b2cb48d7-c5e2-4f07-886d-209261c917a9`.
 
 Production at this refresh:
 
 - Site: GitHub Pages merge `fe8752b3d38c718c70fc9899d9a0217fa15b20f8` (pull request 14), https://lilbird.life/nest/
 - Live Nest HTML serves `nest-client.js?v=58`, `nest-styles.css?v=47`, and `journey.js?v=8`. The free-plan sentence names My Journey. Close my account and hello@lilbird.life are on the page. Nest Premium still says coming soon.
 - Assessment worker: `v8.7.0-release-b3`, deployment `286f679b-032e-4a28-a856-857af1dedf8e`. `/ping` returns that version with `nestLetters` enabled. Cron remains `0 15 * * *`.
-- Solo worker: `v1.31-b4-close-held`, deployment `d52431cc-5b21-4a20-a220-cb0daa7f1adb`. `POST /account-close` returns 403 and does not ban. Its 15-minute schedule is unchanged.
+- Solo worker: `v1.32-nest-plus-grant`, deployment `b2cb48d7-c5e2-4f07-886d-209261c917a9`. `POST /account-close` returns 403 and does not ban. Its 15-minute schedule is unchanged. The previous deployment was `v1.31-b4-close-held`.
 - Database `mebqqzbuwkogdxvnihrq`, branch main Production. Read-only counts after the disposable logins were removed: 46 auth users, 18 entitlements, all active, 0 Nest Plus rows, 0 duplicate user-and-product pairs, 0 `account_closes` rows, 5 deliveries (4 sent, 1 failed), 3 letter-state rows, 2 with Nest coaching on, 1 unsubscribed. Desk alerts: 0 rows.
 - `nest-letters:last-run` is absent in the production KV namespace. B2, which writes that key, was deployed at 01:56 UTC on 31 October. B3 followed at 02:41 UTC. The daily cron is 15:00 UTC, so no scheduled run has happened on either of those workers. The previous run was 30 October 15:00 UTC, before those deploys.
 - Supabase scheduled backups are still not included on the Free plan. A manual encrypted export is described under backups. It has not been run.
@@ -37,7 +37,7 @@ Completion counts only the 48 matrix rows. A row is complete only when this refr
 | 15 | Live model wording for every tool | Implemented but not verified in production | The prompt requires one detail from the member’s words and forbids diagnosis. This refresh did not send fifteen live model requests. |
 | 16 | Tools are part of the Nest, not a paid add-on | Complete and verified | Published `journey.js` has no Nest Plus check. Any signed-in member can open a tool. |
 | 17 | The Nest reads as one home | Complete and verified | The live signup card names My Journey on the free plan. The sidebar checklist is “For your Nest.” My Journey’s own card is “Tools for the Tangle.” |
-| 18 | Subscription tiers | Complete and verified | Live signup cards still show Free Nest, Nest Plus at $7.99 a month, and Nest Premium as coming soon. There is no $47 checkout. A disposable signed-in call opened a live Stripe page for Nest Plus at $7.99 a month, and the Solo pay button opened the $197 card form. No card was charged. The Stripe line for Nest Plus still describes Relationship Dynamic and the First Flight workbook, which is older than the site copy. No Nest Plus entitlement row exists. See the payment section. |
+| 18 | Subscription tiers | Complete and verified | Live signup cards still show Free Nest, Nest Plus at $7.99 a month, and Nest Premium as coming soon. There is no $47 checkout. The existing Nest Plus product now describes the guide, full read, Life Canvas check-ins, Relationship Dynamic, and Roots & Wings, and an unpaid live checkout showed that sentence at $7.99 a month. The Solo pay button opened the $197 card form. No card was charged. No Nest Plus entitlement row exists. The grant-failure fix is on the live Solo worker. See the payment section. |
 | 19 | Welcome, 26 letters, and four check-ins | Complete and verified | Letter tests render the welcome, all 26 letters, and the check-ins. Sender is `lil' bird <hello@lilbird.life>`. The deployed letter files match the published copies from the Release A deploy. |
 | 20 | Letters do not look like a course | Complete and verified | Numbered letters use an empty kicker. The render test reports no “Note N of 26.” |
 | 21 | Unsubscribe is visible and one-click capable | Complete and verified | The renderer sets the unsubscribe URL, `List-Unsubscribe`, and `List-Unsubscribe-Post`. Preference tests pass. A mailbox was not opened on 30 October. |
@@ -66,7 +66,7 @@ Completion counts only the 48 matrix rows. A row is complete only when this refr
 | 44 | Held mail has a written recovery | Complete and verified | `docs/NEST-LETTERS.md` has the count query and the guarded updates. The cron does not resend a held row. That document still says the live worker is `v8.4.0` and does not write `nest-letters:last-run`. The code in `v8.5.2` does write it. The document is behind the deploy. |
 | 45 | Someone can see a failed run without reading member mail | Partially implemented | The deployed B2 code writes count-only `nest-letters:last-run` and a `desk_alerts` row with counts when a run has failed, held, or uncertain mail. The key is absent and `desk_alerts` has 0 rows because no cron has run since that deploy. The 27 October failed delivery is still the only failed row. It was not retried. |
 | 46 | Regression tests exist | Complete and verified | 97 Nest tests and 2 Solo close-route tests passed on 31 October. They cover Journey, the guide, letters, Release A, B3 recovery, and the B4 closure request. They do not prove a live model reply, a mail client, or a completed card charge. |
-| 47 | The published source matches the live sender | Complete and verified | `origin/main` is `fe8752b3`. The assessment worker is `v8.7.0-release-b3` and `/ping` reports coaching letters enabled. The Solo worker is `v1.31-b4-close-held`. The public Nest page matches that merge, including Close my account and `nest-client.js?v=58`. |
+| 47 | The published source matches the live sender | Complete and verified | `origin/main` is `fe8752b3`. The assessment worker is `v8.7.0-release-b3` and `/ping` reports coaching letters enabled. The Solo worker is `v1.32-nest-plus-grant`. The public Nest page matches that merge, including Close my account and `nest-client.js?v=58`. |
 | 48 | Backups | Not implemented | The Free plan still does not include Supabase backups. A no-cost export procedure is written below. No production export was taken during this refresh. |
 
 ## Enhancements
@@ -94,7 +94,53 @@ These are not part of the 48. They stay optional.
 
 Completion is 40 / 48 = 83%. Partial, unverified, and not-implemented rows are not counted as complete.
 
-The five partial rows are 9, 22, 33, 34, and 45. Rows 8 and 17 moved to complete because the published Journey sentence and the free-plan wording are live. The two unverified rows are still 15 and 23. The missing row is still 48, backups. Documenting an export does not create a backup.
+The five partial rows are 9, 22, 33, 34, and 45. Rows 8 and 17 moved to complete because the published Journey sentence and the free-plan wording are live. The two unverified rows are still 15 and 23. The missing row is still 48, backups. Documenting an export does not create a backup. Closing the release cycle does not add a complete row.
+
+A closeout read on 31 October, with no checkout started and no export taken, still matches the production list at the top of this file: Nest frontend merge `fe8752b3`, `nest-client.js?v=58`, assessment worker `v8.7.0-release-b3` with coaching letters enabled, Solo worker `v1.32-nest-plus-grant` deployment `b2cb48d7-c5e2-4f07-886d-209261c917a9`, Nest Plus at $7.99 a month, and staff-assisted closure. An unsigned close request still returns 401.
+
+## Post-Release Operational Follow-Up
+
+Releases A through B4 are deployed, and the Nest Plus grant fix is deployed. The items below are open. They are not resolved by this closeout.
+
+### A. First Nest Plus purchase
+
+No completed Nest Plus payment has been observed. When the first legitimate purchase happens, check it. Do not grant the entitlement by hand.
+
+1. Stripe shows one subscription at $7.99 a month.
+2. The payment succeeds.
+3. The webhook completes.
+4. One active `nest_plus` row exists for that member.
+5. `granted_by` starts with `stripe_sub:` and names that subscription.
+6. A refresh of the Nest shows Nest Plus.
+7. The guide, full read, Life Canvas, Relationship Dynamic, and Roots & Wings open for that member.
+8. There is no second subscription and no second entitlement row.
+
+### B. Coaching email monitoring
+
+Read the first scheduled B2 monitor record when it exists. Check `nest-letters:last-run`, delivery counts, failed, held, and uncertain counts, and any administrative alert. The sequence should not move except after a recorded send. Do not trigger the cron. Do not retry the 27 October failed delivery.
+
+### C. Independent encrypted backup
+
+The procedure later in this file has not been run. Supabase Free has no scheduled backup. Before a destructive account change or a significant database change, get approval, then export encrypted copies of Postgres including Auth, the assessment KV records, and the relevant Storage objects. Check the export structure and write down how a restore would be done. Do not keep a plaintext export in GitHub or in an ordinary project folder. This closeout did not export production data and did not add paid infrastructure.
+
+### D. First Flight entitlement consistency
+
+Three active First Flight entitlements remain. The assessment worker still treats First Flight as Nest Plus for the full read and Relationship Dynamic. The published Nest does not. Do not remove that access. Review what those members were promised before changing the rule. Do not publish the unpublished Nest client from the iCloud project folder.
+
+### E. Account closure
+
+Closure stays staff-assisted. `POST /account-close` is disabled and tells the member to write to hello@lilbird.life. Merging two Nests can still close the other login and does not cancel Stripe. Before a merge or a closure, staff check whether either login has a live subscription and cancel it in Stripe first. Do not close or merge a real account as part of this closeout.
+
+## Known limitations, still open
+
+These stay open. None of them is resolved by closing the release cycle.
+
+- Two Nest Plus webhook deliveries that arrive together can send two unlock emails. A later delivery of the same subscription does not create a second entitlement.
+- The first completed Nest Plus purchase has not been seen.
+- Supabase Free has no independent scheduled backup.
+- Five requirements are partial, two are implemented and not production-verified, and backups are not implemented. The score stays 40 of 48.
+- First Flight access still needs a historical review before the assessment worker and the Nest use one rule.
+- Account closure is a manual staff process.
 
 ## Payment investigation, 31 October 2026
 
@@ -113,23 +159,21 @@ No live card was charged. Checkout was opened and then left unpaid.
 
 Releases A through B4 did not remove these checkout routes. The Solo deploy that disabled account closure still creates Nest Plus, workbook, and Solo sessions.
 
-What is actually wrong:
+What was corrected, and what is still open:
 
-- The live Stripe line says Nest Plus adds Relationship Dynamic and the First Flight workbook. The First Flight workbook is already in the free Nest. The proposed replacement is below. It has not been written to Stripe.
-- No `nest_plus` entitlement has ever been written. A completed Nest Plus payment has not been observed. The grant code and the unique `(user_id, product)` index are in place. This refresh did not pay, so it does not prove the webhook writes the row.
+- The Nest Plus product description is now the approved sentence below. The product, the $7.99 monthly price, and the subscription interval were left as they were. An unpaid live checkout displayed that sentence. The session was then expired, still unpaid.
+- No `nest_plus` entitlement has ever been written. A completed Nest Plus payment has not been observed. The live Solo worker now verifies the row before the unlock email and returns 500 when that write cannot be confirmed.
 - Nest Premium cannot be bought. That is the published product state, not a broken button.
 
-No payment code was changed. No worker was deployed. Live Stripe metadata was not changed.
+The Solo worker grant fix is deployed. No production entitlement or subscription was edited.
 
-### Proposed Nest Plus description
+### Nest Plus description
 
-Do not create a product or a price. Leave the amount at $7.99 a month.
+The existing product now uses this description. No second product or price was created. The amount is still $7.99 a month.
 
-Current checkout line: “Adds the Relationship Dynamic tool and the First Flight workbook to your lil' bird Nest.”
+`Your lil’ bird guide, full Inner Compass read, Life Canvas check-ins, Relationship Dynamic, and Roots & Wings workbook. Cancel anytime.`
 
-Proposed description, and nothing else:
-
-`lil' bird guide, the full Inner Compass read, Life Canvas, Relationship Dynamic, and the Roots & Wings workbook. Cancel anytime.`
+An unpaid Checkout page showed that sentence under “Subscribe to Nest Plus” at $7.99 per month, in live mode. The page was not submitted. The session was expired afterward and remained unpaid.
 
 That matches what a Nest Plus entitlement opens today:
 
@@ -140,13 +184,15 @@ That matches what a Nest Plus entitlement opens today:
 - Roots & Wings opens for a `nest_plus` entitlement. It is also $27 on its own.
 - Cancel anytime is the billing-portal setting: cancellation is at period end. Access stays until Stripe marks the subscription canceled, unpaid, or deleted.
 
-Left out on purpose: the First Flight workbook, Solo, live coaching, and Nest Premium. Those are not what this $7.99 price unlocks. The Nest screen does not treat a First Flight entitlement as Nest Plus. The assessment worker source still lists `first_flight` inside its Nest Plus product list, so a First Flight member can receive the full read and Relationship Dynamic from that worker. That is a separate mismatch. It is not a reason to put the First Flight workbook on the Nest Plus line.
+Left out on purpose: the First Flight workbook, Solo, live coaching, and Nest Premium. Those are not what this $7.99 price unlocks. The published Nest screen does not treat a First Flight entitlement as Nest Plus. The assessment worker still does. That mismatch is recorded below and was not deployed as a policy change.
 
 ### Payment-to-entitlement trace
 
 Production checkout uses live Stripe keys. There is no test-mode price in the worker configuration, so a faithful isolated charge was not run. No live card was charged.
 
-The Solo worker’s `/stripe-webhook` path, read against the current source:
+The previous live worker, `v1.31-b4-close-held`, returned false from `grantProductEntitlement` without throwing. Fulfillment ignored that result, sent the unlock email, and answered 200. `v1.32-nest-plus-grant` is now the live Solo worker.
+
+The happy path, unchanged in shape:
 
 | Check | What the code does |
 | --- | --- |
@@ -159,9 +205,23 @@ The Solo worker’s `/stripe-webhook` path, read against the current source:
 | Cancellation | The portal cancels at period end. `cancel_at_period_end` keeps the entitlement and records a desk alert. Access is turned off when the subscription is deleted or its status is `canceled`, `unpaid`, or `incomplete_expired`. A failed renewal invoice does not itself remove access. |
 | Nest display | After login, the Nest reads `user_entitlements`. Nest Plus is shown when the active product is `nest_plus`, `coaching`, or `life_change_intensive`. A return from checkout polls that read up to eight times. A refresh after the row exists shows Nest Plus. |
 
-Observation checklist for the next real Nest Plus payment. Do this after Stripe metadata is updated, and do not grant the row by hand:
+Live grant path as of this deploy: after Stripe reports the session paid, the worker writes one `nest_plus` row with `granted_by` set to `stripe_sub:` plus the subscription id, reads that row back, and only then sends the unlock email. If the write or the read-back fails, it records a `grant-failed` desk alert that includes the subscription id, sends no unlock email, and returns HTTP 500 so Stripe retries the same event. That retry does not create a checkout or a subscription and does not charge the card again. A second delivery, once the active row exists, does not write a second row and does not send a second email. If the email send fails after the row is verified, the worker records `email-failed`, leaves the row active, and returns 200. Cancellation is unchanged: the portal still cancels at period end, and access is removed only when the subscription is deleted or its status is `canceled`, `unpaid`, or `incomplete_expired`.
 
-1. The checkout line matches the proposed description, and the amount is still $7.99 a month.
+Mock tests in `solo/nest-plus-grant.test.mjs`, plus the two account-close tests, passed: 10 of 10. They used an in-memory store. No live card was used. Covered cases: one paid grant then one email, a duplicate delivery, a failed write with an alert and no email, a retry that grants once, a failed read-back, an email failure that leaves the row active, and unpaid or expired sessions that grant nothing. A source check confirms both Nest Plus webhook failures return 500, an expired checkout does not grant, and the billing portal still cancels at period end.
+
+### First Flight and Nest Plus
+
+Do not deploy an entitlement change for this until it is reviewed.
+
+The published Nest client treats Nest Plus as `life_change_intensive`, `coaching`, or `nest_plus`. It does not treat `first_flight` as Nest Plus. The Solo worker’s product list matches that. Public copy sells First Flight as a $149 session. The First Flight workbook is already in the free Nest. Coaching and the Intensive are the products described as including Nest Plus.
+
+The live assessment worker, `v8.7.0-release-b3`, still sets `NEST_PLUS_PRODUCTS` to `nest_plus`, `first_flight`, `coaching`, and `life_change_intensive`. Its comment says Nest Plus is included with First Flight. That list is what opens the full read and Relationship Dynamic for a linked read whose email matches the login. The last read-only entitlement count in this cycle was 3 active `first_flight` rows and 0 `nest_plus` rows. Those three rows were not changed.
+
+Recommended policy, once those three memberships are confirmed: one list everywhere, matching the published Nest and the Solo worker. First Flight remains the session and the free workbook. Nest Plus remains the $7.99 subscription, and it stays included with coaching and the Intensive. Do not remove `first_flight` from the assessment list before that confirmation. The unpublished iCloud copy of `nest/nest-client.js` still labels First Flight as Nest Plus. Do not publish that copy as the policy.
+
+Observation checklist for the next real Nest Plus payment. Do not grant the row by hand:
+
+1. The checkout line matches the approved description, and the amount is still $7.99 a month.
 2. The member pays from the Nest they are signed into.
 3. Stripe shows one paid subscription invoice for that checkout, not a second subscription.
 4. One `user_entitlements` row exists for that user with `product = nest_plus`, `active = true`, and `granted_by` starting with `stripe_sub:`.
@@ -180,9 +240,11 @@ Release A closed the two P1 authorization holes. Canvas reads and writes go thro
 
 None found in this refresh. Checkout opens for Nest Plus and Solo. The old close route does not ban. Authorization checks from Release A were not weakened.
 
-### P1 — Apply the proposed Nest Plus description, then watch one real payment
+### P1 — Watch the first real Nest Plus payment
 
-The proposed description is in the commercial verification section. It is not on the live Stripe product yet. After it is approved, change only that product’s description. Leave the $7.99 price. Then follow the eight-step observation checklist on the next real purchase. Do not grant the entitlement by hand.
+The product description is on the live Nest Plus product. The price is still $7.99 a month. Solo worker `v1.32-nest-plus-grant` is deployed. The assessment worker and the Nest frontend were left as they were. Follow the eight-step observation checklist on the next real purchase. Do not grant the entitlement by hand.
+
+No completed Nest Plus payment has been observed. Sequential duplicate delivery is covered by the mock tests. Two webhook deliveries arriving at the same time can still send two emails. The unique user-and-product index still keeps a single row. The three active First Flight entitlements stay under the current assessment-worker rule until that history is reviewed.
 
 ### P1 — No database backup has been taken
 
