@@ -1494,6 +1494,10 @@
     const panel = document.getElementById('nest-settings');
     if (!panel) return;
     panel.classList.remove('hidden');
+    if (focusPhoto === 'closure') {
+      document.getElementById('account-closure')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
     if (!focusPhoto) {
       panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
@@ -1882,10 +1886,9 @@
           <textarea id="trouble-note" rows="2" placeholder="Which part of the Nest, and what you expected"></textarea>
         </label>
         <button type="button" class="btn btn-outline" id="btn-trouble">Send to the desk</button>
-        <label>Close my Nest
-          <input id="close-confirm" type="text" autocomplete="off" placeholder="close my nest" />
-        </label>
-        <button type="button" class="btn btn-outline" id="btn-account-close">Close my Nest</button>
+        <h4>Close my account</h4>
+        <p>Opening this page does not close the Nest. The request, and what closure changes, are with your picture and email settings.</p>
+        <button type="button" class="btn btn-outline" id="btn-account-close">Close my account</button>
       </article>`;
   }
 
@@ -1898,7 +1901,7 @@
     pane.querySelector('#btn-account-export')?.addEventListener('click', () => void exportNest());
     pane.querySelector('#btn-merge-undo')?.addEventListener('click', () => void undoMerge());
     pane.querySelector('#btn-trouble')?.addEventListener('click', () => void sendTrouble());
-    pane.querySelector('#btn-account-close')?.addEventListener('click', () => void closeNest());
+    pane.querySelector('#btn-account-close')?.addEventListener('click', () => openSettings('closure'));
     void refreshAccountTools(false);
   }
 
@@ -2049,20 +2052,6 @@
       accountStatus('Sent to the desk.');
       const note = document.getElementById('trouble-note');
       if (note) note.value = '';
-    } catch (e) {
-      accountStatus(e.message);
-    }
-  }
-
-  async function closeNest() {
-    const confirmText = document.getElementById('close-confirm')?.value || '';
-    try {
-      const data = await workerPost('/account-close', { confirm: confirmText });
-      if (data.billing) {
-        accountStatus(data.message);
-        return;
-      }
-      accountStatus('This Nest is closed. You can log out.');
     } catch (e) {
       accountStatus(e.message);
     }
@@ -2938,7 +2927,8 @@
     const card = document.getElementById('next-steps-card');
     if (card) card.dataset.touched = 'yes';
   });
-  if (location.hash === '#email-preferences') openSettings(false);
+  if (location.hash === '#close-account') openSettings('closure');
+  else if (location.hash === '#email-preferences') openSettings(false);
 
   document.addEventListener('visibilitychange', () => {
     if (
