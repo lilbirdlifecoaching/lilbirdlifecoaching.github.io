@@ -449,7 +449,7 @@ test('Bridge status and check-in need this session, not a couple id', () => {
 test('the assessment worker wires every private route through the same decisions', () => {
   const workerPath = "/Users/lukehaythorpe/Library/Mobile Documents/com~apple~CloudDocs/_LLC Buisiness Files/Lil' Bird/lilbird site/Deep-profile Cursor Project/lilbird-assessment.js";
   const worker = readFileSync(workerPath, 'utf8');
-  assert.match(worker, /const WORKER_VERSION = 'v8\.6\.0-release-b2'/);
+  assert.match(worker, /const WORKER_VERSION = 'v8\.7\.0-release-b3'/);
   assert.match(worker, /verifiedAssessmentNestIds/);
   assert.match(worker, /confirmedAccountEmail/);
   assert.doesNotMatch(worker, /return \{ profile: null, suppressed/);

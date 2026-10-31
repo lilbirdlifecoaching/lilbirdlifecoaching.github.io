@@ -4,6 +4,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<script>
+  (function () {
+    function takeRecoverToken() {
+      try {
+        var params = new URLSearchParams(location.search);
+        var hash = new URLSearchParams((location.hash || '').replace(/^#/, ''));
+        var token = hash.get('recover') || params.get('recover');
+        if (!token) return;
+        params.delete('recover');
+        hash.delete('recover');
+        var query = params.toString();
+        var fragment = hash.toString();
+        history.replaceState(null, '', location.pathname + (query ? '?' + query : '') + (fragment ? '#' + fragment : ''));
+        window.__lbRecover = token;
+      } catch (e) {}
+    }
+    takeRecoverToken();
+    window.addEventListener('hashchange', takeRecoverToken);
+  })();
+</script>
 <script>
   (function(){
     var k='lilbird-theme', s=null;
@@ -6824,11 +6845,106 @@ async function generatePartnerDynamic(){
 // ═══════════════════════════════════════
 // INIT — check for existing profile or test mode
 // ═══════════════════════════════════════
+async function offerOwnershipRecovery(note, nest) {
+  note.textContent = 'Sign in with the email that received this read, or write hello@lilbird.life from that address.';
+  let button = document.getElementById('recover-ownership');
+  if (!button) {
+    button = document.createElement('button');
+    button.id = 'recover-ownership';
+    button.type = 'button';
+    button.className = 'btn btn-gold';
+    button.style.marginTop = '16px';
+    button.textContent = 'Send a confirmation';
+    note.insertAdjacentElement('afterend', button);
+  }
+  button.hidden = false;
+  button.disabled = false;
+  button.onclick = async function() {
+    button.disabled = true;
+    const session = await dpSession();
+    if (!session) {
+      note.textContent = 'Sign in with the email that received this read, or write hello@lilbird.life from that address.';
+      button.disabled = false;
+      return;
+    }
+    try {
+      const response = await fetch(WORKER_URL + '/nest-ownership/request', {
+        method: 'POST',
+        headers: Object.assign({ 'Content-Type': 'application/json' }, await dpAuthHeaders()),
+        body: JSON.stringify({ nestId: nest }),
+      });
+      const payload = await response.json().catch(function() { return {}; });
+      if (payload.owned === true) {
+        await claimRecoveredRead(nest, note);
+        return;
+      }
+      note.textContent = payload.message || 'If this read was saved with the confirmed email on this Nest, a one-time confirmation is on its way. If nothing arrives, write hello@lilbird.life from the address that received the read.';
+    } catch (_) {
+      note.textContent = 'The confirmation could not be requested. Write hello@lilbird.life from the address that received the read.';
+    }
+    button.disabled = false;
+  };
+}
+
+async function claimRecoveredRead(nest, note) {
+  const sb = dpClient();
+  if (!sb) return;
+  const { error } = await sb.rpc('link_deep_profile_to_user', { p_nest_id: nest });
+  if (error) {
+    if (note) note.textContent = 'Sign in with the email that received this read, or write hello@lilbird.life from that address.';
+    return;
+  }
+  const next = new URL(window.location.href);
+  next.searchParams.delete('recover');
+  next.searchParams.set('nest', nest);
+  window.location.replace(next.pathname + next.search);
+}
+
+async function finishOwnershipRecovery(token) {
+  try { delete window.__lbRecover; } catch (e) {}
+  const note = document.getElementById('saved-read-note');
+  if (note) {
+    note.hidden = false;
+    note.textContent = 'Confirming this read for your Nest.';
+  }
+  const session = await dpSession();
+  if (!session) {
+    if (note) note.textContent = 'Sign in with the email that received this read, then open the confirmation again.';
+    return;
+  }
+  try {
+    const response = await fetch(WORKER_URL + '/nest-ownership/confirm', {
+      method: 'POST',
+      headers: Object.assign({ 'Content-Type': 'application/json' }, await dpAuthHeaders()),
+      body: JSON.stringify({ token: token }),
+    });
+    const payload = await response.json().catch(function() { return {}; });
+    if (!response.ok || !payload.nestId) {
+      if (note) note.textContent = 'That confirmation did not go through. Request a new one from your results link, or write hello@lilbird.life from the address that received the read.';
+      return;
+    }
+    await claimRecoveredRead(payload.nestId, note);
+  } catch (_) {
+    if (note) note.textContent = 'That confirmation did not go through. Request a new one from your results link, or write hello@lilbird.life from the address that received the read.';
+  }
+}
+
 // Init — deferred so page renders immediately first
 window.addEventListener('DOMContentLoaded', function() {
   const params = new URLSearchParams(window.location.search);
 
   updateGateCopy();
+  const recoveryToken = window.__lbRecover || params.get('recover');
+  if (recoveryToken) {
+    try { delete window.__lbRecover; } catch (e) {}
+    if (params.has('recover')) {
+      params.delete('recover');
+      const query = params.toString();
+      history.replaceState(null, '', location.pathname + (query ? '?' + query : '') + location.hash);
+    }
+    finishOwnershipRecovery(recoveryToken);
+    return;
+  }
 
   // Only hit the Worker if a ?nest= param is in the URL
   const existingNest = params.get('nest');
@@ -6846,9 +6962,7 @@ window.addEventListener('DOMContentLoaded', function() {
         let denied = {};
         try { denied = await r.json(); } catch (_) {}
         if (savedNote) {
-          if (denied.recovery === 'confirm-results-email') {
-            savedNote.textContent = 'Sign in with the email that received this read, or write hello@lilbird.life from that address.';
-          }
+          if (denied.recovery === 'confirm-results-email') offerOwnershipRecovery(savedNote, existingNest);
           savedNote.hidden = false;
         }
         return;
