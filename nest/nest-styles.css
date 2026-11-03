@@ -85,7 +85,7 @@ body.nest-page { line-height: 1.5; }
 .nest-letters-card li { margin: 0.25rem 0; }
 .letters-choice { display: flex; gap: 0.7rem; align-items: flex-start; margin: 0.75rem 0; line-height: 1.5; }
 .letters-choice strong { color: var(--text-main); font-weight: 500; }
-.letters-quiet { font-size: 0.86rem; }
+.letters-quiet { color: var(--text-muted); font-size: 0.86rem; line-height: 1.5; margin: 0; }
 .letters-status { min-height: 1.2rem; color: var(--gold); margin: 0.4rem 0 0.8rem; }
 .letters-dialog {
   display: none;

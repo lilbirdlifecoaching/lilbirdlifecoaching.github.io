@@ -13,6 +13,8 @@ import {
   capabilityStillValid,
   claimDecision,
   courseLinkDecision,
+  createCanvasShellDecision,
+  emptyCanvasRecord,
   issueCanvasCapability,
   mayRecordOwnerEmail,
   newCanvasToken,
@@ -262,6 +264,43 @@ test('Bridge accepts a submitted profile and refuses a stored profile without ac
   assert.equal(arrayIsNotConsent.allow, false);
 });
 
+test('a signed-in Nest member can create a canvas shell with their own email only', () => {
+  assert.equal(createCanvasShellDecision({ user: null, bodyEmail: 'owner@example.com' }).status, 401);
+  assert.equal(createCanvasShellDecision({ user: owner, bodyEmail: 'other@example.com' }).status, 403);
+  assert.equal(createCanvasShellDecision({ user: owner, bodyEmail: '' }).status, 403);
+  const ok = createCanvasShellDecision({ user: owner, bodyEmail: 'Owner@Example.com' });
+  assert.equal(ok.allow, true);
+  assert.equal(ok.via, 'create');
+  assert.equal(mayRecordOwnerEmail(ok), true);
+  assert.equal(mayRecordOwnerEmail({ allow: true, via: 'capability', ownership: null }), true);
+
+  const shell = emptyCanvasRecord('2026-11-03T12:00:00.000Z');
+  assert.equal(shell.email, '');
+  assert.deepEqual(shell.canvasScores, {});
+  assert.deepEqual(shell.canvasHistory, []);
+  const written = applyCanvasWrite(shell, {
+    email: 'owner@example.com',
+    canvasScores: { why: 50, who: 50, where: 50, what: 50, how: 50 },
+    canvasHistory: [{ date: '2026-11-03T12:00:00.000Z', scores: { why: 50 } }],
+  });
+  assert.equal(written.emailToBind, 'owner@example.com');
+  assert.equal(written.record.email, 'owner@example.com');
+  assert.equal(written.record.canvasScores.why, 50);
+  assert.equal(written.record.createdAt, '2026-11-03T12:00:00.000Z');
+
+  const missingStillDenied = canvasAccessDecision({
+    user: owner,
+    ownership: null,
+    token: '',
+    recordToken: '',
+    tokenExpires: '',
+    now,
+    recordExists: false,
+  });
+  assert.equal(missingStillDenied.allow, false);
+  assert.equal(missingStillDenied.status, 404);
+});
+
 test('a canvas write cannot replace the bound email or move the capability expiry', () => {
   const first = applyCanvasWrite(
     {
@@ -449,7 +488,9 @@ test('Bridge status and check-in need this session, not a couple id', () => {
 test('the assessment worker wires every private route through the same decisions', () => {
   const workerPath = "/Users/lukehaythorpe/Library/Mobile Documents/com~apple~CloudDocs/_LLC Buisiness Files/Lil' Bird/lilbird site/Deep-profile Cursor Project/lilbird-assessment.js";
   const worker = readFileSync(workerPath, 'utf8');
-  assert.match(worker, /const WORKER_VERSION = 'v8\.7\.0-release-b3'/);
+  assert.match(worker, /const WORKER_VERSION = 'v8\.8\.0-canvas-checkin'/);
+  assert.match(worker, /createCanvasShellDecision/);
+  assert.match(worker, /emptyCanvasRecord/);
   assert.match(worker, /verifiedAssessmentNestIds/);
   assert.match(worker, /confirmedAccountEmail/);
   assert.doesNotMatch(worker, /return \{ profile: null, suppressed/);

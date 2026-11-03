@@ -37,7 +37,7 @@ function preferencesDialog(view, options = {}) {
 export function preferenceCard(view, options = {}) {
   if (!view) return '';
   if (!view.verified) {
-    return '<article class="nest-letters-card" id="email-preferences"><h2>Email preferences</h2><p>Confirm your email first. Then you can choose the fortnightly notes. Your Nest is already yours.</p></article>';
+    return '<article class="nest-letters-card" id="email-preferences"><h2>Email preferences</h2><p>Confirm your email first. Coaching notes are part of Nest once you do. You can turn them off anytime.</p></article>';
   }
   const nestOn = view.nestCoaching === true;
   const needsInvite = !nestOn && (view.status === 'none' || view.status === 'declined' || view.needsReaffirm);
@@ -172,8 +172,8 @@ async function showFor(user) {
       writeIntent(map);
       const saved = await saveChoice(user, { nestCoaching: choice === 'yes' });
       if (saved.ok && saved.payload?.view?.userId === user.id) {
-        notice = 'Preferences saved';
-        dialogOpen = true;
+        notice = '';
+        dialogOpen = false;
         paint(saved.payload.view);
         return;
       }

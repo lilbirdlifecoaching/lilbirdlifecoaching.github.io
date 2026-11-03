@@ -432,21 +432,21 @@ test('retry keeps the letter number', () => {
   assert.equal(noteForKey('q0-0').key, 'canvas-1');
 });
 
-test('signup consent starts unticked and declining still leaves a Nest choice', () => {
+test('signup enrolls coaching notes by default without a consent checkbox', () => {
   const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8');
-  const box = html.slice(html.indexOf('id="signup-letters"'), html.indexOf('id="signup-letters"') + 80);
-  assert.match(box, /type="checkbox"/);
-  assert.doesNotMatch(box, /checked/);
-  assert.doesNotMatch(html, /signup-letters[\s\S]{0,40}required/);
-  assert.match(html, /fortnightly coaching notes/);
-  assert.match(html, /quarterly Life Canvas check-ins/);
-  assert.match(html, /Leaving this unticked still creates your Nest/);
+  assert.doesNotMatch(html, /id="signup-letters"/);
+  assert.match(html, /Fortnightly coaching notes are included/);
+  assert.match(html, /Email preferences/);
+  assert.match(html, /coaching notes/);
   const client = readFileSync(new URL('./nest-client.js', import.meta.url), 'utf8');
   const signupAt = client.indexOf('sb.auth.signUp');
-  const choiceAt = client.indexOf("getElementById('signup-letters')?.checked === true");
-  assert.ok(signupAt > 0 && choiceAt > signupAt);
-  assert.doesNotMatch(client, /if \(!acceptLetters\) return/);
-  const declined = enroll({ user: user(), choice: 'no', now });
+  const acceptAt = client.indexOf('accept: true', signupAt);
+  assert.ok(signupAt > 0 && acceptAt > signupAt);
+  assert.doesNotMatch(client, /getElementById\('signup-letters'\)/);
+  const enrolled = enroll({ user: user(), choice: 'yes', now });
+  assert.equal(enrolled.ok, true);
+  assert.equal(enrolled.state.nestCoaching, true);
+  const declined = enroll({ user: user({ id: '22222222-2222-4222-8222-222222222222' }), choice: 'no', now });
   assert.equal(declined.ok, true);
   assert.equal(declined.state.status, 'declined');
   assert.equal(declined.state.nestCoaching, false);
