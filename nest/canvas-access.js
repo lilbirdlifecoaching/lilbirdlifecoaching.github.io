@@ -120,8 +120,33 @@ export function canvasDenial(decision) {
 /** Strong enough to write the claim table or create a new ownership row. */
 export function mayRecordOwnerEmail(decision) {
   if (!decision?.allow) return false;
-  if (decision.via === 'capability') return true;
+  if (decision.via === 'capability' || decision.via === 'create') return true;
   return decision.ownership === 'link' || decision.ownership === 'read';
+}
+
+/**
+ * First Life Canvas check-in from Nest with no prior read. The caller must be
+ * signed in, and the email on the body must be their confirmed account email.
+ * A missing record is created only on this path; an existing stranger record
+ * still goes through canvasAccessDecision and stays denied.
+ */
+export function createCanvasShellDecision({ user, bodyEmail }) {
+  if (!user?.id) return { allow: false, status: 401, error: 'Please log in.', ownership: null };
+  const caller = String(user.email || '').trim().toLowerCase();
+  const incoming = String(bodyEmail || '').trim().toLowerCase();
+  if (!EMAIL.test(caller) || !EMAIL.test(incoming) || caller !== incoming) {
+    return { allow: false, status: 403, error: 'Not allowed', ownership: null };
+  }
+  return { allow: true, via: 'create', ownership: null };
+}
+
+export function emptyCanvasRecord(now = new Date().toISOString()) {
+  return {
+    email: '',
+    canvasScores: {},
+    canvasHistory: [],
+    createdAt: now,
+  };
 }
 
 /**

@@ -235,11 +235,10 @@
           : (error.message || 'Could not create the Nest. Try again.');
         return;
       }
-      const acceptLetters = document.getElementById('signup-letters')?.checked === true;
       const signedUp = data?.session?.user || data?.user || null;
       if (signedUp) {
         document.dispatchEvent(new CustomEvent('lilbird-letters-signup', {
-          detail: { user: signedUp, accept: acceptLetters }
+          detail: { user: signedUp, accept: true }
         }));
       }
       if (data?.session?.user) {
@@ -565,7 +564,7 @@
       const src = nestPlusSource();
       return { name: 'Nest Plus', note: src === 'Nest Plus' ? 'lil\' bird guide, the full read, Life Canvas, Relationship Dynamic, and the Roots & Wings workbook. $7.99 a month.' : src + '.' };
     }
-    return { name: 'Nest', note: 'My Journey, the Glow Map, quizzes, and the First Flight workbook. Coaching notes only if you asked for them. Nest Plus adds the guide, the full read, Life Canvas, Relationship Dynamic, and Roots & Wings.' };
+    return { name: 'Nest', note: 'My Journey, the Glow Map, quizzes, coaching notes, and the First Flight workbook. Nest Plus adds the guide, the full read, Life Canvas, Relationship Dynamic, and Roots & Wings.' };
   }
 
   function nestAccessSummary() {
@@ -2375,12 +2374,31 @@
     return '<div class="lc-views" role="tablist">' + views + '</div>' + body + '<div class="lc-record">' + record + '</div>' + more;
   }
 
+  function defaultCanvasScores() {
+    const scores = {};
+    for (const dim of CANVAS_DIMS) scores[dim.key] = 50;
+    return scores;
+  }
+
+  function generateNestId() {
+    try {
+      if (typeof crypto !== 'undefined' && crypto.randomUUID) return 'nest-' + crypto.randomUUID();
+    } catch (_) {}
+    const a = new Uint8Array(16);
+    if (typeof crypto !== 'undefined' && crypto.getRandomValues) crypto.getRandomValues(a);
+    else for (let i = 0; i < a.length; i++) a[i] = Math.floor(Math.random() * 256);
+    return 'nest-' + Array.from(a, (b) => b.toString(16).padStart(2, '0')).join('');
+  }
+
   function canvasCheckinHtml(scores) {
     if (!canvasCheckinOpen) {
-      return '<div class="lc-actions"><button type="button" class="btn btn-gold" data-lc-checkin>Check in again</button>' +
-        '<a class="btn btn-outline" href="' + escapeHtml(innerCompassHref()) + '">Open your Inner Compass</a></div>';
+      const startLabel = canvasScores ? 'Check in again' : 'Start a check-in';
+      const compass = deepNestId
+        ? '<a class="btn btn-outline" href="' + escapeHtml(innerCompassHref()) + '">Open your Inner Compass</a>'
+        : '';
+      return '<div class="lc-actions"><button type="button" class="btn btn-gold" data-lc-checkin>' + startLabel + '</button>' + compass + '</div>';
     }
-    const source = canvasDraft || scores;
+    const source = canvasDraft || scores || defaultCanvasScores();
     const sliders = CANVAS_DIMS.map((dim) => {
       const value = source[dim.key];
       const note = canvasTexts && canvasTexts[dim.key] ? '<p class="lc-note">' + escapeHtml(canvasTexts[dim.key]) + '</p>' : '';
@@ -2388,24 +2406,31 @@
         '<p class="lc-note">' + escapeHtml(dim.question) + '</p>' + note +
         '<input type="range" min="0" max="100" value="' + value + '" data-lc-slider="' + dim.key + '" style="accent-color:' + dim.color + ';color:' + dim.color + '" aria-label="' + escapeHtml(dim.title) + '"></div>';
     }).join('');
+    const cancel = canvasScores
+      ? '<button type="button" class="btn btn-outline" data-lc-cancel>Cancel</button>'
+      : '';
     return '<div class="lc-checkin"><p class="lc-kicker">Check in</p><h3 class="lc-title">Where are these five today?</h3>' + sliders +
-      '<div class="lc-actions"><button type="button" class="btn btn-gold" data-lc-save>Save this check-in</button><button type="button" class="btn btn-outline" data-lc-cancel>Cancel</button></div></div>';
+      '<div class="lc-actions"><button type="button" class="btn btn-gold" data-lc-save>Save this check-in</button>' + cancel + '</div></div>';
   }
 
   function renderLifeCanvas() {
     const pane = document.getElementById('pane-canvas');
     if (!pane) return;
-    if (!deepNestId) {
-      pane.innerHTML = '<div class="lc-shell"><article class="lc-card"><p class="lc-kicker">Life Canvas</p><h2 class="lc-title">Five parts of your life, on one page</h2><p class="lc-lead">Passion and purpose, connections, spaces, resources, and energy. They fill in when you take the Inner Compass, and later check-ins stay on this tab.</p><div class="lc-empty-actions"><a class="btn btn-ember" href="/inner-compass/?from=nest">Take the Inner Compass →</a></div></article></div>';
+    if (canvasAccessNote) {
+      pane.innerHTML = '<div class="lc-shell"><article class="lc-card"><p class="lc-kicker">Life Canvas</p><h2 class="lc-title">This read is not open from this login</h2><p class="lc-lead">' + escapeHtml(canvasAccessNote) + '</p><div class="lc-empty-actions"><a class="btn btn-ember" href="' + escapeHtml(innerCompassHref()) + '">Open the Inner Compass →</a></div></article></div>';
       return;
     }
     if (!canvasScores) {
-      const denied = !!canvasAccessNote;
-      const title = denied ? 'This read is not open from this login' : 'Your Inner Compass is linked';
-      const lead = denied
-        ? canvasAccessNote
-        : 'The five scores show up here after the Life Canvas questions in the Inner Compass. Check-ins after that stay on this tab.';
-      pane.innerHTML = '<div class="lc-shell"><article class="lc-card"><p class="lc-kicker">Life Canvas</p><h2 class="lc-title">' + title + '</h2><p class="lc-lead">' + escapeHtml(lead) + '</p><div class="lc-empty-actions"><a class="btn btn-ember" href="' + escapeHtml(innerCompassHref()) + '">Open the Inner Compass →</a></div></article></div>';
+      if (!canvasCheckinOpen) canvasCheckinOpen = true;
+      if (!canvasDraft) canvasDraft = defaultCanvasScores();
+      const status = canvasStatus
+        ? '<p class="lc-status' + (canvasStatus.indexOf('Could not') === 0 ? ' is-error' : '') + '">' + escapeHtml(canvasStatus) + '</p>'
+        : '';
+      pane.innerHTML = '<div class="lc-shell"><article class="lc-card"><p class="lc-kicker">Life Canvas</p><h2 class="lc-title">Five parts of your life, on one page</h2><p class="lc-lead">Passion and purpose, connections, spaces, resources, and energy. Move the sliders to where you are today. Later check-ins stay on this tab.</p>' + status + '</article><article class="lc-card">' + canvasCheckinHtml(canvasDraft) + '</article></div>';
+      requestAnimationFrame(() => {
+        if (!pane.isConnected) return;
+        pane.querySelectorAll('[data-lc-slider]').forEach(paintCanvasSlider);
+      });
       return;
     }
     const scores = canvasScores;
@@ -2458,34 +2483,44 @@
   }
 
   async function saveLifeCanvasCheckin(btn) {
-    if (!deepNestId || !canvasScores) return;
     const pane = document.getElementById('pane-canvas');
+    const baseline = canvasScores || canvasDraft || defaultCanvasScores();
     const next = {};
     CANVAS_DIMS.forEach((dim) => {
       const input = pane && pane.querySelector('[data-lc-slider="' + dim.key + '"]');
       const n = Number(input && input.value);
-      next[dim.key] = Number.isFinite(n) ? Math.max(0, Math.min(100, Math.round(n))) : canvasScores[dim.key];
+      next[dim.key] = Number.isFinite(n) ? Math.max(0, Math.min(100, Math.round(n))) : baseline[dim.key];
     });
     const entry = { scores: next, overall: canvasOverall(next), date: new Date().toISOString() };
+    const creating = !deepNestId;
+    const nestId = deepNestId || generateNestId();
     if (btn) {
       btn.disabled = true;
       btn.textContent = 'Saving…';
     }
     try {
+      const payload = { nestId, canvasScores: next, canvasHistory: [entry] };
+      if (creating && currentUser?.email) payload.email = String(currentUser.email).trim().toLowerCase();
       const res = await fetch(ASSESSMENT_WORKER_URL + '/store-profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
-        body: JSON.stringify({ nestId: deepNestId, canvasScores: next, canvasHistory: [entry] })
+        body: JSON.stringify(payload)
       });
       if (!res.ok) {
         const body = await res.json().catch(() => null);
         throw new Error(assessmentDenialMessage(body, res.status) || 'save failed');
+      }
+      if (creating) {
+        const { error } = await sb.rpc('link_deep_profile_to_user', { p_nest_id: nestId });
+        if (error) throw new Error(error.message || 'Could not link this check-in to your Nest.');
+        deepNestId = nestId;
       }
       canvasScores = next;
       canvasHistory = [entry].concat(canvasHistory).slice(0, 24);
       canvasDraft = null;
       canvasCheckinOpen = false;
       canvasStatus = 'Saved. This check-in is on your history.';
+      canvasAccessNote = '';
       renderLifeCanvas();
     } catch (err) {
       canvasStatus = err && err.message && err.message !== 'save failed'
@@ -2617,7 +2652,7 @@
       }
       if (e.target.closest('[data-lc-checkin]')) {
         canvasCheckinOpen = true;
-        canvasDraft = null;
+        canvasDraft = canvasScores ? null : defaultCanvasScores();
         canvasStatus = '';
         renderLifeCanvas();
         return;
