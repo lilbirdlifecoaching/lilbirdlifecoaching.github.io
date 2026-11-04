@@ -347,25 +347,53 @@
 
   function initRockHotspots() {
     var stage = document.getElementById('rocks-stage');
-    var dialog = document.getElementById('rock-dialog');
-    if (!stage || !dialog || typeof dialog.showModal !== 'function') return;
-    var title = document.getElementById('rock-dialog-title');
-    var link = dialog.querySelector('.rock-dialog-link');
-    var closeBtn = dialog.querySelector('[data-rock-close]');
+    var pop = document.getElementById('rock-pop');
+    if (!stage || !pop) return;
+    var phrase = document.getElementById('rock-pop-phrase');
+    var link = document.getElementById('rock-pop-link');
+    var closeBtn = pop.querySelector('[data-rock-close]');
+    var active = null;
+
+    function closePop() {
+      pop.hidden = true;
+      if (active) active.classList.remove('is-active');
+      active = null;
+    }
+
+    function openPop(btn) {
+      if (active) active.classList.remove('is-active');
+      active = btn;
+      btn.classList.add('is-active');
+      if (phrase) phrase.textContent = btn.getAttribute('data-phrase') || '';
+      if (link) {
+        link.setAttribute('href', btn.getAttribute('data-href') || '#');
+      }
+      pop.style.left = btn.style.left;
+      pop.style.top = btn.style.top;
+      pop.hidden = false;
+    }
 
     stage.querySelectorAll('.rock-hotspot').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        if (title) title.textContent = btn.getAttribute('data-phrase') || '';
-        if (link) link.setAttribute('href', btn.getAttribute('data-href') || '#');
-        dialog.showModal();
-        if (link) link.focus();
+      btn.addEventListener('mouseenter', function () {
+        if (!pop.hidden && active === btn) return;
+        openPop(btn);
+      });
+      btn.addEventListener('focus', function () { openPop(btn); });
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (!pop.hidden && active === btn) {
+          if (link && link.getAttribute('href')) global.location.href = link.getAttribute('href');
+          return;
+        }
+        openPop(btn);
       });
     });
-    if (closeBtn) {
-      closeBtn.addEventListener('click', function () { dialog.close(); });
-    }
-    dialog.addEventListener('click', function (e) {
-      if (e.target === dialog) dialog.close();
+    if (closeBtn) closeBtn.addEventListener('click', closePop);
+    document.addEventListener('click', function (e) {
+      if (!stage.contains(e.target)) closePop();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closePop();
     });
   }
 
