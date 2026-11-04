@@ -25,6 +25,7 @@
   <link rel="stylesheet" href="./nest-styles.css?v=47" />
   <link rel="stylesheet" href="./nest-tour.css?v=3" />
   <link rel="stylesheet" href="/css/lilbird-nest-theme.css?v=20260917m" />
+  <link rel="stylesheet" href="/css/lilbird-nest-redesign.css?v=20261104p1r3" />
   <!-- Google Tag Manager -->
   <script src="/lilbird-gtm-id.js"></script>
   <script src="/lilbird-gtm.js"></script>
@@ -95,10 +96,17 @@
     </main>
   </div>
 
-  <div id="view-dashboard" class="view">
-    <nav class="top-nav">
-      <a class="wordmark" href="/">lil' bird</a>
-      <div class="nav-user">
+  <div id="view-dashboard" class="view nest-app" data-nest-area="home">
+    <header class="top-nav nest-chrome">
+      <a class="nest-brand" href="/" aria-label="lil' bird home">
+        <img class="nest-brand-logo nest-logo-day" src="/bird-logo-teal.png" alt="" width="36" height="36" />
+        <img class="nest-brand-logo nest-logo-night" src="/bird-logo.png" alt="" width="36" height="36" />
+        <span class="nest-brand-text">
+          <span class="nest-brand-name">lil' bird</span>
+          <span class="nest-brand-sub">Your Nest</span>
+        </span>
+      </a>
+      <div class="nest-chrome-actions">
         <button type="button" class="theme-toggle" aria-pressed="true" aria-label="Switch to night mode">
           <span class="theme-toggle-track" aria-hidden="true">
             <span class="theme-toggle-thumb">
@@ -108,36 +116,82 @@
           </span>
           <span class="theme-toggle-label">Day</span>
         </button>
-        <span id="nav-user-name" class="nav-user-name"></span>
-        <span id="nav-plan" class="nav-plan hidden"></span>
-        <button id="btn-nest-welcome" class="btn btn-outline btn-tour" type="button" title="What is Nest?">
-          <span class="tour-label-long">What is Nest?</span>
-          <span class="tour-label-short" aria-hidden="true">Nest?</span>
-        </button>
-        <button id="btn-nest-tour" class="btn btn-outline btn-tour" type="button" title="Take a Nest tour">
-          <span class="tour-label-long">Take a tour</span>
-          <span class="tour-label-short" aria-hidden="true">Tour</span>
-        </button>
-        <button id="btn-nav-profile" class="avatar" type="button" aria-label="Picture and email" title="Picture and email"><i class="ti ti-user"></i></button>
-        <a id="nav-desk" class="btn btn-outline hidden" href="/desk/">Desk</a>
-        <button id="btn-logout" class="btn btn-outline btn-logout" type="button">Log out</button>
+        <div class="nest-account">
+          <button id="btn-nav-profile" class="avatar nest-account-trigger" type="button" aria-expanded="false" aria-controls="nest-account-menu" aria-label="Account menu" title="Account">
+            <i class="ti ti-user"></i>
+          </button>
+          <div id="nest-account-menu" class="nest-account-menu" hidden>
+            <p class="nest-account-name" id="nav-user-name"></p>
+            <p class="nest-account-plan" id="nav-plan" hidden></p>
+            <button type="button" class="nest-account-item" data-account-action="settings">Picture and email</button>
+            <button id="btn-nest-welcome" type="button" class="nest-account-item" title="What is Nest?">What is Nest?</button>
+            <button id="btn-nest-tour" type="button" class="nest-account-item" title="Take a Nest tour">Take a tour</button>
+            <a id="nav-desk" class="nest-account-item hidden" href="/desk/">Desk</a>
+            <button id="btn-logout" type="button" class="nest-account-item nest-account-logout">Log out</button>
+          </div>
+        </div>
       </div>
-    </nav>
+    </header>
 
-    <main class="dash-wrap">
+    <div class="nest-shell">
+      <aside class="nest-rail" aria-label="Nest navigation">
+        <button type="button" class="rail-link is-active" data-nest-area="home" id="rail-home">
+          <i class="ti ti-home"></i><span>Home</span>
+        </button>
+        <button type="button" class="rail-link dash-tab" id="tab-journey" data-nest-area="journey">
+          <i class="ti ti-map-2"></i><span>My Journey</span>
+        </button>
+        <div class="rail-group" data-rail-group="understand">
+          <button type="button" class="rail-link" data-nest-area="understand" id="rail-understand">
+            <i class="ti ti-heart-handshake"></i><span>Understand myself</span>
+          </button>
+          <div class="rail-sub">
+            <button type="button" class="rail-sublink dash-tab" id="tab-canvas" data-nest-area="understand">Life Canvas</button>
+            <button type="button" class="rail-sublink dash-tab" id="tab-profile" data-nest-area="understand">
+              Inner Compass <span id="profile-dot" class="profile-dot hidden"></span>
+            </button>
+          </div>
+        </div>
+        <button type="button" class="rail-link dash-tab" id="tab-ask" data-nest-area="guide">
+          <i class="ti ti-feather"></i><span>My Guide</span>
+        </button>
+        <button type="button" class="rail-link dash-tab" id="tab-products" data-nest-area="learn">
+          <i class="ti ti-books"></i><span>Learn &amp; grow</span>
+        </button>
+        <button type="button" class="rail-link dash-tab rail-quiet" id="tab-live" data-nest-area="guide">
+          <i class="ti ti-users"></i><span>Live</span> <i id="live-tab-lock" class="ti ti-lock live-tab-lock" aria-hidden="true"></i>
+        </button>
+      </aside>
+
+      <main class="dash-wrap nest-dash">
       <p id="dash-error" class="dash-error hidden" role="alert"></p>
       <div id="dash-loading" class="dash-loading hidden">Loading your Nest…</div>
-      <section class="tabs-row">
-        <button id="tab-products" class="dash-tab active" type="button"><i class="ti ti-layout-grid"></i> My products</button>
-        <button id="tab-canvas" class="dash-tab" type="button"><i class="ti ti-chart-donut"></i> Life Canvas</button>
-        <button id="tab-profile" class="dash-tab" type="button">
-          <i class="ti ti-compass"></i> Inner Compass
-          <span id="profile-dot" class="profile-dot hidden"></span>
-        </button>
-        <button id="tab-journey" class="dash-tab" type="button"><i class="ti ti-map-2"></i> My Journey</button>
-        <button id="tab-live" class="dash-tab" type="button"><i class="ti ti-users"></i> Live <i id="live-tab-lock" class="ti ti-lock live-tab-lock" aria-hidden="true"></i></button>
-        <button id="tab-ask" class="dash-tab" type="button"><i class="ti ti-feather"></i> Guide</button>
-      </section>
+
+      <div class="nest-home-block" id="nest-home-block">
+        <p class="nest-greeting" id="nest-greeting" hidden></p>
+
+        <section class="next-chapter" id="next-chapter" aria-labelledby="next-chapter-title" data-state="loading">
+          <div class="next-chapter-copy">
+            <p class="next-chapter-kicker" id="next-chapter-kicker">Your next chapter</p>
+            <h2 class="next-chapter-title" id="next-chapter-title">Finding your bearings</h2>
+            <p class="next-chapter-body" id="next-chapter-body">Loading your Nest…</p>
+            <div class="next-chapter-context" id="next-chapter-context" hidden>
+              <p class="next-chapter-context-kicker" id="next-chapter-context-kicker"></p>
+              <h3 class="next-chapter-context-title" id="next-chapter-context-title"></h3>
+              <p class="next-chapter-context-body" id="next-chapter-context-body"></p>
+            </div>
+            <div class="next-chapter-actions" id="next-chapter-actions"></div>
+          </div>
+          <div class="next-chapter-art" aria-hidden="true">
+            <div class="companions-slot">
+              <img class="companions-img companions-day" src="./assets/companions-day-placeholder.png" alt="" width="720" height="480" decoding="async" />
+              <img class="companions-img companions-night" src="./assets/companions-night-placeholder.png" alt="" width="720" height="480" decoding="async" />
+            </div>
+          </div>
+        </section>
+
+        <section class="nest-secondary" id="nest-secondary" aria-label="Quick paths"></section>
+      </div>
 
       <section id="nest-settings" class="nest-settings hidden" aria-labelledby="nest-settings-title">
         <div class="nest-settings-head">
@@ -229,7 +283,24 @@
           </article>
         </aside>
       </div>
-    </main>
+      </main>
+    </div>
+
+    <nav class="nest-mobile-bar" aria-label="Primary">
+      <button type="button" class="mobile-bar-link is-active" data-nest-area="home"><i class="ti ti-home"></i><span>Home</span></button>
+      <button type="button" class="mobile-bar-link" data-nest-area="journey" data-tab="journey"><i class="ti ti-map-2"></i><span>Journey</span></button>
+      <button type="button" class="mobile-bar-link" data-nest-area="guide" data-tab="ask"><i class="ti ti-feather"></i><span>Guide</span></button>
+      <button type="button" class="mobile-bar-link" data-nest-area="learn" data-tab="products"><i class="ti ti-books"></i><span>Grow</span></button>
+      <button type="button" class="mobile-bar-link" id="mobile-more-btn" aria-expanded="false" aria-controls="nest-mobile-more"><i class="ti ti-dots"></i><span>More</span></button>
+    </nav>
+    <div id="nest-mobile-more" class="nest-mobile-more" hidden>
+      <button type="button" data-tab="canvas">Life Canvas</button>
+      <button type="button" data-tab="profile">Inner Compass</button>
+      <button type="button" data-tab="live">Live sessions</button>
+      <button type="button" data-account-action="settings">Picture and email</button>
+      <button type="button" data-account-action="tour">Take a tour</button>
+      <button type="button" data-account-action="logout">Log out</button>
+    </div>
   </div>
 
   <script src="/lilbird-auth-bridge.js"></script>
@@ -237,7 +308,7 @@
   <script src="/js/lilbird-theme.js"></script>
   <script src="/js/lilbird-theme-nav.js"></script>
   <script src="./nest-tour.js?v=16"></script>
-  <script src="./nest-client.js?v=59"></script>
+  <script src="./nest-client.js?v=63"></script>
   <script type="module" src="./nest-letters-ui.js?v=3"></script>
   <script type="module" src="./journey.js?v=8"></script>
 </body>

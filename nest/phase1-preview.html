@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Nest Phase 1 preview · lil' bird</title>
+  <link rel="icon" type="image/png" href="/bird-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.49.0/dist/tabler-icons.min.css" />
+  <link rel="stylesheet" href="/css/lilbird-tokens.css" />
+  <link rel="stylesheet" href="/css/lilbird-theme-chrome.css" />
+  <link rel="stylesheet" href="./nest-styles.css?v=47" />
+  <link rel="stylesheet" href="/css/lilbird-nest-theme.css?v=20260917m" />
+  <link rel="stylesheet" href="/css/lilbird-nest-redesign.css?v=20261104p1r3" />
+  <style>
+    .preview-banner {
+      position: sticky; top: 0; z-index: 50;
+      display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: center;
+      padding: 0.5rem 1rem; background: #18495c; color: #fff9ef;
+      font-family: "DM Sans", system-ui, sans-serif; font-size: 0.82rem;
+    }
+    .preview-banner button, .preview-banner a {
+      border: 1px solid rgba(255,249,239,0.35); background: transparent; color: inherit;
+      border-radius: 999px; padding: 0.3rem 0.7rem; font: inherit; cursor: pointer; text-decoration: none;
+    }
+    .preview-banner button.is-on { background: rgba(255,249,239,0.18); }
+    #view-dashboard.view { display: block; }
+    body.nest-page { min-height: 100vh; }
+  </style>
+</head>
+<body class="nest-page">
+  <div class="preview-banner" role="region" aria-label="Phase 1 preview controls">
+    <strong>Phase 1r2 preview</strong>
+    <span id="preview-state-label">returning</span>
+    <button type="button" data-demo="new">New</button>
+    <button type="button" data-demo="returning" class="is-on">Returning</button>
+    <button type="button" data-demo="active">Next step</button>
+    <button type="button" id="preview-theme">Day / night</button>
+    <a href="./">Live Nest</a>
+  </div>
+
+  <div id="view-dashboard" class="view nest-app" data-nest-area="home">
+    <header class="top-nav nest-chrome">
+      <a class="nest-brand" href="/" aria-label="lil' bird home">
+        <img class="nest-brand-logo nest-logo-day" src="/bird-logo-teal.png" alt="" width="36" height="36" />
+        <img class="nest-brand-logo nest-logo-night" src="/bird-logo.png" alt="" width="36" height="36" />
+        <span class="nest-brand-text">
+          <span class="nest-brand-name">lil' bird</span>
+          <span class="nest-brand-sub">Your Nest</span>
+        </span>
+      </a>
+      <div class="nest-chrome-actions">
+        <button type="button" class="theme-toggle" id="preview-theme-btn" aria-pressed="true" aria-label="Switch to night mode">
+          <span class="theme-toggle-track" aria-hidden="true">
+            <span class="theme-toggle-thumb">
+              <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"/><g stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></g></svg>
+              <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5z"/></svg>
+            </span>
+          </span>
+          <span class="theme-toggle-label">Day</span>
+        </button>
+        <button id="btn-nav-profile" class="avatar has-photo nest-account-trigger" type="button" aria-label="Account">
+          <img src="./luke-avatar.jpg" alt="" width="30" height="30" />
+        </button>
+      </div>
+    </header>
+
+    <div class="nest-shell">
+      <aside class="nest-rail" aria-label="Nest navigation">
+        <button type="button" class="rail-link is-active"><i class="ti ti-home"></i><span>Home</span></button>
+        <button type="button" class="rail-link"><i class="ti ti-map-2"></i><span>My Journey</span></button>
+        <button type="button" class="rail-link"><i class="ti ti-heart-handshake"></i><span>Understand myself</span></button>
+        <button type="button" class="rail-link"><i class="ti ti-feather"></i><span>My Guide</span></button>
+        <button type="button" class="rail-link"><i class="ti ti-books"></i><span>Learn &amp; grow</span></button>
+        <button type="button" class="rail-link rail-quiet"><i class="ti ti-users"></i><span>Live</span></button>
+      </aside>
+
+      <main class="dash-wrap nest-dash">
+        <div class="nest-home-block">
+          <p class="nest-greeting" id="nest-greeting">Welcome back, Maya. You are not walking through this alone.</p>
+
+          <section class="next-chapter" id="next-chapter" data-state="returning" data-focus="reflections">
+            <div class="next-chapter-copy">
+              <p class="next-chapter-kicker" id="next-chapter-kicker">Your next chapter</p>
+              <h2 class="next-chapter-title" id="next-chapter-title">A little further along.</h2>
+              <p class="next-chapter-body" id="next-chapter-body">You've already started exploring what matters to you. Pick up where you left off.</p>
+              <div class="next-chapter-context" id="next-chapter-context">
+                <p class="next-chapter-context-kicker" id="next-chapter-context-kicker">Where you left off</p>
+                <h3 class="next-chapter-context-title" id="next-chapter-context-title">Your reflections</h3>
+                <p class="next-chapter-context-body" id="next-chapter-context-body">Return to the thoughts you saved and see what feels important now.</p>
+              </div>
+              <div class="next-chapter-actions" id="next-chapter-actions">
+                <button type="button" class="btn-primary-nest">Continue reflecting →</button>
+                <button type="button" class="btn-quiet">Browse Learn &amp; grow</button>
+              </div>
+            </div>
+            <div class="next-chapter-art" aria-hidden="true">
+              <div class="companions-slot">
+                <img class="companions-img companions-day" src="./assets/companions-day-placeholder.png" alt="" width="720" height="480" />
+                <img class="companions-img companions-night" src="./assets/companions-night-placeholder.png" alt="" width="720" height="480" />
+              </div>
+            </div>
+          </section>
+
+          <section class="nest-secondary" id="nest-secondary" aria-label="Quick paths">
+            <article class="nest-secondary-card"><button type="button">
+              <span class="nest-secondary-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 7.5 12 4l8 3.5v9L12 20l-8-3.5v-9Z"/><path d="M12 4v16M4 7.5l8 3.5 8-3.5"/></svg></span>
+              <p class="nest-secondary-kicker">Life Canvas</p>
+              <h3 class="nest-secondary-title">See where you stand</h3>
+              <p class="nest-secondary-body">Open your check-in and see how the different parts of your life feel right now.</p>
+            </button></article>
+            <article class="nest-secondary-card"><button type="button">
+              <span class="nest-secondary-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 19c4-3 6-7 12-12-1 6-5 11-12 12Z"/></svg></span>
+              <p class="nest-secondary-kicker">My Guide</p>
+              <h3 class="nest-secondary-title">Talk it through</h3>
+              <p class="nest-secondary-body">A place to bring hard questions. Included with Nest Plus.</p>
+            </button></article>
+            <article class="nest-secondary-card"><button type="button">
+              <span class="nest-secondary-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 12c3 5 6 7.5 8 7.5S17 17 20 12"/><path d="M8 11.5c.5-3 2-5 4-5.5 2.5-.5 4 2 4 5"/></svg></span>
+              <p class="nest-secondary-kicker">Your Nest</p>
+              <h3 class="nest-secondary-title">What you have</h3>
+              <p class="nest-secondary-body">Free Nest includes My Journey, coaching notes, and the First Flight workbook.</p>
+            </button></article>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <nav class="nest-mobile-bar" aria-label="Primary">
+      <button type="button" class="mobile-bar-link is-active"><i class="ti ti-home"></i><span>Home</span></button>
+      <button type="button" class="mobile-bar-link"><i class="ti ti-map-2"></i><span>Journey</span></button>
+      <button type="button" class="mobile-bar-link"><i class="ti ti-feather"></i><span>Guide</span></button>
+      <button type="button" class="mobile-bar-link"><i class="ti ti-books"></i><span>Grow</span></button>
+      <button type="button" class="mobile-bar-link"><i class="ti ti-dots"></i><span>More</span></button>
+    </nav>
+  </div>
+
+  <script>
+    (function () {
+      var states = {
+        new: {
+          label: 'new member',
+          greeting: 'Welcome to your Nest. You are not walking through this alone.',
+          title: 'Finding your bearings',
+          body: "You don't need to have everything figured out. Tell us a little about where you are, and we'll help you find a good place to begin.",
+          context: null,
+          primary: 'What brings you here? →',
+          secondary: 'Try the free Inner Compass'
+        },
+        returning: {
+          label: 'returning · reflections',
+          greeting: 'Welcome back, Maya. You are not walking through this alone.',
+          title: 'A little further along.',
+          body: "You've already started exploring what matters to you. Pick up where you left off.",
+          context: {
+            kicker: 'Where you left off',
+            title: 'Your reflections',
+            body: 'Return to the thoughts you saved and see what feels important now.',
+            quote: false
+          },
+          primary: 'Continue reflecting →',
+          secondary: 'Browse Learn & grow'
+        },
+        active: {
+          label: 'saved next step',
+          greeting: 'Welcome back, Maya. You are not walking through this alone.',
+          title: 'One step at a time.',
+          body: "Here's the next step you chose for yourself.",
+          context: {
+            kicker: 'Your next step',
+            title: '',
+            body: 'Sit with the sentence I wrote for little me, then take one kind action this week.',
+            quote: true
+          },
+          primary: 'Return to my next step →',
+          secondary: 'Browse Learn & grow'
+        }
+      };
+
+      function applyState(key) {
+        var cfg = states[key] || states.returning;
+        document.getElementById('preview-state-label').textContent = cfg.label;
+        document.getElementById('nest-greeting').textContent = cfg.greeting;
+        document.getElementById('next-chapter').dataset.state = key === 'active' ? 'active' : (key === 'new' ? 'new' : 'returning');
+        document.getElementById('next-chapter').dataset.focus = key === 'active' ? 'active' : (key === 'new' ? 'new' : 'reflections');
+        document.getElementById('next-chapter-title').textContent = cfg.title;
+        document.getElementById('next-chapter-body').textContent = cfg.body;
+        var ctx = document.getElementById('next-chapter-context');
+        if (cfg.context) {
+          ctx.hidden = false;
+          ctx.classList.toggle('is-quote', !!cfg.context.quote);
+          document.getElementById('next-chapter-context-kicker').textContent = cfg.context.kicker;
+          var ct = document.getElementById('next-chapter-context-title');
+          ct.textContent = cfg.context.title || '';
+          ct.hidden = !cfg.context.title;
+          document.getElementById('next-chapter-context-body').textContent = cfg.context.body;
+        } else {
+          ctx.hidden = true;
+          ctx.classList.remove('is-quote');
+        }
+        document.getElementById('next-chapter-actions').innerHTML =
+          '<button type="button" class="btn-primary-nest">' + cfg.primary + '</button>' +
+          '<button type="button" class="btn-quiet">' + cfg.secondary + '</button>';
+        document.querySelectorAll('[data-demo]').forEach(function (btn) {
+          btn.classList.toggle('is-on', btn.getAttribute('data-demo') === key);
+        });
+        try {
+          var url = new URL(window.location.href);
+          url.searchParams.set('demo-chapter', key);
+          history.replaceState(null, '', url);
+        } catch (e) {}
+      }
+
+      function setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        document.documentElement.style.colorScheme = theme;
+        var label = document.querySelector('.theme-toggle-label');
+        if (label) label.textContent = theme === 'dark' ? 'Night' : 'Day';
+      }
+      function toggleTheme() {
+        setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+      }
+
+      document.querySelectorAll('[data-demo]').forEach(function (btn) {
+        btn.addEventListener('click', function () { applyState(btn.getAttribute('data-demo')); });
+      });
+      document.getElementById('preview-theme').addEventListener('click', toggleTheme);
+      document.getElementById('preview-theme-btn').addEventListener('click', toggleTheme);
+
+      var params = new URLSearchParams(window.location.search);
+      if (params.get('theme') === 'dark') setTheme('dark');
+      else setTheme('light');
+      if (params.get('hide-banner') === '1') {
+        var banner = document.querySelector('.preview-banner');
+        if (banner) banner.style.display = 'none';
+      }
+      applyState(params.get('demo-chapter') || 'returning');
+    })();
+  </script>
+</body>
+</html>
