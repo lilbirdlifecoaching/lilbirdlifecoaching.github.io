@@ -360,32 +360,45 @@
       active = null;
     }
 
-    function openPop(btn) {
+    function rockAnchor(el) {
+      var stageRect = stage.getBoundingClientRect();
+      var rockRect = el.getBoundingClientRect();
+      return {
+        left: ((rockRect.left + rockRect.width / 2 - stageRect.left) / stageRect.width) * 100,
+        top: ((rockRect.top - stageRect.top) / stageRect.height) * 100
+      };
+    }
+
+    function openPop(el) {
       if (active) active.classList.remove('is-active');
-      active = btn;
-      btn.classList.add('is-active');
-      if (phrase) phrase.textContent = btn.getAttribute('data-phrase') || '';
-      if (link) {
-        link.setAttribute('href', btn.getAttribute('data-href') || '#');
-      }
-      pop.style.left = btn.style.left;
-      pop.style.top = btn.style.top;
+      active = el;
+      el.classList.add('is-active');
+      if (phrase) phrase.textContent = el.getAttribute('data-phrase') || '';
+      if (link) link.setAttribute('href', el.getAttribute('data-href') || '#');
+      var anchor = rockAnchor(el);
+      pop.style.left = anchor.left + '%';
+      pop.style.top = anchor.top + '%';
       pop.hidden = false;
     }
 
-    stage.querySelectorAll('.rock-hotspot').forEach(function (btn) {
-      btn.addEventListener('mouseenter', function () {
-        if (!pop.hidden && active === btn) return;
-        openPop(btn);
-      });
-      btn.addEventListener('focus', function () { openPop(btn); });
-      btn.addEventListener('click', function (e) {
+    stage.querySelectorAll('.rock-hotspot').forEach(function (el) {
+      el.addEventListener('mouseenter', function () { openPop(el); });
+      el.addEventListener('focus', function () { openPop(el); });
+      el.addEventListener('click', function (e) {
         e.preventDefault();
-        if (!pop.hidden && active === btn) {
-          if (link && link.getAttribute('href')) global.location.href = link.getAttribute('href');
+        e.stopPropagation();
+        if (!pop.hidden && active === el) {
+          var href = el.getAttribute('data-href');
+          if (href) global.location.href = href;
           return;
         }
-        openPop(btn);
+        openPop(el);
+      });
+      el.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          el.click();
+        }
       });
     });
     if (closeBtn) closeBtn.addEventListener('click', closePop);
