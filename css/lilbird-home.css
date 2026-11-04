@@ -1903,8 +1903,8 @@ footer, .site-footer {
 }
 .rocks-stage .hotspot-glow {
   /* Same screen blend as the tree — brighten the stone, keep the drawing */
-  mix-blend-mode: soft-light;
-  filter: brightness(1.42) saturate(1.15) contrast(1.05);
+  mix-blend-mode: screen;
+  filter: brightness(1.45) saturate(1.25) contrast(1.05);
 }
 .rocks-stage,
 .nest-tree-stage {
@@ -2054,7 +2054,8 @@ footer, .site-footer {
 .nest-tree-stage .hotspot-targets {
   border-radius: inherit;
 }
-.nest-tree-cta { margin: 0.15rem 0 0; }
+.nest-tree-cta { margin: 0.35rem 0 0; }
+.nest-tree-frame .nest-tree-cta { text-align: center; }
 .tree-tip-pop {
   position: absolute;
   z-index: 5;
