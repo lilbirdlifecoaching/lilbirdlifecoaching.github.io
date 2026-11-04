@@ -410,6 +410,44 @@
     });
   }
 
+  function initTreeHotspots() {
+    var stage = document.getElementById('nest-tree-stage');
+    var pop = document.getElementById('tree-tip-pop');
+    if (!stage || !pop) return;
+    var title = document.getElementById('tree-tip-title');
+    var body = document.getElementById('tree-tip-body');
+    var active = null;
+
+    function closeTip() {
+      pop.hidden = true;
+      if (active) active.classList.remove('is-active');
+      active = null;
+    }
+
+    function openTip(el) {
+      if (active) active.classList.remove('is-active');
+      active = el;
+      el.classList.add('is-active');
+      if (title) title.textContent = el.getAttribute('data-title') || '';
+      if (body) body.textContent = el.getAttribute('data-body') || '';
+      var stageRect = stage.getBoundingClientRect();
+      var rockRect = el.getBoundingClientRect();
+      pop.style.left = (((rockRect.left + rockRect.width / 2 - stageRect.left) / stageRect.width) * 100) + '%';
+      pop.style.top = (((rockRect.top - stageRect.top) / stageRect.height) * 100) + '%';
+      pop.hidden = false;
+    }
+
+    stage.querySelectorAll('.tree-hotspot').forEach(function (el) {
+      el.addEventListener('mouseenter', function () { openTip(el); });
+      el.addEventListener('focus', function () { openTip(el); });
+      el.addEventListener('mouseleave', function () {
+        if (document.activeElement !== el) closeTip();
+      });
+      el.addEventListener('blur', closeTip);
+    });
+    stage.addEventListener('mouseleave', closeTip);
+  }
+
   function initHeroMotion() {
     if (global.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     var hero = document.querySelector('.hero');
@@ -454,6 +492,7 @@
     initNavMenu();
     initNavDropdowns();
     initRockHotspots();
+    initTreeHotspots();
     initHeroMotion();
     initQuoteTicker();
   }

@@ -6,10 +6,6 @@
   var STORAGE_KEY = 'lilbird-theme';
   var root = document.documentElement;
 
-  function systemPrefersDark() {
-    return global.matchMedia && global.matchMedia('(prefers-color-scheme: dark)').matches;
-  }
-
   function getStored() {
     try {
       var v = localStorage.getItem(STORAGE_KEY);
@@ -109,7 +105,7 @@
     boot: boot,
     setTheme: setTheme,
     toggleTheme: toggleTheme,
-    getTheme: function () { return root.getAttribute('data-theme') || 'dark'; },
+    getTheme: function () { return root.getAttribute('data-theme') || 'light'; },
     resolveTheme: resolveTheme,
   };
 

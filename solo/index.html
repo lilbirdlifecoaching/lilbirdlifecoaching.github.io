@@ -8,7 +8,7 @@
     (function(){
       var k='lilbird-theme', s=null;
       try{s=localStorage.getItem(k);}catch(e){}
-      var t=(s==='light'||s==='dark')?s:(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+      var t=(s==='light'||s==='dark')?s:'light';
       document.documentElement.setAttribute('data-theme', t);
       document.documentElement.style.colorScheme=t;
     })();
@@ -48,6 +48,23 @@
       --font-body:    'DM Sans', system-ui, sans-serif;
       --font-mono:    'DM Mono', monospace;
     }
+
+
+    html[data-theme="light"] {
+      --dark: #f5f2eb;
+      --dark-mid: #efeae0;
+      --dark-card: #ffffff;
+      --dark-hover: #f3efe6;
+      --mist: rgba(30,32,40,0.04);
+      --text: #1e2028;
+      --text-dim: rgba(30,32,40,0.58);
+      --text-muted: rgba(30,32,40,0.35);
+      --gold-dim: rgba(201,161,48,0.12);
+      --gold-border: rgba(201,161,48,0.28);
+      --session-dim: rgba(201,161,48,0.1);
+      --session-border: rgba(201,161,48,0.28);
+    }
+    html[data-theme="light"] body { background: #f5f2eb; color: var(--text); }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -551,12 +568,25 @@
       margin: 0 -0.25rem; padding-left: 0.25rem; padding-right: 0.25rem;
     }
     .solo-landing-brand { display: flex; align-items: center; gap: 0.65rem; text-decoration: none; color: inherit; }
-    .solo-landing-brand .bird-mark {
-      width: 36px; height: 36px; background: var(--gold); border-radius: 10px;
+    .solo-landing-brand .bird-mark,
+    .solo-landing-brand .bird-mark-img {
+      width: 36px; height: 36px; border-radius: 10px;
       display: flex; align-items: center; justify-content: center; font-size: 1.05rem;
+      object-fit: contain; background: transparent;
     }
     .solo-landing-brand-name { font-family: var(--font-display); font-size: 1.05rem; font-weight: 400; }
-    .solo-landing-top-actions { display: flex; align-items: center; gap: 0.75rem; }
+    .solo-landing-top-actions { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; justify-content: flex-end; }
+    .solo-landing-back {
+      font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-dim); text-decoration: none; border: 1px solid var(--gold-border); border-radius: 6px;
+      padding: 0.4rem 0.75rem; transition: color 0.2s, border-color 0.2s;
+    }
+    .solo-landing-back:hover { color: var(--gold); border-color: var(--gold); }
+    .loading-bird img { width: 48px; height: 48px; display: block; }
+    .nav-bird-img, .session-nav-bird-img, .auth-logo .bird-mark-img, .post-purchase-wrap .bird-mark-img {
+      width: 32px; height: 32px; object-fit: contain; display: block; border-radius: 8px;
+    }
+    .auth-logo .bird-mark-img { width: 52px; height: 52px; margin: 0 auto 1rem; }
     .solo-landing-signin {
       font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase;
       color: var(--text-dim); background: none; border: 1px solid var(--gold-border); border-radius: 6px;
@@ -702,26 +732,28 @@
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NG8ZFNX2" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   <div id="view-loading" class="view active">
-    <div class="loading-bird">🪶</div>
+    <div class="loading-bird"><img src="/bird-logo.png" alt="" width="48" height="48" data-logo-dark="/bird-logo.png" data-logo-light="/bird-logo-teal.png" /></div>
     <div class="loading-text">finding your nest...</div>
   </div>
 
   <div id="view-landing" class="view">
     <div class="solo-landing">
       <div class="solo-landing-top">
-        <a class="solo-landing-brand" href="https://lilbird.life/">
-          <div class="bird-mark">🪶</div>
+        <a class="solo-landing-brand" href="/">
+          <img class="bird-mark bird-mark-img" src="/bird-logo.png" alt="" width="40" height="40" data-logo-dark="/bird-logo.png" data-logo-light="/bird-logo-teal.png" />
           <span class="solo-landing-brand-name">lil' bird</span>
         </a>
         <div class="solo-landing-top-actions">
-          <button type="button" class="theme-toggle" aria-pressed="false" aria-label="Switch appearance">
+          <a class="solo-landing-back" href="/">← Home</a>
+          <a class="solo-landing-back" href="/nest/">← Nest</a>
+          <button type="button" class="theme-toggle" aria-pressed="true" aria-label="Switch to night mode">
             <span class="theme-toggle-track" aria-hidden="true">
               <span class="theme-toggle-thumb">
                 <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"/><g stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></g></svg>
                 <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5z"/></svg>
               </span>
             </span>
-            <span class="theme-toggle-label">Night</span>
+            <span class="theme-toggle-label">Day</span>
           </button>
           <button type="button" class="solo-landing-signin" id="btn-landing-signin">Sign in</button>
         </div>
@@ -822,18 +854,18 @@
 
   <div id="view-post-purchase" class="view">
     <div class="solo-auth-theme-wrap">
-      <button type="button" class="theme-toggle" aria-pressed="false" aria-label="Switch appearance">
+      <button type="button" class="theme-toggle" aria-pressed="true" aria-label="Switch to night mode">
         <span class="theme-toggle-track" aria-hidden="true">
           <span class="theme-toggle-thumb">
             <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"/><g stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></g></svg>
             <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5z"/></svg>
           </span>
         </span>
-        <span class="theme-toggle-label">Night</span>
+        <span class="theme-toggle-label">Day</span>
       </button>
     </div>
     <div class="post-purchase-wrap">
-      <div class="bird-mark">🪶</div>
+      <img class="bird-mark bird-mark-img" src="/bird-logo.png" alt="" width="52" height="52" data-logo-dark="/bird-logo.png" data-logo-light="/bird-logo-teal.png" />
       <h1>You're in.</h1>
       <p class="lede" id="post-purchase-lede">Payment received. Set a password with this email to open your sessions.</p>
       <div class="post-purchase-card">
@@ -855,20 +887,20 @@
 
   <div id="view-auth" class="view">
     <div class="solo-auth-theme-wrap">
-      <button type="button" class="theme-toggle" aria-pressed="false" aria-label="Switch appearance">
+      <button type="button" class="theme-toggle" aria-pressed="true" aria-label="Switch to night mode">
         <span class="theme-toggle-track" aria-hidden="true">
           <span class="theme-toggle-thumb">
             <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"/><g stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></g></svg>
             <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5z"/></svg>
           </span>
         </span>
-        <span class="theme-toggle-label">Night</span>
+        <span class="theme-toggle-label">Day</span>
       </button>
     </div>
     <div class="auth-wrap">
       <button type="button" class="auth-back" id="btn-auth-back">← What is Solo</button>
       <div class="auth-logo">
-        <div class="bird-mark">🪶</div>
+        <img class="bird-mark bird-mark-img" src="/bird-logo.png" alt="" width="52" height="52" data-logo-dark="/bird-logo.png" data-logo-light="/bird-logo-teal.png" />
         <h1>lil' bird</h1>
         <p>Life Change Sessions · Solo</p>
       </div>
@@ -897,18 +929,19 @@
 
   <div id="view-dashboard" class="view">
     <nav class="dash-nav">
-      <div class="nav-brand"><div class="nav-bird">🪶</div><div class="nav-title">lil' bird</div></div>
+      <div class="nav-brand"><img class="nav-bird-img" src="/bird-logo.png" alt="" width="32" height="32" data-logo-dark="/bird-logo.png" data-logo-light="/bird-logo-teal.png" /><div class="nav-title">lil' bird</div></div>
       <div class="nav-right">
-        <button type="button" class="theme-toggle" aria-pressed="false" aria-label="Switch appearance">
+        <button type="button" class="theme-toggle" aria-pressed="true" aria-label="Switch to night mode">
           <span class="theme-toggle-track" aria-hidden="true">
             <span class="theme-toggle-thumb">
               <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"/><g stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></g></svg>
               <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5z"/></svg>
             </span>
           </span>
-          <span class="theme-toggle-label">Night</span>
+          <span class="theme-toggle-label">Day</span>
         </button>
-        <a href="/nest/" id="nav-back-nest" class="lilbird-nav-nest" hidden>← your Nest</a>
+        <a href="/" class="lilbird-nav-nest">← Home</a>
+        <a href="/nest/" id="nav-back-nest" class="lilbird-nav-nest">← Nest</a>
         <span class="nav-user" id="nav-user-email"></span>
         <button class="btn-ghost" id="btn-signout">Sign out</button>
       </div>
@@ -930,11 +963,21 @@
   <div id="view-session" class="view">
     <nav class="session-nav">
       <div class="session-nav-left">
-        <div class="session-nav-bird" id="session-nav-bird">🪶</div>
+        <img class="session-nav-bird-img" id="session-nav-bird" src="/bird-logo.png" alt="" width="32" height="32" data-logo-dark="/bird-logo.png" data-logo-light="/bird-logo-teal.png" />
         <span class="session-nav-label">lil' bird · life change sessions</span>
       </div>
       <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;justify-content:flex-end">
-        <a href="/nest/" id="nav-back-nest-session" class="lilbird-nav-nest" hidden>← your Nest</a>
+        <button type="button" class="theme-toggle" aria-pressed="true" aria-label="Switch to night mode">
+          <span class="theme-toggle-track" aria-hidden="true">
+            <span class="theme-toggle-thumb">
+              <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"/><g stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></g></svg>
+              <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5z"/></svg>
+            </span>
+          </span>
+          <span class="theme-toggle-label">Day</span>
+        </button>
+        <a href="/" class="lilbird-nav-nest">← Home</a>
+        <a href="/nest/" id="nav-back-nest-session" class="lilbird-nav-nest">← Nest</a>
         <button class="btn-back-dash" id="btn-session-info" style="display:none" onclick="toggleSessionInfo()">Info</button>
         <button class="btn-back-dash" id="btn-back-dash">← My sessions</button>
       </div>
@@ -1920,7 +1963,7 @@
       document.documentElement.style.setProperty('--session-col', session.color);
       document.documentElement.style.setProperty('--session-dim', session.dim);
       document.documentElement.style.setProperty('--session-border', session.border);
-      document.getElementById('session-nav-bird').textContent = session.emoji;
+      /* keep bird logo in session nav */
 
       const toolsHtml = session.tools.length ? '<div class="tools-section"><div class="tools-label">Tools in this session</div><div class="tool-list">' +
         session.tools.map(function(t) {

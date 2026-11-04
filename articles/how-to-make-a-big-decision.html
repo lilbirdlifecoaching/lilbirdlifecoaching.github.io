@@ -7,7 +7,7 @@
     (function(){
       var k='lilbird-theme', s=null;
       try{s=localStorage.getItem(k);}catch(e){}
-      var t=(s==='light'||s==='dark')?s:(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+      var t=(s==='light'||s==='dark')?s:'light';
       document.documentElement.setAttribute('data-theme', t);
       document.documentElement.style.colorScheme=t;
     })();
