@@ -345,6 +345,135 @@
     });
   }
 
+  function bindPixelHotspots(stage, options) {
+    if (!stage) return;
+    options = options || {};
+    var targets = Array.prototype.slice.call(stage.querySelectorAll('.art-hotspot'));
+    var glowMap = {};
+    stage.querySelectorAll('.hotspot-glow').forEach(function (img) {
+      glowMap[img.getAttribute('data-glow')] = { img: img, canvas: null, ctx: null };
+    });
+    var activeKey = null;
+    var activeTarget = null;
+
+    function ensureHit(key) {
+      var g = glowMap[key];
+      if (!g) return null;
+      if (g.ctx) return g;
+      var w = g.img.naturalWidth;
+      var h = g.img.naturalHeight;
+      if (!w || !h) return null;
+      var canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      var ctx = canvas.getContext('2d', { willReadFrequently: true });
+      ctx.drawImage(g.img, 0, 0);
+      g.canvas = canvas;
+      g.ctx = ctx;
+      return g;
+    }
+
+    function clearLit() {
+      Object.keys(glowMap).forEach(function (key) {
+        glowMap[key].img.classList.remove('is-lit');
+      });
+      targets.forEach(function (t) { t.classList.remove('is-active'); });
+    }
+
+    function setActive(key, target) {
+      if (activeKey === key && activeTarget === target) {
+        if (options.onActivate) options.onActivate(target, key, false);
+        return;
+      }
+      clearLit();
+      activeKey = key;
+      activeTarget = target || null;
+      stage.classList.toggle('is-hot', !!key);
+      if (!key) {
+        if (options.onClear) options.onClear();
+        return;
+      }
+      if (glowMap[key]) glowMap[key].img.classList.add('is-lit');
+      if (target) target.classList.add('is-active');
+      if (options.onActivate) options.onActivate(target, key, true);
+    }
+
+    function hitKey(clientX, clientY) {
+      var rect = stage.getBoundingClientRect();
+      if (!rect.width || !rect.height) return null;
+      var nx = (clientX - rect.left) / rect.width;
+      var ny = (clientY - rect.top) / rect.height;
+      for (var i = targets.length - 1; i >= 0; i--) {
+        var target = targets[i];
+        var key = target.getAttribute('data-glow');
+        var g = ensureHit(key);
+        if (!g || !g.ctx) continue;
+        var px = Math.floor(nx * g.canvas.width);
+        var py = Math.floor(ny * g.canvas.height);
+        if (px < 0 || py < 0 || px >= g.canvas.width || py >= g.canvas.height) continue;
+        if (g.ctx.getImageData(px, py, 1, 1).data[3] > 28) return { key: key, target: target };
+      }
+      return null;
+    }
+
+    function targetByKey(key) {
+      for (var i = 0; i < targets.length; i++) {
+        if (targets[i].getAttribute('data-glow') === key) return targets[i];
+      }
+      return null;
+    }
+
+    stage.addEventListener('pointermove', function (e) {
+      if (e.pointerType === 'touch') return;
+      var hit = hitKey(e.clientX, e.clientY);
+      if (hit) setActive(hit.key, hit.target);
+      else if (document.activeElement && stage.contains(document.activeElement) && document.activeElement.classList.contains('art-hotspot')) {
+        /* keep keyboard focus highlight */
+      } else {
+        setActive(null, null);
+      }
+    });
+    stage.addEventListener('pointerleave', function () {
+      if (document.activeElement && stage.contains(document.activeElement) && document.activeElement.classList.contains('art-hotspot')) return;
+      setActive(null, null);
+    });
+    stage.addEventListener('click', function (e) {
+      if (e.target.closest && e.target.closest('.rock-pop, .tree-tip-pop')) return;
+      var hit = hitKey(e.clientX, e.clientY);
+      if (!hit) return;
+      e.preventDefault();
+      setActive(hit.key, hit.target);
+      if (options.onClick) options.onClick(hit.target, hit.key);
+    });
+
+    targets.forEach(function (target) {
+      target.addEventListener('focus', function () {
+        setActive(target.getAttribute('data-glow'), target);
+      });
+      target.addEventListener('blur', function () {
+        if (activeTarget === target) setActive(null, null);
+      });
+      target.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        setActive(target.getAttribute('data-glow'), target);
+        if (options.onClick) options.onClick(target, target.getAttribute('data-glow'));
+      });
+    });
+
+    // Warm canvases once images decode
+    Object.keys(glowMap).forEach(function (key) {
+      var img = glowMap[key].img;
+      if (img.complete) ensureHit(key);
+      else img.addEventListener('load', function () { ensureHit(key); });
+    });
+
+    return {
+      clear: function () { setActive(null, null); },
+      activate: function (key) { setActive(key, targetByKey(key)); }
+    };
+  }
+
   function initRockHotspots() {
     var stage = document.getElementById('rocks-stage');
     var pop = document.getElementById('rock-pop');
@@ -352,55 +481,43 @@
     var phrase = document.getElementById('rock-pop-phrase');
     var link = document.getElementById('rock-pop-link');
     var closeBtn = pop.querySelector('[data-rock-close]');
-    var active = null;
+    var controller = null;
 
     function closePop() {
       pop.hidden = true;
-      if (active) active.classList.remove('is-active');
-      active = null;
+      if (controller) controller.clear();
     }
 
-    function rockAnchor(el) {
+    function openPop(target) {
+      if (!target) return;
+      if (phrase) phrase.textContent = target.getAttribute('data-phrase') || '';
+      if (link) link.setAttribute('href', target.getAttribute('data-href') || '#');
       var stageRect = stage.getBoundingClientRect();
-      var rockRect = el.getBoundingClientRect();
-      return {
-        left: ((rockRect.left + rockRect.width / 2 - stageRect.left) / stageRect.width) * 100,
-        top: ((rockRect.top - stageRect.top) / stageRect.height) * 100
-      };
-    }
-
-    function openPop(el) {
-      if (active) active.classList.remove('is-active');
-      active = el;
-      el.classList.add('is-active');
-      if (phrase) phrase.textContent = el.getAttribute('data-phrase') || '';
-      if (link) link.setAttribute('href', el.getAttribute('data-href') || '#');
-      var anchor = rockAnchor(el);
-      pop.style.left = anchor.left + '%';
-      pop.style.top = anchor.top + '%';
+      var rockRect = target.getBoundingClientRect();
+      pop.style.left = (((rockRect.left + rockRect.width / 2 - stageRect.left) / stageRect.width) * 100) + '%';
+      pop.style.top = (((rockRect.top - stageRect.top) / stageRect.height) * 100) + '%';
       pop.hidden = false;
     }
 
-    stage.querySelectorAll('.rock-hotspot').forEach(function (el) {
-      el.addEventListener('mouseenter', function () { openPop(el); });
-      el.addEventListener('focus', function () { openPop(el); });
-      el.addEventListener('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        if (!pop.hidden && active === el) {
-          var href = el.getAttribute('data-href');
+    controller = bindPixelHotspots(stage, {
+      onActivate: function (target, key, changed) {
+        if (!target) {
+          pop.hidden = true;
+          return;
+        }
+        openPop(target);
+      },
+      onClear: function () { pop.hidden = true; },
+      onClick: function (target) {
+        if (!pop.hidden && phrase && phrase.textContent === (target.getAttribute('data-phrase') || '')) {
+          var href = target.getAttribute('data-href');
           if (href) global.location.href = href;
           return;
         }
-        openPop(el);
-      });
-      el.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          el.click();
-        }
-      });
+        openPop(target);
+      }
     });
+
     if (closeBtn) closeBtn.addEventListener('click', closePop);
     document.addEventListener('click', function (e) {
       if (!stage.contains(e.target)) closePop();
@@ -416,36 +533,27 @@
     if (!stage || !pop) return;
     var title = document.getElementById('tree-tip-title');
     var body = document.getElementById('tree-tip-body');
-    var active = null;
 
-    function closeTip() {
-      pop.hidden = true;
-      if (active) active.classList.remove('is-active');
-      active = null;
-    }
-
-    function openTip(el) {
-      if (active) active.classList.remove('is-active');
-      active = el;
-      el.classList.add('is-active');
-      if (title) title.textContent = el.getAttribute('data-title') || '';
-      if (body) body.textContent = el.getAttribute('data-body') || '';
+    function placeTip(target) {
+      if (title) title.textContent = target.getAttribute('data-title') || '';
+      if (body) body.textContent = target.getAttribute('data-body') || '';
       var stageRect = stage.getBoundingClientRect();
-      var rockRect = el.getBoundingClientRect();
-      pop.style.left = (((rockRect.left + rockRect.width / 2 - stageRect.left) / stageRect.width) * 100) + '%';
-      pop.style.top = (((rockRect.top - stageRect.top) / stageRect.height) * 100) + '%';
+      var tipRect = target.getBoundingClientRect();
+      pop.style.left = (((tipRect.left + tipRect.width / 2 - stageRect.left) / stageRect.width) * 100) + '%';
+      pop.style.top = (((tipRect.top - stageRect.top) / stageRect.height) * 100) + '%';
       pop.hidden = false;
     }
 
-    stage.querySelectorAll('.tree-hotspot').forEach(function (el) {
-      el.addEventListener('mouseenter', function () { openTip(el); });
-      el.addEventListener('focus', function () { openTip(el); });
-      el.addEventListener('mouseleave', function () {
-        if (document.activeElement !== el) closeTip();
-      });
-      el.addEventListener('blur', closeTip);
+    bindPixelHotspots(stage, {
+      onActivate: function (target) {
+        if (!target) {
+          pop.hidden = true;
+          return;
+        }
+        placeTip(target);
+      },
+      onClear: function () { pop.hidden = true; }
     });
-    stage.addEventListener('mouseleave', closeTip);
   }
 
   function initHeroMotion() {
