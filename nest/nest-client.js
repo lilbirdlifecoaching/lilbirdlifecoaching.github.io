@@ -40,6 +40,7 @@
   let canvasDraft = null;
   let canvasStatus = '';
   let canvasAccessNote = '';
+  let journeySignals = { rows: [], latestStep: null, status: '' };
   const CANVAS_DIMS = [
     { key: 'why', title: 'Passion & Purpose', color: '#F5C842', question: 'How alive does what you\'re doing feel?' },
     { key: 'who', title: 'Connections', color: '#4adea8', question: 'How held are you by the people around you?' },
@@ -491,6 +492,9 @@
 
       document.getElementById('profile-dot').classList.toggle('hidden', !hasInnerCompassComplete());
       updateNavAvatar();
+      await loadJourneySignals();
+      renderNextChapter();
+      renderNestSecondary();
       renderNextSteps();
       renderProducts();
       renderProfile();
@@ -510,8 +514,9 @@
       }
       void handlePurchaseReturn();
       const arrival = new URLSearchParams(window.location.search);
-      if (!arrival.get('tab') && !arrival.get('tool') && hasNestPlus()) setTab('ask');
+      if (!arrival.get('tab') && !arrival.get('tool')) goHome();
       else syncGuideAccess();
+      syncNestAreaFromTab(arrival.get('tab'));
       document.dispatchEvent(new CustomEvent('lilbird-nest-ready', { detail: { user: currentUser } }));
     } catch (err) {
       console.error('Nest hydrateDashboard:', err);
@@ -798,6 +803,309 @@
 
     btn.textContent = original;
     btn.disabled = false;
+  }
+
+  async function loadJourneySignals() {
+    journeySignals = { rows: [], latestStep: null, status: '' };
+    if (!currentUser?.id) return;
+    try {
+      const result = await sb
+        .from('journey_reflections')
+        .select('id, tool_id, next_step, insight, created_at')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false })
+        .limit(8);
+      if (result.error) {
+        if (result.error.code === '42P01' || /journey_reflections/.test(result.error.message || '')) {
+          journeySignals.status = 'unavailable';
+        }
+        return;
+      }
+      journeySignals.rows = result.data || [];
+      journeySignals.latestStep = journeySignals.rows.find((row) => row.next_step) || null;
+    } catch (e) {
+      console.warn('journey signals:', e);
+    }
+  }
+
+  function demoChapterOverride() {
+    try {
+      return new URLSearchParams(window.location.search).get('demo-chapter');
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function resolveChapterFocus() {
+    // Hierarchy: next_step → Journey reflections → Life Canvas → Inner Compass → invitation
+    const override = demoChapterOverride();
+    if (override === 'active') return 'active';
+    if (override === 'returning') return 'reflections';
+    if (override === 'new') return 'new';
+
+    if (journeySignals.latestStep && journeySignals.latestStep.next_step) return 'active';
+    if (journeySignals.rows.length > 0) return 'reflections';
+    if (Array.isArray(canvasHistory) && canvasHistory.length > 0) return 'canvas';
+    if (hasInnerCompassComplete()) return 'compass';
+    if (youngerYouPhotoUrl()) return 'returning-soft';
+    return 'new';
+  }
+
+  function chapterStateFromData() {
+    const focus = resolveChapterFocus();
+    if (focus === 'active') return 'active';
+    if (focus === 'new') return 'new';
+    return 'returning';
+  }
+
+  function firstName() {
+    const raw =
+      courseProfile?.full_name ||
+      currentUser?.user_metadata?.full_name ||
+      '';
+    const part = String(raw).trim().split(/\s+/)[0];
+    return part || '';
+  }
+
+  function renderNextChapter() {
+    const root = document.getElementById('next-chapter');
+    if (!root) return;
+    const kicker = document.getElementById('next-chapter-kicker');
+    const title = document.getElementById('next-chapter-title');
+    const body = document.getElementById('next-chapter-body');
+    const actions = document.getElementById('next-chapter-actions');
+    const greeting = document.getElementById('nest-greeting');
+    const context = document.getElementById('next-chapter-context');
+    const contextKicker = document.getElementById('next-chapter-context-kicker');
+    const contextTitle = document.getElementById('next-chapter-context-title');
+    const contextBody = document.getElementById('next-chapter-context-body');
+    const name = firstName();
+    const focus = resolveChapterFocus();
+    root.dataset.state = chapterStateFromData();
+    root.dataset.focus = focus;
+
+    // Welcome carries the name; hero copy should not repeat it.
+    if (greeting) {
+      greeting.hidden = false;
+      greeting.textContent = name
+        ? 'Welcome back, ' + name + '. You are not walking through this alone.'
+        : 'Welcome to your Nest. You are not walking through this alone.';
+    }
+
+    let cfg = null;
+    if (focus === 'active') {
+      // Prefer the member's own saved words. Demo override may supply a sample when empty.
+      let stepText = String(journeySignals.latestStep?.next_step || '').trim();
+      if (!stepText && demoChapterOverride() === 'active') {
+        stepText = 'Sit with the sentence I wrote for little me, then take one kind action this week.';
+      }
+      cfg = {
+        kicker: 'Your next chapter',
+        title: 'One step at a time.',
+        body: "Here's the next step you chose for yourself.",
+        context: stepText
+          ? {
+              kicker: 'Your next step',
+              title: '',
+              body: stepText,
+              quote: true
+            }
+          : null,
+        // Opens My Journey — where saved next steps live today (no separate action flow).
+        primary: { label: 'Return to my next step →', action: 'journey' },
+        secondary: { label: 'Browse Learn & grow', action: 'products' }
+      };
+    } else if (focus === 'reflections') {
+      cfg = {
+        kicker: 'Your next chapter',
+        title: 'A little further along.',
+        body: "You've already started exploring what matters to you. Pick up where you left off.",
+        context: {
+          kicker: 'Where you left off',
+          title: 'Your reflections',
+          body: 'Return to the thoughts you saved and see what feels important now.'
+        },
+        primary: { label: 'Continue reflecting →', action: 'journey' },
+        secondary: { label: 'Browse Learn & grow', action: 'products' }
+      };
+    } else if (focus === 'canvas') {
+      cfg = {
+        kicker: 'Your next chapter',
+        title: 'A little further along.',
+        body: 'You have already checked in with your life. Take another look when you are ready.',
+        context: {
+          kicker: 'Where you left off',
+          title: 'Your Life Canvas',
+          body: 'See how the different parts of your life feel right now.'
+        },
+        primary: { label: 'Open Life Canvas →', action: 'canvas' },
+        secondary: { label: 'Open My Journey', action: 'journey' }
+      };
+    } else if (focus === 'compass') {
+      cfg = {
+        kicker: 'Your next chapter',
+        title: 'A little further along.',
+        body: 'You have already begun to understand yourself. Return to that clarity, or take a new step.',
+        context: {
+          kicker: 'Where you left off',
+          title: 'Your Inner Compass',
+          body: 'Revisit what you discovered, then choose what feels right next.'
+        },
+        primary: { label: 'Open your Inner Compass →', action: 'compass' },
+        secondary: { label: 'Open My Journey', action: 'journey' }
+      };
+    } else if (focus === 'returning-soft') {
+      cfg = {
+        kicker: 'Your next chapter',
+        title: 'A little further along.',
+        body: 'A little of your story is already here. Continue whenever you feel ready.',
+        context: null,
+        primary: { label: 'Continue in My Journey →', action: 'journey' },
+        secondary: { label: 'Browse Learn & grow', action: 'products' }
+      };
+    } else {
+      cfg = {
+        kicker: 'Your next chapter',
+        title: 'Finding your bearings',
+        body: "You don't need to have everything figured out. Tell us a little about where you are, and we'll help you find a good place to begin.",
+        context: null,
+        primary: { label: 'What brings you here? →', action: 'journey' },
+        secondary: { label: 'Try the free Inner Compass', href: '/inner-compass/?from=nest' }
+      };
+    }
+
+    if (kicker) kicker.textContent = cfg.kicker;
+    if (title) title.textContent = cfg.title;
+    if (body) body.textContent = cfg.body;
+    if (context) {
+      if (cfg.context) {
+        context.hidden = false;
+        context.classList.toggle('is-quote', !!cfg.context.quote);
+        if (contextKicker) contextKicker.textContent = cfg.context.kicker;
+        if (contextTitle) {
+          contextTitle.textContent = cfg.context.title || '';
+          contextTitle.hidden = !cfg.context.title;
+        }
+        if (contextBody) contextBody.textContent = cfg.context.body;
+      } else {
+        context.hidden = true;
+        context.classList.remove('is-quote');
+      }
+    }
+    if (actions) {
+      const primary = cfg.primary.href
+        ? '<a class="btn-primary-nest" href="' + escapeHtml(cfg.primary.href) + '">' + escapeHtml(cfg.primary.label) + '</a>'
+        : '<button type="button" class="btn-primary-nest" data-chapter-action="' + escapeHtml(cfg.primary.action) + '">' + escapeHtml(cfg.primary.label) + '</button>';
+      const secondary = cfg.secondary
+        ? (cfg.secondary.href
+          ? '<a class="btn-quiet" href="' + escapeHtml(cfg.secondary.href) + '">' + escapeHtml(cfg.secondary.label) + '</a>'
+          : '<button type="button" class="btn-quiet" data-chapter-action="' + escapeHtml(cfg.secondary.action) + '">' + escapeHtml(cfg.secondary.label) + '</button>')
+        : '';
+      actions.innerHTML = primary + secondary;
+      actions.querySelectorAll('[data-chapter-action]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const act = btn.getAttribute('data-chapter-action');
+          if (act === 'journey') setTab('journey');
+          else if (act === 'compass') openInnerCompassRead();
+          else if (act === 'canvas') setTab('canvas');
+          else if (act === 'products') setTab('products');
+          else if (act === 'ask') setTab('ask');
+        });
+      });
+    }
+  }
+
+  function secondaryIcon(kind) {
+    if (kind === 'canvas') {
+      return '<span class="nest-secondary-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 7.5 12 4l8 3.5v9L12 20l-8-3.5v-9Z"/><path d="M12 4v16M4 7.5l8 3.5 8-3.5"/></svg></span>';
+    }
+    if (kind === 'guide') {
+      return '<span class="nest-secondary-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 19c4-3 6-7 12-12-1 6-5 11-12 12Z"/><path d="M5 19c3-4 6-7 12-12"/><path d="m8 14-1-4m4 2-.5-4"/></svg></span>';
+    }
+    return '<span class="nest-secondary-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 12c3 5 6 7.5 8 7.5S17 17 20 12"/><path d="M5 14c4 3.5 10 4 14-.5"/><path d="M8 11.5c.5-3 2-5 4-5.5 2.5-.5 4 2 4 5"/></svg></span>';
+  }
+
+  function renderNestSecondary() {
+    const host = document.getElementById('nest-secondary');
+    if (!host) return;
+    const membership = membershipCardCopy();
+    const guide = guideCardCopy();
+    const cards = [
+      {
+        kind: 'canvas',
+        kicker: 'Life Canvas',
+        title: canvasHistory.length ? 'See where you stand' : 'A picture of your life',
+        body: canvasHistory.length
+          ? 'Open your check-in and see how the different parts of your life feel right now.'
+          : 'Five parts of your life on one page. Useful when you want a clearer picture.',
+        action: 'canvas'
+      },
+      {
+        kind: 'guide',
+        kicker: 'My Guide',
+        title: guide.title,
+        body: guide.body,
+        action: 'ask'
+      },
+      {
+        kind: 'membership',
+        kicker: 'Your Nest',
+        title: membership.title,
+        body: membership.body,
+        action: 'products'
+      }
+    ];
+    host.innerHTML = cards.map((card) => {
+      const inner =
+        secondaryIcon(card.kind) +
+        '<p class="nest-secondary-kicker">' + escapeHtml(card.kicker) + '</p>' +
+        '<h3 class="nest-secondary-title">' + escapeHtml(card.title) + '</h3>' +
+        '<p class="nest-secondary-body">' + escapeHtml(card.body) + '</p>';
+      return '<article class="nest-secondary-card"><button type="button" data-secondary-action="' + escapeHtml(card.action) + '">' + inner + '</button></article>';
+    }).join('');
+    host.querySelectorAll('[data-secondary-action]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const act = btn.getAttribute('data-secondary-action');
+        if (act === 'canvas') setTab('canvas');
+        else if (act === 'ask') setTab('ask');
+        else if (act === 'products') setTab('products');
+        else if (act === 'journey') setTab('journey');
+      });
+    });
+  }
+
+  function guideCardCopy() {
+    if (hasNestPlus()) {
+      return {
+        title: 'Talk it through',
+        body: 'Ask about what is in front of you. Your Nest Plus guide is ready when you are.'
+      };
+    }
+    return {
+      title: 'Talk it through',
+      body: 'A place to bring hard questions. Included with Nest Plus.'
+    };
+  }
+
+  function membershipCardCopy() {
+    // Free Nest includes the First Flight *workbook* for everyone.
+    // The First Flight *session* ($149) is a separate entitlement — do not imply it is free.
+    if (entitlements.has('nest_premium') || entitlements.has('solo_course')) {
+      return {
+        title: 'What you have',
+        body: 'Your Nest includes Solo and live coaching when those are open for you.'
+      };
+    }
+    if (hasNestPlus()) {
+      return {
+        title: 'What you have',
+        body: 'Nest Plus: the guide, Life Canvas, the full Inner Compass read, and related tools.'
+      };
+    }
+    return {
+      title: 'What you have',
+      body: 'Free Nest includes My Journey, coaching notes, and the First Flight workbook.'
+    };
   }
 
   function renderNextSteps() {
@@ -1659,10 +1967,11 @@
     if (!el) return;
     const plan = planInfo();
     const plus = plan.name !== 'Nest';
-    el.textContent = plus ? '✦ ' + plan.name : 'Nest';
+    el.textContent = plus ? plan.name : 'Free Nest';
     el.classList.toggle('is-plus', plus);
     el.title = plan.note;
     el.classList.remove('hidden');
+    el.hidden = false;
   }
 
   function setYoungerYouStatus(msg, kind) {
@@ -2541,6 +2850,42 @@
     }
   }
 
+  function nestAreaForTab(name) {
+    if (name === 'journey') return 'journey';
+    if (name === 'canvas' || name === 'profile') return 'understand';
+    if (name === 'ask' || name === 'live') return 'guide';
+    if (name === 'products') return 'learn';
+    return 'home';
+  }
+
+  function setNestArea(area) {
+    const app = document.getElementById('view-dashboard');
+    if (app) app.dataset.nestArea = area || 'home';
+    document.querySelectorAll('.rail-link[data-nest-area]').forEach((el) => {
+      el.classList.toggle('is-active', el.getAttribute('data-nest-area') === area && !el.classList.contains('dash-tab'));
+    });
+    document.querySelectorAll('.mobile-bar-link').forEach((el) => {
+      el.classList.toggle('is-active', el.getAttribute('data-nest-area') === area);
+    });
+    const understandGroup = document.querySelector('.rail-group[data-rail-group="understand"]');
+    if (understandGroup) understandGroup.classList.toggle('is-open', area === 'understand');
+  }
+
+  function syncNestAreaFromTab(tabName) {
+    if (!tabName) return;
+    setNestArea(nestAreaForTab(tabName));
+  }
+
+  function goHome() {
+    document.querySelectorAll('.dash-tab').forEach((el) => el.classList.remove('active'));
+    document.querySelectorAll('#view-dashboard .tab-pane').forEach((el) => el.classList.remove('active'));
+    setNestArea('home');
+    const dashGrid = document.getElementById('dash-grid');
+    if (dashGrid) dashGrid.classList.remove('is-ask-tab');
+    closeAccountMenu();
+    closeMobileMore();
+  }
+
   // tabs
   function setTab(name) {
     document.querySelectorAll('.dash-tab').forEach((el) => el.classList.remove('active'));
@@ -2549,6 +2894,7 @@
     const pane = document.getElementById(`pane-${name}`);
     if (tab) tab.classList.add('active');
     if (pane) pane.classList.add('active');
+    setNestArea(nestAreaForTab(name));
     const dashGrid = document.getElementById('dash-grid');
     if (dashGrid) dashGrid.classList.toggle('is-ask-tab', name === 'ask');
     const steps = document.getElementById('next-steps-card');
@@ -2560,8 +2906,43 @@
     if (name === 'ask') bootGuide();
     if (name === 'live') void loadLiveCard();
     if (name === 'journey' && window.LilbirdJourney) window.LilbirdJourney.show();
+    closeAccountMenu();
+    closeMobileMore();
   }
   window.__nestSetTab = setTab;
+  window.__nestGoHome = goHome;
+
+  function closeAccountMenu() {
+    const menu = document.getElementById('nest-account-menu');
+    const trigger = document.getElementById('btn-nav-profile');
+    if (menu) menu.hidden = true;
+    if (trigger) trigger.setAttribute('aria-expanded', 'false');
+  }
+
+  function toggleAccountMenu() {
+    const menu = document.getElementById('nest-account-menu');
+    const trigger = document.getElementById('btn-nav-profile');
+    if (!menu || !trigger) return;
+    const open = menu.hidden;
+    menu.hidden = !open;
+    trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+
+  function closeMobileMore() {
+    const more = document.getElementById('nest-mobile-more');
+    const btn = document.getElementById('mobile-more-btn');
+    if (more) more.hidden = true;
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+  }
+
+  function toggleMobileMore() {
+    const more = document.getElementById('nest-mobile-more');
+    const btn = document.getElementById('mobile-more-btn');
+    if (!more || !btn) return;
+    const open = more.hidden;
+    more.hidden = !open;
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
 
   function resetDashboardUi() {
     nestPlusGrantedBy = '';
@@ -2955,8 +3336,55 @@
 
   const btnNavProfile = document.getElementById('btn-nav-profile');
   if (btnNavProfile) {
-    btnNavProfile.addEventListener('click', () => openSettings(false));
+    btnNavProfile.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleAccountMenu();
+    });
   }
+  document.getElementById('nest-account-menu')?.addEventListener('click', (e) => {
+    const item = e.target.closest('[data-account-action]');
+    if (!item) return;
+    const act = item.getAttribute('data-account-action');
+    if (act === 'settings') {
+      closeAccountMenu();
+      openSettings(false);
+    }
+  });
+  document.addEventListener('click', (e) => {
+    const account = document.querySelector('.nest-account');
+    if (account && !account.contains(e.target)) closeAccountMenu();
+  });
+  document.getElementById('rail-home')?.addEventListener('click', () => goHome());
+  document.getElementById('rail-understand')?.addEventListener('click', () => setTab('canvas'));
+  document.querySelectorAll('.mobile-bar-link').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const area = btn.getAttribute('data-nest-area');
+      const tab = btn.getAttribute('data-tab');
+      if (btn.id === 'mobile-more-btn') {
+        toggleMobileMore();
+        return;
+      }
+      if (area === 'home') goHome();
+      else if (tab) setTab(tab);
+    });
+  });
+  document.getElementById('nest-mobile-more')?.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    const tab = btn.getAttribute('data-tab');
+    const act = btn.getAttribute('data-account-action');
+    if (tab) setTab(tab);
+    else if (act === 'settings') {
+      closeMobileMore();
+      openSettings(false);
+    } else if (act === 'tour') {
+      closeMobileMore();
+      document.getElementById('btn-nest-tour')?.click();
+    } else if (act === 'logout') {
+      closeMobileMore();
+      document.getElementById('btn-logout')?.click();
+    }
+  });
   document.getElementById('nest-settings-close')?.addEventListener('click', closeSettings);
   document.getElementById('next-steps-card')?.querySelector('summary')?.addEventListener('click', () => {
     const card = document.getElementById('next-steps-card');
