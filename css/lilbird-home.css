@@ -1902,27 +1902,28 @@ footer, .site-footer {
   box-shadow: inset 0 0 0 2px rgba(245, 200, 66, 0.55);
 }
 .rocks-stage .hotspot-glow {
-  /* Idle shimmer so the stones read as clickable without copy */
-  mix-blend-mode: screen;
-  filter: brightness(1.28) saturate(1.15) contrast(1.02);
-  opacity: 0.42;
-  animation: rock-idle-shimmer 2.8s ease-in-out infinite;
+  /* Gold wash on the stone silhouette — visible on light parchment, unlike screen-blend */
+  background: radial-gradient(circle at 40% 35%, #FFE28A 0%, #F5C842 55%, #D4A017 100%);
+  mix-blend-mode: multiply;
+  filter: none;
+  opacity: 0.55;
+  animation: rock-idle-shimmer 2.6s ease-in-out infinite;
 }
 .rocks-stage .hotspot-glow:nth-child(1) { animation-delay: 0s; }
-.rocks-stage .hotspot-glow:nth-child(2) { animation-delay: 0.45s; }
-.rocks-stage .hotspot-glow:nth-child(3) { animation-delay: 0.9s; }
-.rocks-stage .hotspot-glow:nth-child(4) { animation-delay: 1.35s; }
+.rocks-stage .hotspot-glow:nth-child(2) { animation-delay: 0.4s; }
+.rocks-stage .hotspot-glow:nth-child(3) { animation-delay: 0.8s; }
+.rocks-stage .hotspot-glow:nth-child(4) { animation-delay: 1.2s; }
 .rocks-stage .hotspot-glow.is-lit {
-  opacity: 1;
-  filter: brightness(1.55) saturate(1.3) contrast(1.06);
+  opacity: 0.92;
+  background: radial-gradient(circle at 40% 35%, #FFF3C4 0%, #F5C842 45%, #E0B12A 100%);
   animation: none;
 }
 @keyframes rock-idle-shimmer {
-  0%, 100% { opacity: 0.28; }
-  50% { opacity: 0.55; }
+  0%, 100% { opacity: 0.38; }
+  50% { opacity: 0.72; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .rocks-stage .hotspot-glow { animation: none; opacity: 0.4; }
+  .rocks-stage .hotspot-glow { animation: none; opacity: 0.55; }
 }
 .rocks-stage,
 .nest-tree-stage {
