@@ -911,8 +911,12 @@
               quote: true
             }
           : null,
-        // Opens My Journey — where saved next steps live today (no separate action flow).
-        primary: { label: 'Return to my next step →', action: 'journey' },
+        // Opens the exact reflection that owns this next step (P2a). Falls back to Journey home.
+        primary: {
+          label: 'Return to my next step →',
+          action: 'journey-step',
+          reflectionId: journeySignals.latestStep?.id || ''
+        },
         secondary: { label: 'Browse Learn & grow', action: 'products' }
       };
     } else if (focus === 'reflections') {
@@ -993,9 +997,12 @@
       }
     }
     if (actions) {
+      const reflectionAttr = cfg.primary.reflectionId
+        ? ' data-reflection-id="' + escapeHtml(cfg.primary.reflectionId) + '"'
+        : '';
       const primary = cfg.primary.href
         ? '<a class="btn-primary-nest" href="' + escapeHtml(cfg.primary.href) + '">' + escapeHtml(cfg.primary.label) + '</a>'
-        : '<button type="button" class="btn-primary-nest" data-chapter-action="' + escapeHtml(cfg.primary.action) + '">' + escapeHtml(cfg.primary.label) + '</button>';
+        : '<button type="button" class="btn-primary-nest" data-chapter-action="' + escapeHtml(cfg.primary.action) + '"' + reflectionAttr + '>' + escapeHtml(cfg.primary.label) + '</button>';
       const secondary = cfg.secondary
         ? (cfg.secondary.href
           ? '<a class="btn-quiet" href="' + escapeHtml(cfg.secondary.href) + '">' + escapeHtml(cfg.secondary.label) + '</a>'
@@ -1005,7 +1012,8 @@
       actions.querySelectorAll('[data-chapter-action]').forEach((btn) => {
         btn.addEventListener('click', () => {
           const act = btn.getAttribute('data-chapter-action');
-          if (act === 'journey') setTab('journey');
+          if (act === 'journey-step') returnToNextStep(btn.getAttribute('data-reflection-id') || '');
+          else if (act === 'journey') setTab('journey');
           else if (act === 'compass') openInnerCompassRead();
           else if (act === 'canvas') setTab('canvas');
           else if (act === 'products') setTab('products');
@@ -1013,6 +1021,27 @@
         });
       });
     }
+  }
+
+  function rememberReflectionDeepLink(reflectionId) {
+    const id = String(reflectionId || '').trim();
+    try {
+      const url = new URL(window.location.href);
+      if (id) url.searchParams.set('reflection', id);
+      else url.searchParams.delete('reflection');
+      window.history.replaceState(null, '', url.pathname + url.search + url.hash);
+    } catch (_) {}
+  }
+
+  function returnToNextStep(reflectionId) {
+    const id = String(reflectionId || journeySignals.latestStep?.id || '').trim();
+    if (window.LilbirdJourney && typeof window.LilbirdJourney.focusReflection === 'function') {
+      void window.LilbirdJourney.focusReflection(id, { announce: true });
+      return;
+    }
+    // Journey module not ready yet — leave a deep link for refresh() / maybeOpenDeepLink.
+    rememberReflectionDeepLink(id);
+    setTab('journey');
   }
 
   function secondaryIcon(kind) {

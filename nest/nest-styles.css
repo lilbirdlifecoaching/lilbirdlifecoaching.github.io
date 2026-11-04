@@ -1121,12 +1121,29 @@ body.nest-page { line-height: 1.5; }
   color: var(--gold-dim);
 }
 .journey-reflection header { display: flex; justify-content: space-between; gap: 0.75rem; align-items: baseline; }
-.journey-card-step { margin: 0; }
+.journey-card-step { margin: 0; overflow-wrap: anywhere; }
 .journey-reflection details { display: grid; gap: 0.45rem; }
 .journey-reflection summary {
   cursor: pointer;
   color: var(--gold);
   width: fit-content;
+}
+.journey-reflection.is-returning {
+  border-color: rgba(245, 200, 66, 0.42);
+  outline: 2px solid rgba(245, 200, 66, 0.28);
+  outline-offset: 2px;
+}
+.journey-reflection.is-returning .journey-card-step {
+  color: var(--text-main);
+  line-height: 1.45;
+}
+html[data-theme="light"] .journey-reflection.is-returning {
+  border-color: rgba(176, 120, 24, 0.4);
+  outline-color: rgba(176, 120, 24, 0.28);
+  background: rgba(255, 248, 230, 0.45);
+}
+@media (prefers-reduced-motion: reduce) {
+  .journey-reflection.is-returning { scroll-margin-block: 0; }
 }
 .journey-empty, .journey-status { color: var(--text-muted); margin: 0; }
 .journey-back { justify-self: start; }
