@@ -61,7 +61,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/lilbird-tokens.css?v=20260917k" />
-  <link rel="stylesheet" href="/css/lilbird-home.css?v=20261103b" />
+  <link rel="stylesheet" href="/css/lilbird-home.css?v=20261103c" />
   <link rel="stylesheet" href="/css/lilbird-chat.css?v=20260917k" />
   <!-- Google Tag Manager -->
   <script src="/lilbird-gtm-id.js"></script>
@@ -297,16 +297,16 @@
     <div class="rocks-stage reveal reveal-delay-2" id="rocks-stage">
       <img class="rocks-art" src="/images/home/backpack-rocks.jpg" alt="A sketched blue backpack on the floor with rocks and Big Bird spilling out" width="1024" height="682" loading="lazy" decoding="async" />
       <div class="hotspot-glows" aria-hidden="true">
-        <img class="hotspot-glow" data-glow="rock-1" src="/images/home/hotspots/rock-1-full.png" alt="" width="1024" height="682" decoding="async" />
-        <img class="hotspot-glow" data-glow="rock-2" src="/images/home/hotspots/rock-2-full.png" alt="" width="1024" height="682" decoding="async" />
-        <img class="hotspot-glow" data-glow="rock-3" src="/images/home/hotspots/rock-3-full.png" alt="" width="1024" height="682" decoding="async" />
-        <img class="hotspot-glow" data-glow="rock-4" src="/images/home/hotspots/rock-4-full.png" alt="" width="1024" height="682" decoding="async" />
+        <img class="hotspot-glow" data-glow="rock-1" src="/images/home/backpack-rocks.jpg" data-hit="/images/home/hotspots/rock-1-hit.png" style="--hotspot-mask:url('/images/home/hotspots/rock-1-full.png')" alt="" width="1024" height="682" decoding="async" />
+        <img class="hotspot-glow" data-glow="rock-2" src="/images/home/backpack-rocks.jpg" data-hit="/images/home/hotspots/rock-2-hit.png" style="--hotspot-mask:url('/images/home/hotspots/rock-2-full.png')" alt="" width="1024" height="682" decoding="async" />
+        <img class="hotspot-glow" data-glow="rock-3" src="/images/home/backpack-rocks.jpg" data-hit="/images/home/hotspots/rock-3-hit.png" style="--hotspot-mask:url('/images/home/hotspots/rock-3-full.png')" alt="" width="1024" height="682" decoding="async" />
+        <img class="hotspot-glow" data-glow="rock-4" src="/images/home/backpack-rocks.jpg" data-hit="/images/home/hotspots/rock-4-hit.png" style="--hotspot-mask:url('/images/home/hotspots/rock-4-full.png')" alt="" width="1024" height="682" decoding="async" />
       </div>
       <div class="hotspot-targets">
-        <button type="button" class="art-hotspot" data-glow="rock-1" data-phrase="I know something needs to change. I just can't name what." data-href="/articles/how-do-you-know-youre-ready-for-life-coaching.html" aria-label="Rock: I know something needs to change" style="left:26.5%;top:71.5%;width:16%;height:16.5%"></button>
-        <button type="button" class="art-hotspot" data-glow="rock-2" data-phrase="I keep having the same conversations with myself and going nowhere." data-href="/articles/stuck-between-two-paths.html" aria-label="Rock: same conversations going nowhere" style="left:43.5%;top:69%;width:15%;height:16.5%"></button>
-        <button type="button" class="art-hotspot" data-glow="rock-3" data-phrase="On paper, my life looks fine. From the inside, it doesn't feel like mine." data-href="/articles/on-paper-my-life-looks-fine.html" aria-label="Rock: on paper my life looks fine" style="left:56.5%;top:50%;width:19%;height:18%"></button>
-        <button type="button" class="art-hotspot" data-glow="rock-4" data-phrase="I'm not in crisis. I'm just stuck. And I'm tired of it." data-href="/articles/feeling-stuck-in-your-late-twenties.html" aria-label="Rock: not in crisis, just stuck" style="left:72.5%;top:66.5%;width:21%;height:27.5%"></button>
+        <button type="button" class="art-hotspot" data-glow="rock-1" data-phrase="I know something needs to change. I just can't name what." data-href="/articles/how-do-you-know-youre-ready-for-life-coaching.html" aria-label="Rock: I know something needs to change" style="left:20%;top:66%;width:23%;height:19%"></button>
+        <button type="button" class="art-hotspot" data-glow="rock-2" data-phrase="I keep having the same conversations with myself and going nowhere." data-href="/articles/stuck-between-two-paths.html" aria-label="Rock: same conversations going nowhere" style="left:39%;top:66%;width:16.5%;height:18.5%"></button>
+        <button type="button" class="art-hotspot" data-glow="rock-3" data-phrase="On paper, my life looks fine. From the inside, it doesn't feel like mine." data-href="/articles/on-paper-my-life-looks-fine.html" aria-label="Rock: on paper my life looks fine" style="left:53%;top:46%;width:23%;height:22%"></button>
+        <button type="button" class="art-hotspot" data-glow="rock-4" data-phrase="I'm not in crisis. I'm just stuck. And I'm tired of it." data-href="/articles/feeling-stuck-in-your-late-twenties.html" aria-label="Rock: not in crisis, just stuck" style="left:70%;top:63%;width:25%;height:27%"></button>
       </div>
       <div class="rock-pop" id="rock-pop" hidden>
         <p class="rock-pop-kicker">One of the rocks</p>
@@ -339,14 +339,14 @@
         <div class="nest-tree-stage" id="nest-tree-stage">
           <img src="/images/home/nest-tree.jpg" alt="Sketch of a tree with a high nest, birdhouse, and flock of birds" width="864" height="1152" loading="lazy" decoding="async" />
           <div class="hotspot-glows" aria-hidden="true">
-            <img class="hotspot-glow" data-glow="tree-nest" src="/images/home/hotspots/tree-nest-full.png" alt="" width="864" height="1152" decoding="async" />
-            <img class="hotspot-glow" data-glow="tree-house" src="/images/home/hotspots/tree-house-full.png" alt="" width="864" height="1152" decoding="async" />
-            <img class="hotspot-glow" data-glow="tree-birds" src="/images/home/hotspots/tree-birds-full.png" alt="" width="864" height="1152" decoding="async" />
+            <img class="hotspot-glow" data-glow="tree-nest" src="/images/home/nest-tree.jpg" data-hit="/images/home/hotspots/tree-nest-hit.png" style="--hotspot-mask:url('/images/home/hotspots/tree-nest-full.png')" alt="" width="864" height="1152" decoding="async" />
+            <img class="hotspot-glow" data-glow="tree-house" src="/images/home/nest-tree.jpg" data-hit="/images/home/hotspots/tree-house-hit.png" style="--hotspot-mask:url('/images/home/hotspots/tree-house-full.png')" alt="" width="864" height="1152" decoding="async" />
+            <img class="hotspot-glow" data-glow="tree-birds" src="/images/home/nest-tree.jpg" data-hit="/images/home/hotspots/tree-birds-hit.png" style="--hotspot-mask:url('/images/home/hotspots/tree-birds-full.png')" alt="" width="864" height="1152" decoding="async" />
           </div>
           <div class="hotspot-targets">
-            <button type="button" class="art-hotspot" data-glow="tree-nest" data-title="Nest" data-body="Free home base. See yourself clearly and keep what you find." aria-label="Nest: free home base" style="left:45.5%;top:14.5%;width:21%;height:14%"></button>
-            <button type="button" class="art-hotspot" data-glow="tree-house" data-title="Nest Plus" data-body="Deeper tools on your own time. $7.99 a month." aria-label="Nest Plus" style="left:35%;top:48%;width:9%;height:10%"></button>
-            <button type="button" class="art-hotspot" data-glow="tree-birds" data-title="Nest Premium" data-body="Live group coaching with others on the path, when open." aria-label="Nest Premium" style="left:66%;top:7%;width:20.5%;height:12.5%"></button>
+            <button type="button" class="art-hotspot" data-glow="tree-nest" data-title="Nest" data-body="Free home base. See yourself clearly and keep what you find." aria-label="Nest: free home base" style="left:46%;top:15%;width:21%;height:13%"></button>
+            <button type="button" class="art-hotspot" data-glow="tree-house" data-title="Nest Plus" data-body="Deeper tools on your own time. $7.99 a month." aria-label="Nest Plus" style="left:35%;top:48%;width:11%;height:10%"></button>
+            <button type="button" class="art-hotspot" data-glow="tree-birds" data-title="Nest Premium" data-body="Live group coaching with others on the path, when open." aria-label="Nest Premium" style="left:64%;top:5%;width:24%;height:16%"></button>
           </div>
           <div class="tree-tip-pop" id="tree-tip-pop" hidden>
             <strong class="tree-tip-title" id="tree-tip-title"></strong>
@@ -574,7 +574,7 @@
 <script src="/first-flight-booking.js"></script>
 <script src="/lb-chat-safe.js"></script>
 <script src="/js/lilbird-theme.js?v=20261103a"></script>
-<script src="/js/lilbird-home.js?v=20261103b"></script>
+<script src="/js/lilbird-home.js?v=20261103c"></script>
 <script src="/js/lilbird-chat.js"></script>
 </body>
 </html>
