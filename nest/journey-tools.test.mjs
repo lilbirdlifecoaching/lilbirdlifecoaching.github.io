@@ -139,7 +139,8 @@ test('the page keeps recommendation text out of storage and out of the reflectio
   assert.match(page, /id="journey-recommend"/);
   assert.match(page, /recommendTools\(state\.recommendText\)/);
   assert.equal(page.includes('localStorage'), false);
-  assert.match(page, /searchParams\.delete\('tool'\)/);
+  assert.match(page, /clearJourneyParams\(\['tool', 'reflection'\]\)/);
+  assert.match(page, /focusReflection/);
   assert.match(page, /__nestSkipTourForTool = true/);
   assert.match(tour, /if \(window\.__nestSkipTourForTool\) return;/);
   assert.match(styles, /\.journey-filters \{ display: flex; flex-wrap: wrap;/);

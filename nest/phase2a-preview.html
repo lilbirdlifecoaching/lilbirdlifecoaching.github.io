@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nest P2a preview — return to next step</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:wght@400;500&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./nest-styles.css?v=48" />
+  <link rel="stylesheet" href="../css/lilbird-nest-redesign.css" />
+  <style>
+    body { margin: 0; font-family: "Source Sans 3", system-ui, sans-serif; background: var(--dark-bg, #1a1612); color: var(--text-main, #f5f0e8); }
+    html[data-theme="light"] body { background: #f7f2ea; color: #2a241c; }
+    .preview-bar {
+      display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
+      padding: 0.75rem 1rem; border-bottom: 1px solid rgba(245,200,66,0.25);
+      position: sticky; top: 0; z-index: 5; backdrop-filter: blur(8px);
+      background: rgba(20,16,12,0.85);
+    }
+    html[data-theme="light"] .preview-bar { background: rgba(247,242,234,0.92); }
+    .preview-bar button {
+      font: inherit; cursor: pointer; border-radius: 999px; padding: 0.35rem 0.75rem;
+      border: 1px solid rgba(245,200,66,0.35); background: transparent; color: inherit;
+    }
+    .preview-bar button.is-on { background: rgba(245,200,66,0.2); border-color: rgba(245,200,66,0.7); }
+    .preview-frame { max-width: 920px; margin: 0 auto; padding: 1.25rem 1rem 3rem; }
+    .status { color: var(--text-muted, #b7aea0); margin: 0 0 1rem; }
+  </style>
+</head>
+<body>
+  <div class="preview-bar">
+    <strong>P2a preview</strong>
+    <button type="button" data-scene="found" class="is-on">Found next step</button>
+    <button type="button" data-scene="long">Long next step</button>
+    <button type="button" data-scene="missing">Deleted reflection</button>
+    <button type="button" data-scene="empty">No reflections</button>
+    <button type="button" data-theme-toggle>Day / Night</button>
+  </div>
+  <div class="preview-frame">
+    <p class="status" id="scene-status" role="status">Here is the next step you saved.</p>
+    <div id="pane-journey"></div>
+  </div>
+  <script>
+    const scenes = {
+      found: {
+        status: 'Here is the next step you saved.',
+        html: journeyHome([
+          card('r2', 'Boundary Untangler', '20 Feb 2026', 'Write the letter this weekend.', true, 'I will answer work chat in the morning.'),
+          card('r1', 'Name the Need', '1 Feb 2026', 'Turn off chat after 7pm.', false, 'Evenings that are actually off.')
+        ])
+      },
+      long: {
+        status: 'Here is the next step you saved.',
+        html: journeyHome([
+          card(
+            'r-long',
+            'A Softer Story',
+            '18 Feb 2026',
+            'Sit with the sentence I wrote for little me, then take one kind action this week that protects the quiet hour after dinner even when the group chat keeps buzzing and the deadline feels loud.',
+            true,
+            'I can choose a smaller, kinder pace.'
+          )
+        ])
+      },
+      missing: {
+        status: 'That reflection is no longer in your Journey. Your other reflections are below.',
+        html: journeyHome([
+          card('r1', 'Name the Need', '1 Feb 2026', 'Turn off chat after 7pm.', false, 'Evenings that are actually off.')
+        ])
+      },
+      empty: {
+        status: 'Open a saved reflection below, or begin a new exercise.',
+        html: journeyHome([])
+      }
+    };
+
+    function card(id, title, when, step, focused, field) {
+      return (
+        '<article class="journey-reflection' + (focused ? ' is-returning' : '') + '" id="reflection-' + id + '"' +
+          (focused ? ' aria-current="true"' : '') + '>' +
+          '<header><h4>' + title + '</h4><time>' + when + '</time></header>' +
+          '<p class="journey-card-step"><span>Next step</span> ' + step + '</p>' +
+          '<details' + (focused ? ' open' : '') + '><summary>Open this reflection</summary>' +
+          '<p><span>Need</span> ' + field + '</p></details>' +
+          '<button type="button" class="btn btn-outline">Delete</button>' +
+        '</article>'
+      );
+    }
+
+    function journeyHome(cards) {
+      const reflections = cards.length
+        ? cards.join('')
+        : '<p class="journey-empty">Nothing saved yet. You can finish an exercise and leave it unsaved.</p>';
+      return (
+        '<div class="journey-home">' +
+          '<p class="journey-kicker">tools for the tangle</p>' +
+          '<h2>Find a little clarity</h2>' +
+          '<p class="journey-lead">Whatever feels tangled today, there’s a place to begin.</p>' +
+          '<section class="journey-block journey-saved" id="journey-reflections"><h3>Saved reflections</h3>' +
+            reflections + '</section>' +
+        '</div>'
+      );
+    }
+
+    function apply(scene) {
+      const cfg = scenes[scene] || scenes.found;
+      document.getElementById('scene-status').textContent = cfg.status;
+      document.getElementById('pane-journey').innerHTML = cfg.html;
+      document.querySelectorAll('[data-scene]').forEach((btn) => {
+        btn.classList.toggle('is-on', btn.getAttribute('data-scene') === scene);
+      });
+    }
+
+    document.querySelectorAll('[data-scene]').forEach((btn) => {
+      btn.addEventListener('click', () => apply(btn.getAttribute('data-scene')));
+    });
+    document.querySelector('[data-theme-toggle]').addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      document.documentElement.style.colorScheme = next;
+    });
+    apply('found');
+  </script>
+</body>
+</html>

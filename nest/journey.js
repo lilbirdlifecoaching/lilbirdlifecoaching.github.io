@@ -7,6 +7,11 @@ import {
 } from './journey-reflect.js?v=4';
 import { createJourneySession, saveOutcome } from './journey-session.js';
 import {
+  FOCUS_FOUND_STATUS,
+  FOCUS_MISSING_STATUS,
+  resolveFocusReflection,
+} from './journey-focus.js?v=1';
+import {
   categoryLabel,
   recommendTools,
   reflectionView,
@@ -18,8 +23,11 @@ import {
 const session = createJourneySession();
 let linkHandled = false;
 
-if (new URLSearchParams(window.location.search).has('tool')) {
-  window.__nestSkipTourForTool = true;
+{
+  const bootParams = new URLSearchParams(window.location.search);
+  if (bootParams.has('tool') || bootParams.has('reflection')) {
+    window.__nestSkipTourForTool = true;
+  }
 }
 
 const state = {
@@ -244,12 +252,14 @@ function reflectionHtml(row) {
   const view = reflectionView(row);
   const body = view.fields.map((field) => '<p><span>' + escapeHtml(field.label) + '</span> ' + escapeHtml(field.value) + '</p>').join('');
   const note = view.insight ? '<p class="journey-note"><span>Coaching note</span> ' + escapeHtml(view.insight) + '</p>' : '';
+  const focused = state.highlightId === row.id;
   const stepLine = '<p class="journey-card-step"><span>Next step</span> ' + escapeHtml(view.nextStep || 'Not named') + '</p>';
   return (
-    '<article class="journey-reflection" id="reflection-' + escapeHtml(row.id) + '">' +
+    '<article class="journey-reflection' + (focused ? ' is-returning' : '') + '" id="reflection-' + escapeHtml(row.id) + '"' +
+      (focused ? ' aria-current="true"' : '') + '>' +
       '<header><h4>' + escapeHtml(view.title) + '</h4><time>' + escapeHtml(formatWhen(row.created_at)) + '</time></header>' +
       stepLine +
-      '<details' + (state.highlightId === row.id ? ' open' : '') + '><summary>Open this reflection</summary>' + body + note + '</details>' +
+      '<details' + (focused ? ' open' : '') + '><summary>Open this reflection</summary>' + body + note + '</details>' +
       '<button type="button" class="btn btn-outline" data-delete-reflection="' + escapeHtml(row.id) + '">Delete</button>' +
     '</article>'
   );
@@ -554,8 +564,15 @@ async function deleteReflection(id) {
     return;
   }
   state.rows = state.rows.filter((row) => row.id !== id);
+  if (state.highlightId === id) state.highlightId = '';
   state.status = 'Deleted.';
   render();
+}
+
+function scrollToReflectionCard(card) {
+  if (!card) return;
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  card.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'nearest' });
 }
 
 function openReflection(id) {
@@ -563,27 +580,94 @@ function openReflection(id) {
   if (!card) return;
   const details = card.querySelector('details');
   if (details) details.open = true;
-  card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  card.classList.add('is-returning');
+  card.setAttribute('aria-current', 'true');
+  scrollToReflectionCard(card);
 }
 
-function clearToolParam() {
+/**
+ * Open My Journey on a specific saved reflection (Home "Return to my next step").
+ * Falls back to the Journey home list when the id is missing or deleted.
+ */
+async function focusReflection(preferredId, options) {
+  const opts = options && typeof options === 'object' ? options : {};
+  const announce = opts.announce !== false;
+  if (!currentMemberId()) {
+    host()?.setTab('journey');
+    return { status: 'none' };
+  }
+
+  host()?.setTab('journey');
+  state.mode = 'home';
+  state.toolId = '';
+  state.stage = 0;
+  state.draft = {};
+  state.insight = '';
+  state.insightFromModel = false;
+  state.busy = false;
+  state.savedId = '';
+  state.savedTitle = '';
+
+  await loadRows();
+  // Resolve only against rows already scoped to the signed-in member (RLS + user_id filter).
+  const resolved = resolveFocusReflection(state.rows, preferredId);
+
+  if (resolved.status === 'found') {
+    state.highlightId = resolved.reflection.id;
+    state.status = announce ? FOCUS_FOUND_STATUS : '';
+    render();
+    openReflection(resolved.reflection.id);
+    return resolved;
+  }
+
+  state.highlightId = '';
+  if (resolved.status === 'missing' || resolved.status === 'invalid') {
+    // Same copy for deleted, foreign, and malformed ids — no existence leak.
+    state.status = FOCUS_MISSING_STATUS;
+  } else {
+    state.status = announce ? 'Open a saved reflection below, or begin a new exercise.' : '';
+  }
+  render();
+  const list = document.getElementById('journey-reflections');
+  if (list) scrollToReflectionCard(list);
+  return resolved;
+}
+
+function clearJourneyParams(keys) {
   const url = new URL(window.location.href);
-  if (!url.searchParams.has('tool')) return;
-  url.searchParams.delete('tool');
+  let changed = false;
+  (keys || []).forEach((key) => {
+    if (url.searchParams.has(key)) {
+      url.searchParams.delete(key);
+      changed = true;
+    }
+  });
+  if (!changed) return;
   window.history.replaceState(null, '', url.pathname + url.search + url.hash);
 }
 
 function maybeOpenDeepLink() {
   if (linkHandled || !currentMemberId()) return false;
   const params = new URLSearchParams(window.location.search);
-  if (!params.has('tool')) {
+  const reflectionId = params.get('reflection');
+  const toolParam = params.get('tool');
+
+  if (!reflectionId && !toolParam) {
     linkHandled = true;
     return false;
   }
-  const resolved = resolveToolLink(params.get('tool'));
+
   window.__nestSkipTourForTool = true;
-  clearToolParam();
+  clearJourneyParams(['tool', 'reflection']);
   linkHandled = true;
+
+  if (reflectionId) {
+    // Malformed / foreign ids resolve to the same safe fallback inside focusReflection.
+    void focusReflection(reflectionId, { announce: true });
+    return true;
+  }
+
+  const resolved = resolveToolLink(toolParam);
   if (!resolved.ok) {
     state.mode = 'home';
     state.toolId = '';
@@ -624,7 +708,11 @@ function onClick(event) {
   else if ('save' in target.dataset) void saveReflection();
   else if ('viewSaved' in target.dataset) void viewSaved();
   else if (target.dataset.deleteReflection) void deleteReflection(target.dataset.deleteReflection);
-  else if (target.dataset.openReflection) openReflection(target.dataset.openReflection);
+  else if (target.dataset.openReflection) {
+    state.highlightId = target.dataset.openReflection;
+    render();
+    openReflection(target.dataset.openReflection);
+  }
 }
 
 function onInput(event) {
@@ -693,6 +781,9 @@ window.LilbirdJourney = {
   openTool(toolId) {
     host()?.setTab('journey');
     startTool(toolId);
+  },
+  focusReflection(preferredId, options) {
+    return focusReflection(preferredId, options);
   },
 };
 
