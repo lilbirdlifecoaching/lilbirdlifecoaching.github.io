@@ -1829,24 +1829,70 @@ footer, .site-footer {
 
 /* ─── Rocks / backpack recognition ─── */
 .rocks-section { max-width: 920px; }
+.rocks-mobile-hint {
+  display: none;
+  margin-bottom: 0;
+}
 .rocks-stage {
   position: relative;
   margin-top: 1.5rem;
+}
+.rocks-art-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1536 / 1024;
   border-radius: 8px;
   overflow: hidden;
   background: #f3efe6;
   line-height: 0;
   border: 1px solid rgba(17, 17, 17, 0.08);
 }
-[data-theme="dark"] .rocks-stage {
+[data-theme="dark"] .rocks-art-frame {
   background: #1a1814;
   border-color: rgba(245, 200, 66, 0.14);
 }
 .rocks-art {
-  width: 100%;
-  height: auto;
   display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
+.rocks-hotspots {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  z-index: 2;
+}
+.rock-path {
+  cursor: pointer;
+  fill: transparent;
+  stroke: transparent;
+  stroke-width: 6;
+  transition: fill 0.2s ease, stroke 0.2s ease, stroke-width 0.2s ease;
+}
+.rock-path:hover,
+.rock-path:focus-visible,
+.rock-path.is-active {
+  fill: rgba(245, 200, 66, 0.16);
+  stroke: #d49a22;
+  outline: none;
+}
+.rock-path:focus-visible {
+  stroke-width: 9;
+  stroke: #F5C842;
+}
+.rock-path.is-intro {
+  fill: rgba(245, 200, 66, 0.2);
+  stroke: #F5C842;
+  stroke-width: 7;
+}
+/* Debug: ?rocks-debug=1 */
+.rocks-debug .rock-path[data-rock="1"] { fill: rgba(255, 200, 40, 0.35); stroke: #e0a800; stroke-width: 3; }
+.rocks-debug .rock-path[data-rock="2"] { fill: rgba(40, 200, 255, 0.35); stroke: #0090c0; stroke-width: 3; }
+.rocks-debug .rock-path[data-rock="3"] { fill: rgba(255, 60, 180, 0.35); stroke: #c00080; stroke-width: 3; }
+.rocks-debug .rock-path[data-rock="4"] { fill: rgba(80, 220, 100, 0.35); stroke: #208040; stroke-width: 3; }
 .hotspot-glows {
   position: absolute;
   inset: 0;
@@ -1861,7 +1907,6 @@ footer, .site-footer {
   object-fit: fill;
   opacity: 0;
   transition: opacity 0.18s ease, filter 0.18s ease;
-  /* Masked copy of the base art — brightens the object, never covers the drawing with a plate */
   -webkit-mask-image: var(--hotspot-mask);
   mask-image: var(--hotspot-mask);
   -webkit-mask-size: 100% 100%;
@@ -1871,11 +1916,8 @@ footer, .site-footer {
   filter: brightness(1.38) saturate(1.2) contrast(1.06);
   mix-blend-mode: soft-light;
 }
-.hotspot-glow.is-lit {
-  opacity: 1;
-}
+.hotspot-glow.is-lit { opacity: 1; }
 .nest-tree-stage .hotspot-glow {
-  /* Screen keeps the etched tree visible while lifting nest / birds / house */
   mix-blend-mode: screen;
   filter: brightness(1.45) saturate(1.4) contrast(1.05);
 }
@@ -1893,7 +1935,6 @@ footer, .site-footer {
   background: transparent;
   cursor: pointer;
   outline: none;
-  /* Keyboard focus only — mouse uses pixel hit-testing on the art */
   pointer-events: none;
   appearance: none;
   -webkit-appearance: none;
@@ -1901,19 +1942,24 @@ footer, .site-footer {
 .art-hotspot:focus-visible {
   box-shadow: inset 0 0 0 2px rgba(245, 200, 66, 0.55);
 }
-.rocks-stage .hotspot-glow {
-  /* Same screen blend as the tree — brighten the stone, keep the drawing */
-  mix-blend-mode: screen;
-  filter: brightness(1.45) saturate(1.25) contrast(1.05);
+.nest-tree-stage { cursor: default; }
+.nest-tree-stage.is-hot { cursor: pointer; }
+.rock-tip {
+  position: absolute;
+  z-index: 4;
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+  background: rgba(18, 16, 14, 0.92);
+  color: #F5C842;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  pointer-events: none;
+  transform: translate(-50%, calc(-100% - 10px));
+  white-space: nowrap;
 }
-.rocks-stage,
-.nest-tree-stage {
-  cursor: default;
-}
-.rocks-stage.is-hot,
-.nest-tree-stage.is-hot {
-  cursor: pointer;
-}
+.rock-tip[hidden] { display: none !important; }
 .rock-pop {
   position: absolute;
   z-index: 5;
@@ -1925,6 +1971,7 @@ footer, .site-footer {
   box-shadow: 0 14px 32px rgba(0, 0, 0, 0.35);
   transform: translate(-50%, calc(-100% - 14px));
   pointer-events: auto;
+  line-height: 1.35;
 }
 .rock-pop[hidden] { display: none !important; }
 .rock-pop::after {
@@ -1970,6 +2017,40 @@ footer, .site-footer {
   cursor: pointer;
   font-size: 0.85rem;
   line-height: 1;
+}
+.rocks-fallback {
+  display: none;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+  margin-top: 0.85rem;
+}
+.rocks-fallback-btn {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.7rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  background: rgba(245, 200, 66, 0.08);
+  color: var(--text-main);
+  cursor: pointer;
+}
+[data-theme="dark"] .rocks-fallback-btn {
+  border-color: rgba(245, 200, 66, 0.22);
+  background: rgba(245, 200, 66, 0.1);
+}
+@media (max-width: 720px) {
+  .rocks-mobile-hint { display: block; }
+  .rocks-fallback { display: grid; }
+  .rock-path {
+    stroke: rgba(212, 154, 34, 0.45);
+    stroke-width: 4;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rock-path { transition: none; }
+  .rock-path.is-intro { fill: transparent; stroke: transparent; }
 }
 
 /* ─── Nest showcase ─── */

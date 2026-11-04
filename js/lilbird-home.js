@@ -486,46 +486,132 @@
 
   function initRockHotspots() {
     var stage = document.getElementById('rocks-stage');
+    var frame = stage && stage.querySelector('.rocks-art-frame');
     var pop = document.getElementById('rock-pop');
-    if (!stage || !pop) return;
-    var phrase = document.getElementById('rock-pop-phrase');
-    var link = document.getElementById('rock-pop-link');
+    var tip = document.getElementById('rock-tip');
+    if (!stage || !frame || !pop) return;
+
+    var ROCKS = {
+      '1': {
+        label: 'Uncertainty',
+        kicker: 'One of the rocks',
+        phrase: 'I know something needs to change. I just can\'t name what.',
+        href: '/articles/how-do-you-know-youre-ready-for-life-coaching.html'
+      },
+      '2': {
+        label: 'Overthinking',
+        kicker: 'One of the rocks',
+        phrase: 'I keep having the same conversations with myself and going nowhere.',
+        href: '/articles/stuck-between-two-paths.html'
+      },
+      '3': {
+        label: 'Disconnection',
+        kicker: 'One of the rocks',
+        phrase: 'On paper, my life looks fine. From the inside, it doesn\'t feel like mine.',
+        href: '/articles/on-paper-my-life-looks-fine.html'
+      },
+      '4': {
+        label: 'Feeling stuck',
+        kicker: 'One of the rocks',
+        phrase: 'I\'m not in crisis. I\'m just stuck. And I\'m tired of it.',
+        href: '/articles/feeling-stuck-in-your-late-twenties.html'
+      }
+    };
+
+    var paths = Array.prototype.slice.call(stage.querySelectorAll('.rock-path'));
+    var phraseEl = document.getElementById('rock-pop-phrase');
+    var kickerEl = document.getElementById('rock-pop-kicker');
+    var linkEl = document.getElementById('rock-pop-link');
     var closeBtn = pop.querySelector('[data-rock-close]');
-    var controller = null;
+    var activeId = null;
+    var lastTrigger = null;
+
+    if (/(?:^|[?&])rocks-debug=1(?:&|$)/.test(location.search)) {
+      document.documentElement.classList.add('rocks-debug');
+    }
+
+    function placeOver(el, path) {
+      var frameRect = frame.getBoundingClientRect();
+      var rockRect = path.getBoundingClientRect();
+      el.style.left = (((rockRect.left + rockRect.width / 2 - frameRect.left) / frameRect.width) * 100) + '%';
+      el.style.top = (((rockRect.top - frameRect.top) / frameRect.height) * 100) + '%';
+    }
+
+    function clearActive() {
+      paths.forEach(function (p) { p.classList.remove('is-active'); });
+    }
+
+    function hideTip() {
+      if (tip) tip.hidden = true;
+    }
+
+    function showTip(path, data) {
+      if (!tip || !data) return;
+      tip.textContent = data.label;
+      placeOver(tip, path);
+      tip.hidden = false;
+    }
 
     function closePop() {
       pop.hidden = true;
-      if (controller) controller.clear();
+      clearActive();
+      activeId = null;
+      if (lastTrigger && typeof lastTrigger.focus === 'function') {
+        try { lastTrigger.focus(); } catch (err) {}
+      }
     }
 
-    function openPop(target) {
-      if (!target) return;
-      if (phrase) phrase.textContent = target.getAttribute('data-phrase') || '';
-      if (link) link.setAttribute('href', target.getAttribute('data-href') || '#');
-      var stageRect = stage.getBoundingClientRect();
-      var rockRect = target.getBoundingClientRect();
-      pop.style.left = (((rockRect.left + rockRect.width / 2 - stageRect.left) / stageRect.width) * 100) + '%';
-      pop.style.top = (((rockRect.top - stageRect.top) / stageRect.height) * 100) + '%';
+    function openRock(id, trigger) {
+      var data = ROCKS[id];
+      var path = stage.querySelector('#rock-' + id);
+      if (!data || !path) return;
+      lastTrigger = trigger || path;
+      clearActive();
+      path.classList.add('is-active');
+      activeId = id;
+      if (kickerEl) kickerEl.textContent = data.kicker;
+      if (phraseEl) phraseEl.textContent = data.phrase;
+      if (linkEl) linkEl.setAttribute('href', data.href);
+      placeOver(pop, path);
+      hideTip();
       pop.hidden = false;
+      if (closeBtn) closeBtn.focus();
     }
 
-    controller = bindPixelHotspots(stage, {
-      onActivate: function (target, key, changed) {
-        if (!target) {
-          pop.hidden = true;
-          return;
-        }
-        openPop(target);
-      },
-      onClear: function () { pop.hidden = true; },
-      onClick: function (target) {
-        if (!pop.hidden && phrase && phrase.textContent === (target.getAttribute('data-phrase') || '')) {
-          var href = target.getAttribute('data-href');
+    paths.forEach(function (path) {
+      var id = path.getAttribute('data-rock');
+      path.addEventListener('pointerenter', function (e) {
+        if (e.pointerType === 'touch') return;
+        showTip(path, ROCKS[id]);
+      });
+      path.addEventListener('pointerleave', function () {
+        hideTip();
+      });
+      path.addEventListener('focus', function () {
+        showTip(path, ROCKS[id]);
+      });
+      path.addEventListener('blur', function () {
+        hideTip();
+      });
+      path.addEventListener('click', function () {
+        if (activeId === id && !pop.hidden) {
+          var href = ROCKS[id] && ROCKS[id].href;
           if (href) global.location.href = href;
           return;
         }
-        openPop(target);
-      }
+        openRock(id, path);
+      });
+      path.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        openRock(id, path);
+      });
+    });
+
+    stage.querySelectorAll('.rocks-fallback-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        openRock(btn.getAttribute('data-rock'), btn);
+      });
     });
 
     if (closeBtn) closeBtn.addEventListener('click', closePop);
@@ -535,6 +621,26 @@
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') closePop();
     });
+
+    // One-shot intro pulse when the stage enters the viewport
+    var reduced = global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!reduced && 'IntersectionObserver' in global) {
+      var played = false;
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting || played) return;
+          played = true;
+          io.disconnect();
+          paths.forEach(function (path, i) {
+            global.setTimeout(function () {
+              path.classList.add('is-intro');
+              global.setTimeout(function () { path.classList.remove('is-intro'); }, 420);
+            }, i * 220);
+          });
+        });
+      }, { threshold: 0.35 });
+      io.observe(stage);
+    }
   }
 
   function initTreeHotspots() {
