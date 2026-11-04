@@ -1860,11 +1860,24 @@ footer, .site-footer {
   height: 100%;
   object-fit: fill;
   opacity: 0;
-  transition: opacity 0.18s ease;
-  filter: saturate(1.15) brightness(1.08);
+  transition: opacity 0.18s ease, filter 0.18s ease;
+  /* Masked copy of the base art — brightens the object, never covers the drawing with a plate */
+  -webkit-mask-image: var(--hotspot-mask);
+  mask-image: var(--hotspot-mask);
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  filter: brightness(1.38) saturate(1.2) contrast(1.06);
+  mix-blend-mode: soft-light;
 }
 .hotspot-glow.is-lit {
   opacity: 1;
+}
+.nest-tree-stage .hotspot-glow {
+  /* Screen keeps the etched tree visible while lifting nest / birds / house */
+  mix-blend-mode: screen;
+  filter: brightness(1.45) saturate(1.4) contrast(1.05);
 }
 .hotspot-targets {
   position: absolute;

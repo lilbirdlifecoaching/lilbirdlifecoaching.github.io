@@ -360,17 +360,27 @@
       var g = glowMap[key];
       if (!g) return null;
       if (g.ctx) return g;
-      var w = g.img.naturalWidth;
-      var h = g.img.naturalHeight;
-      if (!w || !h) return null;
-      var canvas = document.createElement('canvas');
-      canvas.width = w;
-      canvas.height = h;
-      var ctx = canvas.getContext('2d', { willReadFrequently: true });
-      ctx.drawImage(g.img, 0, 0);
-      g.canvas = canvas;
-      g.ctx = ctx;
-      return g;
+      if (g.loading) return null;
+      var hitSrc = g.img.getAttribute('data-hit') || g.img.currentSrc || g.img.src;
+      g.loading = true;
+      var hitImg = new Image();
+      hitImg.decoding = 'async';
+      hitImg.onload = function () {
+        var w = hitImg.naturalWidth;
+        var h = hitImg.naturalHeight;
+        if (!w || !h) { g.loading = false; return; }
+        var canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        var ctx = canvas.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(hitImg, 0, 0);
+        g.canvas = canvas;
+        g.ctx = ctx;
+        g.loading = false;
+      };
+      hitImg.onerror = function () { g.loading = false; };
+      hitImg.src = hitSrc;
+      return null;
     }
 
     function clearLit() {
