@@ -61,7 +61,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/lilbird-tokens.css?v=20260917k" />
-  <link rel="stylesheet" href="/css/lilbird-home.css?v=20261103c" />
+  <link rel="stylesheet" href="/css/lilbird-home.css?v=20261103d" />
   <link rel="stylesheet" href="/css/lilbird-chat.css?v=20260917k" />
   <!-- Google Tag Manager -->
   <script src="/lilbird-gtm-id.js"></script>
@@ -300,10 +300,12 @@
     </p>
     <div class="rocks-stage reveal reveal-delay-2" id="rocks-stage">
       <img class="rocks-art" src="/images/home/backpack-rocks.jpg" alt="A sketched blue backpack on the floor with rocks and Big Bird spilling out" width="1376" height="768" loading="lazy" decoding="async" />
-      <button type="button" class="rock-hotspot rock-shape-a" style="left:41%;top:57%;" data-phrase="I know something needs to change. I just can't name what." data-href="/articles/how-do-you-know-youre-ready-for-life-coaching.html" aria-label="Rock: I know something needs to change"></button>
-      <button type="button" class="rock-hotspot rock-shape-b" style="left:49%;top:73%;" data-phrase="I keep having the same conversations with myself and going nowhere." data-href="/articles/stuck-between-two-paths.html" aria-label="Rock: same conversations going nowhere"></button>
-      <button type="button" class="rock-hotspot rock-shape-c" style="left:60%;top:65%;" data-phrase="On paper, my life looks fine. From the inside, it doesn't feel like mine." data-href="/articles/on-paper-my-life-looks-fine.html" aria-label="Rock: on paper my life looks fine"></button>
-      <button type="button" class="rock-hotspot rock-shape-d" style="left:71%;top:77%;" data-phrase="I'm not in crisis. I'm just stuck. And I'm tired of it." data-href="/articles/feeling-stuck-in-your-late-twenties.html" aria-label="Rock: not in crisis, just stuck"></button>
+      <svg class="rocks-hitmap" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="false">
+        <polygon class="rock-hotspot" tabindex="0" role="button" data-phrase="I know something needs to change. I just can't name what." data-href="/articles/how-do-you-know-youre-ready-for-life-coaching.html" aria-label="Rock: I know something needs to change" points="34,50 41,46 48,49 50,58 46,66 38,67 32,60"></polygon>
+        <polygon class="rock-hotspot" tabindex="0" role="button" data-phrase="I keep having the same conversations with myself and going nowhere." data-href="/articles/stuck-between-two-paths.html" aria-label="Rock: same conversations going nowhere" points="42,68 50,64 57,69 58,80 52,88 43,87 39,78"></polygon>
+        <polygon class="rock-hotspot" tabindex="0" role="button" data-phrase="On paper, my life looks fine. From the inside, it doesn't feel like mine." data-href="/articles/on-paper-my-life-looks-fine.html" aria-label="Rock: on paper my life looks fine" points="52,54 61,50 69,56 70,68 63,76 53,74 49,64"></polygon>
+        <polygon class="rock-hotspot" tabindex="0" role="button" data-phrase="I'm not in crisis. I'm just stuck. And I'm tired of it." data-href="/articles/feeling-stuck-in-your-late-twenties.html" aria-label="Rock: not in crisis, just stuck" points="64,70 73,66 80,72 81,84 74,91 65,89 61,79"></polygon>
+      </svg>
       <div class="rock-pop" id="rock-pop" hidden>
         <p class="rock-pop-kicker">One of the rocks</p>
         <p class="rock-pop-phrase" id="rock-pop-phrase"></p>
@@ -565,7 +567,7 @@
 <script src="/first-flight-booking.js"></script>
 <script src="/lb-chat-safe.js"></script>
 <script src="/js/lilbird-theme.js?v=20260917k"></script>
-<script src="/js/lilbird-home.js?v=20261103c"></script>
+<script src="/js/lilbird-home.js?v=20261103d"></script>
 <script src="/js/lilbird-chat.js"></script>
 </body>
 </html>
