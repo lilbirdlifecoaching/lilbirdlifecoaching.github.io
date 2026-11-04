@@ -4,7 +4,7 @@
  */
 (function (global) {
   var TOGGLE_HTML =
-    '<button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false" aria-label="Switch appearance">' +
+    '<button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="true" aria-label="Switch to night mode">' +
     '<span class="theme-toggle-track" aria-hidden="true">' +
     '<span class="theme-toggle-thumb">' +
     '<svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"/>' +
@@ -16,7 +16,7 @@
     '</g></svg>' +
     '<svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5z"/></svg>' +
     '</span></span>' +
-    '<span class="theme-toggle-label">Night</span></button>';
+    '<span class="theme-toggle-label">Day</span></button>';
 
   function findChromeAnchor() {
     return (

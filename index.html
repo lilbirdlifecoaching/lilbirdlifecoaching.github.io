@@ -61,7 +61,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/lilbird-tokens.css?v=20260917k" />
-  <link rel="stylesheet" href="/css/lilbird-home.css?v=20261103d" />
+  <link rel="stylesheet" href="/css/lilbird-home.css?v=20261103a" />
   <link rel="stylesheet" href="/css/lilbird-chat.css?v=20260917k" />
   <!-- Google Tag Manager -->
   <script src="/lilbird-gtm-id.js"></script>
@@ -265,23 +265,19 @@
     <h2 class="story-headline reveal reveal-delay-1">
       Safety first.<br/><em>Then the real work.</em>
     </h2>
-    <div class="feather-grid reveal reveal-delay-2" role="list">
-      <article class="feather-card" role="listitem">
-        <img class="feather-art feather-a" src="/images/home/feather.jpg" alt="" width="640" height="360" loading="lazy" decoding="async" />
-        <p class="feather-text"><strong>Confidential.</strong> What's said in session stays there.</p>
-      </article>
-      <article class="feather-card" role="listitem">
-        <img class="feather-art feather-b" src="/images/home/feather.jpg" alt="" width="640" height="360" loading="lazy" decoding="async" />
-        <p class="feather-text"><strong>Your data, your Nest.</strong> Assessment answers are yours.</p>
-      </article>
-      <article class="feather-card" role="listitem">
-        <img class="feather-art feather-c" src="/images/home/feather.jpg" alt="" width="640" height="360" loading="lazy" decoding="async" />
-        <p class="feather-text"><strong>GiANT Worldwide certified.</strong> Real methodology behind the work.</p>
-      </article>
-      <article class="feather-card" role="listitem">
-        <img class="feather-art feather-d" src="/images/home/feather.jpg" alt="" width="640" height="360" loading="lazy" decoding="async" />
-        <p class="feather-text"><strong>Coaching ≠ therapy.</strong> We'll say if you need a clinician.</p>
-      </article>
+    <div class="recognition-grid reveal reveal-delay-2" role="list">
+      <div class="recognition-item" role="listitem">
+        <p class="recognition-text">Confidential.<br/>What's said in session stays there.</p>
+      </div>
+      <div class="recognition-item" role="listitem">
+        <p class="recognition-text">Your data, your Nest.<br/>Assessment answers are yours.</p>
+      </div>
+      <div class="recognition-item" role="listitem">
+        <p class="recognition-text">GiANT Worldwide certified.<br/>Real methodology behind the work.</p>
+      </div>
+      <div class="recognition-item" role="listitem">
+        <p class="recognition-text">Coaching ≠ therapy.<br/>We'll say if you need a clinician.</p>
+      </div>
     </div>
   </section>
 
@@ -334,17 +330,17 @@
         <figcaption>Inside the Nest · your tools in one place</figcaption>
       </figure>
       <figure class="nest-tree-frame">
-        <div class="nest-tree-stage">
+        <div class="nest-tree-stage" id="nest-tree-stage">
           <img src="/images/home/nest-tree.jpg" alt="Sketch of a tree with a high nest, birdhouse, and flock of birds" width="900" height="1200" loading="lazy" decoding="async" />
-          <button type="button" class="tree-hotspot tree-hotspot-nest" style="left:48%;top:20%;" data-tier="nest" aria-describedby="tree-tip-nest">
-            <span class="tree-tip" id="tree-tip-nest"><strong>Nest</strong> Free home base. See yourself clearly and keep what you find.</span>
-          </button>
-          <button type="button" class="tree-hotspot tree-hotspot-plus" style="left:68%;top:44%;" data-tier="plus" aria-describedby="tree-tip-plus">
-            <span class="tree-tip" id="tree-tip-plus"><strong>Nest Plus</strong> Deeper tools on your own time. $7.99 a month.</span>
-          </button>
-          <button type="button" class="tree-hotspot tree-hotspot-premium" style="left:56%;top:9%;" data-tier="premium" aria-describedby="tree-tip-premium">
-            <span class="tree-tip" id="tree-tip-premium"><strong>Nest Premium</strong> Live group coaching with others on the path, when open.</span>
-          </button>
+          <svg class="tree-hitmap" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="false">
+            <polygon class="tree-hotspot" tabindex="0" role="button" data-tier="nest" data-title="Nest" data-body="Free home base. See yourself clearly and keep what you find." aria-label="Nest: free home base" points="50,14 68,10 78,16 76,28 62,30 50,24"></polygon>
+            <polygon class="tree-hotspot" tabindex="0" role="button" data-tier="plus" data-title="Nest Plus" data-body="Deeper tools on your own time. $7.99 a month." aria-label="Nest Plus" points="33,47 45,45 49,52 47,61 37,63 31,56"></polygon>
+            <polygon class="tree-hotspot" tabindex="0" role="button" data-tier="premium" data-title="Nest Premium" data-body="Live group coaching with others on the path, when open." aria-label="Nest Premium" points="68,6 82,3 95,7 97,16 86,21 70,18"></polygon>
+          </svg>
+          <div class="tree-tip-pop" id="tree-tip-pop" hidden>
+            <strong class="tree-tip-title" id="tree-tip-title"></strong>
+            <span class="tree-tip-body" id="tree-tip-body"></span>
+          </div>
         </div>
         <ul class="nest-tree-legend">
           <li><strong>Nest</strong> — the free home base</li>
@@ -566,8 +562,8 @@
 </div>
 <script src="/first-flight-booking.js"></script>
 <script src="/lb-chat-safe.js"></script>
-<script src="/js/lilbird-theme.js?v=20260917k"></script>
-<script src="/js/lilbird-home.js?v=20261103d"></script>
+<script src="/js/lilbird-theme.js?v=20261103a"></script>
+<script src="/js/lilbird-home.js?v=20261103a"></script>
 <script src="/js/lilbird-chat.js"></script>
 </body>
 </html>

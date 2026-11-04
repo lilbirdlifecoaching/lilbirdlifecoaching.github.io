@@ -7,7 +7,7 @@
     (function(){
       var k='lilbird-theme', s=null;
       try{s=localStorage.getItem(k);}catch(e){}
-      var t=(s==='light'||s==='dark')?s:(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+      var t=(s==='light'||s==='dark')?s:'light';
       document.documentElement.setAttribute('data-theme', t);
       document.documentElement.style.colorScheme=t;
     })();
@@ -458,6 +458,8 @@
     .btn-return:hover { background: #9dc4a2; transform: translateY(-1px); }
   </style>
   <link rel="stylesheet" href="/css/lilbird-solo-tools-theme.css" />
+<link rel="stylesheet" href="/css/lilbird-tokens.css" />
+<link rel="stylesheet" href="/css/lilbird-theme-chrome.css" />
 </head>
 
 <body>
@@ -908,5 +910,8 @@
   fab.addEventListener('click', () => { active ? stop() : start(); });
 })();
 </script>
+
+<script src="/js/lilbird-theme.js"></script>
+<script src="/js/lilbird-theme-nav.js"></script>
 </body>
 </html>
