@@ -1847,28 +1847,54 @@ footer, .site-footer {
   height: auto;
   display: block;
 }
-.rocks-hitmap {
+.hotspot-glows {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.hotspot-glow {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+  object-fit: fill;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+  filter: saturate(1.15) brightness(1.08);
+}
+.hotspot-glow.is-lit {
+  opacity: 1;
+}
+.hotspot-targets {
+  position: absolute;
+  inset: 0;
   z-index: 2;
   pointer-events: none;
 }
-.rock-hotspot {
-  fill: transparent;
-  stroke: transparent;
+.art-hotspot {
+  position: absolute;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
   cursor: pointer;
-  pointer-events: auto;
   outline: none;
-  transition: fill 0.18s ease, stroke 0.18s ease;
+  /* Keyboard focus only — mouse uses pixel hit-testing on the art */
+  pointer-events: none;
+  appearance: none;
+  -webkit-appearance: none;
 }
-.rock-hotspot:hover,
-.rock-hotspot:focus-visible,
-.rock-hotspot.is-active {
-  fill: rgba(245, 200, 66, 0.22);
-  stroke: rgba(245, 200, 66, 0.55);
-  stroke-width: 0.35;
+.art-hotspot:focus-visible {
+  box-shadow: inset 0 0 0 2px rgba(245, 200, 66, 0.55);
+}
+.rocks-stage,
+.nest-tree-stage {
+  cursor: default;
+}
+.rocks-stage.is-hot,
+.nest-tree-stage.is-hot {
+  cursor: pointer;
 }
 .rock-pop {
   position: absolute;
@@ -1955,28 +1981,9 @@ footer, .site-footer {
   position: relative;
   line-height: 0;
 }
-.tree-hitmap {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 2;
-  pointer-events: none;
-}
-.tree-hotspot {
-  fill: transparent;
-  stroke: transparent;
-  cursor: pointer;
-  pointer-events: auto;
-  outline: none;
-  transition: fill 0.18s ease, stroke 0.18s ease;
-}
-.tree-hotspot:hover,
-.tree-hotspot:focus-visible,
-.tree-hotspot.is-active {
-  fill: rgba(245, 200, 66, 0.2);
-  stroke: rgba(245, 200, 66, 0.55);
-  stroke-width: 0.35;
+.nest-tree-stage .hotspot-glows,
+.nest-tree-stage .hotspot-targets {
+  border-radius: inherit;
 }
 .tree-tip-pop {
   position: absolute;
