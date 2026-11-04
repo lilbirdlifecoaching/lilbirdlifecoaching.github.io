@@ -471,15 +471,11 @@
       });
     });
 
-    // Warm hit canvases (works for <img> glow layers and <div> gold washes)
+    // Warm canvases once images decode
     Object.keys(glowMap).forEach(function (key) {
-      var el = glowMap[key].img;
-      if (el.tagName === 'IMG') {
-        if (el.complete) ensureHit(key);
-        else el.addEventListener('load', function () { ensureHit(key); });
-      } else {
-        ensureHit(key);
-      }
+      var img = glowMap[key].img;
+      if (img.complete) ensureHit(key);
+      else img.addEventListener('load', function () { ensureHit(key); });
     });
 
     return {
