@@ -61,7 +61,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/lilbird-tokens.css?v=20260917k" />
-  <link rel="stylesheet" href="/css/lilbird-home.css?v=20261103a" />
+  <link rel="stylesheet" href="/css/lilbird-home.css?v=20261103b" />
   <link rel="stylesheet" href="/css/lilbird-chat.css?v=20260917k" />
   <!-- Google Tag Manager -->
   <script src="/lilbird-gtm-id.js"></script>
@@ -99,9 +99,9 @@
           <div class="nav-dropdown-panel" id="nav-offerings-panel" hidden>
             <a href="/solo/">Self-guided course</a>
             <a href="/first-flight/book.html?code=IMREADY">Intro coaching session</a>
-            <a href="/book.html#discovery">Discovery Call</a>
             <a href="/intensive/">Life Change Intensive</a>
             <a href="/book.html#coaching">Coaching</a>
+            <a href="/book.html#discovery">Discovery Call</a>
           </div>
         </div>
         <a href="/nest/" class="nav-nest">The Nest</a>
@@ -131,9 +131,9 @@
         <p class="nav-menu-label">Offerings</p>
         <a href="/solo/">Self-guided course</a>
         <a href="/first-flight/book.html?code=IMREADY">Intro coaching session</a>
-        <a href="/book.html#discovery">Discovery Call</a>
         <a href="/intensive/">Life Change Intensive</a>
         <a href="/book.html#coaching">Coaching</a>
+        <a href="/book.html#discovery">Discovery Call</a>
       </div>
       <div class="nav-menu-group">
         <p class="nav-menu-label">Start here</p>
@@ -301,27 +301,17 @@
     </p>
     <div class="rocks-stage reveal reveal-delay-2" id="rocks-stage">
       <img class="rocks-art" src="/images/home/backpack-rocks.jpg" alt="A sketched blue backpack on the floor with rocks and Big Bird spilling out" width="1376" height="768" loading="lazy" decoding="async" />
-      <button type="button" class="rock-hotspot" style="left:42%;top:58%;" data-phrase="I know something needs to change. I just can't name what." data-href="/articles/how-do-you-know-youre-ready-for-life-coaching.html" aria-label="Rock: I know something needs to change">
-        <span class="rock-tip">I know something needs to change. I just can't name what.</span>
-      </button>
-      <button type="button" class="rock-hotspot" style="left:50%;top:74%;" data-phrase="I keep having the same conversations with myself and going nowhere." data-href="/articles/stuck-between-two-paths.html" aria-label="Rock: same conversations going nowhere">
-        <span class="rock-tip">I keep having the same conversations with myself and going nowhere.</span>
-      </button>
-      <button type="button" class="rock-hotspot" style="left:61%;top:66%;" data-phrase="On paper, my life looks fine. From the inside, it doesn't feel like mine." data-href="/articles/on-paper-my-life-looks-fine.html" aria-label="Rock: on paper my life looks fine">
-        <span class="rock-tip">On paper, my life looks fine. From the inside, it doesn't feel like mine.</span>
-      </button>
-      <button type="button" class="rock-hotspot" style="left:72%;top:78%;" data-phrase="I'm not in crisis. I'm just stuck. And I'm tired of it." data-href="/articles/feeling-stuck-in-your-late-twenties.html" aria-label="Rock: not in crisis, just stuck">
-        <span class="rock-tip">I'm not in crisis. I'm just stuck. And I'm tired of it.</span>
-      </button>
-    </div>
-    <dialog class="rock-dialog" id="rock-dialog" aria-labelledby="rock-dialog-title">
-      <div class="rock-dialog-panel">
-        <p class="rock-dialog-kicker">One of the rocks</p>
-        <h3 id="rock-dialog-title" class="rock-dialog-phrase"></h3>
-        <a class="btn-primary rock-dialog-link" href="#">Read the article <span>→</span></a>
-        <button type="button" class="rock-dialog-close" data-rock-close>Close</button>
+      <button type="button" class="rock-hotspot rock-shape-a" style="left:41%;top:57%;" data-phrase="I know something needs to change. I just can't name what." data-href="/articles/how-do-you-know-youre-ready-for-life-coaching.html" aria-label="Rock: I know something needs to change"></button>
+      <button type="button" class="rock-hotspot rock-shape-b" style="left:49%;top:73%;" data-phrase="I keep having the same conversations with myself and going nowhere." data-href="/articles/stuck-between-two-paths.html" aria-label="Rock: same conversations going nowhere"></button>
+      <button type="button" class="rock-hotspot rock-shape-c" style="left:60%;top:65%;" data-phrase="On paper, my life looks fine. From the inside, it doesn't feel like mine." data-href="/articles/on-paper-my-life-looks-fine.html" aria-label="Rock: on paper my life looks fine"></button>
+      <button type="button" class="rock-hotspot rock-shape-d" style="left:71%;top:77%;" data-phrase="I'm not in crisis. I'm just stuck. And I'm tired of it." data-href="/articles/feeling-stuck-in-your-late-twenties.html" aria-label="Rock: not in crisis, just stuck"></button>
+      <div class="rock-pop" id="rock-pop" hidden>
+        <p class="rock-pop-kicker">One of the rocks</p>
+        <p class="rock-pop-phrase" id="rock-pop-phrase"></p>
+        <a class="rock-pop-link" id="rock-pop-link" href="#">Read the article →</a>
+        <button type="button" class="rock-pop-close" data-rock-close aria-label="Close">✕</button>
       </div>
-    </dialog>
+    </div>
   </section>
 
   <div class="divider reveal"><div class="divider-line"></div><span class="divider-glyph">✦</span><div class="divider-line"></div></div>
@@ -343,7 +333,18 @@
         <figcaption>Inside the Nest · your tools in one place</figcaption>
       </figure>
       <figure class="nest-tree-frame">
-        <img src="/images/home/nest-tree.jpg" alt="Sketch of a tree with a nest, birdhouse, and flock of birds" width="900" height="1200" loading="lazy" decoding="async" />
+        <div class="nest-tree-stage">
+          <img src="/images/home/nest-tree.jpg" alt="Sketch of a tree with a high nest, birdhouse, and flock of birds" width="900" height="1200" loading="lazy" decoding="async" />
+          <button type="button" class="tree-hotspot tree-hotspot-nest" style="left:28%;top:18%;" data-tier="nest" aria-describedby="tree-tip-nest">
+            <span class="tree-tip" id="tree-tip-nest"><strong>Nest</strong> Free home base. See yourself clearly and keep what you find.</span>
+          </button>
+          <button type="button" class="tree-hotspot tree-hotspot-plus" style="left:62%;top:42%;" data-tier="plus" aria-describedby="tree-tip-plus">
+            <span class="tree-tip" id="tree-tip-plus"><strong>Nest Plus</strong> Deeper tools on your own time. $7.99 a month.</span>
+          </button>
+          <button type="button" class="tree-hotspot tree-hotspot-premium" style="left:58%;top:10%;" data-tier="premium" aria-describedby="tree-tip-premium">
+            <span class="tree-tip" id="tree-tip-premium"><strong>Nest Premium</strong> Live group coaching with others on the path, when open.</span>
+          </button>
+        </div>
         <ul class="nest-tree-legend">
           <li><strong>Nest</strong> — the free home base</li>
           <li><strong>Nest Plus</strong> — full tools, $7.99 / month</li>
@@ -367,7 +368,7 @@
       How you<br/><em>come in.</em>
     </h2>
     <p class="story-body reveal reveal-delay-2">
-      Same home the whole way. Open the Nest free. Add Plus when you want the deeper work. Meet with Luke when you want a person.
+      Same home the whole way. Each stage changes what becomes possible.
     </p>
 
     <div class="pathfinder-layout reveal reveal-delay-2" id="pathfinder-layout">
@@ -380,19 +381,18 @@
             <div>
               <p class="tier-act">Stage one</p>
               <p class="tier-name">The Nest</p>
-              <p class="tier-sub">Free. This is the home.</p>
+              <p class="tier-sub">See yourself clearly. Keep what you find.</p>
             </div>
           </div>
           <div class="tier-rows">
             <a class="pathfinder-row" href="/nest/">
               <div>
                 <p class="pf-name">Your personal dashboard</p>
-                <p class="pf-desc">Glow Map, quizzes, coaching notes, and the First Flight workbook.</p>
+                <p class="pf-desc">A free home for the version of you that is starting to come into focus.</p>
               </div>
               <span class="pf-go">Open →</span>
             </a>
           </div>
-          <p class="tier-note">Most people arrive from <a href="/inner-compass/">let's discover you</a> (about 15 minutes), <a href="/am-i-ready-for-coaching.html">Am I Ready</a> (3 minutes), or the <a href="#journal-letter">letter</a>. All three land here.</p>
         </div>
         <div class="pathfinder-tier" data-pathfinder-tier="1">
           <div class="pathfinder-tier-visual-mobile">
@@ -402,19 +402,18 @@
             <div>
               <p class="tier-act">Stage two</p>
               <p class="tier-name">Nest Plus</p>
-              <p class="tier-sub">$7.99 a month. Same Nest. The deeper work, on your own time.</p>
+              <p class="tier-sub">Deeper work that holds when you are on your own.</p>
             </div>
           </div>
           <div class="tier-rows">
             <a class="pathfinder-row" href="/nest/">
               <div>
                 <p class="pf-name">Nest Plus · $7.99/month</p>
-                <p class="pf-desc">Full Inner Compass read, Life Canvas, Relationship Dynamic, and the Roots &amp; Wings workbook. Eight sessions, the same workbook as the Intensive. Included while Nest Plus is active. Cancel anytime.</p>
+                <p class="pf-desc">From insight to practice. Tools that help the change stick between sessions.</p>
               </div>
               <span class="pf-go">See it →</span>
             </a>
           </div>
-          <p class="tier-note">The <a href="/solo/">Solo course</a> ($197) is the self-guided videos. Nest Plus is separate.</p>
         </div>
         <div class="pathfinder-tier" data-pathfinder-tier="2">
           <div class="pathfinder-tier-visual-mobile">
@@ -424,28 +423,28 @@
             <div>
               <p class="tier-act">Stage three</p>
               <p class="tier-name">With Luke</p>
-              <p class="tier-sub">Still the Nest. Group first, then one-to-one.</p>
+              <p class="tier-sub">Growth with someone beside you.</p>
             </div>
           </div>
           <div class="tier-rows">
             <a class="pathfinder-row" href="/nest/">
               <div>
                 <p class="pf-name">Nest Premium · coming soon</p>
-                <p class="pf-desc">Live group coaching. Everything in Plus, plus Solo. $47 a month when booking opens.</p>
+                <p class="pf-desc">Live group coaching. Belonging and momentum with others on the path.</p>
               </div>
               <span class="pf-go">The Nest →</span>
             </a>
             <a class="pathfinder-row" href="/first-flight/book.html?code=IMREADY">
               <div>
                 <p class="pf-name">First Flight</p>
-                <p class="pf-desc">One 90-minute in-person session. Map your story, name what's going on, and leave with one next move you'll take.</p>
+                <p class="pf-desc">One clear conversation. Leave with a next move you will actually take.</p>
               </div>
               <span class="pf-go">Book →</span>
             </a>
             <a class="pathfinder-row" href="/intensive/">
               <div>
                 <p class="pf-name">Life Change Intensive</p>
-                <p class="pf-desc">Eight in-person sessions · $4,999. When you already know one conversation won't be enough.</p>
+                <p class="pf-desc">Eight sessions. A full arc when you already know one talk will not be enough.</p>
               </div>
               <span class="pf-go">Learn more →</span>
             </a>
@@ -567,7 +566,7 @@
 <script src="/first-flight-booking.js"></script>
 <script src="/lb-chat-safe.js"></script>
 <script src="/js/lilbird-theme.js?v=20260917k"></script>
-<script src="/js/lilbird-home.js?v=20261103a"></script>
+<script src="/js/lilbird-home.js?v=20261103b"></script>
 <script src="/js/lilbird-chat.js"></script>
 </body>
 </html>
