@@ -22,6 +22,11 @@ If a change touches pricing, booking, worker logic, or public copy, log it here.
 
 ## 2026-11-05 (Claude)
 
+### Solo part 3: public sales page in the painted world
+- **Status:** `deployed` (Pages only)
+- `#view-landing` now uses the scene: hero copy on a torn sheet with the kids beside it (new `.solo-landing-hero-copy` / `.solo-landing-kids` markup in `solo/index.html`), each section on its own sheet, buy form as a soft slip. Phone top bar on one row. `lilbird-solo-journal.css?v=20261105s5`.
+- Tools inside a session hide their own top row (`lilbird-solo-tools-journal.css?v=20261105t2`).
+
 ### Solo part 2: phone header + all 15 tools
 - **Status:** `deployed` (Pages only)
 - Solo phone header (`lilbird-solo-journal.css?v=20261105s3`): one row; lilbird.life link, email and the "Day/Night" word hidden under 600px.
