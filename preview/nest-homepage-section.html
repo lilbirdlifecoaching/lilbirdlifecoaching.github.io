@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nest homepage section — day/night preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --font-serif: "Cormorant Garamond", Georgia, serif;
+      --font-sans: "DM Sans", system-ui, sans-serif;
+      --ink: #241f1b;
+      --muted: #5c5348;
+      --accent: #9a6a22;
+      --primary: #18495c;
+      --primary-text: #fff9ef;
+      --parchment: #fff8e8;
+      --parchment-raised: #fffcf4;
+      --border: rgba(176, 146, 100, 0.42);
+      --page: #ebe4d4;
+      --page-wash: linear-gradient(165deg, #f7f1e6 0%, #e8dfcc 48%, #d9c9a8 100%);
+      --shot-shadow: 0 28px 60px rgba(55, 42, 25, 0.18);
+      --tier-shadow: 0 14px 28px rgba(55, 42, 25, 0.08);
+    }
+    html[data-theme="dark"] {
+      --ink: #f7f1e6;
+      --muted: #c5d0d7;
+      --accent: #f0bc59;
+      --parchment: #f3e6c8;
+      --parchment-raised: #f7edd6;
+      --border: rgba(176, 146, 100, 0.5);
+      --page: #0f2433;
+      --page-wash: linear-gradient(165deg, #122a3a 0%, #0f2433 45%, #0a1a24 100%);
+      --shot-shadow: 0 28px 60px rgba(0, 0, 0, 0.45);
+      --tier-shadow: 0 14px 28px rgba(0, 0, 0, 0.28);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font-sans);
+      color: var(--ink);
+      background: var(--page-wash);
+      background-color: var(--page);
+      min-height: 100vh;
+    }
+
+    .preview-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.75rem 1.25rem;
+      background: color-mix(in srgb, var(--parchment) 92%, transparent);
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .preview-bar strong { color: var(--ink); font-weight: 600; }
+    .theme-toggle {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: var(--parchment-raised);
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 0.45rem 0.95rem;
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    /* ── Proposed Nest showcase ── */
+    .nest-showcase {
+      width: min(1180px, calc(100% - 2.5rem));
+      margin: 0 auto;
+      padding: 3.25rem 0 3.75rem;
+    }
+
+    .nest-showcase-intro {
+      max-width: 38rem;
+      margin: 0 0 1.75rem;
+    }
+    .section-label {
+      margin: 0 0 0.55rem;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .story-headline {
+      margin: 0 0 0.7rem;
+      font-family: var(--font-serif);
+      font-weight: 500;
+      font-size: clamp(2rem, 4.2vw, 3rem);
+      line-height: 1.12;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+    }
+    .story-headline em {
+      font-style: italic;
+      font-weight: 500;
+    }
+    .nest-shot-lede {
+      margin: 0;
+      font-size: 1.05rem;
+      line-height: 1.5;
+      color: var(--muted);
+      max-width: 34rem;
+    }
+
+    .nest-shot-stage {
+      position: relative;
+      margin: 0 0 1.75rem;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: var(--shot-shadow);
+      border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+      background: #1a1510;
+      isolation: isolate;
+    }
+    .nest-shot-stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background:
+        linear-gradient(180deg, transparent 72%, rgba(20, 14, 8, 0.28) 100%),
+        radial-gradient(ellipse 90% 60% at 50% 0%, transparent 55%, rgba(20, 14, 8, 0.12) 100%);
+      opacity: 0.55;
+    }
+    html[data-theme="dark"] .nest-shot-stage::before {
+      background:
+        linear-gradient(180deg, transparent 70%, rgba(8, 16, 24, 0.45) 100%),
+        radial-gradient(ellipse 90% 60% at 50% 0%, transparent 55%, rgba(0, 0, 0, 0.2) 100%);
+    }
+    .nest-shot-stage img {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1440 / 980;
+      object-fit: cover;
+      object-position: center top;
+    }
+    .nest-shot-day { display: block; }
+    .nest-shot-night { display: none; }
+    html[data-theme="dark"] .nest-shot-day { display: none; }
+    html[data-theme="dark"] .nest-shot-night { display: block; }
+
+    .nest-shot-caption {
+      position: absolute;
+      left: 1rem;
+      bottom: 0.9rem;
+      z-index: 2;
+      margin: 0;
+      padding: 0.35rem 0.7rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #fff9ef;
+      background: rgba(24, 73, 92, 0.72);
+      border-radius: 999px;
+      backdrop-filter: blur(6px);
+    }
+
+    /* Tiers */
+    .nest-tiers {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      margin: 0 0 1.5rem;
+    }
+    .nest-tier {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      padding: 1.25rem 1.2rem 1.35rem;
+      background: var(--parchment);
+      background-image: linear-gradient(180deg, var(--parchment-raised) 0%, var(--parchment) 100%);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--tier-shadow);
+      color: #241f1b;
+      min-height: 100%;
+    }
+    html[data-theme="dark"] .nest-tier {
+      color: #241f1b;
+    }
+    .nest-tier-kicker {
+      margin: 0;
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #9a6a22;
+    }
+    .nest-tier-name {
+      margin: 0;
+      font-family: var(--font-serif);
+      font-weight: 500;
+      font-size: 1.55rem;
+      line-height: 1.15;
+      color: #241f1b;
+    }
+    .nest-tier-price {
+      margin: 0;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #18495c;
+    }
+    .nest-tier-body {
+      margin: 0;
+      flex: 1;
+      font-size: 0.92rem;
+      line-height: 1.45;
+      color: #4f463c;
+    }
+    .nest-tier-list {
+      margin: 0.15rem 0 0.35rem;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 0.35rem;
+    }
+    .nest-tier-list li {
+      position: relative;
+      padding-left: 0.95rem;
+      font-size: 0.86rem;
+      line-height: 1.35;
+      color: #4f463c;
+    }
+    .nest-tier-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.45em;
+      width: 0.4rem;
+      height: 0.4rem;
+      border-radius: 50%;
+      background: #b07a2c;
+      opacity: 0.75;
+    }
+    .nest-tier.is-featured {
+      border-color: rgba(24, 73, 92, 0.45);
+      box-shadow:
+        var(--tier-shadow),
+        inset 0 0 0 1px rgba(24, 73, 92, 0.12);
+    }
+    .nest-tier-badge {
+      position: absolute;
+      top: 0.85rem;
+      right: 0.9rem;
+      margin: 0;
+      padding: 0.2rem 0.55rem;
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #18495c;
+      background: rgba(24, 73, 92, 0.1);
+      border-radius: 999px;
+    }
+
+    .nest-showcase-cta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.85rem 1.25rem;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.85rem 1.25rem;
+      border-radius: 999px;
+      background: #18495c;
+      color: #fff9ef;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.98rem;
+      border: 1px solid #18495c;
+    }
+    .btn-primary:hover { filter: brightness(1.06); }
+    .btn-quiet-link {
+      color: var(--muted);
+      font-size: 0.95rem;
+      text-decoration: none;
+      border-bottom: 1px solid color-mix(in srgb, var(--muted) 45%, transparent);
+    }
+    html[data-theme="dark"] .btn-quiet-link { color: var(--muted); }
+
+    @media (max-width: 860px) {
+      .nest-tiers { grid-template-columns: 1fr; }
+      .nest-showcase { width: min(100% - 1.5rem, 1180px); padding-top: 2.25rem; }
+      .nest-shot-caption { font-size: 0.65rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="preview-bar">
+    <span><strong>Preview only</strong> — proposed homepage Nest section (not live yet)</span>
+    <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">Show night</button>
+  </div>
+
+  <section class="nest-showcase" id="paths" aria-labelledby="nest-showcase-title">
+    <div class="nest-showcase-intro">
+      <p class="section-label">your personal dashboard</p>
+      <h2 class="story-headline pricing-headline" id="nest-showcase-title">
+        The Nest is<br /><em>where the work lives.</em>
+      </h2>
+      <p class="story-body nest-shot-lede">
+        A calm home for what you find — reflections, tools, and a next step that is actually yours. Free to open. Add Nest Plus when you want the guide and deeper map.
+      </p>
+    </div>
+
+    <div class="nest-shot-stage">
+      <img
+        class="nest-shot-day"
+        src="/images/home/nest-preview/nest-home-day.jpg"
+        alt="The Nest dashboard in day mode: illustrated valley, Your Next Chapter, and companion children"
+        width="1440"
+        height="980"
+        decoding="async"
+      />
+      <img
+        class="nest-shot-night"
+        src="/images/home/nest-preview/nest-home-night.jpg"
+        alt="The Nest dashboard in night mode: moonlit valley, parchment panels, and companion children"
+        width="1440"
+        height="980"
+        decoding="async"
+      />
+      <p class="nest-shot-caption">Inside the Nest</p>
+    </div>
+
+    <div class="nest-tiers" role="list">
+      <article class="nest-tier" role="listitem">
+        <p class="nest-tier-kicker">Start here</p>
+        <h3 class="nest-tier-name">Nest</h3>
+        <p class="nest-tier-price">Free</p>
+        <p class="nest-tier-body">Find your bearings and keep what you find.</p>
+        <ul class="nest-tier-list">
+          <li>My Journey &amp; reflections</li>
+          <li>Glow Map &amp; quizzes</li>
+          <li>First Flight workbook</li>
+        </ul>
+      </article>
+
+      <article class="nest-tier is-featured" role="listitem">
+        <p class="nest-tier-kicker">Go deeper</p>
+        <h3 class="nest-tier-name">Nest Plus</h3>
+        <p class="nest-tier-price">$7.99 / month</p>
+        <p class="nest-tier-body">Understand yourself more clearly on your own time.</p>
+        <ul class="nest-tier-list">
+          <li>lil’ bird Guide</li>
+          <li>Life Canvas &amp; full Inner Compass</li>
+          <li>Relationship Dynamic &amp; Roots &amp; Wings</li>
+        </ul>
+      </article>
+
+      <article class="nest-tier" role="listitem">
+        <p class="nest-tier-kicker">With others</p>
+        <h3 class="nest-tier-name">Nest Premium</h3>
+        <p class="nest-tier-price">Live group coaching · when open</p>
+        <p class="nest-tier-body">Grow with guidance and a room of people on the path.</p>
+        <ul class="nest-tier-list">
+          <li>Everything in Nest Plus</li>
+          <li>Solo Course access</li>
+          <li>Monthly live group call</li>
+        </ul>
+      </article>
+    </div>
+
+    <div class="nest-showcase-cta">
+      <a class="btn-primary" href="/nest/">Open your Nest <span aria-hidden="true">→</span></a>
+      <a class="btn-quiet-link" href="/book.html">Or start with a free discovery call</a>
+    </div>
+  </section>
+
+  <script>
+    (function () {
+      var root = document.documentElement;
+      var btn = document.getElementById("theme-toggle");
+      function setTheme(theme) {
+        root.setAttribute("data-theme", theme);
+        var night = theme === "dark";
+        btn.textContent = night ? "Show day" : "Show night";
+        btn.setAttribute("aria-pressed", night ? "true" : "false");
+      }
+      btn.addEventListener("click", function () {
+        setTheme(root.getAttribute("data-theme") === "dark" ? "light" : "dark");
+      });
+      var q = new URLSearchParams(location.search).get("theme");
+      if (q === "dark" || q === "night") setTheme("dark");
+      else if (q === "light" || q === "day") setTheme("light");
+    })();
+  </script>
+</body>
+</html>
