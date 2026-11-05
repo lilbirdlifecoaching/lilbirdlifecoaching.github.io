@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Nest Phase 1B illustrated world fixture</title>
+  <link rel="icon" type="image/png" href="/bird-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.49.0/dist/tabler-icons.min.css" />
+  <link rel="stylesheet" href="/css/lilbird-tokens.css" />
+  <link rel="stylesheet" href="/css/lilbird-theme-chrome.css" />
+  <link rel="stylesheet" href="./nest-styles.css?v=50" />
+  <link rel="stylesheet" href="/css/lilbird-nest-theme.css?v=20260917m" />
+  <link rel="stylesheet" href="/css/lilbird-nest-redesign.css?v=20261105p1" />
+  <link rel="stylesheet" href="/css/lilbird-nest-world.css?v=20261105w2" />
+  <style>
+    .fixture-banner {
+      position: sticky; top: 0; z-index: 60;
+      display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center;
+      padding: 0.45rem 1rem; background: #18495c; color: #fff9ef;
+      font: 0.8rem "DM Sans", system-ui, sans-serif;
+    }
+    .fixture-banner button, .fixture-banner a {
+      border: 1px solid rgba(255,249,239,0.35); background: transparent; color: inherit;
+      border-radius: 999px; padding: 0.25rem 0.65rem; font: inherit; cursor: pointer; text-decoration: none;
+    }
+    .fixture-banner button.is-on { background: rgba(255,249,239,0.18); }
+    #view-dashboard.view { display: block; }
+    .nonowner-solo-note {
+      margin: 1rem 0 0; padding: 1rem 1.1rem; border-radius: 16px;
+      border: 1px dashed color-mix(in srgb, var(--lb-border) 80%, transparent);
+      background: color-mix(in srgb, var(--lb-surface) 70%, transparent);
+      color: var(--lb-muted); font-size: 0.92rem;
+    }
+    .nonowner-solo-note[hidden] { display: none !important; }
+    .nonowner-solo-note strong { color: var(--lb-text); }
+  </style>
+</head>
+<body class="nest-page nest-world">
+  <div class="fixture-banner" id="fixture-banner">
+    <strong>Phase 1B fixture</strong>
+    <span id="label">returning · Solo continue</span>
+    <button type="button" data-member="returning" class="is-on">Returning</button>
+    <button type="button" data-member="new">New</button>
+    <button type="button" data-solo="off">Non-owner</button>
+    <button type="button" data-solo="start">Solo start</button>
+    <button type="button" data-solo="continue" class="is-on">Solo continue</button>
+    <button type="button" data-solo="complete">Solo done</button>
+    <button type="button" id="btn-theme">Day / night</button>
+    <a href="../docs/lilbird_nest_visual_assets_v2/lilbird_nest_asset_kit_v2/references/approved-concept-3-day.png">Concept #3</a>
+  </div>
+
+  <div id="view-dashboard" class="view nest-app" data-nest-area="home">
+    <div class="nest-world-decor" aria-hidden="true">
+      <img class="world-canopy world-canopy-day" src="./assets/lilbird-kit/botanicals/golden-canopy.webp" alt="" width="463" height="115" decoding="async" />
+      <img class="world-canopy world-canopy-night" src="./assets/lilbird-kit/accents/upper-golden-leaves.webp" alt="" width="523" height="121" decoding="async" />
+      <img class="world-stars" src="./assets/lilbird-kit/accents/star-cloud-wash.webp" alt="" width="353" height="89" decoding="async" />
+      <img class="world-lupines" src="./assets/lilbird-kit/botanicals/purple-lupines.webp" alt="" width="83" height="152" decoding="async" />
+      <img class="world-flowers" src="./assets/lilbird-kit/botanicals/yellow-wildflowers.webp" alt="" width="98" height="145" decoding="async" />
+      <img class="world-rocks" src="./assets/lilbird-kit/accents/rock-grass-cluster.webp" alt="" width="256" height="83" decoding="async" />
+    </div>
+    <header class="top-nav nest-chrome">
+      <a class="nest-brand" href="/" aria-label="lil' bird home">
+        <img class="nest-brand-logo nest-logo-day" src="/bird-logo-teal.png" alt="" width="36" height="36" />
+        <img class="nest-brand-logo nest-logo-night" src="/bird-logo.png" alt="" width="36" height="36" />
+        <span class="nest-brand-text">
+          <span class="nest-brand-name">lil' bird</span>
+          <span class="nest-brand-sub">Your Nest</span>
+        </span>
+      </a>
+      <div class="nest-chrome-actions">
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="true" aria-label="Switch to night mode">
+          <span class="theme-toggle-track" aria-hidden="true">
+            <span class="theme-toggle-thumb">
+              <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"/><g stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></g></svg>
+              <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5z"/></svg>
+            </span>
+          </span>
+          <span class="theme-toggle-label">Day</span>
+        </button>
+        <button class="avatar has-photo nest-account-trigger" type="button" aria-label="Account">
+          <img src="./luke-avatar.jpg" alt="" width="30" height="30" />
+        </button>
+      </div>
+    </header>
+
+    <div class="nest-shell">
+      <aside class="nest-rail" aria-label="Nest navigation">
+        <button type="button" class="rail-link is-active"><i class="ti ti-home"></i><span>Home</span></button>
+        <button type="button" class="rail-link"><i class="ti ti-map-2"></i><span>My Journey</span></button>
+        <button type="button" class="rail-link"><i class="ti ti-heart-handshake"></i><span>Understand myself</span></button>
+        <button type="button" class="rail-link"><i class="ti ti-feather"></i><span>My Guide</span></button>
+        <button type="button" class="rail-link"><i class="ti ti-books"></i><span>Learn &amp; grow</span></button>
+        <a class="rail-link rail-solo" id="rail-solo" href="/solo/" hidden>
+          <i class="ti ti-book" aria-hidden="true"></i><span>Solo Course</span>
+        </a>
+        <button type="button" class="rail-link rail-quiet"><i class="ti ti-users"></i><span>Live</span></button>
+      </aside>
+
+      <main class="dash-wrap nest-dash">
+        <div class="nest-home-block">
+          <p class="nest-greeting" id="greeting">Welcome back, Maya. You are not walking through this alone.</p>
+          <div class="nest-home-stage">
+            <section class="next-chapter" id="chapter">
+              <div class="next-chapter-accents" aria-hidden="true">
+                <img class="accent-leaf" src="./assets/lilbird-kit/accents/golden-leaf-sprig.webp" alt="" width="64" height="64" />
+                <img class="accent-wayfinder" src="./assets/lilbird-kit/accents/wayfinder-sign.webp" alt="" width="72" height="72" />
+              </div>
+              <div class="next-chapter-copy">
+                <p class="next-chapter-kicker">Your next chapter</p>
+                <h2 class="next-chapter-title" id="title">A little further along.</h2>
+                <p class="next-chapter-body" id="body">You've already started exploring what matters to you. Pick up where you left off.</p>
+                <div class="next-chapter-context" id="ctx">
+                  <p class="next-chapter-context-kicker">Where you left off</p>
+                  <h3 class="next-chapter-context-title">Your reflections</h3>
+                  <p class="next-chapter-context-body">Return to the thoughts you saved and see what feels important now.</p>
+                </div>
+                <div class="next-chapter-actions" id="actions"></div>
+              </div>
+            </section>
+            <div class="nest-companions-stage" aria-hidden="true">
+              <img class="nest-companions-day" src="./assets/lilbird-kit/companions/approved-companions-day-blended.webp" alt="" width="953" height="463" decoding="async" />
+              <img class="nest-companions-night" src="./assets/lilbird-kit/companions/approved-companions-night-blended.webp" alt="" width="953" height="472" decoding="async" />
+            </div>
+          </div>
+          <section class="nest-secondary" id="secondary" aria-label="Quick paths"></section>
+          <aside class="nonowner-solo-note" id="nonowner-note" hidden>
+            <strong>Non-owner Solo discoverability (fixture):</strong>
+            Solo stays locked on Learn &amp; grow — Buy Solo / membership path. No unlocked rail or Solo tab.
+          </aside>
+        </div>
+      </main>
+    </div>
+
+    <nav class="nest-mobile-bar" id="nest-mobile-bar" aria-label="Primary">
+      <button type="button" class="mobile-bar-link is-active"><i class="ti ti-home"></i><span>Home</span></button>
+      <button type="button" class="mobile-bar-link"><i class="ti ti-map-2"></i><span>Journey</span></button>
+      <a class="mobile-bar-link mobile-solo-tab" id="mobile-solo-tab" href="/solo/" hidden><i class="ti ti-book"></i><span>Solo</span></a>
+      <button type="button" class="mobile-bar-link"><i class="ti ti-feather"></i><span>Guide</span></button>
+      <button type="button" class="mobile-bar-link mobile-grow-tab" id="mobile-grow-tab"><i class="ti ti-books"></i><span>Grow</span></button>
+      <button type="button" class="mobile-bar-link"><i class="ti ti-dots"></i><span>More</span></button>
+    </nav>
+  </div>
+
+  <script>
+    (function () {
+      var member = 'returning';
+      var solo = 'continue';
+      var kit = './assets/lilbird-kit/icons/';
+      var members = {
+        returning: {
+          greeting: 'Welcome back, Maya. You are not walking through this alone.',
+          title: 'A little further along.',
+          body: "You've already started exploring what matters to you. Pick up where you left off.",
+          ctx: true,
+          primary: 'Continue reflecting →'
+        },
+        new: {
+          greeting: 'Welcome to your Nest. You are not walking through this alone.',
+          title: 'Finding your bearings',
+          body: "You don't need to have everything figured out. Tell us a little about where you are, and we'll help you find a good place to begin.",
+          ctx: false,
+          primary: 'What brings you here? →'
+        }
+      };
+      function soloEntry() {
+        if (solo === 'start') return { label: 'Start Solo Course →', title: 'Start Solo Course', body: 'Begin with Session 0 · First Flight.', href: '/solo/' };
+        if (solo === 'continue') return { label: 'Continue Solo Course →', title: 'Continue Solo Course', body: 'Next: Session 2 · Vision & Goals.', href: '/solo/' };
+        if (solo === 'complete') return { label: 'View My Flight Plan →', title: 'View My Flight Plan', body: 'All sessions complete. Revisit your Full Flight Plan anytime.', href: '/solo/?view=plan' };
+        return null;
+      }
+      function icon(kind) {
+        var src = kit + 'nest-watercolor.webp';
+        if (kind === 'canvas') src = kit + 'folded-map-watercolor.webp';
+        if (kind === 'solo') src = kit + 'open-book-watercolor.webp';
+        if (kind === 'guide') src = kit + 'lantern-watercolor.webp';
+        return '<img class="nest-secondary-watercolor" src="' + src + '" alt="" width="64" height="64" decoding="async" />';
+      }
+      function render() {
+        var m = members[member];
+        var s = soloEntry();
+        document.getElementById('label').textContent = member + ' · ' + (solo === 'off' ? 'non-owner' : 'Solo ' + solo);
+        document.getElementById('greeting').textContent = m.greeting;
+        document.getElementById('title').textContent = m.title;
+        document.getElementById('body').textContent = m.body;
+        document.getElementById('ctx').hidden = !m.ctx;
+        var secondary = s
+          ? '<a class="btn-quiet" href="' + s.href + '">' + s.label + '</a>'
+          : (member === 'new'
+            ? '<a class="btn-quiet" href="/inner-compass/?from=nest">Try the free Inner Compass</a>'
+            : '<button type="button" class="btn-quiet">Browse Learn &amp; grow</button>');
+        document.getElementById('actions').innerHTML =
+          '<button type="button" class="btn-primary-nest">' + m.primary + '</button>' + secondary;
+        var entitled = solo !== 'off';
+        document.getElementById('rail-solo').hidden = !entitled;
+        document.getElementById('mobile-solo-tab').hidden = !entitled;
+        document.getElementById('mobile-grow-tab').hidden = !!entitled;
+        document.getElementById('nest-mobile-bar').classList.toggle('has-solo', entitled);
+        document.getElementById('nonowner-note').hidden = entitled;
+        var cards = [
+          { kind: 'canvas', kicker: 'Life Canvas', title: 'See where you stand', body: 'Open your check-in and see how the different parts of your life feel right now.' }
+        ];
+        if (s) {
+          cards.push({ kind: 'solo', kicker: 'Solo Course', title: s.title, body: s.body, href: s.href });
+          cards.push({ kind: 'guide', kicker: 'My Guide', title: 'Talk it through', body: 'Ask about what is in front of you. Your guide is ready when you are.' });
+        } else {
+          cards.push({ kind: 'guide', kicker: 'My Guide', title: 'Talk it through', body: 'A place to bring hard questions. Included with Nest Plus.' });
+          cards.push({ kind: 'membership', kicker: 'Your Nest', title: 'What you have', body: 'Free Nest includes My Journey, coaching notes, and the First Flight workbook. Solo stays on Learn & grow until unlocked.' });
+        }
+        document.getElementById('secondary').innerHTML = cards.map(function (c) {
+          var inner = icon(c.kind) + '<p class="nest-secondary-kicker">' + c.kicker + '</p><h3 class="nest-secondary-title">' + c.title + '</h3><p class="nest-secondary-body">' + c.body + '</p>';
+          if (c.href) return '<article class="nest-secondary-card" data-kind="' + c.kind + '"><a class="nest-secondary-link" href="' + c.href + '">' + inner + '</a></article>';
+          return '<article class="nest-secondary-card" data-kind="' + c.kind + '"><button type="button">' + inner + '</button></article>';
+        }).join('');
+        document.querySelectorAll('[data-member]').forEach(function (b) { b.classList.toggle('is-on', b.getAttribute('data-member') === member); });
+        document.querySelectorAll('[data-solo]').forEach(function (b) { b.classList.toggle('is-on', b.getAttribute('data-solo') === solo); });
+        try {
+          var url = new URL(location.href);
+          url.searchParams.set('member', member);
+          url.searchParams.set('solo', solo);
+          history.replaceState(null, '', url);
+        } catch (e) {}
+      }
+      function setTheme(t) {
+        document.documentElement.setAttribute('data-theme', t);
+        document.querySelector('.theme-toggle-label').textContent = t === 'dark' ? 'Night' : 'Day';
+      }
+      document.querySelectorAll('[data-member]').forEach(function (b) {
+        b.addEventListener('click', function () { member = b.getAttribute('data-member'); render(); });
+      });
+      document.querySelectorAll('[data-solo]').forEach(function (b) {
+        b.addEventListener('click', function () { solo = b.getAttribute('data-solo'); render(); });
+      });
+      document.getElementById('btn-theme').addEventListener('click', function () {
+        setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+      });
+      document.getElementById('theme-toggle').addEventListener('click', function () {
+        setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+      });
+      var p = new URLSearchParams(location.search);
+      if (p.get('theme') === 'dark') setTheme('dark'); else setTheme('light');
+      if (p.get('hide-banner') === '1') document.getElementById('fixture-banner').style.display = 'none';
+      member = p.get('member') === 'new' ? 'new' : 'returning';
+      solo = ['off', 'start', 'continue', 'complete'].indexOf(p.get('solo')) >= 0 ? p.get('solo') : 'continue';
+      render();
+    })();
+  </script>
+</body>
+</html>

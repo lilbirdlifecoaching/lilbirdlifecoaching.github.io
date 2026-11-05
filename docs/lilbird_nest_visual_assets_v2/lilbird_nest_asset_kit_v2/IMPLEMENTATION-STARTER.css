@@ -1,0 +1,28 @@
+/* Lil’ Bird Nest layered composition — starting point only.
+   All copy/buttons/nav are live HTML. No flattened UI images. */
+.nest-world {
+  --nest-scene: url("../assets/lilbird-kit/backgrounds/valley-day.webp");
+  background-color: #f7f1e6;
+  background-image: linear-gradient(180deg, rgba(247,241,230,.05), rgba(247,241,230,.35)), var(--nest-scene);
+  background-position: center top;
+  background-size: auto, cover;
+  background-repeat: no-repeat;
+  min-height: 100dvh;
+}
+[data-theme="night"] .nest-world {
+  --nest-scene: url("../assets/lilbird-kit/backgrounds/valley-night.webp");
+  background-color: #0f2433;
+}
+.nest-chapter {
+  position: relative;
+  isolation: isolate;
+  color: #241f1b;
+  background: rgba(255,247,230,.95);
+  border-radius: 26px;
+  /* Consider CSS clip-path/mask for parchment edges, not text baked into images */
+}
+.nest-decorative { pointer-events:none; user-select:none; }
+@media (max-width: 767px) {
+  .nest-world { background-size:auto, auto 70vh; background-position:center top; }
+  .nest-companions { max-width:100%; object-fit:contain; }
+}

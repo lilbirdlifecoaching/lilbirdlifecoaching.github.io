@@ -1,0 +1,443 @@
+/* Phase 1B — Illustrated Nest world (concept #3).
+   Live HTML for all copy/nav/buttons. Decorative assets only.
+   Requires existing data-theme=light|dark on <html>. */
+
+.nest-page.nest-world {
+  --world-day: url("/nest/assets/lilbird-kit/backgrounds/valley-day.webp");
+  --world-night: url("/nest/assets/lilbird-kit/backgrounds/valley-night.webp");
+  --paper-grain: url("/nest/assets/lilbird-kit/textures/cream-grain.webp");
+  --paper-hero: url("/nest/assets/lilbird-kit/panels/paper-wide.webp");
+  --paper-card: url("/nest/assets/lilbird-kit/panels/paper-card-a.webp");
+  --paper-rail: url("/nest/assets/lilbird-kit/textures/paper-sample.webp");
+  --lb-bg: #c9b892;
+  --lb-surface: rgba(255, 248, 232, 0.94);
+  --lb-surface-raised: rgba(255, 252, 244, 0.97);
+  --lb-text: #241f1b;
+  --lb-muted: #5c5348;
+  --lb-accent: #b07a2c;
+  --lb-accent-soft: rgba(232, 183, 90, 0.28);
+  --lb-primary: #18495c;
+  --lb-primary-text: #fff9ef;
+  --lb-border: rgba(176, 146, 100, 0.45);
+  --lb-shadow: 0 18px 40px rgba(55, 42, 25, 0.12);
+  --lb-rail: 220px;
+  background-color: #c9b892;
+  background-image:
+    linear-gradient(180deg, rgba(247, 241, 230, 0.08) 0%, rgba(247, 241, 230, 0.22) 55%, rgba(201, 184, 146, 0.55) 100%),
+    var(--world-day);
+  background-position: center top, center 18%;
+  background-size: auto, cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  overflow-x: clip;
+  max-width: 100vw;
+}
+
+html[data-theme="dark"] .nest-page.nest-world {
+  --lb-bg: #0f2433;
+  --lb-surface: rgba(24, 45, 61, 0.92);
+  --lb-surface-raised: rgba(32, 54, 71, 0.96);
+  --lb-text: #f7f1e6;
+  --lb-muted: #c5d0d7;
+  --lb-accent: #f0bc59;
+  --lb-accent-soft: rgba(240, 188, 89, 0.2);
+  --lb-primary: #f0bc59;
+  --lb-primary-text: #142533;
+  --lb-border: rgba(90, 118, 138, 0.55);
+  --lb-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  background-color: #0f2433;
+  background-image:
+    linear-gradient(180deg, rgba(15, 36, 51, 0.15) 0%, rgba(15, 36, 51, 0.45) 70%, rgba(15, 36, 51, 0.72) 100%),
+    var(--world-night);
+  background-position: center top, center 20%;
+  background-size: auto, cover;
+}
+
+/* Kill Phase-1 flat parchment overlay when world mode is on */
+.nest-page.nest-world::before {
+  opacity: 0.18;
+  background-image: var(--paper-grain);
+  background-size: 120px 120px;
+  mix-blend-mode: soft-light;
+}
+html[data-theme="dark"] .nest-page.nest-world::before {
+  opacity: 0.1;
+  mix-blend-mode: soft-light;
+}
+
+/* ── Decorative world layers (non-interactive) ── */
+.nest-world-decor {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.nest-world-decor img {
+  position: absolute;
+  max-width: none;
+  display: block;
+}
+.world-canopy {
+  top: -2%;
+  left: 8%;
+  width: min(62vw, 720px);
+  opacity: 0.88;
+}
+.world-canopy-night { display: none; }
+html[data-theme="dark"] .world-canopy-day { display: none; }
+html[data-theme="dark"] .world-canopy-night {
+  display: block;
+  opacity: 0.55;
+  filter: brightness(0.75) saturate(0.85);
+}
+.world-lupines {
+  left: -1%;
+  bottom: 4%;
+  width: min(14vw, 140px);
+  opacity: 0.9;
+}
+.world-flowers {
+  right: 2%;
+  bottom: 6%;
+  width: min(12vw, 120px);
+  opacity: 0.85;
+}
+.world-rocks {
+  left: 28%;
+  bottom: -1%;
+  width: min(28vw, 320px);
+  opacity: 0.75;
+}
+.world-stars {
+  display: none;
+  top: 4%;
+  right: 6%;
+  width: min(40vw, 420px);
+  opacity: 0.7;
+}
+html[data-theme="dark"] .world-stars { display: block; }
+html[data-theme="dark"] .world-lupines,
+html[data-theme="dark"] .world-flowers {
+  opacity: 0.45;
+  filter: brightness(0.7) saturate(0.8);
+}
+
+.nest-app,
+.nest-world .view {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Chrome sits lightly on the landscape ── */
+.nest-world .nest-chrome {
+  background: color-mix(in srgb, var(--lb-surface) 78%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--lb-border) 55%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.nest-world .nest-greeting {
+  text-shadow: 0 1px 0 rgba(255, 249, 239, 0.35);
+  max-width: 40rem;
+}
+html[data-theme="dark"] .nest-world .nest-greeting {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+/* ── Rail as tall parchment panel ── */
+.nest-world .nest-rail {
+  margin: 0.85rem 0 1.25rem 0.85rem;
+  padding: 1.1rem 0.7rem 1.4rem 0.75rem;
+  border-radius: 22px;
+  border: 1px solid color-mix(in srgb, var(--lb-border) 60%, transparent);
+  background-color: rgba(255, 248, 232, 0.92);
+  background-image:
+    linear-gradient(180deg, rgba(255, 252, 244, 0.55), rgba(255, 248, 232, 0.75)),
+    var(--paper-rail);
+  background-size: auto, cover;
+  background-position: center;
+  box-shadow: var(--lb-shadow);
+  height: calc(100vh - 88px);
+  border-right: 0;
+}
+html[data-theme="dark"] .nest-world .nest-rail {
+  /* Warm parchment panels at night — landscape carries the night mood */
+  background-color: rgba(255, 246, 226, 0.9);
+  background-image:
+    linear-gradient(180deg, rgba(255, 250, 236, 0.55), rgba(244, 228, 198, 0.72)),
+    var(--paper-rail);
+  color: #241f1b;
+  filter: none;
+}
+html[data-theme="dark"] .nest-world .nest-rail .rail-link,
+html[data-theme="dark"] .nest-world .nest-rail .rail-sublink {
+  color: #2c2620;
+}
+html[data-theme="dark"] .nest-world .nest-rail .rail-link.is-active,
+html[data-theme="dark"] .nest-world .nest-rail .rail-link.dash-tab.active {
+  background: rgba(240, 188, 89, 0.35);
+  color: #1a1510;
+}
+
+.nest-world .rail-link.is-active,
+.nest-world .rail-link.dash-tab.active {
+  background: var(--lb-accent-soft);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--lb-accent) 35%, transparent);
+}
+
+/* ── Home stage: parchment chapter + companions in the landscape ── */
+.nest-home-stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(220px, 0.85fr);
+  gap: 0.5rem 1rem;
+  align-items: end;
+  margin: 0 0 1.35rem;
+  min-width: 0;
+}
+
+.nest-world .next-chapter {
+  grid-column: 1;
+  position: relative;
+  display: block;
+  grid-template-columns: none;
+  min-height: 0;
+  margin: 0;
+  padding: clamp(1.4rem, 3vw, 2.1rem) clamp(1.25rem, 2.6vw, 2rem);
+  border-radius: 26px;
+  border: 1px solid color-mix(in srgb, var(--lb-border) 50%, transparent);
+  background-color: rgba(255, 248, 232, 0.95);
+  background-image:
+    linear-gradient(155deg, rgba(255, 252, 244, 0.88), rgba(255, 245, 220, 0.92)),
+    var(--paper-hero);
+  background-size: auto, cover;
+  background-position: center;
+  box-shadow: var(--lb-shadow);
+  overflow: visible;
+}
+html[data-theme="dark"] .nest-world .next-chapter {
+  background-color: rgba(255, 246, 226, 0.94);
+  background-image:
+    linear-gradient(155deg, rgba(255, 250, 236, 0.9), rgba(244, 228, 198, 0.94)),
+    var(--paper-hero);
+  color: #241f1b;
+}
+html[data-theme="dark"] .nest-world .next-chapter-title,
+html[data-theme="dark"] .nest-world .next-chapter-context-title {
+  color: #241f1b;
+}
+html[data-theme="dark"] .nest-world .next-chapter-body,
+html[data-theme="dark"] .nest-world .next-chapter-context-body {
+  color: #5c5348;
+}
+html[data-theme="dark"] .nest-world .next-chapter-kicker,
+html[data-theme="dark"] .nest-world .next-chapter-context-kicker {
+  color: #9a6a22;
+}
+
+.nest-world .next-chapter-art { display: none; }
+
+.nest-world .next-chapter-copy {
+  max-width: 36rem;
+}
+
+.nest-companions-stage {
+  grid-column: 2;
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+  min-height: 240px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin-bottom: -0.35rem;
+}
+.nest-companions-stage img {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  object-fit: contain;
+  object-position: bottom center;
+  filter: drop-shadow(0 14px 24px rgba(40, 30, 18, 0.22));
+}
+.nest-companions-night { display: none; }
+html[data-theme="dark"] .nest-companions-day { display: none; }
+html[data-theme="dark"] .nest-companions-night { display: block; }
+
+/* Soft botanical accents on chapter (small, non-competing) */
+.nest-world .next-chapter-accents .accent-leaf {
+  width: 42px;
+  opacity: 0.55;
+}
+.nest-world .next-chapter-accents .accent-wayfinder {
+  width: 48px;
+  opacity: 0.4;
+  left: auto;
+  right: 1rem;
+  bottom: 0.85rem;
+}
+
+/* ── Secondary parchment cards ── */
+.nest-world .nest-secondary {
+  gap: 0.9rem;
+}
+.nest-world .nest-secondary-card {
+  position: relative;
+  padding: 1.05rem 1.05rem 1.15rem;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--lb-border) 55%, transparent);
+  background-color: rgba(255, 248, 232, 0.92);
+  background-image:
+    linear-gradient(180deg, rgba(255, 252, 244, 0.75), rgba(255, 245, 220, 0.85)),
+    var(--paper-card);
+  background-size: auto, cover;
+  box-shadow: 0 10px 28px rgba(55, 42, 25, 0.1);
+  overflow: hidden;
+}
+html[data-theme="dark"] .nest-world .nest-secondary-card {
+  background-color: rgba(255, 246, 226, 0.92);
+  background-image:
+    linear-gradient(180deg, rgba(255, 250, 236, 0.82), rgba(244, 228, 198, 0.9)),
+    var(--paper-card);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+  color: #241f1b;
+}
+html[data-theme="dark"] .nest-world .nest-secondary-title {
+  color: #241f1b;
+}
+html[data-theme="dark"] .nest-world .nest-secondary-body,
+html[data-theme="dark"] .nest-world .nest-secondary-kicker {
+  color: #5c5348;
+}
+html[data-theme="dark"] .nest-world .nest-secondary-kicker {
+  color: #9a6a22;
+}
+
+/* Keep primary CTAs teal on warm parchment (concept #3 night) */
+html[data-theme="dark"] .nest-world .btn-primary-nest {
+  background: #18495c;
+  color: #fff9ef;
+  border-color: #18495c;
+}
+html[data-theme="dark"] .nest-world .btn-quiet {
+  color: #241f1b;
+  border-color: rgba(36, 31, 27, 0.28);
+  background: rgba(255, 252, 244, 0.65);
+}
+html[data-theme="dark"] .nest-world .nest-mobile-bar {
+  background: color-mix(in srgb, rgba(255, 246, 226, 0.94) 88%, transparent);
+  border-top-color: rgba(176, 146, 100, 0.45);
+  color: #241f1b;
+}
+html[data-theme="dark"] .nest-world .mobile-bar-link {
+  color: #3a332c;
+}
+html[data-theme="dark"] .nest-world .mobile-bar-link.is-active {
+  background: rgba(240, 188, 89, 0.35);
+  color: #1a1510;
+}
+
+.nest-secondary-watercolor {
+  width: 3.1rem;
+  height: 3.1rem;
+  object-fit: contain;
+  margin-bottom: 0.15rem;
+  display: block;
+}
+.nest-world .nest-secondary-icon { display: none; }
+.nest-world .nest-secondary-watercolor + .nest-secondary-icon { display: none; }
+
+/* Prefer watercolor icons when present */
+.nest-secondary-card:has(.nest-secondary-watercolor) .nest-secondary-icon {
+  display: none;
+}
+
+/* ── Mobile / narrow ── */
+@media (max-width: 980px) {
+  .nest-page.nest-world {
+    background-attachment: scroll;
+    background-size: auto, auto 58vh;
+    background-position: center top, center top;
+  }
+  .nest-world-decor .world-canopy {
+    width: min(92vw, 420px);
+    left: -8%;
+    top: -1%;
+    opacity: 0.7;
+  }
+  .nest-world-decor .world-lupines,
+  .nest-world-decor .world-flowers,
+  .nest-world-decor .world-rocks {
+    display: none;
+  }
+  .nest-world .nest-rail { display: none; }
+
+  .nest-home-stage {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.65rem;
+  }
+  .nest-world .next-chapter {
+    grid-column: 1;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 1.1rem 1rem 1rem;
+    overflow: hidden;
+  }
+  .nest-companions-stage {
+    grid-column: 1;
+    min-height: 0;
+    margin: 0;
+    justify-content: center;
+  }
+  .nest-companions-stage img {
+    max-width: min(92vw, 360px);
+    width: 78%;
+  }
+  .nest-world .next-chapter-accents .accent-wayfinder { display: none; }
+  .nest-world .nest-greeting,
+  .nest-world .next-chapter-title,
+  .nest-world .next-chapter-body {
+    overflow-wrap: anywhere;
+    word-break: normal;
+    max-width: 100%;
+  }
+  .nest-world .nest-chrome {
+    padding: 0.5rem 0.75rem;
+    gap: 0.5rem;
+  }
+  .nest-world .nest-brand-name {
+    max-width: 42vw;
+  }
+}
+
+@media (max-width: 560px) {
+  .nest-page.nest-world {
+    background-size: auto, auto 48vh;
+  }
+  .nest-companions-stage img {
+    width: 72%;
+    max-width: 280px;
+  }
+  .nest-world .nest-secondary-watercolor {
+    width: 2.6rem;
+    height: 2.6rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .nest-world .mobile-bar-link {
+    font-size: 0.55rem;
+    min-height: 44px;
+    padding: 0.3rem 0.05rem;
+  }
+  .nest-world .mobile-bar-link i { font-size: 1.05rem; }
+  .nest-world .nest-brand-sub { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nest-world .nest-secondary-card,
+  .nest-world .rail-link {
+    transition: none !important;
+  }
+}

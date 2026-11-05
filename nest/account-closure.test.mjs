@@ -51,6 +51,6 @@ test('closure copy leaves coaching, the claim, and recovery in place', () => {
   assert.match(claim, /nest_owner_emails/);
   assert.doesNotMatch(claim, /delete from auth\.users/i);
   assert.match(recovery, /RECOVERY_MESSAGE/);
-  assert.match(nestPage, /nest-client\.js\?v=69/);
+  assert.match(nestPage, /nest-client\.js\?v=70/);
   assert.match(client, /nest-letters/);
 });

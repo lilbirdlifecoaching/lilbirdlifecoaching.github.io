@@ -1232,16 +1232,21 @@
   }
 
   function secondaryIcon(kind) {
+    const kit = './assets/lilbird-kit/icons/';
     if (kind === 'canvas') {
-      return '<span class="nest-secondary-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 7.5 12 4l8 3.5v9L12 20l-8-3.5v-9Z"/><path d="M12 4v16M4 7.5l8 3.5 8-3.5"/></svg></span>';
+      return '<img class="nest-secondary-watercolor" src="' + kit + 'folded-map-watercolor.webp" alt="" width="64" height="64" decoding="async" />' +
+        '<span class="nest-secondary-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 7.5 12 4l8 3.5v9L12 20l-8-3.5v-9Z"/><path d="M12 4v16M4 7.5l8 3.5 8-3.5"/></svg></span>';
     }
     if (kind === 'guide') {
-      return '<span class="nest-secondary-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 19c4-3 6-7 12-12-1 6-5 11-12 12Z"/><path d="M5 19c3-4 6-7 12-12"/><path d="m8 14-1-4m4 2-.5-4"/></svg></span>';
+      return '<img class="nest-secondary-watercolor" src="' + kit + 'lantern-watercolor.webp" alt="" width="64" height="64" decoding="async" />' +
+        '<span class="nest-secondary-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 19c4-3 6-7 12-12-1 6-5 11-12 12Z"/><path d="M5 19c3-4 6-7 12-12"/><path d="m8 14-1-4m4 2-.5-4"/></svg></span>';
     }
     if (kind === 'solo') {
-      return '<span class="nest-secondary-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 4h10a2 2 0 0 1 2 2v14l-5-2.5L7 20V6a2 2 0 0 1 2-2"/><path d="M17 4h2a2 2 0 0 1 2 2v14"/></svg></span>';
+      return '<img class="nest-secondary-watercolor" src="' + kit + 'open-book-watercolor.webp" alt="" width="64" height="64" decoding="async" />' +
+        '<span class="nest-secondary-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 4h10a2 2 0 0 1 2 2v14l-5-2.5L7 20V6a2 2 0 0 1 2-2"/><path d="M17 4h2a2 2 0 0 1 2 2v14"/></svg></span>';
     }
-    return '<span class="nest-secondary-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 12c3 5 6 7.5 8 7.5S17 17 20 12"/><path d="M5 14c4 3.5 10 4 14-.5"/><path d="M8 11.5c.5-3 2-5 4-5.5 2.5-.5 4 2 4 5"/></svg></span>';
+    return '<img class="nest-secondary-watercolor" src="' + kit + 'nest-watercolor.webp" alt="" width="64" height="64" decoding="async" />' +
+      '<span class="nest-secondary-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 12c3 5 6 7.5 8 7.5S17 17 20 12"/><path d="M5 14c4 3.5 10 4 14-.5"/><path d="M8 11.5c.5-3 2-5 4-5.5 2.5-.5 4 2 4 5"/></svg></span>';
   }
 
   function renderNestSecondary() {
@@ -1294,9 +1299,9 @@
         '<h3 class="nest-secondary-title">' + escapeHtml(card.title) + '</h3>' +
         '<p class="nest-secondary-body">' + escapeHtml(card.body) + '</p>';
       if (card.href) {
-        return '<article class="nest-secondary-card"><a class="nest-secondary-link" href="' + escapeHtml(card.href) + '">' + inner + '</a></article>';
+        return '<article class="nest-secondary-card" data-kind="' + escapeHtml(card.kind) + '"><a class="nest-secondary-link" href="' + escapeHtml(card.href) + '">' + inner + '</a></article>';
       }
-      return '<article class="nest-secondary-card"><button type="button" data-secondary-action="' + escapeHtml(card.action) + '">' + inner + '</button></article>';
+      return '<article class="nest-secondary-card" data-kind="' + escapeHtml(card.kind) + '"><button type="button" data-secondary-action="' + escapeHtml(card.action) + '">' + inner + '</button></article>';
     }).join('');
     host.querySelectorAll('[data-secondary-action]').forEach((btn) => {
       btn.addEventListener('click', () => {
