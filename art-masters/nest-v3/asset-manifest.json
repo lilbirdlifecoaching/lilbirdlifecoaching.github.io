@@ -1,0 +1,176 @@
+[
+  {
+    "file": "01-backdrop-day.png",
+    "width": 1774,
+    "height": 887,
+    "mode": "RGB",
+    "bytes": 3550984,
+    "sha256": "73c34a83556cb6d0ef070a033e7b5d45034e9f144d299df4628672534d382a8e",
+    "transparent_pixels": 0,
+    "alpha_extrema": null,
+    "visible_bounds": null
+  },
+  {
+    "file": "02-backdrop-night.png",
+    "width": 1774,
+    "height": 887,
+    "mode": "RGB",
+    "bytes": 3302333,
+    "sha256": "22190125b82f4e59a211361fbd3d83ee2cb19bd8ac04bf6f082fe43331279987",
+    "transparent_pixels": 0,
+    "alpha_extrema": null,
+    "visible_bounds": null
+  },
+  {
+    "file": "03-companions-day.png",
+    "width": 1254,
+    "height": 1254,
+    "mode": "RGBA",
+    "bytes": 2600337,
+    "sha256": "ef68ea6106e88e41200172f153ed3808cb05effee783b50a94555fccf6e88865",
+    "transparent_pixels": 663428,
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "visible_bounds": [
+      0,
+      9,
+      1240,
+      1235
+    ]
+  },
+  {
+    "file": "04-companions-night.png",
+    "width": 1254,
+    "height": 1254,
+    "mode": "RGBA",
+    "bytes": 2560244,
+    "sha256": "e482f5fa8d46be913feec593b58ef5800baa7e8b8b5ab52fc056e61df3b969a4",
+    "transparent_pixels": 637801,
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "visible_bounds": [
+      0,
+      19,
+      1248,
+      1254
+    ]
+  },
+  {
+    "file": "05-meadow-day.png",
+    "width": 2172,
+    "height": 724,
+    "mode": "RGBA",
+    "bytes": 1491362,
+    "sha256": "af09be58a9dca36d5aaf568864d85ebe0f8a4c3299a77940d2113424bd66686e",
+    "transparent_pixels": 1059579,
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "visible_bounds": [
+      0,
+      8,
+      2172,
+      724
+    ]
+  },
+  {
+    "file": "06-meadow-night.png",
+    "width": 2172,
+    "height": 724,
+    "mode": "RGBA",
+    "bytes": 1445242,
+    "sha256": "056879df245e24b5540d3859035728e15db85c0121982fa683dc57857370e04b",
+    "transparent_pixels": 1071665,
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "visible_bounds": [
+      0,
+      31,
+      2172,
+      708
+    ]
+  },
+  {
+    "file": "07-spot-mountains.png",
+    "width": 1254,
+    "height": 1254,
+    "mode": "RGBA",
+    "bytes": 684562,
+    "sha256": "ad790aeb63f5594ce303e8e53814e53f6aaa1906740a832eb024f2004a9305ff",
+    "transparent_pixels": 1322612,
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "visible_bounds": [
+      37,
+      71,
+      1230,
+      1182
+    ]
+  },
+  {
+    "file": "08-spot-book.png",
+    "width": 1254,
+    "height": 1254,
+    "mode": "RGBA",
+    "bytes": 936003,
+    "sha256": "85430563d1d1ca04792bb25f07011f8b24ec8038da96e273653f49c48e5a93cc",
+    "transparent_pixels": 1179350,
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "visible_bounds": [
+      0,
+      30,
+      1240,
+      1254
+    ]
+  },
+  {
+    "file": "09-spot-lantern.png",
+    "width": 1254,
+    "height": 1254,
+    "mode": "RGBA",
+    "bytes": 1362324,
+    "sha256": "6661f883e23e4419dd3c36f578b56cf1d8dc075e1af27304f14aefbabd8eb51e",
+    "transparent_pixels": 1055625,
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "visible_bounds": [
+      0,
+      7,
+      1242,
+      1254
+    ]
+  },
+  {
+    "file": "10-spot-nest.png",
+    "width": 1254,
+    "height": 1254,
+    "mode": "RGBA",
+    "bytes": 1773016,
+    "sha256": "68fae9c754132413bdab95aae153417f8eacb2fe276195a045464f52745bc795",
+    "transparent_pixels": 959085,
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "visible_bounds": [
+      0,
+      17,
+      1240,
+      1254
+    ]
+  }
+]

@@ -22,6 +22,12 @@ If a change touches pricing, booking, worker logic, or public copy, log it here.
 
 ## 2026-11-05 (Claude)
 
+### Nest Home — new layered artwork (v3) live
+- **Status:** `deployed` (Pages only)
+- ChatGPT layered set dropped in: `nest/assets/lilbird-kit/v3/` (scene day/night, companions day/night with lantern at night, meadow strip day/night, four card spots: mountains, book, lantern, nest). WebP derivatives; day/night pairs share one crop so they line up.
+- Full-size PNG masters + manifest + prompts kept in `art-masters/nest-v3/` and excluded from the published site via `_config.yml`.
+- `css/lilbird-nest-concept.css?v=20261105c2`, `nest/nest-client.js?v=73` (card spot paths). Fixture updated to match.
+
 ### Nest Home — code-drawn torn paper + one painted scene layer
 - **Status:** `built in repo` (Pages only, no worker or data changes)
 - New `js/lilbird-deckle.js`: injects SVG filters (`#lb-deckle-a/b/c/soft`) that tear panel edges from noise, so edges stay crisp at any card height. Replaces stretched `panels/*.webp` masks.

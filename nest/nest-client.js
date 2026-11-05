@@ -1273,22 +1273,23 @@
   }
 
   function secondaryIcon(kind) {
-    const kit = './assets/lilbird-kit/icons/';
-    let src = kit + 'nest-watercolor.webp';
-    let w = 203;
-    let h = 103;
+    // v3 spot art (transparent, from art-masters/nest-v3)
+    const kit = './assets/lilbird-kit/v3/';
+    let src = kit + 'spot-nest.webp';
+    let w = 520;
+    let h = 422;
     if (kind === 'canvas') {
-      src = kit + 'mountains-watercolor.webp';
-      w = 201;
-      h = 92;
+      src = kit + 'spot-mountains.webp';
+      w = 520;
+      h = 165;
     } else if (kind === 'guide') {
-      src = kit + 'lantern-watercolor.webp';
-      w = 79;
-      h = 89;
+      src = kit + 'spot-lantern.webp';
+      w = 520;
+      h = 519;
     } else if (kind === 'solo') {
-      src = kit + 'open-book-watercolor.webp';
-      w = 191;
-      h = 92;
+      src = kit + 'spot-book.webp';
+      w = 520;
+      h = 253;
     }
     return '<span class="nest-secondary-art" aria-hidden="true">' +
       '<img class="nest-secondary-watercolor" src="' + src + '" alt="" width="' + w + '" height="' + h + '" decoding="async" />' +

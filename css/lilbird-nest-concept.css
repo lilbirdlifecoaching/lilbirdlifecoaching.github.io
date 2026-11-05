@@ -12,8 +12,10 @@
  */
 
 .nest-page.nest-world {
-  --scene-day: url("/nest/assets/lilbird-kit/backgrounds/nest-valley-day.webp");
-  --scene-night: url("/nest/assets/lilbird-kit/backgrounds/nest-valley-night.webp");
+  --scene-day: url("/nest/assets/lilbird-kit/v3/scene-day.webp");
+  --meadow-day: url("/nest/assets/lilbird-kit/v3/meadow-day.webp");
+  --scene-night: url("/nest/assets/lilbird-kit/v3/scene-night.webp");
+  --meadow-night: url("/nest/assets/lilbird-kit/v3/meadow-night.webp");
   --paper-day:
     radial-gradient(120% 90% at 30% 20%, #fffdf6 0%, #fff7e6 48%, #f8ebcf 82%, #efdcb4 100%);
   --paper-night:
@@ -43,10 +45,12 @@ html[data-theme="dark"] .nest-page.nest-world {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background: var(--scene-day) center bottom / cover no-repeat;
+  background:
+    var(--meadow-day) center bottom / max(100%, 1100px) auto no-repeat,
+    var(--scene-day) center bottom / cover no-repeat;
 }
 html[data-theme="dark"] .nest-world .nest-world-decor {
-  background-image: var(--scene-night);
+  background-image: var(--meadow-night), var(--scene-night);
 }
 .nest-world .nest-world-decor img { display: none; }
 /* Calm the top-left so the greeting reads without a box */
@@ -394,4 +398,37 @@ html[data-theme] body.nest-world .nest-secondary-card[data-kind] {
   background-image: none !important;
   box-shadow: none !important;
   border-color: transparent !important;
+}
+
+/* ── v3 art (ChatGPT layered set, 5 Nov) ── */
+@media (min-width: 981px) {
+  .nest-companions-stage {
+    right: -9%;
+    bottom: -17%;
+    width: min(48%, 640px);
+  }
+  .nest-companions-stage img {
+    max-height: min(68vh, 620px);
+  }
+  .nest-world .nest-secondary-art { height: 5.4rem; min-height: 5.4rem; }
+}
+.nest-world .nest-secondary-watercolor,
+html[data-theme="dark"] .nest-world .nest-secondary-watercolor {
+  max-height: 5.1rem;
+  max-width: 10.5rem;
+  mix-blend-mode: normal;
+  filter: none;
+}
+.nest-world .nest-secondary-card[data-kind="canvas"] .nest-secondary-watercolor {
+  max-width: 11.5rem;
+}
+@media (max-width: 980px) {
+  .nest-world .nest-world-decor {
+    background-size: 160% auto, cover;
+    background-position: center bottom, 62% bottom;
+  }
+  .nest-companions-stage img {
+    width: min(86vw, 400px);
+    max-width: 400px;
+  }
 }

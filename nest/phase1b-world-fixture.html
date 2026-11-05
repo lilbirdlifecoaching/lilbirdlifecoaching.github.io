@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="/css/lilbird-nest-theme.css?v=20260917m" />
   <link rel="stylesheet" href="/css/lilbird-nest-redesign.css?v=20261105p1" />
   <link rel="stylesheet" href="/css/lilbird-nest-world.css?v=20261105e1" />
-  <link rel="stylesheet" href="/css/lilbird-nest-concept.css?v=20261105c1" />
+  <link rel="stylesheet" href="/css/lilbird-nest-concept.css?v=20261105c2" />
   <style>
     .fixture-banner {
       position: sticky; top: 0; z-index: 60;
@@ -126,8 +126,8 @@
               </div>
             </section>
             <div class="nest-companions-stage" aria-hidden="true">
-              <img class="nest-companions-day" src="./assets/lilbird-kit/companions/nest-companions-day.webp" alt="" width="1611" height="1095" decoding="async" />
-              <img class="nest-companions-night" src="./assets/lilbird-kit/companions/nest-companions-night.webp" alt="" width="1293" height="720" decoding="async" />
+              <img class="nest-companions-day" src="./assets/lilbird-kit/v3/companions-day.webp" alt="" width="1213" height="1079" decoding="async" />
+              <img class="nest-companions-night" src="./assets/lilbird-kit/v3/companions-night.webp" alt="" width="1213" height="1079" decoding="async" />
             </div>
           </div>
           <section class="nest-secondary" id="secondary" aria-label="Quick paths"></section>
@@ -179,10 +179,11 @@
         return null;
       }
       function icon(kind) {
-        var src = kit + 'nest-watercolor.webp', w = 203, h = 103;
-        if (kind === 'canvas') { src = kit + 'mountains-watercolor.webp'; w = 201; h = 92; }
-        if (kind === 'solo') { src = kit + 'open-book-watercolor.webp'; w = 191; h = 92; }
-        if (kind === 'guide') { src = kit + 'lantern-watercolor.webp'; w = 79; h = 89; }
+        var v3 = './assets/lilbird-kit/v3/';
+        var src = v3 + 'spot-nest.webp', w = 520, h = 422;
+        if (kind === 'canvas') { src = v3 + 'spot-mountains.webp'; w = 520; h = 165; }
+        if (kind === 'solo') { src = v3 + 'spot-book.webp'; w = 520; h = 253; }
+        if (kind === 'guide') { src = v3 + 'spot-lantern.webp'; w = 520; h = 519; }
         return '<span class="nest-secondary-art" aria-hidden="true"><img class="nest-secondary-watercolor" src="' + src + '" alt="" width="' + w + '" height="' + h + '" decoding="async" /></span>';
       }
       function render() {
