@@ -5,7 +5,7 @@
    do not “fix” soft edges or low-res backgrounds with blur/mask filters. */
 
 .nest-page.nest-world {
-  /* Nov 5 replacements — opaque panoramas; companions are separate RGBA cutouts */
+  /* Opaque valley panoramas + blended companion vignettes + deckle panel silhouettes */
   --world-day: url("/nest/assets/lilbird-kit/backgrounds/nest-valley-day.webp");
   --world-night: url("/nest/assets/lilbird-kit/backgrounds/nest-valley-night.webp");
   /* cream-grain.webp is a ~57px circular stamp — never tile it.
@@ -18,8 +18,14 @@
   --parchment-muted: #4f463c;
   --parchment-accent: #9a6a22;
   --parchment-border: rgba(176, 146, 100, 0.45);
-  /* Fully opaque warm wash — no texture images */
+  /* Fully opaque warm wash under deckle masks */
   --parchment-surface: linear-gradient(180deg, #fffdf8 0%, #fff8e8 100%);
+  /* Deckle silhouettes from kit panels (alpha edges) — mask only, not tiled fills */
+  --deckle-chapter: url("/nest/assets/lilbird-kit/panels/parchment-hero-large.webp");
+  --deckle-card-a: url("/nest/assets/lilbird-kit/panels/parchment-hero-horizontal.webp");
+  --deckle-card-b: url("/nest/assets/lilbird-kit/panels/paper-wide.webp");
+  --deckle-card-c: url("/nest/assets/lilbird-kit/panels/parchment-hero-small.webp");
+  --deckle-rail: url("/nest/assets/lilbird-kit/panels/paper-sidebar-tall.webp");
   --lb-bg: #c9b892;
   --lb-surface: #fff8e8;
   --lb-surface-raised: #fffcf4;
@@ -191,25 +197,31 @@ html[data-theme="dark"] .nest-world .nest-greeting-sub {
   .nest-world .nest-brand-rail { display: none; }
 }
 
-/* ── Rail: content-height parchment (not a tall empty column) ── */
+/* ── Rail: content-height deckled parchment (not a tall empty column) ── */
 .nest-world .nest-rail {
   position: relative;
   margin: 0.85rem 0 1.25rem 0.85rem;
-  padding: 1rem 0.8rem 1.15rem 0.85rem;
-  border-radius: 26px;
-  border: 1px solid var(--parchment-border);
+  padding: 1.15rem 1rem 1.35rem 1.05rem;
+  border-radius: 0;
+  border: 0;
   background-color: var(--parchment) !important;
   background-image: var(--parchment-surface) !important;
   background-repeat: no-repeat !important;
   background-size: auto !important;
-  box-shadow: 0 16px 34px rgba(40, 28, 14, 0.14);
+  box-shadow: none;
+  filter: drop-shadow(0 14px 28px rgba(40, 28, 14, 0.16));
   height: auto;
   max-height: calc(100vh - 88px);
   overflow: auto;
-  border-right: 1px solid var(--parchment-border);
   color: var(--parchment-ink);
-  -webkit-mask-image: none !important;
-  mask-image: none !important;
+  -webkit-mask-image: var(--deckle-rail);
+  mask-image: var(--deckle-rail);
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-mode: alpha;
+  mask-mode: alpha;
 }
 .nest-world .nest-rail::after {
   content: "";
@@ -240,15 +252,17 @@ html[data-theme="dark"] .nest-world .nest-rail .rail-link.dash-tab.active {
   box-shadow: inset 0 0 0 1px rgba(176, 122, 44, 0.35);
 }
 
-/* ── Home stage: illustrated journal chapter + companions ── */
+/* ── Home stage: chapter overlays left; companions grounded in the valley right ── */
 .nest-home-stage {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1.12fr) minmax(240px, 0.88fr);
-  gap: 0.85rem 1.25rem;
-  align-items: end;
-  margin: 0 0 1.25rem;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  align-items: start;
+  margin: 0 0 0.65rem;
   min-width: 0;
+  min-height: min(54vh, 560px);
+  isolation: isolate;
 }
 
 .nest-world .next-chapter {
@@ -257,20 +271,29 @@ html[data-theme="dark"] .nest-world .nest-rail .rail-link.dash-tab.active {
   z-index: 2;
   display: block;
   grid-template-columns: none;
+  width: min(100%, 38rem);
+  max-width: 52%;
   min-height: 0;
   margin: 0;
-  padding: clamp(1.55rem, 3.2vw, 2.35rem) clamp(1.45rem, 3vw, 2.4rem) clamp(1.4rem, 2.8vw, 2rem);
-  border-radius: 28px;
-  border: 1px solid var(--parchment-border);
+  padding: clamp(1.85rem, 3.4vw, 2.55rem) clamp(1.7rem, 3.2vw, 2.65rem) clamp(1.55rem, 3vw, 2.15rem);
+  border-radius: 0;
+  border: 0;
   background-color: var(--parchment) !important;
   background-image: var(--parchment-surface) !important;
   background-repeat: no-repeat !important;
   background-size: auto !important;
-  box-shadow: 0 20px 40px rgba(40, 28, 14, 0.15);
+  box-shadow: none;
+  filter: drop-shadow(0 18px 36px rgba(40, 28, 14, 0.18));
   overflow: visible;
   color: var(--parchment-ink);
-  -webkit-mask-image: none !important;
-  mask-image: none !important;
+  -webkit-mask-image: var(--deckle-chapter);
+  mask-image: var(--deckle-chapter);
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-mode: alpha;
+  mask-mode: alpha;
 }
 html[data-theme="dark"] .nest-world .next-chapter {
   background-color: var(--parchment) !important;
@@ -356,51 +379,41 @@ html[data-theme="dark"] .nest-world .next-chapter {
   gap: 0.75rem;
 }
 
+/* Companions are landscape ground on the right — not a side-panel cutout */
 .nest-companions-stage {
-  grid-column: 2;
-  position: relative;
+  position: absolute;
+  right: -4%;
+  bottom: -12%;
   z-index: 1;
   pointer-events: none;
-  min-height: 280px;
+  width: min(68%, 780px);
+  min-height: 0;
   display: flex;
   align-items: flex-end;
-  justify-content: center;
+  justify-content: flex-end;
   margin: 0;
   padding: 0;
 }
 .nest-companions-stage img {
   width: 100%;
-  max-width: 400px;
-  max-height: min(48vh, 440px);
+  max-width: none;
+  max-height: min(58vh, 520px);
   height: auto;
   object-fit: contain;
-  object-position: bottom center;
-  /* Soften hard cutout edges into the landscape */
-  -webkit-mask-image:
-    linear-gradient(180deg, transparent 0%, #000 10%, #000 78%, transparent 100%),
-    linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
-  mask-image:
-    linear-gradient(180deg, transparent 0%, #000 10%, #000 78%, transparent 100%),
-    linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
-  -webkit-mask-composite: source-in;
-  mask-composite: intersect;
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  filter: drop-shadow(0 14px 22px rgba(40, 28, 14, 0.18));
+  object-position: bottom right;
+  /* Blended assets already feather — no extra CSS cutout masks */
+  -webkit-mask-image: none;
+  mask-image: none;
+  filter: drop-shadow(0 12px 22px rgba(40, 28, 14, 0.16));
 }
 .nest-companions-night { display: none; }
 html[data-theme="dark"] .nest-companions-day { display: none; }
 html[data-theme="dark"] .nest-companions-night { display: block; }
 
 /* Leaf sits above the kicker row so it never overlaps text */
-.nest-world .next-chapter {
-  padding-top: clamp(2.4rem, 4vw, 3rem);
-}
 .nest-world .next-chapter-accents .accent-leaf {
-  top: 0.55rem;
-  left: 0.85rem;
+  top: 0.85rem;
+  left: 1.15rem;
   right: auto;
   width: 42px;
   opacity: 0.8;
@@ -414,28 +427,44 @@ html[data-theme="dark"] .nest-companions-night { display: block; }
   display: none;
 }
 
-/* ── Secondary cards: distinct illustrated invitations ── */
+/* ── Secondary cards: distinct illustrated invitations on deckled paper ── */
 .nest-world .nest-secondary {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
+  gap: 1.1rem;
+  margin-top: 0.85rem;
 }
 .nest-world .nest-secondary-card {
   position: relative;
-  padding: 1.15rem 1.1rem 1.25rem;
-  border-radius: 22px;
-  border: 1px solid var(--parchment-border);
+  padding: 1.35rem 1.25rem 1.4rem;
+  border-radius: 0;
+  border: 0;
   background-color: var(--parchment) !important;
   background-image: var(--parchment-surface) !important;
   background-repeat: no-repeat !important;
   background-size: auto !important;
-  box-shadow: 0 12px 28px rgba(40, 28, 14, 0.12);
+  box-shadow: none;
+  filter: drop-shadow(0 12px 24px rgba(40, 28, 14, 0.14));
   overflow: visible;
   color: var(--parchment-ink);
-  -webkit-mask-image: none !important;
-  mask-image: none !important;
+  -webkit-mask-image: var(--deckle-card-a);
+  mask-image: var(--deckle-card-a);
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-mode: alpha;
+  mask-mode: alpha;
+}
+.nest-world .nest-secondary-card:nth-child(2) {
+  -webkit-mask-image: var(--deckle-card-b);
+  mask-image: var(--deckle-card-b);
+}
+.nest-world .nest-secondary-card:nth-child(3) {
+  -webkit-mask-image: var(--deckle-card-c);
+  mask-image: var(--deckle-card-c);
 }
 .nest-world .nest-secondary-card[data-kind="solo"],
 .nest-world .nest-secondary-card[data-kind="guide"] {
@@ -761,16 +790,18 @@ html[data-theme="dark"] .nest-world .mobile-bar-link.is-active {
   .nest-home-stage {
     display: flex;
     flex-direction: column;
-    gap: 0.85rem;
-    margin-bottom: 0.85rem;
+    gap: 0.35rem;
+    margin-bottom: 0.65rem;
+    min-height: 0;
   }
   .nest-world .next-chapter {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
-    padding: 2.15rem 1.05rem 1rem 1.15rem;
+    padding: 2.15rem 1.25rem 1.15rem 1.35rem;
     overflow: visible;
     z-index: 2;
+    filter: drop-shadow(0 14px 28px rgba(40, 28, 14, 0.16));
   }
   .nest-world .next-chapter-copy {
     gap: 0.55rem;
@@ -825,29 +856,33 @@ html[data-theme="dark"] .nest-world .mobile-bar-link.is-active {
     opacity: 0.62;
   }
 
-  /* Own intentional band — no negative-margin overlap / head clipping */
+  /* Grounded band under chapter — still landscape, not a floating sticker */
   .nest-companions-stage {
+    position: relative;
+    right: auto;
+    bottom: auto;
     width: 100%;
     min-height: 0;
-    margin: 0;
-    padding: 0.15rem 0 0.25rem;
+    margin: -0.35rem 0 0;
+    padding: 0;
     justify-content: center;
-    align-self: center;
+    align-self: stretch;
     z-index: 1;
   }
   .nest-companions-stage img {
-    width: min(72vw, 280px);
-    max-width: 280px;
+    width: min(92vw, 420px);
+    max-width: 420px;
     max-height: none;
+    object-position: bottom center;
   }
 
   .nest-world .nest-secondary {
-    margin-top: 0;
+    margin-top: 0.35rem;
     grid-template-columns: 1fr;
-    gap: 0.75rem;
+    gap: 0.85rem;
   }
   .nest-world .nest-secondary-card {
-    padding: 1rem 1rem 1.1rem;
+    padding: 1.2rem 1.2rem 1.3rem;
   }
   .nest-world .nest-secondary-art {
     min-height: 4.25rem;
@@ -887,8 +922,8 @@ html[data-theme="dark"] .nest-world .mobile-bar-link.is-active {
     background-position: center top, center 18%;
   }
   .nest-companions-stage img {
-    width: min(78vw, 260px);
-    max-width: 260px;
+    width: min(94vw, 380px);
+    max-width: 380px;
   }
 }
 
@@ -901,16 +936,41 @@ html[data-theme="dark"] .nest-world .mobile-bar-link.is-active {
   .nest-world .mobile-bar-link i { font-size: 1.05rem; }
   .nest-world .nest-brand-sub { display: none; }
   .nest-world .next-chapter {
-    padding: 1rem 0.9rem 0.9rem;
+    padding: 1.35rem 1.1rem 1.05rem;
   }
   .nest-companions-stage img {
-    width: min(82vw, 240px);
+    width: min(96vw, 340px);
   }
 }
 
+/* Soft settle-in — presence, not noise */
+@keyframes nest-world-settle {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes nest-companions-settle {
+  from { opacity: 0; transform: translateY(16px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.nest-world .next-chapter {
+  animation: nest-world-settle 0.7s ease-out both;
+}
+.nest-world .nest-companions-stage {
+  animation: nest-companions-settle 0.95s 0.12s ease-out both;
+}
+.nest-world .nest-secondary-card {
+  animation: nest-world-settle 0.65s ease-out both;
+}
+.nest-world .nest-secondary-card:nth-child(1) { animation-delay: 0.18s; }
+.nest-world .nest-secondary-card:nth-child(2) { animation-delay: 0.28s; }
+.nest-world .nest-secondary-card:nth-child(3) { animation-delay: 0.38s; }
+
 @media (prefers-reduced-motion: reduce) {
   .nest-world .nest-secondary-card,
-  .nest-world .rail-link {
+  .nest-world .rail-link,
+  .nest-world .next-chapter,
+  .nest-world .nest-companions-stage {
     transition: none !important;
+    animation: none !important;
   }
 }
