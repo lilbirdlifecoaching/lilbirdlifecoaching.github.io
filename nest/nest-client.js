@@ -40,7 +40,7 @@
   let canvasDraft = null;
   let canvasStatus = '';
   let canvasAccessNote = '';
-  let journeySignals = { rows: [], latestStep: null, status: '' };
+  let journeySignals = { rows: [], checkins: [], activeFocus: null, latestStep: null, status: '' };
   const CANVAS_DIMS = [
     { key: 'why', title: 'Passion & Purpose', color: '#F5C842', question: 'How alive does what you\'re doing feel?' },
     { key: 'who', title: 'Connections', color: '#4adea8', question: 'How held are you by the people around you?' },
@@ -806,7 +806,14 @@
   }
 
   async function loadJourneySignals() {
-    journeySignals = { rows: [], latestStep: null, status: '' };
+    journeySignals = {
+      rows: [],
+      checkins: [],
+      activeFocus: null,
+      latestStep: null,
+      status: '',
+      checkinsStatus: 'unknown'
+    };
     if (!currentUser?.id) return;
     try {
       const result = await sb
@@ -814,18 +821,80 @@
         .select('id, tool_id, next_step, insight, created_at')
         .eq('user_id', currentUser.id)
         .order('created_at', { ascending: false })
-        .limit(8);
+        .limit(24);
       if (result.error) {
         if (result.error.code === '42P01' || /journey_reflections/.test(result.error.message || '')) {
           journeySignals.status = 'unavailable';
+        } else {
+          journeySignals.status = 'error';
+          console.warn('journey reflections:', result.error);
         }
         return;
       }
       journeySignals.rows = result.data || [];
-      journeySignals.latestStep = journeySignals.rows.find((row) => row.next_step) || null;
+
+      let checkinsOpts = { checkinsUnavailable: false, checkinsError: false };
+      try {
+        const checkins = await sb
+          .from('journey_checkins')
+          .select('id, reflection_id, response, note, created_at')
+          .eq('user_id', currentUser.id)
+          .order('created_at', { ascending: false })
+          .order('id', { ascending: false })
+          .limit(40);
+        if (checkins.error) {
+          if (checkins.error.code === '42P01' || /journey_checkins/.test(checkins.error.message || '')) {
+            journeySignals.checkinsStatus = 'missing';
+            journeySignals.checkins = [];
+            checkinsOpts = { checkinsUnavailable: true, checkinsError: false };
+          } else {
+            // Do not treat as empty — empty would incorrectly revive legacy focus.
+            journeySignals.checkinsStatus = 'error';
+            journeySignals.checkins = [];
+            checkinsOpts = { checkinsUnavailable: false, checkinsError: true };
+            console.warn('journey checkins:', checkins.error);
+          }
+        } else {
+          journeySignals.checkinsStatus = 'ok';
+          journeySignals.checkins = checkins.data || [];
+        }
+      } catch (e) {
+        journeySignals.checkinsStatus = 'error';
+        journeySignals.checkins = [];
+        checkinsOpts = { checkinsUnavailable: false, checkinsError: true };
+        console.warn('journey checkins:', e);
+      }
+
+      const focus = resolveActiveFocusClient(journeySignals.rows, journeySignals.checkins, checkinsOpts);
+      journeySignals.activeFocus = focus;
+      journeySignals.latestStep = focus.status === 'active' ? focus.reflection : null;
     } catch (e) {
       console.warn('journey signals:', e);
     }
+  }
+
+  /**
+   * Home uses the same resolveActiveFocus as My Journey via window.LilbirdJourneyFocus
+   * (set by nest/journey-focus.js module). Fallback is legacy-only and never invents resting.
+   */
+  function resolveActiveFocusClient(reflections, checkins, options) {
+    const api = window.LilbirdJourneyFocus;
+    if (api && typeof api.resolveActiveFocus === 'function') {
+      return api.resolveActiveFocus(reflections, checkins, options);
+    }
+    const rows = Array.isArray(reflections) ? reflections : [];
+    if (options && options.checkinsError) {
+      return { status: 'none', reflection: null, source: null, legacy: false, error: true };
+    }
+    const legacy = rows.find((row) => row && String(row.next_step || '').trim()) || null;
+    if (legacy) return { status: 'active', reflection: legacy, source: null, legacy: true };
+    return { status: 'none', reflection: null, source: null, legacy: false };
+  }
+
+  async function refreshJourneySignals() {
+    await loadJourneySignals();
+    renderNextChapter();
+    renderNestSecondary();
   }
 
   function demoChapterOverride() {
@@ -840,10 +909,17 @@
     // Hierarchy: next_step → Journey reflections → Life Canvas → Inner Compass → invitation
     const override = demoChapterOverride();
     if (override === 'active') return 'active';
+    if (override === 'resting') return 'resting';
     if (override === 'returning') return 'reflections';
     if (override === 'new') return 'new';
 
-    if (journeySignals.latestStep && journeySignals.latestStep.next_step) return 'active';
+    if (journeySignals.activeFocus?.error) {
+      return journeySignals.rows.length > 0 ? 'reflections' : 'new';
+    }
+    if (journeySignals.activeFocus?.status === 'active' && journeySignals.activeFocus.reflection?.next_step) {
+      return 'active';
+    }
+    if (journeySignals.activeFocus?.status === 'resting') return 'resting';
     if (journeySignals.rows.length > 0) return 'reflections';
     if (Array.isArray(canvasHistory) && canvasHistory.length > 0) return 'canvas';
     if (hasInnerCompassComplete()) return 'compass';
@@ -854,6 +930,7 @@
   function chapterStateFromData() {
     const focus = resolveChapterFocus();
     if (focus === 'active') return 'active';
+    if (focus === 'resting') return 'returning';
     if (focus === 'new') return 'new';
     return 'returning';
   }
@@ -917,6 +994,16 @@
           action: 'journey-step',
           reflectionId: journeySignals.latestStep?.id || ''
         },
+        secondary: { label: 'Browse Learn & grow', action: 'products' }
+      };
+    } else if (focus === 'resting') {
+      const resting = window.LilbirdJourneyFocus?.RESTING_CHAPTER;
+      cfg = {
+        kicker: resting?.kicker || 'Your next chapter',
+        title: resting?.title || "What's next?",
+        body: resting?.body || "You've put your last step aside. When you're ready, you can choose what you'd like to work on next.",
+        context: null,
+        primary: { label: resting?.primaryLabel || 'Explore My Journey', action: 'journey' },
         secondary: { label: 'Browse Learn & grow', action: 'products' }
       };
     } else if (focus === 'reflections') {
@@ -1034,7 +1121,12 @@
   }
 
   function returnToNextStep(reflectionId) {
-    const id = String(reflectionId || journeySignals.latestStep?.id || '').trim();
+    const id = String(
+      reflectionId ||
+        journeySignals.activeFocus?.reflection?.id ||
+        journeySignals.latestStep?.id ||
+        ''
+    ).trim();
     if (window.LilbirdJourney && typeof window.LilbirdJourney.focusReflection === 'function') {
       void window.LilbirdJourney.focusReflection(id, { announce: true });
       return;
@@ -3023,6 +3115,7 @@
     setTab,
     workerUrl: SOLO_WORKER_URL,
     getUser() { return currentUser; },
+    refreshJourneySignals,
   };
   function refreshJourney() {
     if (window.LilbirdJourney) void window.LilbirdJourney.refresh();

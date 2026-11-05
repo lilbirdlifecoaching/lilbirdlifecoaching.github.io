@@ -7,10 +7,20 @@ import {
 } from './journey-reflect.js?v=4';
 import { createJourneySession, saveOutcome } from './journey-session.js';
 import {
+  CHECKIN_RESPONSES,
   FOCUS_FOUND_STATUS,
   FOCUS_MISSING_STATUS,
+  MEMBER_CHECKIN_CHOICES,
+  NOTE_MAX,
+  checkinChoice,
+  clipCheckinNote,
+  hasNextStep,
+  historyLabel,
+  isMemberCheckinResponse,
+  resolveActiveFocus,
   resolveFocusReflection,
-} from './journey-focus.js?v=1';
+  sortCheckinsNewestFirst,
+} from './journey-focus.js?v=2';
 import {
   categoryLabel,
   recommendTools,
@@ -41,6 +51,10 @@ const state = {
   savedTitle: '',
   highlightId: '',
   rows: [],
+  checkins: [],
+  checkinsUnavailable: false,
+  checkinsError: false,
+  checkinUi: null,
   status: '',
   busy: false,
   query: '',
@@ -107,6 +121,8 @@ async function loadRows() {
   const user = api && api.getUser ? api.getUser() : null;
   if (!api || !user?.id) {
     state.rows = [];
+    state.checkins = [];
+    state.checkinsUnavailable = false;
     return;
   }
   const result = await api.sb
@@ -119,19 +135,89 @@ async function loadRows() {
     state.status = result.error.code === '42P01' || /journey_reflections/.test(result.error.message || '')
       ? 'Saving opens once the Journey table is in place. Nothing is stored until then.'
       : 'Your saved reflections could not be loaded.';
+  } else {
+    state.rows = result.data || [];
+    if (state.status.indexOf('Journey table') === 0) state.status = '';
+  }
+  await loadCheckins();
+}
+
+async function loadCheckins() {
+  const api = host();
+  const user = api && api.getUser ? api.getUser() : null;
+  if (!api || !user?.id) {
+    state.checkins = [];
+    state.checkinsUnavailable = false;
+    state.checkinsError = false;
     return;
   }
-  state.rows = result.data || [];
-  if (state.status.indexOf('Journey table') === 0) state.status = '';
+  try {
+    const result = await api.sb
+      .from('journey_checkins')
+      .select('id, reflection_id, response, note, created_at')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false });
+    if (result.error) {
+      if (result.error.code === '42P01' || /journey_checkins/.test(result.error.message || '')) {
+        state.checkinsUnavailable = true;
+        state.checkinsError = false;
+        state.checkins = [];
+        return;
+      }
+      // Auth / permission / unexpected errors — do not pretend the stream is empty.
+      state.checkinsUnavailable = false;
+      state.checkinsError = true;
+      state.checkins = [];
+      if (!state.status) {
+        state.status = 'Your check-ins could not be loaded. Your reflections are still here.';
+      }
+      console.warn('journey checkins:', result.error);
+      return;
+    }
+    state.checkinsUnavailable = false;
+    state.checkinsError = false;
+    state.checkins = sortCheckinsNewestFirst(result.data || []);
+  } catch (e) {
+    state.checkinsUnavailable = false;
+    state.checkinsError = true;
+    state.checkins = [];
+    console.warn('journey checkins:', e);
+  }
+}
+
+function currentFocus() {
+  return resolveActiveFocus(state.rows, state.checkins, {
+    checkinsUnavailable: state.checkinsUnavailable,
+    checkinsError: state.checkinsError,
+  });
+}
+
+function notifyHostFocus() {
+  if (host() && typeof host().refreshJourneySignals === 'function') {
+    void host().refreshJourneySignals();
+  }
+}
+
+function checkinsForReflection(reflectionId) {
+  const id = String(reflectionId || '');
+  return state.checkins.filter((row) => row && String(row.reflection_id) === id);
 }
 
 function renderPreview() {
   const card = preview();
   if (!card) return;
-  const steps = state.rows.filter((row) => row.next_step);
-  const latest = steps[0];
+  const focus = currentFocus();
+  const latest = focus.status === 'active' ? focus.reflection : null;
   if (!latest) {
-    card.innerHTML = '<p class="sidebar-eyebrow">my journey</p><h4>Tools for the Tangle</h4><p>A short exercise can leave you with one next step. Saving is optional.</p><button type="button" class="btn btn-outline full" data-open-journey>Open My Journey</button>';
+    const resting = focus.status === 'resting';
+    card.innerHTML = '<p class="sidebar-eyebrow">my journey</p><h4>' +
+      (resting ? 'What’s next?' : 'Tools for the Tangle') +
+      '</h4><p>' +
+      (resting
+        ? 'When you’re ready, choose what you’d like to work on next.'
+        : 'A short exercise can leave you with one next step. Saving is optional.') +
+      '</p><button type="button" class="btn btn-outline full" data-open-journey>Open My Journey</button>';
     return;
   }
   const view = reflectionView(latest);
@@ -252,17 +338,205 @@ function reflectionHtml(row) {
   const view = reflectionView(row);
   const body = view.fields.map((field) => '<p><span>' + escapeHtml(field.label) + '</span> ' + escapeHtml(field.value) + '</p>').join('');
   const note = view.insight ? '<p class="journey-note"><span>Coaching note</span> ' + escapeHtml(view.insight) + '</p>' : '';
-  const focused = state.highlightId === row.id;
+  const focus = currentFocus();
+  const isActiveFocus = !!(focus.reflection && focus.reflection.id === row.id);
+  const focused = state.highlightId === row.id || isActiveFocus;
   const stepLine = '<p class="journey-card-step"><span>Next step</span> ' + escapeHtml(view.nextStep || 'Not named') + '</p>';
+  const badge = isActiveFocus ? '<p class="journey-focus-badge">Your current focus</p>' : '';
   return (
-    '<article class="journey-reflection' + (focused ? ' is-returning' : '') + '" id="reflection-' + escapeHtml(row.id) + '"' +
+    '<article class="journey-reflection' + (focused ? ' is-returning' : '') + (isActiveFocus ? ' is-active-focus' : '') +
+      '" id="reflection-' + escapeHtml(row.id) + '"' +
       (focused ? ' aria-current="true"' : '') + '>' +
       '<header><h4>' + escapeHtml(view.title) + '</h4><time>' + escapeHtml(formatWhen(row.created_at)) + '</time></header>' +
+      badge +
       stepLine +
+      checkinPanelHtml(row, isActiveFocus) +
       '<details' + (focused ? ' open' : '') + '><summary>Open this reflection</summary>' + body + note + '</details>' +
       '<button type="button" class="btn btn-outline" data-delete-reflection="' + escapeHtml(row.id) + '">Delete</button>' +
     '</article>'
   );
+}
+
+function checkinHistoryHtml(row) {
+  const list = checkinsForReflection(row.id);
+  if (!list.length) return '';
+  return (
+    '<ul class="journey-checkin-history">' +
+      list.map((item) => {
+        const note = item.note ? '<span class="journey-checkin-note">' + escapeHtml(item.note) + '</span>' : '';
+        return '<li><span>' + escapeHtml(formatWhen(item.created_at)) + ' · ' + escapeHtml(historyLabel(item.response)) +
+          '</span>' + note + '</li>';
+      }).join('') +
+    '</ul>'
+  );
+}
+
+async function insertCheckin(reflectionId, response, note) {
+  const api = host();
+  const user = api && api.getUser ? api.getUser() : null;
+  if (!api || !user?.id || !reflectionId || !response) {
+    return { ok: false, error: 'signed-out' };
+  }
+  const owned = state.rows.some((row) => row && row.id === reflectionId);
+  if (!owned) return { ok: false, error: 'forbidden' };
+  const row = {
+    user_id: user.id,
+    reflection_id: reflectionId,
+    response,
+    note: clipCheckinNote(note),
+  };
+  try {
+    const result = await api.sb.from('journey_checkins').insert(row).select('id, reflection_id, response, note, created_at');
+    if (result.error || !result.data || !result.data[0]) {
+      return { ok: false, error: result.error || { message: 'insert failed' } };
+    }
+    return { ok: true, row: result.data[0] };
+  } catch (e) {
+    return { ok: false, error: e };
+  }
+}
+
+function beginCheckinPick(reflectionId, response) {
+  if (!isMemberCheckinResponse(response) || state.busy) return;
+  state.checkinUi = {
+    reflectionId,
+    response,
+    note: '',
+    phase: 'note',
+    confirm: '',
+    cleared: false,
+  };
+  state.status = '';
+  render();
+  const input = document.getElementById('journey-checkin-note');
+  if (input) input.focus();
+}
+
+async function finishCheckin(reflectionId, withNote) {
+  const ui = state.checkinUi;
+  if (!ui || ui.reflectionId !== reflectionId || state.busy) return;
+  const choice = checkinChoice(ui.response);
+  if (!choice) return;
+  let note = null;
+  if (withNote) {
+    const input = document.getElementById('journey-checkin-note');
+    note = clipCheckinNote(input ? input.value : ui.note);
+  }
+  state.busy = true;
+  state.status = 'Saving...';
+  render();
+  const saved = await insertCheckin(reflectionId, ui.response, note);
+  state.busy = false;
+  if (!saved.ok) {
+    state.status = 'That check-in could not be saved. Try again when you are ready.';
+    render();
+    return;
+  }
+  await loadCheckins();
+  const cleared = ui.response === CHECKIN_RESPONSES.CHANGED || ui.response === CHECKIN_RESPONSES.DONE_FOR_NOW;
+  state.checkinUi = {
+    reflectionId,
+    response: ui.response,
+    note: note || '',
+    phase: 'done',
+    confirm: choice.confirm,
+    cleared,
+  };
+  state.status = '';
+  if (cleared) state.highlightId = reflectionId;
+  else state.highlightId = reflectionId;
+  render();
+  notifyHostFocus();
+  openReflection(reflectionId);
+}
+
+async function chooseAgain(reflectionId) {
+  if (!reflectionId || state.busy) return;
+  const row = state.rows.find((item) => item && item.id === reflectionId);
+  if (!row || !hasNextStep(row)) return;
+  if (!window.confirm('Make this your current next step?')) return;
+  state.busy = true;
+  state.status = 'Saving...';
+  render();
+  const saved = await insertCheckin(reflectionId, CHECKIN_RESPONSES.CHOOSE_AGAIN, null);
+  state.busy = false;
+  if (!saved.ok) {
+    state.status = 'That could not be saved. Try again when you are ready.';
+    render();
+    return;
+  }
+  await loadCheckins();
+  state.checkinUi = null;
+  state.highlightId = reflectionId;
+  state.status = 'This is your current next step again.';
+  render();
+  notifyHostFocus();
+  openReflection(reflectionId);
+}
+
+function checkinPanelHtml(row, isActiveFocus) {
+  if (state.checkinsUnavailable) return '';
+  const ui = state.checkinUi && state.checkinUi.reflectionId === row.id ? state.checkinUi : null;
+  const history = checkinHistoryHtml(row);
+  const canChooseAgain = !isActiveFocus && hasNextStep(row);
+
+  if (ui && ui.phase === 'done') {
+    return (
+      '<div class="journey-checkin" id="checkin-' + escapeHtml(row.id) + '">' +
+        '<p class="journey-checkin-confirm" role="status">' + escapeHtml(ui.confirm || '') + '</p>' +
+        (ui.cleared
+          ? '<button type="button" class="btn btn-outline" data-checkin-explore>Choose what matters next</button>'
+          : '<button type="button" class="btn btn-outline" data-checkin-again="' + escapeHtml(row.id) + '">Check in again</button>') +
+        history +
+      '</div>'
+    );
+  }
+
+  if (ui && ui.phase === 'note') {
+    const choice = checkinChoice(ui.response);
+    return (
+      '<div class="journey-checkin" id="checkin-' + escapeHtml(row.id) + '">' +
+        '<p class="journey-lead">' + escapeHtml(choice ? choice.notePrompt : 'Anything you want to add?') + '</p>' +
+        '<p class="journey-empty">Optional. You can skip this.</p>' +
+        '<textarea id="journey-checkin-note" class="journey-checkin-note-input" rows="3" maxlength="' + NOTE_MAX + '" placeholder="A few words is enough.">' +
+          escapeHtml(ui.note || '') +
+        '</textarea>' +
+        '<div class="journey-actions">' +
+          '<button type="button" class="btn btn-gold" data-checkin-save="' + escapeHtml(row.id) + '"' + (state.busy ? ' disabled' : '') + '>Save</button>' +
+          '<button type="button" class="btn btn-outline" data-checkin-skip="' + escapeHtml(row.id) + '"' + (state.busy ? ' disabled' : '') + '>Skip for now</button>' +
+        '</div>' +
+        history +
+      '</div>'
+    );
+  }
+
+  if (isActiveFocus) {
+    const buttons = MEMBER_CHECKIN_CHOICES.map((item) =>
+      '<button type="button" class="btn btn-outline journey-checkin-choice" data-checkin-pick="' +
+        escapeHtml(item.response) + '" data-reflection-id="' + escapeHtml(row.id) + '">' +
+        escapeHtml(item.label) + '</button>'
+    ).join('');
+    return (
+      '<div class="journey-checkin" id="checkin-' + escapeHtml(row.id) + '">' +
+        '<p class="journey-kicker">gentle check-in</p>' +
+        '<p class="journey-lead">Last time, this felt important to you. How has it been going?</p>' +
+        '<div class="journey-checkin-choices">' + buttons + '</div>' +
+        history +
+      '</div>'
+    );
+  }
+
+  if (canChooseAgain) {
+    return (
+      '<div class="journey-checkin journey-checkin-muted">' +
+        history +
+        '<button type="button" class="btn btn-outline" data-choose-again="' + escapeHtml(row.id) + '"' +
+          (state.busy ? ' disabled' : '') + '>Choose this again</button>' +
+      '</div>'
+    );
+  }
+
+  return history ? '<div class="journey-checkin journey-checkin-muted">' + history + '</div>' : '';
 }
 
 function introHtml(tool) {
@@ -565,8 +839,11 @@ async function deleteReflection(id) {
   }
   state.rows = state.rows.filter((row) => row.id !== id);
   if (state.highlightId === id) state.highlightId = '';
+  if (state.checkinUi && state.checkinUi.reflectionId === id) state.checkinUi = null;
   state.status = 'Deleted.';
+  await loadCheckins();
   render();
+  notifyHostFocus();
 }
 
 function scrollToReflectionCard(card) {
@@ -710,9 +987,25 @@ function onClick(event) {
   else if (target.dataset.deleteReflection) void deleteReflection(target.dataset.deleteReflection);
   else if (target.dataset.openReflection) {
     state.highlightId = target.dataset.openReflection;
+    state.checkinUi = null;
     render();
     openReflection(target.dataset.openReflection);
-  }
+  } else if (target.dataset.checkinPick) {
+    beginCheckinPick(target.dataset.reflectionId, target.dataset.checkinPick);
+  } else if (target.dataset.checkinSave) void finishCheckin(target.dataset.checkinSave, true);
+  else if (target.dataset.checkinSkip) void finishCheckin(target.dataset.checkinSkip, false);
+  else if (target.dataset.checkinAgain) {
+    state.checkinUi = null;
+    state.highlightId = target.dataset.checkinAgain;
+    render();
+    openReflection(target.dataset.checkinAgain);
+  } else if ('checkinExplore' in target.dataset) {
+    state.checkinUi = null;
+    state.status = '';
+    render();
+    const tools = document.getElementById('journey-library-results');
+    if (tools) scrollToReflectionCard(tools);
+  } else if (target.dataset.chooseAgain) void chooseAgain(target.dataset.chooseAgain);
 }
 
 function onInput(event) {
@@ -729,6 +1022,9 @@ function onInput(event) {
     const box = document.getElementById('journey-recommend-results');
     if (box) box.innerHTML = recommendResultsHtml();
   }
+  if (input.id === 'journey-checkin-note' && state.checkinUi) {
+    state.checkinUi.note = input.value.slice(0, NOTE_MAX);
+  }
 }
 
 document.addEventListener('click', onClick);
@@ -739,6 +1035,10 @@ window.LilbirdJourney = {
     if (!currentMemberId()) {
       session.invalidate();
       state.rows = [];
+      state.checkins = [];
+      state.checkinsUnavailable = false;
+      state.checkinsError = false;
+      state.checkinUi = null;
       state.mode = 'home';
       state.stage = 0;
       state.toolId = '';
@@ -766,6 +1066,10 @@ window.LilbirdJourney = {
     state.insight = '';
     state.insightFromModel = false;
     state.rows = [];
+    state.checkins = [];
+    state.checkinsUnavailable = false;
+    state.checkinsError = false;
+    state.checkinUi = null;
     state.status = '';
     state.busy = false;
     state.recommendText = '';
@@ -774,6 +1078,9 @@ window.LilbirdJourney = {
     if (el) el.innerHTML = '';
     const card = preview();
     if (card) card.innerHTML = '';
+  },
+  currentFocus() {
+    return currentFocus();
   },
   show() {
     if (state.mode === 'home') render();
