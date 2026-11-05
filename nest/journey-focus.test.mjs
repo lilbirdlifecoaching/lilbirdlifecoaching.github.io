@@ -3,6 +3,7 @@ import test from 'node:test';
 import {
   CHECKIN_RESPONSES,
   FOCUS_MISSING_STATUS,
+  JOURNEY_PANEL_KINDS,
   NOTE_MAX,
   clipCheckinNote,
   hasNextStep,
@@ -10,7 +11,9 @@ import {
   pickLatestNextStep,
   resolveActiveFocus,
   resolveFocusReflection,
+  resolveJourneyPanel,
   sortCheckinsNewestFirst,
+  toggleJourneyPanel,
 } from './journey-focus.js';
 
 const R1 = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1';
@@ -194,4 +197,40 @@ test('example history matrix from the design', () => {
     ...checkins,
   ];
   assert.equal(resolveActiveFocus(reflections, checkins).status, 'resting');
+});
+
+test('journey panels stay mutually exclusive and toggle closed', () => {
+  assert.deepEqual(JOURNEY_PANEL_KINDS, ['details', 'checkin', 'history']);
+
+  let panel = null;
+  let checkinUi = null;
+
+  ({ panel, checkinUi } = toggleJourneyPanel(panel, checkinUi, R2, 'details'));
+  assert.deepEqual(panel, { reflectionId: R2, kind: 'details' });
+  assert.equal(resolveJourneyPanel(panel, checkinUi, R2).kind, 'details');
+  assert.equal(resolveJourneyPanel(panel, checkinUi, R1), null);
+
+  ({ panel, checkinUi } = toggleJourneyPanel(panel, checkinUi, R2, 'checkin'));
+  assert.deepEqual(panel, { reflectionId: R2, kind: 'checkin' });
+  assert.equal(resolveJourneyPanel(panel, checkinUi, R2).kind, 'checkin');
+
+  ({ panel, checkinUi } = toggleJourneyPanel(panel, checkinUi, R2, 'history'));
+  assert.deepEqual(panel, { reflectionId: R2, kind: 'history' });
+
+  ({ panel, checkinUi } = toggleJourneyPanel(panel, checkinUi, R2, 'history'));
+  assert.equal(panel, null);
+
+  checkinUi = { reflectionId: R2, phase: 'note', response: CHECKIN_RESPONSES.TOOK_STEP };
+  panel = { reflectionId: R2, kind: 'checkin' };
+  assert.equal(resolveJourneyPanel(panel, checkinUi, R2).kind, 'checkin');
+
+  ({ panel, checkinUi } = toggleJourneyPanel(panel, checkinUi, R2, 'details'));
+  assert.deepEqual(panel, { reflectionId: R2, kind: 'details' });
+  assert.equal(checkinUi, null);
+
+  ({ panel, checkinUi } = toggleJourneyPanel(panel, null, R2, 'details'));
+  assert.equal(panel, null);
+
+  const invalid = toggleJourneyPanel(panel, null, R2, 'progress');
+  assert.equal(invalid.panel, null);
 });

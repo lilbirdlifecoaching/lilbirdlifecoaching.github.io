@@ -203,8 +203,50 @@ export const RESTING_CHAPTER = Object.freeze({
   primaryLabel: 'Explore My Journey',
 });
 
+/** Reflection card panels — only one kind open per reflection at a time. */
+export const JOURNEY_PANEL_KINDS = Object.freeze(['details', 'checkin', 'history']);
+
+/**
+ * Which panel should render for a reflection, given UI state.
+ * An in-progress check-in always wins so the note/confirm flow stays visible.
+ */
+export function resolveJourneyPanel(panel, checkinUi, reflectionId) {
+  const id = String(reflectionId || '');
+  if (!id) return null;
+  if (checkinUi && String(checkinUi.reflectionId) === id) {
+    return { reflectionId: id, kind: 'checkin' };
+  }
+  if (panel && String(panel.reflectionId) === id && JOURNEY_PANEL_KINDS.includes(panel.kind)) {
+    return { reflectionId: id, kind: panel.kind };
+  }
+  return null;
+}
+
+/**
+ * Toggle or switch the open panel. Returns the next { panel, checkinUi }.
+ * Opening details/history while a check-in note is open clears that check-in UI.
+ */
+export function toggleJourneyPanel(panel, checkinUi, reflectionId, kind) {
+  const id = String(reflectionId || '');
+  if (!id || !JOURNEY_PANEL_KINDS.includes(kind)) {
+    return { panel: null, checkinUi };
+  }
+  const current = resolveJourneyPanel(panel, checkinUi, id);
+  if (current && current.kind === kind) {
+    return {
+      panel: null,
+      checkinUi: checkinUi && String(checkinUi.reflectionId) === id ? null : checkinUi,
+    };
+  }
+  let nextUi = checkinUi;
+  if (checkinUi && String(checkinUi.reflectionId) === id && kind !== 'checkin') {
+    nextUi = null;
+  }
+  return { panel: { reflectionId: id, kind }, checkinUi: nextUi };
+}
+
 /** Shared by Nest Home (classic script) and My Journey (ES module). */
-export const FOCUS_API_VERSION = 2;
+export const FOCUS_API_VERSION = 3;
 
 const focusRoot = typeof globalThis !== 'undefined' ? globalThis : null;
 if (focusRoot) {
@@ -219,6 +261,9 @@ if (focusRoot) {
     CHECKIN_RESPONSES,
     MEMBER_CHECKIN_CHOICES,
     RESTING_CHAPTER,
+    JOURNEY_PANEL_KINDS,
+    resolveJourneyPanel,
+    toggleJourneyPanel,
     NOTE_MAX,
     clipCheckinNote,
     checkinChoice,
