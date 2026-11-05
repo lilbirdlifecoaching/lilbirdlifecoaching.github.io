@@ -22,6 +22,14 @@ If a change touches pricing, booking, worker logic, or public copy, log it here.
 
 ## 2026-11-05 (Claude)
 
+### Aged parchment (ChatGPT parchment set) + Solo text margins
+- **Status:** `deployed` (Pages only)
+- New `css/lilbird-parchment.css?v=20261105p1`, loaded last on Nest, Inner Compass-in-Nest, Solo and all Solo tools. Replaces the code-drawn tear with real paper from `nest/assets/lilbird-kit/paper/`:
+  - whole sheets stretched once for fixed-shape panels: chapter card, sign-in card, Solo sales hero, Inner Compass header (`sheet-hero`), Nest rail (`sheet-rail`), Home cards (`sheet-card`), each with a solid #fcecd6 backing;
+  - the edge frame as a 9-slice (`border-image` 15%, rendered 24–34px) with a soft cream fill for every other panel, so corners hold at any height.
+- Padding raised on every panel so text clears the torn edge (Solo's tight text was the trigger). Tool top row now sits on the paper. Phone session bar fits one row (Nest link hidden there).
+- Masters, manifest and notes in `art-masters/parchment-v1/` (not published). `sheet-page.webp` made but not used yet.
+
 ### Solo part 3: public sales page in the painted world
 - **Status:** `deployed` (Pages only)
 - `#view-landing` now uses the scene: hero copy on a torn sheet with the kids beside it (new `.solo-landing-hero-copy` / `.solo-landing-kids` markup in `solo/index.html`), each section on its own sheet, buy form as a soft slip. Phone top bar on one row. `lilbird-solo-journal.css?v=20261105s5`.

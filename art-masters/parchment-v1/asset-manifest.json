@@ -1,0 +1,135 @@
+[
+  {
+    "file": "01-parchment-hero-wide.png",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "bytes": 2417316,
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      254
+    ],
+    "fully_transparent_pixels": 122128,
+    "central_third_alpha_range": [
+      250,
+      253
+    ],
+    "sha256": "6d8f361df9e2260fddf4c59b32d18227f1cf514c1f6f41ed4b7dd83750db1f08"
+  },
+  {
+    "file": "02-parchment-card-square.png",
+    "dimensions": [
+      1254,
+      1254
+    ],
+    "bytes": 2554501,
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "fully_transparent_pixels": 155116,
+    "central_third_alpha_range": [
+      250,
+      253
+    ],
+    "sha256": "2ea42b936d522f6fd00d696f0660bbb2902c30dcdd67961bfe19cbb35577cca9"
+  },
+  {
+    "file": "03-parchment-card-landscape.png",
+    "dimensions": [
+      1448,
+      1086
+    ],
+    "bytes": 2463089,
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "fully_transparent_pixels": 252666,
+    "central_third_alpha_range": [
+      250,
+      254
+    ],
+    "sha256": "b16cba1efdf0f67f033dd5b62075d5659f21f51cab22c16b221a3514440eaea1"
+  },
+  {
+    "file": "04-parchment-sidebar-tall.png",
+    "dimensions": [
+      725,
+      2170
+    ],
+    "bytes": 2599170,
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "fully_transparent_pixels": 233841,
+    "central_third_alpha_range": [
+      251,
+      254
+    ],
+    "sha256": "b5d0f208722e157779d22c3cad5e962a11f25d06c3e1f43d84f1ca7112dc2d00"
+  },
+  {
+    "file": "05-parchment-mobile-page.png",
+    "dimensions": [
+      1024,
+      1536
+    ],
+    "bytes": 2732101,
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      254
+    ],
+    "fully_transparent_pixels": 156956,
+    "central_third_alpha_range": [
+      250,
+      254
+    ],
+    "sha256": "363e1bee911c4c2341ebf537bafb83055ac1bdb6cbba4d45a4b69287a8d83dbc"
+  },
+  {
+    "file": "06-parchment-journal-spread.png",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "bytes": 2605901,
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      254
+    ],
+    "fully_transparent_pixels": 143868,
+    "central_third_alpha_range": [
+      250,
+      253
+    ],
+    "sha256": "9bb244d142fe01c12cb6fd2f4592bafef191e488ccd51b9135effc08f9ae7ab2"
+  },
+  {
+    "file": "07-parchment-edge-frame.png",
+    "dimensions": [
+      1254,
+      1254
+    ],
+    "bytes": 1285998,
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "fully_transparent_pixels": 992588,
+    "central_third_alpha_range": [
+      0,
+      1
+    ],
+    "sha256": "8f86291a8f408ecb98d23a971f2d94bbc54d4570ee082ee17594181182cd9bc1"
+  }
+]
