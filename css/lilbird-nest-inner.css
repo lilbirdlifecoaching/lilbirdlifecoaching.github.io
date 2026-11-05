@@ -238,3 +238,136 @@ body.nest-world :is(.journey-date, .journey-reflection time, .journey-reflection
   letter-spacing: 0.06em;
   color: var(--honey);
 }
+
+/* Phone: the "For your Nest" checklist follows the screen's own content
+   instead of sitting on top of every screen (was order: -1). */
+@media (max-width: 980px) {
+  body.nest-world .dash-grid:not(.is-ask-tab) #next-steps-card { order: 50; margin-top: 1.2rem; }
+}
+
+/* ══ Sign-in / create your Nest: the doorway into the painted world ══ */
+body.nest-world #view-auth.active::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    url("/nest/assets/lilbird-kit/v3/meadow-day.webp") center bottom / max(100%, 1100px) auto no-repeat,
+    url("/nest/assets/lilbird-kit/v3/scene-day.webp") center bottom / cover no-repeat;
+}
+html[data-theme="dark"] body.nest-world #view-auth.active::before {
+  background-image:
+    url("/nest/assets/lilbird-kit/v3/meadow-night.webp"),
+    url("/nest/assets/lilbird-kit/v3/scene-night.webp");
+}
+body.nest-world #view-auth { position: relative; z-index: 1; min-height: 100dvh; }
+body.nest-world #view-auth .auth-wrap { padding: 4.5rem 1rem 3rem; }
+html[data-theme] body.nest-world #view-auth .auth-card {
+  position: relative;
+  isolation: isolate;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: var(--ink);
+  max-width: 34rem;
+  padding: 2.4rem 2.5rem 2.2rem !important;
+}
+body.nest-world #view-auth .auth-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 26px 18px 28px 16px;
+  background: var(--paper);
+  filter: var(--paper-shadow);
+}
+html.lb-deckle-ready body.nest-world #view-auth .auth-card::before {
+  filter: url(#lb-deckle-a) var(--paper-shadow);
+}
+body.nest-world #view-auth :is(.eyebrow) {
+  font-family: var(--font-sans) !important;
+  letter-spacing: 0.13em !important;
+  color: var(--honey) !important;
+}
+body.nest-world #view-auth h1 { color: var(--ink) !important; font-weight: 400; }
+body.nest-world #view-auth h1 em { color: var(--honey) !important; }
+body.nest-world #view-auth :is(.auth-copy, .letters-quiet, .auth-first-time p, label) { color: var(--ink-soft) !important; }
+body.nest-world #view-auth input {
+  background: rgba(255, 252, 244, 0.9) !important;
+  border: 1px solid rgba(169, 124, 63, 0.38) !important;
+  border-radius: 12px !important;
+  color: var(--ink) !important;
+  font-family: var(--font-sans) !important;
+  padding: 0.75rem 0.9rem !important;
+}
+body.nest-world #view-auth .btn {
+  font-family: var(--font-sans) !important;
+  font-size: 0.95rem !important;
+  font-weight: 500;
+  text-transform: none !important;
+  letter-spacing: 0.01em !important;
+  border-radius: 999px !important;
+  padding: 0.8rem 1.2rem !important;
+  box-shadow: none !important;
+}
+body.nest-world #view-auth .btn-gold {
+  background: #17485b !important;
+  border: 1px solid #17485b !important;
+  color: #fff9ef !important;
+}
+body.nest-world #view-auth .btn-outline {
+  background: rgba(255, 252, 244, 0.6) !important;
+  border: 1.5px solid rgba(42, 34, 27, 0.45) !important;
+  color: var(--ink) !important;
+}
+/* Plans: soft slips on the paper, not grey boxes */
+body.nest-world #view-auth .auth-plan {
+  background: rgba(240, 222, 184, 0.38) !important;
+  border: 1px solid rgba(169, 124, 63, 0.22) !important;
+  border-radius: 14px 10px 16px 12px !important;
+  color: var(--ink) !important;
+}
+body.nest-world #view-auth .auth-plan.is-soon { opacity: 0.85; }
+body.nest-world #view-auth .auth-plan strong { font-family: var(--font-serif); font-weight: 400; color: var(--ink) !important; font-size: 1.08rem; }
+body.nest-world #view-auth .auth-plan b {
+  font-family: var(--font-sans) !important;
+  font-weight: 500;
+  letter-spacing: 0.04em !important;
+  color: var(--honey) !important;
+}
+body.nest-world #view-auth .auth-plan span { color: var(--ink-soft) !important; }
+/* Back link + theme switch float over the scene */
+body.nest-world #view-auth .auth-site-back {
+  font-family: var(--font-sans) !important;
+  letter-spacing: 0.02em !important;
+  text-transform: none !important;
+  font-size: 0.85rem !important;
+  color: var(--ink) !important;
+  background: rgba(255, 252, 244, 0.85);
+  border: 1px solid rgba(169, 124, 63, 0.3);
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+}
+html[data-theme="dark"] body.nest-world #view-auth h1 { color: var(--ink) !important; }
+html[data-theme] body.nest-world #view-auth .auth-card { max-width: 36rem; }
+body.nest-world #view-auth h1 { font-size: clamp(1.9rem, 3vw, 2.5rem) !important; line-height: 1.15; }
+@media (max-width: 560px) {
+  html[data-theme] body.nest-world #view-auth .auth-card { padding: 2rem 1.5rem 1.8rem !important; }
+  body.nest-world #view-auth .auth-wrap { padding-top: 3.8rem; }
+}
+body.nest-world #view-auth h1 em { white-space: nowrap; }
+@media (max-width: 560px) {
+  body.nest-world #view-auth .nest-auth-theme-wrap {
+    position: absolute !important;
+    top: 0.85rem !important;
+    right: 0.85rem !important;
+    left: auto !important;
+  }
+  body.nest-world #view-auth .auth-site-back {
+    position: absolute !important;
+    top: 0.85rem !important;
+    left: 0.85rem !important;
+    right: auto !important;
+  }
+}

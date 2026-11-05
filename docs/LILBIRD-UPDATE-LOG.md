@@ -22,6 +22,13 @@ If a change touches pricing, booking, worker logic, or public copy, log it here.
 
 ## 2026-11-05 (Claude)
 
+### Inner Compass in the Nest, phone checklist, sign-in page
+- **Status:** `deployed` (Pages only)
+- **Inner Compass from the Nest:** saved reads opened with `?from=nest&nest=…` get `html.ic-nest` and `css/lilbird-ic-nest.css?v=20261105n1`: painted scene, torn-paper panels, one type voice, teal "Back to your Nest" pill (the lilbird.life link is hidden there). The public assessment keeps its own look.
+- **Phone:** the "For your Nest" checklist now sits after each screen's content instead of on top of every screen.
+- **Sign-in / create your Nest:** scene + meadow behind it (it had lost its background when Home moved the scene to the dashboard layer), torn-paper card, teal pill buttons, plans as soft slips, back link + theme switch separated on phones. Plan copy says "My Guide" to match the Nest menu.
+- `css/lilbird-nest-inner.css?v=20261105i2`.
+
 ### Nest inner screens in the torn-paper style
 - **Status:** `deployed` (Pages only)
 - New `css/lilbird-nest-inner.css?v=20261105i1`: Learn & grow, My Journey, Life Canvas, My Guide, settings, letters, sidebar and the first-run tour on torn paper; kickers in DM Sans (no typewriter mono); teal pill primary / outlined pill secondary buttons; soft watercolor washes for Journey area tiles; chat on paper, not a grey box.
