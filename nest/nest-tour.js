@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  var STORAGE_KEY = 'lilbird-nest-tour-v1';
+  var STORAGE_KEY = 'lilbird-nest-tour-v2';
   var VIDEO_KEY = 'lilbird-nest-welcome-video-v1';
   var SEEN_KEY = 'lilbird-nest-seen-access';
   var WORKER_URL = 'https://worker-solo.cwwq46sn7m.workers.dev';
@@ -147,82 +147,77 @@
     return { id: key, tab: 'products', selector: def.selector, title: copy.title, body: copy.body, tip: copy.tip, action: copy.action || null };
   }
 
+  function goHomeArea() {
+    var home = document.getElementById('rail-home') || document.querySelector('[data-nest-area="home"].rail-link, .mobile-bar-link[data-nest-area="home"]');
+    if (home) home.click();
+  }
+
+  function stepSelector(step) {
+    if (window.matchMedia && window.matchMedia('(max-width: 980px)').matches && step.mobileSelector) {
+      return step.mobileSelector;
+    }
+    return step.selector;
+  }
+
   function buildSteps() {
     var plan = access().plan;
+    var plusOwned = owns('nest_plus');
     var list = [
       {
-        id: 'welcome',
-        tab: 'products',
-        selector: '#next-steps-card',
-        title: 'This is your Nest',
-        body: 'One home for what you’ve unlocked and what to do next. The checklist sits on the right. On Inner Compass it tucks away until you open it.',
+        id: 'chapter',
+        home: true,
+        selector: '#next-chapter',
+        title: 'Your next chapter',
+        body: 'This is your next chapter. It always shows one good place to pick up.',
         tip: null
       },
       {
-        id: 'plan',
-        tab: 'products',
-        selector: '.plan-badge',
-        title: 'Your plan: ' + plan,
-        body: plan === 'Intensive'
-          ? 'Your Intensive includes everything in the Nest, so every card below is open to you.'
-          : 'This shows what your Nest includes. Locked cards say what they are, what they cost and where to unlock them.',
-        tip: null
-      }
-    ];
-
-    ['life_change_intensive', 'nest_plus', 'lcs_workbook', 'solo_course'].forEach(function (key) {
-      var step = productStep(key, owns(key) ? 'owned' : 'locked');
-      if (step) list.push(step);
-    });
-
-    list.push(
-      {
-        id: 'canvas',
-        tab: 'canvas',
-        selector: '#tab-canvas',
-        title: 'Life Canvas',
-        body: 'Passion, connections, spaces, resources, and energy live on this tab. Check in again and the history graph updates here.',
+        id: 'secondary',
+        home: true,
+        selector: '#nest-secondary',
+        title: 'Quiet paths nearby',
+        body: 'Life Canvas, Solo, My Guide and your Nest live here as quieter invitations under the main chapter.',
         tip: null
       },
       {
-        id: 'profile',
-        tab: 'profile',
-        selector: '#tab-profile',
-        title: 'Inner Compass',
-        body: owns('full_read')
-          ? 'Your full Inner Compass read lives here. Life Canvas has its own tab.'
-          : 'Your Inner Compass lives here. Your two types are free; the full read and Nest unlock for $2 from your read.',
-        tip: '» Complete or open Inner Compass from this tab'
+        id: 'journey',
+        tab: 'journey',
+        selector: '#tab-journey',
+        mobileSelector: '.mobile-bar-link[data-nest-area="journey"]',
+        title: 'My Journey',
+        body: 'Saved reflections and gentle check-ins live here when you want to go deeper.',
+        tip: null
       },
       {
-        id: 'younger',
-        tab: 'products',
-        selector: '#btn-nav-profile',
-        title: 'A picture of little you',
-        body: 'The best ones are baby pictures, or you around four with a haircut you did not choose. It lives with your email settings, up at your picture.',
-        tip: null,
-        action: { label: 'Choose a photo →', photo: true }
-      },
-      {
-        id: 'ask',
+        id: 'guide',
         tab: 'ask',
         selector: '#tab-ask',
-        title: 'lil’ bird guide',
-        body: 'The next best thing to being in the room with Luke. One question at a time, and an exercise only when it would help.',
-        tip: null
+        title: 'My Guide',
+        body: plusOwned
+          ? 'Ask about what is in front of you. Your guide is ready when you are.'
+          : 'A place to bring hard questions. Included with Nest Plus.',
+        tip: plusOwned ? null : 'Nest Plus unlocks the guide'
+      },
+      {
+        id: 'learn',
+        tab: 'products',
+        selector: '#tab-products',
+        title: 'Learn & grow',
+        body: 'Your plan badge and everything you can unlock live here — workbooks, Solo, coaching and Nest Plus.',
+        tip: plan ? 'Your plan: ' + plan : null
       },
       {
         id: 'done',
-        tab: 'products',
+        home: true,
         selector: '#btn-nest-tour',
         title: 'You’re set',
         body: 'That’s the lay of the land. Replay this tour anytime from Take a tour, or watch What is Nest? again whenever you like.',
         tip: null
       }
-    );
+    ];
 
     return list.filter(function (s) {
-      return !!document.querySelector(s.selector);
+      return !!document.querySelector(stepSelector(s));
     });
   }
 
@@ -366,10 +361,11 @@
       return;
     }
 
-    if (step.tab) setTab(step.tab);
+    if (step.home) goHomeArea();
+    else if (step.tab) setTab(step.tab);
 
     requestAnimationFrame(function () {
-      var el = document.querySelector(step.selector);
+      var el = document.querySelector(stepSelector(step));
       if (el && typeof el.scrollIntoView === 'function') {
         try {
           el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
@@ -379,7 +375,7 @@
       }
 
       setTimeout(function () {
-        el = document.querySelector(step.selector);
+        el = document.querySelector(stepSelector(step));
         document.getElementById('nest-tour-title').textContent = step.title;
         document.getElementById('nest-tour-body').textContent = step.body;
         var tipEl = document.getElementById('nest-tour-tip');
