@@ -1,0 +1,143 @@
+/* lil' bird — aged parchment (ChatGPT parchment set, 5 Nov).
+ * Loaded LAST on Nest, Inner Compass-in-Nest, Solo and Solo tools.
+ * Replaces the code-drawn torn edge with real paper:
+ *  - big fixed-shape panels use whole sheets stretched once (sheet-*.webp)
+ *  - every other panel uses the edge frame as a 9-slice (frame.webp), so
+ *    corners keep their shape at any height, with a solid cream fill inside.
+ * Paper stays light in both themes (approved concept).
+ * Masters + notes: art-masters/parchment-v1/ (not published).
+ */
+:root {
+  --pp-frame: url("/nest/assets/lilbird-kit/paper/frame.webp");
+  --pp-hero: url("/nest/assets/lilbird-kit/paper/sheet-hero.webp");
+  --pp-card: url("/nest/assets/lilbird-kit/paper/sheet-card.webp");
+  --pp-rail: url("/nest/assets/lilbird-kit/paper/sheet-rail.webp");
+  --pp-shadow: drop-shadow(0 12px 18px rgba(48, 32, 12, 0.22)) drop-shadow(0 2px 2px rgba(48, 32, 12, 0.14));
+  --pp-fill: radial-gradient(130% 110% at 40% 30%, #fff6e6 0%, #fcefd9 55%, #f8e7c9 100%);
+  --pf: 34px;
+}
+html[data-theme="dark"] { --pp-shadow: drop-shadow(0 16px 26px rgba(0, 0, 0, 0.5)) drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35)); }
+
+/* ══ Whole sheets ══ */
+:is(
+  .nest-world .next-chapter,
+  .nest-world #view-auth .auth-card,
+  html.solo-journal .solo-landing-hero-copy,
+  html.ic-nest #screen-results .result-header,
+  .nest-world .nest-rail,
+  .nest-world .nest-secondary-card
+)::before {
+  border-radius: 0 !important;
+  background: var(--pp-hero) center / 100% 100% no-repeat !important;
+  filter: var(--pp-shadow) !important;
+  inset: 0 !important;
+}
+:is(
+  .nest-world .next-chapter,
+  .nest-world #view-auth .auth-card,
+  html.solo-journal .solo-landing-hero-copy,
+  html.ic-nest #screen-results .result-header,
+  .nest-world .nest-rail,
+  .nest-world .nest-secondary-card
+)::after {
+  /* solid backing under the sheet's near-opaque centre */
+  content: "" !important;
+  display: block !important;
+  position: absolute !important;
+  inset: 9% 6% !important;
+  z-index: -2 !important;
+  background: #fcecd6 !important;
+  border-radius: 18px;
+  pointer-events: none;
+  opacity: 1 !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+}
+.nest-world .nest-rail::before { background-image: var(--pp-rail) !important; }
+.nest-world .nest-secondary-card::before { background-image: var(--pp-card) !important; }
+
+/* ══ 9-slice frame for everything else ══ */
+:is(
+  .nest-world :is(.product-card, .lc-card, .journey-home, .journey-exercise, .guide-presence, .guide-talk, .nest-settings, .nest-letters-card, .sidebar-card, .plan-badge, .nest-mobile-more, .nest-tour-card),
+  html.ic-nest #screen-results :is(.read-accordion, .insight-card, .canvas-hero-card, .role-reflection, .partner-section, .whats-next-panel, .sidebar-card, .nest-next-card, .ic-unlock),
+  html.solo-journal :is(.complete-hero, .flight-plan-block, .session-card, .continue-panel, .sessions-archive, .chat-container, .session-info, .auth-card, .post-purchase-card, .gate-card, .deep-snapshot, .complete-panel, .purchase-gate, .solo-landing-section),
+  html.solo-journal:not(.tool-embedded) .page
+)::before {
+  inset: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  border-style: solid !important;
+  border-color: transparent !important;
+  border-width: var(--pf) !important;
+  border-image: var(--pp-frame) 15% / var(--pf) / 0 stretch !important;
+  filter: var(--pp-shadow) !important;
+  z-index: -2 !important;
+}
+:is(
+  .nest-world :is(.product-card, .lc-card, .journey-home, .journey-exercise, .guide-presence, .guide-talk, .nest-settings, .nest-letters-card, .sidebar-card, .plan-badge, .nest-mobile-more, .nest-tour-card),
+  html.ic-nest #screen-results :is(.read-accordion, .insight-card, .canvas-hero-card, .role-reflection, .partner-section, .whats-next-panel, .sidebar-card, .nest-next-card, .ic-unlock),
+  html.solo-journal :is(.complete-hero, .flight-plan-block, .session-card, .continue-panel, .sessions-archive, .chat-container, .session-info, .auth-card, .post-purchase-card, .gate-card, .deep-snapshot, .complete-panel, .purchase-gate, .solo-landing-section),
+  html.solo-journal:not(.tool-embedded) .page
+)::after {
+  /* cream fill joins the frame's inner edge; softened so no seam shows */
+  content: "" !important;
+  display: block !important;
+  position: absolute !important;
+  inset: calc(var(--pf) * 0.7) !important;
+  z-index: -1 !important;
+  background: var(--pp-fill) !important;
+  filter: blur(2.5px);
+  border-radius: 6px;
+  pointer-events: none;
+  opacity: 1 !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+}
+
+/* Smaller frames on small panels */
+:is(.nest-world :is(.sidebar-card, .plan-badge, .nest-tour-card, .nest-mobile-more), html.ic-nest .sidebar-card, html.ic-nest .nest-next-card, html.solo-journal .session-card) { --pf: 24px; }
+@media (max-width: 600px) { :root { --pf: 26px; } }
+
+/* ══ Breathing room: text never reaches the torn edge ══ */
+.nest-world .next-chapter { padding: 2.6rem 2.9rem 2.4rem !important; }
+.nest-world .nest-rail { padding: 1.7rem 1.35rem 1.8rem 1.45rem !important; }
+.nest-world .nest-secondary-card { padding: 1.7rem 1.9rem 1.9rem !important; }
+.nest-world :is(.product-card, .lc-card, .journey-home, .journey-exercise, .guide-talk, .nest-letters-card, .nest-settings) { padding: 2.1rem 2.3rem 2.2rem !important; }
+.nest-world :is(.sidebar-card, .guide-presence) { padding: 1.45rem 1.5rem 1.5rem !important; }
+.nest-world .plan-badge { padding: 1.05rem 1.5rem 1.15rem !important; }
+.nest-world .nest-tour-card { padding: 1.5rem 1.6rem 1.35rem !important; }
+.nest-world #view-auth .auth-card { padding: 2.9rem 3rem 2.7rem !important; }
+
+html.ic-nest #screen-results .result-header { padding: 2.6rem 2.9rem 2.4rem !important; }
+html.ic-nest #screen-results :is(.read-accordion, .insight-card, .canvas-hero-card, .role-reflection, .partner-section, .whats-next-panel, .ic-unlock) { padding: 1.9rem 2.2rem 2rem !important; }
+html.ic-nest #screen-results :is(.sidebar-card, .nest-next-card) { padding: 1.4rem 1.5rem !important; }
+
+/* Solo: every panel gets real inner margin (the text-hugging fix) */
+html.solo-journal :is(.complete-hero, .flight-plan-block, .continue-panel, .sessions-archive, .auth-card, .post-purchase-card, .gate-card, .deep-snapshot, .complete-panel, .purchase-gate) { padding: 2.1rem 2.4rem 2.2rem !important; }
+html.solo-journal .session-card { padding: 1.4rem 1.6rem !important; }
+html.solo-journal .session-info { padding: 2.2rem 2.3rem 2.3rem !important; }
+html.solo-journal .solo-landing-hero-copy { padding: 2.8rem 3rem 2.5rem !important; }
+html.solo-journal .solo-landing-section { padding: 2.4rem 2.8rem 2.6rem !important; }
+html.solo-journal:not(.tool-embedded) .page { padding: 2.6rem 2.9rem 3rem !important; }
+/* Chat keeps its full-height layout; the frame sits around it */
+html.solo-journal .chat-container { padding: 1.1rem 1.25rem 1.15rem !important; }
+html.solo-journal .chat-header { padding-left: 0.6rem !important; padding-right: 0.6rem !important; }
+html.solo-journal .chat-messages { padding-left: 0.6rem !important; padding-right: 0.6rem !important; }
+html.solo-journal .chat-input-wrap { padding-left: 0.4rem !important; padding-right: 0.4rem !important; }
+html.solo-journal .session-archive-row { padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
+
+@media (max-width: 600px) {
+  .nest-world .next-chapter { padding: 2.2rem 1.8rem 2rem !important; }
+  .nest-world .nest-secondary-card { padding: 1.6rem 1.7rem 1.7rem !important; }
+  .nest-world :is(.product-card, .lc-card, .journey-home, .journey-exercise, .guide-talk, .nest-letters-card, .nest-settings) { padding: 1.8rem 1.6rem 1.9rem !important; }
+  .nest-world #view-auth .auth-card { padding: 2.4rem 1.9rem 2.2rem !important; }
+  html.ic-nest #screen-results :is(.result-header, .read-accordion, .insight-card, .canvas-hero-card, .role-reflection, .partner-section, .whats-next-panel, .ic-unlock) { padding: 1.9rem 1.6rem !important; }
+  html.solo-journal :is(.complete-hero, .flight-plan-block, .continue-panel, .sessions-archive, .auth-card, .post-purchase-card, .gate-card, .deep-snapshot, .complete-panel, .purchase-gate, .session-info, .solo-landing-hero-copy, .solo-landing-section) { padding: 1.9rem 1.6rem 2rem !important; }
+  html.solo-journal:not(.tool-embedded) .page { padding: 2rem 1.55rem 2.3rem !important; }
+}
+
+/* Tools: the top row sits straight on the paper */
+html.solo-journal .page > .nav { background: transparent !important; box-shadow: none !important; border: 0 !important; }
+html.solo-journal .page > .nav .nav-left { background: transparent !important; }
