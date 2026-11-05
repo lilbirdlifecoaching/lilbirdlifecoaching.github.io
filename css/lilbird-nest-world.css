@@ -1,6 +1,8 @@
 /* Phase 1B — Illustrated Nest world (concept #3).
    Live HTML for all copy/nav/buttons. Decorative assets only.
-   Requires existing data-theme=light|dark on <html>. */
+   Requires existing data-theme=light|dark on <html>.
+   Landscape / companion artwork quality is pending replacement assets —
+   do not “fix” soft edges or low-res backgrounds with blur/mask filters. */
 
 .nest-page.nest-world {
   --world-day: url("/nest/assets/lilbird-kit/backgrounds/valley-day.webp");
@@ -9,6 +11,13 @@
   --paper-hero: url("/nest/assets/lilbird-kit/panels/paper-wide.webp");
   --paper-card: url("/nest/assets/lilbird-kit/panels/paper-card-a.webp");
   --paper-rail: url("/nest/assets/lilbird-kit/textures/paper-sample.webp");
+  --parchment: #fff8e8;
+  --parchment-raised: #fffcf4;
+  --parchment-inset: #fff6e2;
+  --parchment-ink: #241f1b;
+  --parchment-muted: #4f463c;
+  --parchment-accent: #9a6a22;
+  --parchment-border: rgba(176, 146, 100, 0.5);
   --lb-bg: #c9b892;
   --lb-surface: rgba(255, 248, 232, 0.94);
   --lb-surface-raised: rgba(255, 252, 244, 0.97);
@@ -23,7 +32,7 @@
   --lb-rail: 220px;
   background-color: #c9b892;
   background-image:
-    linear-gradient(180deg, rgba(247, 241, 230, 0.08) 0%, rgba(247, 241, 230, 0.22) 55%, rgba(201, 184, 146, 0.55) 100%),
+    linear-gradient(180deg, rgba(247, 241, 230, 0.06) 0%, rgba(247, 241, 230, 0.18) 55%, rgba(201, 184, 146, 0.5) 100%),
     var(--world-day);
   background-position: center top, center 18%;
   background-size: auto, cover;
@@ -34,34 +43,35 @@
 }
 
 html[data-theme="dark"] .nest-page.nest-world {
+  /* Landscape carries night mood; parchment panels keep warm ink below */
   --lb-bg: #0f2433;
-  --lb-surface: rgba(24, 45, 61, 0.92);
-  --lb-surface-raised: rgba(32, 54, 71, 0.96);
+  --lb-surface: rgba(255, 248, 232, 0.92);
+  --lb-surface-raised: rgba(255, 252, 244, 0.96);
   --lb-text: #f7f1e6;
   --lb-muted: #c5d0d7;
   --lb-accent: #f0bc59;
-  --lb-accent-soft: rgba(240, 188, 89, 0.2);
-  --lb-primary: #f0bc59;
-  --lb-primary-text: #142533;
-  --lb-border: rgba(90, 118, 138, 0.55);
+  --lb-accent-soft: rgba(240, 188, 89, 0.28);
+  --lb-primary: #18495c;
+  --lb-primary-text: #fff9ef;
+  --lb-border: rgba(176, 146, 100, 0.5);
   --lb-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
   background-color: #0f2433;
   background-image:
-    linear-gradient(180deg, rgba(15, 36, 51, 0.15) 0%, rgba(15, 36, 51, 0.45) 70%, rgba(15, 36, 51, 0.72) 100%),
+    linear-gradient(180deg, rgba(15, 36, 51, 0.12) 0%, rgba(15, 36, 51, 0.42) 70%, rgba(15, 36, 51, 0.7) 100%),
     var(--world-night);
   background-position: center top, center 20%;
   background-size: auto, cover;
 }
 
-/* Kill Phase-1 flat parchment overlay when world mode is on */
+/* Soft grain only — no filter “sharpening” of low-res landscape art */
 .nest-page.nest-world::before {
-  opacity: 0.18;
+  opacity: 0.14;
   background-image: var(--paper-grain);
   background-size: 120px 120px;
   mix-blend-mode: soft-light;
 }
 html[data-theme="dark"] .nest-page.nest-world::before {
-  opacity: 0.1;
+  opacity: 0.08;
   mix-blend-mode: soft-light;
 }
 
@@ -76,51 +86,60 @@ html[data-theme="dark"] .nest-page.nest-world::before {
 .nest-world-decor img {
   position: absolute;
   max-width: none;
+}
+/* Specificity must beat `.nest-world-decor img` so theme toggles actually hide layers */
+.nest-world-decor .world-canopy,
+.nest-world-decor .world-lupines,
+.nest-world-decor .world-flowers,
+.nest-world-decor .world-rocks,
+.nest-world-decor .world-stars {
   display: block;
 }
-.world-canopy {
-  top: -2%;
-  left: 8%;
-  width: min(62vw, 720px);
-  opacity: 0.88;
+.nest-world-decor .world-canopy {
+  top: -4%;
+  left: -6%;
+  width: min(34vw, 400px);
+  opacity: 0.72;
+  /* Stay clear of theme toggle + avatar in the top-right chrome */
+  max-width: calc(100vw - 220px);
 }
-.world-canopy-night { display: none; }
-html[data-theme="dark"] .world-canopy-day { display: none; }
-html[data-theme="dark"] .world-canopy-night {
+.nest-world-decor .world-canopy-night { display: none; }
+html[data-theme="dark"] .nest-world-decor .world-canopy-day { display: none; }
+html[data-theme="dark"] .nest-world-decor .world-canopy-night {
   display: block;
-  opacity: 0.55;
-  filter: brightness(0.75) saturate(0.85);
+  opacity: 0.5;
 }
-.world-lupines {
+.nest-world-decor .world-lupines {
   left: -1%;
   bottom: 4%;
-  width: min(14vw, 140px);
-  opacity: 0.9;
-}
-.world-flowers {
-  right: 2%;
-  bottom: 6%;
   width: min(12vw, 120px);
   opacity: 0.85;
 }
-.world-rocks {
-  left: 28%;
-  bottom: -1%;
-  width: min(28vw, 320px);
-  opacity: 0.75;
+.nest-world-decor .world-flowers {
+  right: 1%;
+  bottom: 5%;
+  width: min(10vw, 100px);
+  opacity: 0.72;
+  /* Keep clear of secondary card row on typical desktop widths */
+  z-index: 0;
 }
-.world-stars {
-  display: none;
-  top: 4%;
-  right: 6%;
-  width: min(40vw, 420px);
+.nest-world-decor .world-rocks {
+  left: 30%;
+  bottom: -2%;
+  width: min(24vw, 280px);
   opacity: 0.7;
 }
-html[data-theme="dark"] .world-stars { display: block; }
-html[data-theme="dark"] .world-lupines,
-html[data-theme="dark"] .world-flowers {
-  opacity: 0.45;
-  filter: brightness(0.7) saturate(0.8);
+.nest-world-decor .world-stars {
+  display: none;
+  top: 3%;
+  right: 4%;
+  width: min(36vw, 380px);
+  opacity: 0.65;
+}
+html[data-theme="dark"] .nest-world-decor .world-stars { display: block; }
+html[data-theme="dark"] .nest-world-decor .world-lupines,
+html[data-theme="dark"] .nest-world-decor .world-flowers {
+  opacity: 0.4;
 }
 
 .nest-app,
@@ -129,18 +148,29 @@ html[data-theme="dark"] .world-flowers {
   z-index: 1;
 }
 
-/* ── Chrome sits lightly on the landscape ── */
+/* ── Chrome / greeting stay clear of decor ── */
 .nest-world .nest-chrome {
-  background: color-mix(in srgb, var(--lb-surface) 78%, transparent);
-  border-bottom: 1px solid color-mix(in srgb, var(--lb-border) 55%, transparent);
+  position: relative;
+  z-index: 6;
+  background: color-mix(in srgb, var(--parchment) 82%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--parchment-border) 55%, transparent);
   backdrop-filter: blur(8px);
+}
+html[data-theme="dark"] .nest-world .nest-chrome {
+  background: color-mix(in srgb, rgba(15, 36, 51, 0.72) 88%, transparent);
+  border-bottom-color: rgba(90, 118, 138, 0.35);
 }
 
 .nest-world .nest-greeting {
+  position: relative;
+  z-index: 3;
   text-shadow: 0 1px 0 rgba(255, 249, 239, 0.35);
-  max-width: 40rem;
+  max-width: min(36rem, 92%);
+  margin-left: auto;
+  margin-right: auto;
 }
 html[data-theme="dark"] .nest-world .nest-greeting {
+  color: #f7f1e6;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
 }
 
@@ -149,8 +179,8 @@ html[data-theme="dark"] .nest-world .nest-greeting {
   margin: 0.85rem 0 1.25rem 0.85rem;
   padding: 1.1rem 0.7rem 1.4rem 0.75rem;
   border-radius: 22px;
-  border: 1px solid color-mix(in srgb, var(--lb-border) 60%, transparent);
-  background-color: rgba(255, 248, 232, 0.92);
+  border: 1px solid var(--parchment-border);
+  background-color: rgba(255, 248, 232, 0.94);
   background-image:
     linear-gradient(180deg, rgba(255, 252, 244, 0.55), rgba(255, 248, 232, 0.75)),
     var(--paper-rail);
@@ -159,30 +189,26 @@ html[data-theme="dark"] .nest-world .nest-greeting {
   box-shadow: var(--lb-shadow);
   height: calc(100vh - 88px);
   border-right: 0;
+  color: var(--parchment-ink);
 }
 html[data-theme="dark"] .nest-world .nest-rail {
-  /* Warm parchment panels at night — landscape carries the night mood */
-  background-color: rgba(255, 246, 226, 0.9);
+  background-color: rgba(255, 246, 226, 0.94);
   background-image:
-    linear-gradient(180deg, rgba(255, 250, 236, 0.55), rgba(244, 228, 198, 0.72)),
+    linear-gradient(180deg, rgba(255, 250, 236, 0.6), rgba(244, 228, 198, 0.78)),
     var(--paper-rail);
-  color: #241f1b;
-  filter: none;
+  color: var(--parchment-ink);
 }
 html[data-theme="dark"] .nest-world .nest-rail .rail-link,
 html[data-theme="dark"] .nest-world .nest-rail .rail-sublink {
   color: #2c2620;
 }
+.nest-world .rail-link.is-active,
+.nest-world .rail-link.dash-tab.active,
 html[data-theme="dark"] .nest-world .nest-rail .rail-link.is-active,
 html[data-theme="dark"] .nest-world .nest-rail .rail-link.dash-tab.active {
-  background: rgba(240, 188, 89, 0.35);
+  background: rgba(232, 183, 90, 0.34);
   color: #1a1510;
-}
-
-.nest-world .rail-link.is-active,
-.nest-world .rail-link.dash-tab.active {
-  background: var(--lb-accent-soft);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--lb-accent) 35%, transparent);
+  box-shadow: inset 0 0 0 1px rgba(176, 122, 44, 0.35);
 }
 
 /* ── Home stage: parchment chapter + companions in the landscape ── */
@@ -192,61 +218,79 @@ html[data-theme="dark"] .nest-world .nest-rail .rail-link.dash-tab.active {
   grid-template-columns: minmax(0, 1.15fr) minmax(220px, 0.85fr);
   gap: 0.5rem 1rem;
   align-items: end;
-  margin: 0 0 1.35rem;
+  margin: 0 0 1.1rem;
   min-width: 0;
 }
 
 .nest-world .next-chapter {
   grid-column: 1;
   position: relative;
+  z-index: 2;
   display: block;
   grid-template-columns: none;
   min-height: 0;
   margin: 0;
-  padding: clamp(1.4rem, 3vw, 2.1rem) clamp(1.25rem, 2.6vw, 2rem);
+  padding: clamp(1.25rem, 2.6vw, 1.85rem) clamp(1.15rem, 2.4vw, 1.85rem);
   border-radius: 26px;
-  border: 1px solid color-mix(in srgb, var(--lb-border) 50%, transparent);
-  background-color: rgba(255, 248, 232, 0.95);
+  border: 1px solid var(--parchment-border);
+  background-color: rgba(255, 248, 232, 0.96);
   background-image:
-    linear-gradient(155deg, rgba(255, 252, 244, 0.88), rgba(255, 245, 220, 0.92)),
+    linear-gradient(155deg, rgba(255, 252, 244, 0.9), rgba(255, 245, 220, 0.94)),
     var(--paper-hero);
   background-size: auto, cover;
   background-position: center;
   box-shadow: var(--lb-shadow);
   overflow: visible;
+  color: var(--parchment-ink);
 }
 html[data-theme="dark"] .nest-world .next-chapter {
-  background-color: rgba(255, 246, 226, 0.94);
+  background-color: rgba(255, 246, 226, 0.96);
   background-image:
-    linear-gradient(155deg, rgba(255, 250, 236, 0.9), rgba(244, 228, 198, 0.94)),
+    linear-gradient(155deg, rgba(255, 250, 236, 0.94), rgba(244, 228, 198, 0.96)),
     var(--paper-hero);
-  color: #241f1b;
+  color: var(--parchment-ink);
 }
-html[data-theme="dark"] .nest-world .next-chapter-title,
-html[data-theme="dark"] .nest-world .next-chapter-context-title {
-  color: #241f1b;
+
+.nest-world .next-chapter-title {
+  color: var(--parchment-ink);
 }
-html[data-theme="dark"] .nest-world .next-chapter-body,
-html[data-theme="dark"] .nest-world .next-chapter-context-body {
-  color: #5c5348;
+.nest-world .next-chapter-body {
+  color: var(--parchment-muted);
 }
-html[data-theme="dark"] .nest-world .next-chapter-kicker,
-html[data-theme="dark"] .nest-world .next-chapter-context-kicker {
-  color: #9a6a22;
+.nest-world .next-chapter-kicker {
+  color: var(--parchment-accent);
+}
+
+/* Warm parchment inset — never inherit dark surface tokens */
+.nest-world .next-chapter-context {
+  background: var(--parchment-inset);
+  border: 1px solid rgba(176, 146, 100, 0.55);
+  color: var(--parchment-ink);
+}
+.nest-world .next-chapter-context-kicker {
+  color: var(--parchment-accent);
+}
+.nest-world .next-chapter-context-title {
+  color: var(--parchment-ink);
+  font-weight: 600;
+}
+.nest-world .next-chapter-context-body {
+  color: var(--parchment-muted);
 }
 
 .nest-world .next-chapter-art { display: none; }
 
 .nest-world .next-chapter-copy {
   max-width: 36rem;
+  gap: 0.65rem;
 }
 
 .nest-companions-stage {
   grid-column: 2;
   position: relative;
-  z-index: 2;
+  z-index: 1;
   pointer-events: none;
-  min-height: 240px;
+  min-height: 220px;
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -258,76 +302,84 @@ html[data-theme="dark"] .nest-world .next-chapter-context-kicker {
   height: auto;
   object-fit: contain;
   object-position: bottom center;
-  filter: drop-shadow(0 14px 24px rgba(40, 30, 18, 0.22));
 }
 .nest-companions-night { display: none; }
 html[data-theme="dark"] .nest-companions-day { display: none; }
 html[data-theme="dark"] .nest-companions-night { display: block; }
 
-/* Soft botanical accents on chapter (small, non-competing) */
+/* Accents stay clear of heading / primary CTA */
 .nest-world .next-chapter-accents .accent-leaf {
-  width: 42px;
-  opacity: 0.55;
-}
-.nest-world .next-chapter-accents .accent-wayfinder {
-  width: 48px;
-  opacity: 0.4;
+  top: 0.55rem;
   left: auto;
-  right: 1rem;
-  bottom: 0.85rem;
+  right: 0.7rem;
+  width: 34px;
+  opacity: 0.4;
+}
+/* Wayfinder sat on top of secondary CTAs — omit until a clear corner exists */
+.nest-world .next-chapter-accents .accent-wayfinder {
+  display: none;
 }
 
 /* ── Secondary parchment cards ── */
 .nest-world .nest-secondary {
-  gap: 0.9rem;
+  position: relative;
+  z-index: 2;
+  gap: 0.85rem;
 }
 .nest-world .nest-secondary-card {
   position: relative;
   padding: 1.05rem 1.05rem 1.15rem;
   border-radius: 18px;
-  border: 1px solid color-mix(in srgb, var(--lb-border) 55%, transparent);
-  background-color: rgba(255, 248, 232, 0.92);
+  border: 1px solid var(--parchment-border);
+  background-color: rgba(255, 248, 232, 0.94);
   background-image:
-    linear-gradient(180deg, rgba(255, 252, 244, 0.75), rgba(255, 245, 220, 0.85)),
+    linear-gradient(180deg, rgba(255, 252, 244, 0.78), rgba(255, 245, 220, 0.88)),
     var(--paper-card);
   background-size: auto, cover;
   box-shadow: 0 10px 28px rgba(55, 42, 25, 0.1);
   overflow: hidden;
+  color: var(--parchment-ink);
 }
 html[data-theme="dark"] .nest-world .nest-secondary-card {
-  background-color: rgba(255, 246, 226, 0.92);
+  background-color: rgba(255, 246, 226, 0.94);
   background-image:
-    linear-gradient(180deg, rgba(255, 250, 236, 0.82), rgba(244, 228, 198, 0.9)),
+    linear-gradient(180deg, rgba(255, 250, 236, 0.85), rgba(244, 228, 198, 0.92)),
     var(--paper-card);
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
-  color: #241f1b;
+  color: var(--parchment-ink);
 }
+.nest-world .nest-secondary-title,
 html[data-theme="dark"] .nest-world .nest-secondary-title {
-  color: #241f1b;
+  color: var(--parchment-ink);
 }
-html[data-theme="dark"] .nest-world .nest-secondary-body,
-html[data-theme="dark"] .nest-world .nest-secondary-kicker {
-  color: #5c5348;
+.nest-world .nest-secondary-body {
+  color: var(--parchment-muted);
 }
+.nest-world .nest-secondary-kicker,
 html[data-theme="dark"] .nest-world .nest-secondary-kicker {
-  color: #9a6a22;
+  color: var(--parchment-accent);
+}
+html[data-theme="dark"] .nest-world .nest-secondary-body {
+  color: var(--parchment-muted);
 }
 
-/* Keep primary CTAs teal on warm parchment (concept #3 night) */
+/* Primary CTAs stay teal on warm parchment in both themes */
+.nest-world .btn-primary-nest,
 html[data-theme="dark"] .nest-world .btn-primary-nest {
   background: #18495c;
   color: #fff9ef;
   border-color: #18495c;
 }
+.nest-world .btn-quiet,
 html[data-theme="dark"] .nest-world .btn-quiet {
-  color: #241f1b;
+  color: var(--parchment-ink);
   border-color: rgba(36, 31, 27, 0.28);
-  background: rgba(255, 252, 244, 0.65);
+  background: rgba(255, 252, 244, 0.7);
 }
 html[data-theme="dark"] .nest-world .nest-mobile-bar {
-  background: color-mix(in srgb, rgba(255, 246, 226, 0.94) 88%, transparent);
+  background: color-mix(in srgb, rgba(255, 246, 226, 0.96) 90%, transparent);
   border-top-color: rgba(176, 146, 100, 0.45);
-  color: #241f1b;
+  color: var(--parchment-ink);
 }
 html[data-theme="dark"] .nest-world .mobile-bar-link {
   color: #3a332c;
@@ -346,55 +398,115 @@ html[data-theme="dark"] .nest-world .mobile-bar-link.is-active {
 }
 .nest-world .nest-secondary-icon { display: none; }
 .nest-world .nest-secondary-watercolor + .nest-secondary-icon { display: none; }
-
-/* Prefer watercolor icons when present */
 .nest-secondary-card:has(.nest-secondary-watercolor) .nest-secondary-icon {
   display: none;
 }
 
-/* ── Mobile / narrow ── */
+/* ── Mobile: compact chapter, tucked companions, reachable cards ── */
 @media (max-width: 980px) {
   .nest-page.nest-world {
     background-attachment: scroll;
-    background-size: auto, auto 58vh;
+    background-size: auto, auto 52vh;
     background-position: center top, center top;
   }
-  .nest-world-decor .world-canopy {
-    width: min(92vw, 420px);
-    left: -8%;
-    top: -1%;
-    opacity: 0.7;
-  }
+  /* Keep sky clear of floating canopy over greeting / chrome */
+  .nest-world-decor .world-canopy,
   .nest-world-decor .world-lupines,
   .nest-world-decor .world-flowers,
   .nest-world-decor .world-rocks {
     display: none;
   }
+  .nest-world-decor .world-stars {
+    width: min(48vw, 200px);
+    top: 1%;
+    right: -6%;
+    opacity: 0.4;
+  }
   .nest-world .nest-rail { display: none; }
 
+  .nest-world .nest-greeting {
+    font-size: clamp(1.05rem, 4.2vw, 1.25rem);
+    line-height: 1.35;
+    margin-bottom: 0.55rem;
+    max-width: 100%;
+    text-align: left;
+  }
+
   .nest-home-stage {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0.65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-bottom: 0.5rem;
   }
   .nest-world .next-chapter {
-    grid-column: 1;
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
-    padding: 1.1rem 1rem 1rem;
+    padding: 0.75rem 0.85rem 0.7rem;
     overflow: hidden;
+    z-index: 2;
   }
+  .nest-world .next-chapter-copy {
+    gap: 0.35rem;
+    max-width: none;
+  }
+  .nest-world .next-chapter-title {
+    font-size: clamp(1.3rem, 5.2vw, 1.55rem);
+    line-height: 1.18;
+  }
+  .nest-world .next-chapter-body {
+    font-size: 0.92rem;
+    line-height: 1.35;
+  }
+  /* Context already carries the resume beat — drop redundant body to shorten the panel */
+  .nest-world .next-chapter:has(#next-chapter-context:not([hidden])) .next-chapter-body,
+  .nest-world .next-chapter:has(.next-chapter-context:not([hidden])) .next-chapter-body {
+    display: none;
+  }
+  .nest-world .next-chapter-context {
+    padding: 0.5rem 0.65rem;
+    margin: 0.05rem 0 0;
+  }
+  .nest-world .next-chapter-context-body {
+    max-height: none;
+    font-size: 0.86rem;
+    line-height: 1.35;
+  }
+  .nest-world .next-chapter-actions {
+    margin-top: 0.2rem;
+    gap: 0.45rem;
+  }
+  .nest-world .next-chapter-actions .btn-primary-nest,
+  .nest-world .next-chapter-actions .btn-quiet {
+    min-height: 44px;
+    width: 100%;
+  }
+  .nest-world .next-chapter-accents .accent-leaf {
+    width: 26px;
+    opacity: 0.32;
+  }
+
   .nest-companions-stage {
-    grid-column: 1;
     min-height: 0;
-    margin: 0;
-    justify-content: center;
+    margin: -2.1rem 0.1rem -0.55rem auto;
+    justify-content: flex-end;
+    width: min(58vw, 220px);
+    align-self: flex-end;
+    z-index: 1;
   }
   .nest-companions-stage img {
-    max-width: min(92vw, 360px);
-    width: 78%;
+    width: 100%;
+    max-width: 220px;
   }
-  .nest-world .next-chapter-accents .accent-wayfinder { display: none; }
+
+  .nest-world .nest-secondary {
+    margin-top: 0;
+    gap: 0.55rem;
+  }
+  .nest-world .nest-secondary-card {
+    padding: 0.8rem 0.85rem 0.9rem;
+  }
+
   .nest-world .nest-greeting,
   .nest-world .next-chapter-title,
   .nest-world .next-chapter-body {
@@ -413,15 +525,18 @@ html[data-theme="dark"] .nest-world .mobile-bar-link.is-active {
 
 @media (max-width: 560px) {
   .nest-page.nest-world {
-    background-size: auto, auto 48vh;
+    background-size: auto, auto 44vh;
+  }
+  .nest-companions-stage {
+    margin-top: -1.55rem;
   }
   .nest-companions-stage img {
-    width: 72%;
-    max-width: 280px;
+    width: min(52vw, 188px);
+    max-width: 188px;
   }
   .nest-world .nest-secondary-watercolor {
-    width: 2.6rem;
-    height: 2.6rem;
+    width: 2.45rem;
+    height: 2.45rem;
   }
 }
 
@@ -433,6 +548,9 @@ html[data-theme="dark"] .nest-world .mobile-bar-link.is-active {
   }
   .nest-world .mobile-bar-link i { font-size: 1.05rem; }
   .nest-world .nest-brand-sub { display: none; }
+  .nest-world .next-chapter {
+    padding: 0.75rem 0.8rem 0.65rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
