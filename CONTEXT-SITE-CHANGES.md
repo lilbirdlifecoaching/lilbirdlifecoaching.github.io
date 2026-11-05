@@ -83,3 +83,7 @@ Add `testimonials/` at site root and reference in markup, e.g. `testimonials/bri
 - `https://lilbird.life/solo/`
 - `https://lilbird.life/book.html#intensive`
 - `https://lilbird.life/about-luke.html`
+
+## 2026-11-05 — Solo journal pilot, not deployed
+
+Isolated branch `pilot/solo-open-journal`; session presentation and mobile inline information only. See `docs/solo-journal-pilot/REVIEW.md` for architecture inventory, synthetic screenshots, validation limits and missing dedicated Solo chapter assets. Preserve existing backend and member state. Await visual approval and dedicated test-member functional checks before release.
