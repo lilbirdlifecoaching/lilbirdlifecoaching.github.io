@@ -155,3 +155,7 @@ html.solo-journal :is(.btn-back2, .btn-add, .btn-add-person, .btn-add-entry) {
   color: var(--ink) !important;
   box-shadow: none !important;
 }
+
+/* Inside a session the frame header already has the title and
+   "Done, back to session", so the tool's own top row is redundant. */
+html.solo-journal.tool-embedded .page > .nav { display: none !important; }
