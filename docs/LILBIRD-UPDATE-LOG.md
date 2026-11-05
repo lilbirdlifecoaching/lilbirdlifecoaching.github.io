@@ -837,3 +837,7 @@ If a change touches pricing, booking, worker logic, or public copy, log it here.
 ---
 
 Last updated: 2026-05-28
+
+## 2026-11-05 — Solo open-journal pilot (draft review only)
+
+Session-only presentation in `css/lilbird-solo-journal.css`: facing desktop pages, inline single-page mobile flow, existing clean companion artwork, reflection heading and reply labels. Existing backend, access, progress, video and tool calls retained. Twenty existing policy/navigation tests pass; eight synthetic browser layout captures pass overflow checks. Live authenticated validation and dedicated Solo chapter artwork remain outstanding. See `docs/solo-journal-pilot/REVIEW.md`. No merge/deployment.

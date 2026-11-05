@@ -1,0 +1,124 @@
+/* Solo session presentation only. All session, auth and persistence logic stays native. */
+#view-session {
+  --journal-paper: #fcf5e6;
+  --journal-ink: #302c27;
+  --journal-muted: #6a6054;
+  --journal-line: #d8c5a3;
+  --journal-accent: #80561b;
+  --journal-desk: #d6c3a3;
+  --journal-art: url('/nest/assets/lilbird-kit/companions/nest-companions-day.webp');
+  background: var(--journal-desk);
+  color: var(--journal-ink);
+}
+html[data-theme="dark"] #view-session {
+  --journal-paper: #203543;
+  --journal-ink: #faf1df;
+  --journal-muted: #ccd5d7;
+  --journal-line: #52636b;
+  --journal-accent: #edc676;
+  --journal-desk: #10232e;
+  --journal-art: url('/nest/assets/lilbird-kit/companions/nest-companions-night-no-lantern.webp');
+}
+#view-session .session-main {
+  --text: var(--journal-ink);
+  --text-dim: var(--journal-muted);
+  --text-muted: var(--journal-muted);
+  --gold: var(--journal-accent);
+  --gold-border: var(--journal-line);
+  --session-col: var(--journal-accent);
+  --session-border: var(--journal-line);
+  --dark-card: var(--journal-paper);
+  --dark-hover: var(--journal-paper);
+  flex: none;
+  max-width: 1240px;
+  margin: 32px auto 48px;
+  width: calc(100% - 64px);
+  padding: 0;
+  gap: 0;
+  overflow: visible;
+  border: 1px solid #907653;
+  border-radius: 20px 15px 15px 20px;
+  background: var(--journal-paper);
+  box-shadow: 0 4px 0 -1px var(--journal-line), 0 8px 0 -2px var(--journal-paper), 0 10px 0 -2px #907653, 0 22px 45px #14212b30;
+  position: relative;
+}
+#view-session.view.active { height: auto; min-height: 100dvh; overflow: visible; }
+#view-session .session-info,
+#view-session .session-chat-col { padding: 36px 40px; min-width: 0; overflow: visible; }
+#view-session .session-info {
+  border-right: 1px solid var(--journal-line);
+  background: linear-gradient(90deg, transparent 94%, #614a2620);
+  border-radius: 20px 0 0 20px;
+}
+#view-session .session-chat-col {
+  background: linear-gradient(90deg, #614a2620, transparent 6%);
+  border-radius: 0 15px 15px 0;
+}
+#view-session .session-info h1 { font-style: normal; font-size: clamp(2rem, 3vw, 2.8rem); }
+#view-session .session-info-desc { max-width: none; margin-bottom: 12px; }
+#view-session .journal-chapter-art {
+  height: 180px;
+  background: var(--journal-art) center / contain no-repeat;
+  margin: 8px 0 20px;
+  pointer-events: none;
+}
+#view-session .session-tag-label { color: var(--journal-accent); }
+#view-session .video-player-container { max-width: 250px; margin: auto; border-radius: 8px; }
+#view-session .video-poster { border-radius: 8px; }
+#view-session .video-label { color: #fff3df; text-align: center; padding: 8px; }
+#view-session .video-play { color: #fff3df; border-color: #fff3df; }
+#view-session .video-wrap { margin-bottom: 24px; }
+#view-session .session-meta-row { gap: 20px; flex-wrap: wrap; padding-block: 16px; border-block: 1px solid var(--journal-line); }
+#view-session .tools-label { color: var(--journal-accent); }
+#view-session .tool-item { min-height: 44px; border-color: var(--journal-line); }
+#view-session .chat-container { border: 0; background: transparent; border-radius: 0; min-height: 640px; height: min(780px, 85dvh); }
+#view-session .journal-reflection-heading { padding: 0 0 20px; border-bottom: 1px solid var(--journal-line); }
+#view-session .journal-reflection-heading > span { font: 11px var(--font-mono); text-transform: uppercase; letter-spacing: .18em; color: var(--journal-accent); }
+#view-session .journal-reflection-heading h2 { font: italic 2.3rem var(--font-display); margin: 14px 0 10px; }
+#view-session .journal-reflection-heading p { font-size: .85rem; line-height: 1.6; color: var(--journal-muted); }
+#view-session .chat-header { padding: 16px 0; border-color: var(--journal-line); background: transparent; }
+#view-session .chat-messages { padding: 20px 0; scrollbar-color: var(--journal-line) transparent; }
+#view-session .msg-bubble { color: var(--journal-ink); }
+#view-session .msg.user .msg-bubble { background: #a78b5720; border-color: var(--journal-line); }
+#view-session .chat-input-wrap { padding: 16px 0 0; border-color: var(--journal-line); background: transparent; }
+#view-session #chat-input { background: var(--journal-paper); color: var(--journal-ink); border: 1px solid var(--journal-line); border-radius: 8px; }
+#view-session #chat-input::placeholder { color: var(--journal-muted); }
+#view-session .btn-send { background: var(--journal-accent); color: var(--journal-paper); width: 44px; height: 44px; }
+#view-session .complete-panel { background: transparent; border-color: var(--journal-line); padding: 24px 0; border-radius: 0; }
+#view-session .tool-embed-wrap { background: var(--journal-paper); }
+#view-session :is(button,a,textarea,[tabindex]):focus-visible { outline: 3px solid var(--journal-accent); outline-offset: 4px; }
+#view-session .session-info-sheet-bar { display: none; }
+#view-session .session-nav { flex-wrap: wrap; gap: 12px; height: auto; min-height: 64px; }
+#view-session .btn-back-dash { min-height: 44px; }
+@media (max-width: 1000px) {
+  #view-session .session-info, #view-session .session-chat-col { padding: 28px; }
+}
+@media (max-width: 768px) {
+  #view-session .session-main { display: block; width: calc(100% - 28px); margin: 18px auto 32px; border-radius: 12px; }
+  #view-session .session-info { display: block; position: static; inset: auto; width: auto; background: transparent; border-right: 0; border-bottom: 1px solid var(--journal-line); max-width: none; z-index: auto; }
+  #view-session .session-info, #view-session .session-chat-col { padding: 24px 20px; border-radius: 0; }
+  #view-session .session-chat-col { background: transparent; min-height: 0; }
+  #view-session .journal-chapter-art { height: 150px; }
+  #view-session .chat-container { height: 75dvh; min-height: 540px; }
+  #view-session .session-nav { padding: 12px 16px; position: static; }
+  #view-session .session-nav-label { font-size: 10px; }
+  #view-session .session-nav > div:last-child { justify-content: flex-start !important; }
+  #view-session #btn-session-info { display: none; }
+  #view-session .session-info.is-open .session-info-sheet-bar { display: none; }
+  #view-session .tool-embed-frame { min-height: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #view-session *, #view-session *::before { animation: none !important; scroll-behavior: auto !important; transition: none !important; }
+}
+#view-session .session-nav {
+  --text-dim: var(--journal-muted);
+  --text-muted: var(--journal-muted);
+  --gold: var(--journal-accent);
+  background: var(--journal-paper);
+  border-color: var(--journal-line);
+}
+#view-session .session-nav .lilbird-nav-nest { color: var(--journal-accent); border-color: var(--journal-line); }
+#view-session .msg.assistant .msg-bubble { background: transparent; border: 0; border-left: 2px solid var(--journal-line); border-radius: 0; }
+#view-session .chat-header { order: 0; }
+#view-session .journal-reflection-heading { order: -1; }
+#view-session .session-main::after { content: ''; position: absolute; inset: 7px; border: 1px solid var(--journal-line); border-radius: 13px; pointer-events: none; }

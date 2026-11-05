@@ -854,6 +854,7 @@
   </style>
   <link rel="stylesheet" href="/css/lilbird-solo-theme.css?v=20260922b" />
   <!-- Google Tag Manager -->
+  <link rel="stylesheet" href="/css/lilbird-solo-journal.css?v=1" />
   <script src="/lilbird-gtm-id.js"></script>
   <script src="/lilbird-gtm.js"></script>
 </head>
@@ -1117,11 +1118,12 @@
       <div class="session-chat-col">
         <div class="chat-container" style="position:relative;overflow:hidden;">
           <div class="chat-header" id="chat-header"></div>
-          <div class="chat-messages" id="chat-messages"></div>
+          <div class="journal-reflection-heading"><span>The Solo Course</span><h2>Your reflection</h2><p>A little space to listen, explore, and find your next step.</p></div>
+          <div class="chat-messages" id="chat-messages" role="log" aria-label="Session conversation" aria-live="polite"></div>
           <div class="chat-input-wrap">
-            <textarea class="chat-textarea" id="chat-input" placeholder="Take your time..." rows="1"></textarea>
+            <textarea class="chat-textarea" id="chat-input" aria-label="Your reply" placeholder="Take your time..." rows="1"></textarea>
             <button type="button" class="btn-mic no-speech-hide" id="chat-mic" title="Speak your answer" aria-label="Speak your answer">🎤</button>
-            <button class="btn-send" id="btn-send" disabled>↑</button>
+            <button class="btn-send" id="btn-send" aria-label="Send reply" disabled>↑</button>
           </div>
           <div class="tool-embed-wrap" id="tool-embed-wrap">
             <div class="tool-embed-header">
@@ -1297,47 +1299,18 @@
       return window.matchMedia('(max-width: 768px)').matches;
     }
 
+    // Session information is an inline journal page at every width.
+    // Keep the existing call sites, without a mobile modal or scroll lock.
     function syncSessionInfoChrome() {
       const btn = document.getElementById('btn-session-info');
       const info = document.getElementById('session-info');
-      const inSession = document.getElementById('view-session')?.classList.contains('active');
-      const mobile = isMobileSessionLayout();
-      if (!btn || !info) return;
-      if (inSession && mobile) {
-        btn.hidden = false;
-        btn.setAttribute('aria-expanded', sessionInfoOpen ? 'true' : 'false');
-      } else {
-        btn.hidden = true;
-        btn.setAttribute('aria-expanded', 'false');
-        if (!mobile) {
-          sessionInfoOpen = false;
-          info.classList.remove('is-open');
-          info.removeAttribute('aria-modal');
-          if (info.getAttribute('role') === 'dialog') info.setAttribute('role', 'region');
-          document.body.classList.remove('session-info-open');
-        }
-      }
+      if (btn) { btn.hidden = true; btn.setAttribute('aria-expanded', 'false'); }
+      if (info) { info.setAttribute('role', 'region'); info.removeAttribute('aria-modal'); }
+      document.body.classList.remove('session-info-open');
     }
 
-    function setSessionInfoOpen(open) {
-      const info = document.getElementById('session-info');
-      const btn = document.getElementById('btn-session-info');
-      if (!info) return;
-      sessionInfoOpen = !!open;
-      info.classList.toggle('is-open', sessionInfoOpen);
-      if (sessionInfoOpen && isMobileSessionLayout()) {
-        info.setAttribute('role', 'dialog');
-        info.setAttribute('aria-modal', 'true');
-        document.body.classList.add('session-info-open');
-        const closeBtn = document.getElementById('btn-close-session-info');
-        if (closeBtn) closeBtn.focus();
-        else info.focus();
-      } else {
-        info.setAttribute('role', 'region');
-        info.removeAttribute('aria-modal');
-        document.body.classList.remove('session-info-open');
-        if (btn && !btn.hidden) btn.focus();
-      }
+    function setSessionInfoOpen() {
+      sessionInfoOpen = false;
       syncSessionInfoChrome();
     }
 
@@ -2348,7 +2321,7 @@
           '<span class="sheet-title">Session info</span>' +
           '<button type="button" class="btn-close-session-info" id="btn-close-session-info">Close</button>' +
         '</div>' +
-        '<div class="session-tag-label">' + session.tag + '</div><h1>' + session.title + '</h1><p class="session-info-desc">' + session.desc + '</p>' + videoHtml +
+        '<div class="session-tag-label">' + session.tag + '</div><h1>' + session.title + '</h1><p class="session-info-desc">' + session.desc + '</p>' + '<div class="journal-chapter-art" aria-hidden="true"></div>' + videoHtml +
         '<div class="session-meta-row"><div class="meta-item"><span class="meta-label">Session</span><span class="meta-value">' + (session.number===0?'Orientation':'0'+session.number+' of 07') + '</span></div><div class="meta-item"><span class="meta-label">Duration</span><span class="meta-value">' + session.duration + '</span></div>' +
         (session.tools.length ? '<div class="meta-item"><span class="meta-label">Tools</span><span class="meta-value">' + session.tools.length + ' tools</span></div>' : '') + '</div>' + toolsHtml;
       const closeInfo = document.getElementById('btn-close-session-info');
