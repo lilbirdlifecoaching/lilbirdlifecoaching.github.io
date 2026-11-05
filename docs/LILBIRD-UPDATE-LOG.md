@@ -22,6 +22,11 @@ If a change touches pricing, booking, worker logic, or public copy, log it here.
 
 ## 2026-11-05 (Claude)
 
+### Nest kids pinned to the scene; Solo field-journal pass (part 1)
+- **Status:** `deployed` (Pages only)
+- Nest Home desktop: kids are `position: fixed` with the painted scene (`lilbird-nest-concept.css?v=20261105c3`), so panels scroll over them.
+- Solo signed-in course (dashboard, sessions list, session view, sign-in, post-purchase): `css/lilbird-solo-journal.css?v=20261105s1` + `html.solo-journal`. Painted scene, torn-paper panels, teal pills, day ink on paper in both themes, `--font-mono` remapped to DM Sans. The public sales view (`#view-landing`) is excluded via `:has()` and keeps its look. Not yet: tool pages in `solo/tools/` and the embedded tool frames.
+
 ### Inner Compass in the Nest, phone checklist, sign-in page
 - **Status:** `deployed` (Pages only)
 - **Inner Compass from the Nest:** saved reads opened with `?from=nest&nest=…` get `html.ic-nest` and `css/lilbird-ic-nest.css?v=20261105n1`: painted scene, torn-paper panels, one type voice, teal "Back to your Nest" pill (the lilbird.life link is hidden there). The public assessment keeps its own look.

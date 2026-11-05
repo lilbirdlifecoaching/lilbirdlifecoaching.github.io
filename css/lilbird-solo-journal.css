@@ -1,0 +1,5 @@
+html.solo-journal :is(.session-archive-title, .session-title, .continue-panel h3, .complete-hero h3) {
+  font-family: "Playfair Display", Georgia, serif !important;
+  font-weight: 400;
+  font-size: 1.05rem;
+}
