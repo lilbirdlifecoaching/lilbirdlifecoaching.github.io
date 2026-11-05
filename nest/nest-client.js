@@ -520,6 +520,7 @@
       document.getElementById('profile-dot').classList.toggle('hidden', !hasInnerCompassComplete());
       updateNavAvatar();
       await loadJourneySignals();
+      syncSoloNavVisibility();
       renderNextChapter();
       renderNestSecondary();
       renderNextSteps();
@@ -708,6 +709,56 @@
       });
     }
     return entitlements.has('solo_course') || entitlements.has('nest_premium') || !!courseProfile?.purchased_at;
+  }
+
+  /** Solo Course rail + mobile tab only for entitled owners. Deep-links to /solo/. */
+  function syncSoloNavVisibility() {
+    const show = hasSoloCourseAccess();
+    const rail = document.getElementById('rail-solo');
+    const soloTab = document.getElementById('mobile-solo-tab');
+    const growTab = document.getElementById('mobile-grow-tab');
+    const moreLearn = document.getElementById('mobile-more-learn');
+    const bar = document.getElementById('nest-mobile-bar');
+    if (rail) {
+      rail.hidden = !show;
+      rail.setAttribute('aria-hidden', show ? 'false' : 'true');
+    }
+    if (soloTab) {
+      soloTab.hidden = !show;
+      soloTab.setAttribute('aria-hidden', show ? 'false' : 'true');
+    }
+    // Entitled: Home · Journey · Solo · Guide · More (Grow moves into More).
+    // Non-owners: Home · Journey · Guide · Grow · More.
+    if (growTab) growTab.hidden = !!show;
+    if (moreLearn) moreLearn.hidden = !show;
+    if (bar) bar.classList.toggle('has-solo', !!show);
+  }
+
+  function soloHomeEntry() {
+    if (!hasSoloCourseAccess()) return null;
+    const solo = progressSummary();
+    if (solo.state === 'complete') {
+      return {
+        label: 'View My Flight Plan →',
+        title: 'View My Flight Plan',
+        body: 'All sessions complete. Revisit your Full Flight Plan anytime.',
+        href: '/solo/?view=plan',
+      };
+    }
+    if (solo.state === 'start') {
+      return {
+        label: 'Start Solo Course →',
+        title: 'Start Solo Course',
+        body: 'Begin with ' + solo.next + '.',
+        href: '/solo/',
+      };
+    }
+    return {
+      label: 'Continue Solo Course →',
+      title: 'Continue Solo Course',
+      body: 'Next: ' + solo.next + '.',
+      href: '/solo/',
+    };
   }
 
   function intensiveProgressFlags() {
@@ -1103,6 +1154,12 @@
       };
     }
 
+    // Entitled Solo owners: promote Start / Continue / Flight Plan as the quiet secondary CTA.
+    const soloEntry = soloHomeEntry();
+    if (soloEntry) {
+      cfg.secondary = { label: soloEntry.label, href: soloEntry.href };
+    }
+
     if (kicker) kicker.textContent = cfg.kicker;
     if (title) title.textContent = cfg.title;
     if (body) body.textContent = cfg.body;
@@ -1181,6 +1238,9 @@
     if (kind === 'guide') {
       return '<span class="nest-secondary-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 19c4-3 6-7 12-12-1 6-5 11-12 12Z"/><path d="M5 19c3-4 6-7 12-12"/><path d="m8 14-1-4m4 2-.5-4"/></svg></span>';
     }
+    if (kind === 'solo') {
+      return '<span class="nest-secondary-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 4h10a2 2 0 0 1 2 2v14l-5-2.5L7 20V6a2 2 0 0 1 2-2"/><path d="M17 4h2a2 2 0 0 1 2 2v14"/></svg></span>';
+    }
     return '<span class="nest-secondary-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 12c3 5 6 7.5 8 7.5S17 17 20 12"/><path d="M5 14c4 3.5 10 4 14-.5"/><path d="M8 11.5c.5-3 2-5 4-5.5 2.5-.5 4 2 4 5"/></svg></span>';
   }
 
@@ -1214,12 +1274,28 @@
         action: 'products'
       }
     ];
+
+    const soloEntry = soloHomeEntry();
+    if (soloEntry) {
+      cards.splice(1, 0, {
+        kind: 'solo',
+        kicker: 'Solo Course',
+        title: soloEntry.title,
+        body: soloEntry.body,
+        href: soloEntry.href
+      });
+      cards.pop();
+    }
+
     host.innerHTML = cards.map((card) => {
       const inner =
         secondaryIcon(card.kind) +
         '<p class="nest-secondary-kicker">' + escapeHtml(card.kicker) + '</p>' +
         '<h3 class="nest-secondary-title">' + escapeHtml(card.title) + '</h3>' +
         '<p class="nest-secondary-body">' + escapeHtml(card.body) + '</p>';
+      if (card.href) {
+        return '<article class="nest-secondary-card"><a class="nest-secondary-link" href="' + escapeHtml(card.href) + '">' + inner + '</a></article>';
+      }
       return '<article class="nest-secondary-card"><button type="button" data-secondary-action="' + escapeHtml(card.action) + '">' + inner + '</button></article>';
     }).join('');
     host.querySelectorAll('[data-secondary-action]').forEach((btn) => {
@@ -3202,6 +3278,10 @@
 
   function resetDashboardUi() {
     nestPlusGrantedBy = '';
+    entitlements = new Set();
+    courseProfile = null;
+    sessionProgress = [];
+    syncSoloNavVisibility();
     setTab('products');
     setDashError('');
     setDashLoading(false);
