@@ -1145,6 +1145,63 @@ html[data-theme="light"] .journey-reflection.is-returning {
 @media (prefers-reduced-motion: reduce) {
   .journey-reflection.is-returning { scroll-margin-block: 0; }
 }
+.journey-focus-badge {
+  margin: 0;
+  font-family: "DM Mono", monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.journey-checkin {
+  display: grid;
+  gap: 0.65rem;
+  padding: 0.75rem 0 0.15rem;
+  border-top: 1px solid rgba(245, 200, 66, 0.16);
+}
+.journey-checkin-muted { border-top-color: transparent; padding-top: 0.35rem; }
+.journey-checkin-choices {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 720px) {
+  .journey-checkin-choices { grid-template-columns: 1fr 1fr; }
+}
+.journey-checkin-choice { justify-content: center; text-align: center; }
+.journey-checkin-note-input {
+  width: 100%;
+  min-height: 96px;
+  background: var(--dark-mid);
+  border: 1px solid rgba(245,200,66,0.14);
+  border-radius: 10px;
+  color: var(--text-main);
+  padding: 0.7rem;
+  font: inherit;
+  line-height: 1.45;
+}
+.journey-checkin-confirm { margin: 0; color: var(--text-main); }
+.journey-checkin-history {
+  list-style: none;
+  margin: 0.15rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+.journey-checkin-history li {
+  display: grid;
+  gap: 0.15rem;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+.journey-checkin-history span:first-child {
+  font-family: "DM Mono", monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+}
+.journey-checkin-note { color: var(--text-muted); overflow-wrap: anywhere; }
 .journey-empty, .journey-status { color: var(--text-muted); margin: 0; }
 .journey-back { justify-self: start; }
 .journey-home { max-width: 920px; }
