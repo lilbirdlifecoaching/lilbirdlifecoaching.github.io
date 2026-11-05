@@ -523,6 +523,38 @@
       }
     }
 
+    .session-info-sheet-bar {
+      display: none;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.75rem 0 1rem;
+      margin-bottom: 0.5rem;
+      background: var(--dark);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .session-info-sheet-bar .sheet-title {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .session-info-sheet-bar .btn-close-session-info {
+      min-height: 44px;
+      min-width: 44px;
+      padding: 0.5rem 0.85rem;
+      border-radius: 999px;
+      border: 1px solid rgba(245,200,66,0.35);
+      background: transparent;
+      color: var(--text-main);
+      font: inherit;
+      cursor: pointer;
+    }
+
     @media (max-width: 768px) {
       .dash-nav { padding: 1rem; }
       .dash-body { padding: 1.5rem 1rem 4rem; }
@@ -531,7 +563,33 @@
       .session-nav-label { display: none; }
       .session-main { grid-template-columns: 1fr; padding: 0; gap: 0; overflow: visible; }
       #view-session.view.active { height: auto; overflow: visible; }
-      .session-info { display: none; }
+      /* Mobile: Info is a full-screen sheet, not a permanently hidden column */
+      .session-info {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 60;
+        width: 100%;
+        max-width: none;
+        padding: 0 1rem 2rem;
+        padding-top: max(0.5rem, env(safe-area-inset-top));
+        padding-bottom: max(2rem, env(safe-area-inset-bottom));
+        background: var(--dark);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .session-info.is-open {
+        display: block;
+      }
+      .session-info.is-open .session-info-sheet-bar {
+        display: flex;
+      }
+      #btn-session-info:not([hidden]) {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        padding: 0.45rem 0.75rem;
+      }
       .session-chat-col { min-height: calc(100vh - 60px); padding: 0; min-height: 0; }
       .chat-container { min-height: calc(100vh - 60px); border-radius: 0; border-left: none; border-right: none; border-bottom: none; }
       .chat-header { padding: 1rem; }
@@ -539,6 +597,7 @@
       .chat-input-wrap { padding: 0.75rem 1rem; padding-bottom: max(0.75rem, env(safe-area-inset-bottom)); }
       .chat-textarea { font-size: 16px; }
       #complete-panel { border-radius: 0; margin-top: 0; border-left: none; border-right: none; }
+      body.session-info-open { overflow: hidden; }
     }
 
     /* ── Stripe checkout modal ─────────────────────────────── */
@@ -978,12 +1037,12 @@
         </button>
         <a href="/" class="lilbird-nav-nest">← Home</a>
         <a href="/nest/" id="nav-back-nest-session" class="lilbird-nav-nest">← Nest</a>
-        <button class="btn-back-dash" id="btn-session-info" style="display:none" onclick="toggleSessionInfo()">Info</button>
+        <button type="button" class="btn-back-dash" id="btn-session-info" hidden aria-controls="session-info" aria-expanded="false">Session info</button>
         <button class="btn-back-dash" id="btn-back-dash">← My sessions</button>
       </div>
     </nav>
     <div class="session-main">
-      <div class="session-info" id="session-info"></div>
+      <div class="session-info" id="session-info" role="region" aria-label="Session information" tabindex="-1"></div>
       <div class="session-chat-col">
         <div class="chat-container" style="position:relative;overflow:hidden;">
           <div class="chat-header" id="chat-header"></div>
@@ -1031,11 +1090,12 @@
   <script src="/lilbird-auth-bridge.js"></script>
   <script src="/lilbird-nest-nav.js?v=2"></script>
   <script src="/js/vendor/supabase-js-2.117.3.js"></script>
+  <script src="/js/lilbird-solo-access.js?v=1"></script>
   <script src="https://js.stripe.com/v3/"></script>
   <script>
     const SUPABASE_URL  = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
-    const SOLO_SHELL_BUILD = 'v1.15-auth-gates-20261001';
+    const SOLO_SHELL_BUILD = 'v1.16-access-mobile-info-20261104';
     const WORKER_URL    = 'https://worker-solo.cwwq46sn7m.workers.dev';
     console.info("lil' bird Solo shell", SOLO_SHELL_BUILD, '| worker:', WORKER_URL);
     // Stripe publishable key — safe to ship in client code.
@@ -1114,9 +1174,44 @@
     };
 
     let currentUser = null, userProfile = null, sessionData = [], activePromo = null;
+    let soloEntitlements = new Set();
     let activeSession = null, chatMsgs = [], isTyping = false, exchangeCount = 0;
     let sessionContext = {}, toolOutputsCache = {}, sessionMemoriesCache = {};
     let completeDashTab = 'plan';
+    let sessionInfoOpen = false;
+
+    /** Shared with Nest + Worker — see /js/lilbird-solo-access.js */
+    function hasSoloAccess() {
+      const api = window.LilbirdSoloAccess;
+      const purchasedAt = userProfile && userProfile.purchased_at ? userProfile.purchased_at : null;
+      if (api && typeof api.hasSoloCourseAccess === 'function') {
+        return api.hasSoloCourseAccess({ products: soloEntitlements, purchasedAt: purchasedAt });
+      }
+      return soloEntitlements.has('solo_course') || soloEntitlements.has('nest_premium') || !!purchasedAt;
+    }
+
+    async function loadSoloEntitlements() {
+      if (!currentUser?.id) {
+        soloEntitlements = new Set();
+        return;
+      }
+      try {
+        const { data, error } = await sb
+          .from('user_entitlements')
+          .select('product')
+          .eq('user_id', currentUser.id)
+          .eq('active', true);
+        if (error) {
+          console.warn('user_entitlements:', error);
+          soloEntitlements = new Set();
+          return;
+        }
+        soloEntitlements = new Set((data || []).map((row) => row.product).filter(Boolean));
+      } catch (e) {
+        console.warn('user_entitlements:', e);
+        soloEntitlements = new Set();
+      }
+    }
     // Bridge to the lil' bird Inner Compass (Cloudflare Worker, KV-backed):
     //   1. Solo course writes a single-use launch token to deep_profile_launches
     //      when the user clicks "Take the Inner Compass" inside Session 3.
@@ -1127,9 +1222,64 @@
     const ASSESSMENT_WORKER_URL = 'https://lilbird-assessment.cwwq46sn7m.workers.dev';
     let deepProfileState = { loaded: false, nestId: null, profile: null };
 
+    function isMobileSessionLayout() {
+      return window.matchMedia('(max-width: 768px)').matches;
+    }
+
+    function syncSessionInfoChrome() {
+      const btn = document.getElementById('btn-session-info');
+      const info = document.getElementById('session-info');
+      const inSession = document.getElementById('view-session')?.classList.contains('active');
+      const mobile = isMobileSessionLayout();
+      if (!btn || !info) return;
+      if (inSession && mobile) {
+        btn.hidden = false;
+        btn.setAttribute('aria-expanded', sessionInfoOpen ? 'true' : 'false');
+      } else {
+        btn.hidden = true;
+        btn.setAttribute('aria-expanded', 'false');
+        if (!mobile) {
+          sessionInfoOpen = false;
+          info.classList.remove('is-open');
+          info.removeAttribute('aria-modal');
+          if (info.getAttribute('role') === 'dialog') info.setAttribute('role', 'region');
+          document.body.classList.remove('session-info-open');
+        }
+      }
+    }
+
+    function setSessionInfoOpen(open) {
+      const info = document.getElementById('session-info');
+      const btn = document.getElementById('btn-session-info');
+      if (!info) return;
+      sessionInfoOpen = !!open;
+      info.classList.toggle('is-open', sessionInfoOpen);
+      if (sessionInfoOpen && isMobileSessionLayout()) {
+        info.setAttribute('role', 'dialog');
+        info.setAttribute('aria-modal', 'true');
+        document.body.classList.add('session-info-open');
+        const closeBtn = document.getElementById('btn-close-session-info');
+        if (closeBtn) closeBtn.focus();
+        else info.focus();
+      } else {
+        info.setAttribute('role', 'region');
+        info.removeAttribute('aria-modal');
+        document.body.classList.remove('session-info-open');
+        if (btn && !btn.hidden) btn.focus();
+      }
+      syncSessionInfoChrome();
+    }
+
+    function toggleSessionInfo() {
+      setSessionInfoOpen(!sessionInfoOpen);
+    }
+
     function showView(id) {
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
       document.getElementById(id).classList.add('active');
+      if (id !== 'view-session') {
+        setSessionInfoOpen(false);
+      }
       if (id === 'view-session') {
         document.body.style.overflow = '';
         document.documentElement.scrollLeft = 0;
@@ -1138,6 +1288,7 @@
       if (id === 'view-landing' || id === 'view-auth' || id === 'view-post-purchase') {
         window.scrollTo(0, 0);
       }
+      syncSessionInfoChrome();
     }
 
     function selectAuthTab(tab) {
@@ -1288,6 +1439,7 @@
       try {
         const { data: profile } = await sb.from('course_users').select('*').eq('id', currentUser.id).single();
         userProfile = profile || null;
+        await loadSoloEntitlements();
         await loadSessionProgress();
         await loadToolOutputs();
         if (isCourseComplete()) await loadSessionMemories();
@@ -1296,6 +1448,7 @@
         deepProfileState = { loaded: false, nestId: null, profile: null };
         renderDashboard();
         showView('view-dashboard');
+        syncSessionInfoChrome();
         await handlePostPurchaseReturn();
       } catch (err) { console.error('Dashboard error:', err); showView('view-landing'); }
     }
@@ -1306,7 +1459,8 @@
         await sb.from('session_progress').update({ status: 'available' }).eq('user_id', currentUser.id).eq('status', 'locked').not('unlocks_at', 'is', null).lte('unlocks_at', now);
         const { data } = await sb.from('session_progress').select('*').eq('user_id', currentUser.id).order('session_number');
         sessionData = data || [];
-        if (userProfile && userProfile.purchased_at && sessionData.length < 8) {
+        // Seed missing rows for any entitled owner (purchase OR solo_course / nest_premium).
+        if (hasSoloAccess() && sessionData.length < 8) {
           var existing = sessionData.map(s => s.session_number), inserts = [];
           for (var i = 0; i <= 7; i++) { if (existing.indexOf(i) === -1) inserts.push({ user_id: currentUser.id, session_number: i, status: i === 0 ? 'available' : 'locked' }); }
           if (inserts.length) { await sb.from('session_progress').insert(inserts); const { data: d2 } = await sb.from('session_progress').select('*').eq('user_id', currentUser.id).order('session_number'); sessionData = d2 || sessionData; }
@@ -1573,9 +1727,8 @@
       const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
       document.getElementById('dash-greeting').textContent = name ? greeting + ', ' + name + '.' : greeting + '.';
       document.getElementById('nav-user-email').textContent = currentUser.email;
-      const purchased = !!userProfile?.purchased_at;
       const content = document.getElementById('dash-content');
-      if (!purchased) {
+      if (!hasSoloAccess()) {
         document.getElementById('dash-progress').style.display = 'none';
         document.getElementById('dash-subtext').textContent = 'Eight sessions at your pace, with the same depth as working with a coach, in a format built around you.';
         content.innerHTML = renderPurchaseGate(); bindPurchaseGate(); return;
@@ -1944,9 +2097,14 @@
 
     // ── OPEN SESSION ──────────────────────────────────────────
     async function openSession(sessionNumber) {
+      if (!hasSoloAccess()) {
+        renderDashboard();
+        return;
+      }
       const session = SESSIONS[sessionNumber];
       if (!session) return;
       activeSession = session;
+      setSessionInfoOpen(false);
       chatMsgs = []; isTyping = false; exchangeCount = 0; sessionContext = {};
       sessionTakeHome = '';
 
@@ -1985,9 +2143,15 @@
         : `<div class="video-coming-soon"><p>🪶 &nbsp; Video coming soon</p></div>`;
 
       document.getElementById('session-info').innerHTML =
+        '<div class="session-info-sheet-bar">' +
+          '<span class="sheet-title">Session info</span>' +
+          '<button type="button" class="btn-close-session-info" id="btn-close-session-info">Close</button>' +
+        '</div>' +
         '<div class="session-tag-label">' + session.tag + '</div><h1>' + session.title + '</h1><p class="session-info-desc">' + session.desc + '</p>' + videoHtml +
         '<div class="session-meta-row"><div class="meta-item"><span class="meta-label">Session</span><span class="meta-value">' + (session.number===0?'Orientation':'0'+session.number+' of 07') + '</span></div><div class="meta-item"><span class="meta-label">Duration</span><span class="meta-value">' + session.duration + '</span></div>' +
         (session.tools.length ? '<div class="meta-item"><span class="meta-label">Tools</span><span class="meta-value">' + session.tools.length + ' tools</span></div>' : '') + '</div>' + toolsHtml;
+      const closeInfo = document.getElementById('btn-close-session-info');
+      if (closeInfo) closeInfo.addEventListener('click', () => setSessionInfoOpen(false));
 
       if (session.videoKey) {
         const video = document.getElementById('session-video'), poster = document.getElementById('video-poster');
@@ -2031,8 +2195,18 @@
       }
 
       await sb.from('session_progress').update({ status: 'in_progress', started_at: new Date().toISOString() }).eq('user_id', currentUser.id).eq('session_number', sessionNumber).eq('status', 'available');
+      syncSessionInfoChrome();
       focusElNoScroll('chat-input');
     }
+
+    document.getElementById('btn-session-info')?.addEventListener('click', () => toggleSessionInfo());
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && sessionInfoOpen) {
+        e.preventDefault();
+        setSessionInfoOpen(false);
+      }
+    });
+    window.addEventListener('resize', () => syncSessionInfoChrome());
 
     function openTool(toolFile) { window.open(toolFile + '?uid=' + currentUser.id + '&session=' + (activeSession ? activeSession.number : 0), '_blank'); }
 
@@ -2768,7 +2942,7 @@
     sb.auth.onAuthStateChange(async(event,session)=>{
       if(event==='SIGNED_IN'&&session?.user&&!currentUser){currentUser=session.user;await loadDashboard();}
       else if(event==='TOKEN_REFRESHED'&&session?.user&&currentUser){currentUser=session.user;}
-      else if(event==='SIGNED_OUT'){currentUser=null;userProfile=null;sessionData=[];showView('view-landing');}
+      else if(event==='SIGNED_OUT'){currentUser=null;userProfile=null;sessionData=[];soloEntitlements=new Set();showView('view-landing');}
     });
 
     (async()=>{
