@@ -8,25 +8,20 @@
   /* Nov 5 replacements — opaque panoramas; companions are separate RGBA cutouts */
   --world-day: url("/nest/assets/lilbird-kit/backgrounds/nest-valley-day.webp");
   --world-night: url("/nest/assets/lilbird-kit/backgrounds/nest-valley-night.webp");
-  --paper-grain: url("/nest/assets/lilbird-kit/textures/cream-grain.webp");
-  --paper-fill: url("/nest/assets/lilbird-kit/textures/cream-grain.webp");
-  --paper-panel-fill: url("/nest/assets/lilbird-kit/textures/paper-sample.webp");
-  --paper-hero: url("/nest/assets/lilbird-kit/panels/parchment-hero-large.webp");
-  --paper-hero-mask: url("/nest/assets/lilbird-kit/panels/parchment-hero-large.webp");
-  --paper-inset: url("/nest/assets/lilbird-kit/panels/parchment-hero-small.webp");
-  --paper-card: url("/nest/assets/lilbird-kit/panels/paper-card-a.webp");
-  --paper-card-b: url("/nest/assets/lilbird-kit/panels/paper-card-b.webp");
-  --paper-card-c: url("/nest/assets/lilbird-kit/panels/paper-card-c.webp");
-  --paper-card-portrait: url("/nest/assets/lilbird-kit/panels/parchment-card-portrait.webp");
-  --paper-rail: url("/nest/assets/lilbird-kit/panels/paper-sidebar-tall.webp");
-  --paper-rail-fill: url("/nest/assets/lilbird-kit/textures/paper-sample.webp");
+  /* cream-grain.webp is a ~57px circular stamp — never tile it as a fill */
   --parchment: #fff8e8;
   --parchment-raised: #fffcf4;
-  --parchment-inset: #fff6e2;
+  --parchment-deep: #f3e4c4;
+  --parchment-inset: #fffaf0;
   --parchment-ink: #241f1b;
   --parchment-muted: #4f463c;
   --parchment-accent: #9a6a22;
-  --parchment-border: rgba(176, 146, 100, 0.5);
+  --parchment-border: rgba(176, 146, 100, 0.45);
+  /* Opaque wash + one cover of paper-sample (never tile cream-grain.webp) */
+  --parchment-grain: url("/nest/assets/lilbird-kit/textures/paper-sample.webp");
+  --parchment-surface:
+    linear-gradient(180deg, rgba(255, 253, 248, 0.94) 0%, rgba(255, 248, 232, 0.9) 100%),
+    var(--parchment-grain);
   --lb-bg: #c9b892;
   --lb-surface: rgba(255, 248, 232, 0.94);
   --lb-surface-raised: rgba(255, 252, 244, 0.97);
@@ -72,16 +67,12 @@ html[data-theme="dark"] .nest-page.nest-world {
   background-size: auto, cover;
 }
 
-/* Soft grain only — no filter “sharpening” of low-res landscape art */
+/* Kill Phase-1 paper-grain overlay entirely in world mode */
 .nest-page.nest-world::before {
-  opacity: 0.14;
-  background-image: var(--paper-grain);
-  background-size: 120px 120px;
-  mix-blend-mode: soft-light;
-}
-html[data-theme="dark"] .nest-page.nest-world::before {
-  opacity: 0.08;
-  mix-blend-mode: soft-light;
+  content: none !important;
+  display: none !important;
+  background: none !important;
+  opacity: 0 !important;
 }
 
 /* ── Decorative world layers ──
@@ -134,39 +125,28 @@ html[data-theme="dark"] .nest-world .nest-greeting {
     0 0 18px rgba(15, 36, 51, 0.55);
 }
 
-/* ── Rail as tall parchment panel ── */
+/* ── Rail: opaque warm parchment body (no tile / no full-card mask) ── */
 .nest-world .nest-rail {
   margin: 0.85rem 0 1.25rem 0.85rem;
-  padding: 1.25rem 0.85rem 1.5rem 0.9rem;
-  border-radius: 0;
-  border: 0;
-  background-color: #fff6e2;
-  background-image:
-    linear-gradient(180deg, rgba(255, 252, 244, 0.35), rgba(255, 244, 220, 0.2)),
-    var(--paper-fill),
-    var(--paper-rail);
-  background-size: auto, 140px 140px, 100% 100%;
-  background-position: center, center, center;
-  background-repeat: no-repeat, repeat, no-repeat;
-  box-shadow: 0 18px 36px rgba(40, 28, 14, 0.16);
+  padding: 1.2rem 0.8rem 1.45rem 0.85rem;
+  border-radius: 26px;
+  border: 1px solid var(--parchment-border);
+  background-color: var(--parchment) !important;
+  background-image: var(--parchment-surface) !important;
+  background-repeat: no-repeat !important;
+  background-size: auto, cover !important;
+  background-position: center, center !important;
+  background-blend-mode: normal, soft-light;
+  box-shadow: 0 16px 34px rgba(40, 28, 14, 0.14);
   height: calc(100vh - 88px);
-  border-right: 0;
+  border-right: 1px solid var(--parchment-border);
   color: var(--parchment-ink);
-  -webkit-mask-image: var(--paper-rail);
-  mask-image: var(--paper-rail);
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  mask-position: center;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
 }
 html[data-theme="dark"] .nest-world .nest-rail {
-  background-color: #fff4dc;
-  background-image:
-    linear-gradient(180deg, rgba(255, 250, 236, 0.4), rgba(244, 228, 198, 0.28)),
-    var(--paper-fill),
-    var(--paper-rail);
+  background-color: var(--parchment) !important;
+  background-image: var(--parchment-surface) !important;
   color: var(--parchment-ink);
 }
 html[data-theme="dark"] .nest-world .nest-rail .rail-link,
@@ -202,35 +182,23 @@ html[data-theme="dark"] .nest-world .nest-rail .rail-link.dash-tab.active {
   min-height: 0;
   margin: 0;
   padding: clamp(1.55rem, 3.2vw, 2.35rem) clamp(1.45rem, 3vw, 2.4rem) clamp(1.4rem, 2.8vw, 2rem);
-  border-radius: 0;
-  border: 0;
-  background-color: #fff5df;
-  background-image:
-    linear-gradient(160deg, rgba(255, 252, 244, 0.42) 0%, rgba(255, 240, 210, 0.18) 55%, rgba(244, 220, 180, 0.28) 100%),
-    var(--paper-fill),
-    var(--paper-hero);
-  background-size: auto, 160px 160px, 100% 100%;
-  background-position: center, center, center;
-  background-repeat: no-repeat, repeat, no-repeat;
-  box-shadow: 0 22px 44px rgba(40, 28, 14, 0.18);
+  border-radius: 28px;
+  border: 1px solid var(--parchment-border);
+  background-color: var(--parchment) !important;
+  background-image: var(--parchment-surface) !important;
+  background-repeat: no-repeat !important;
+  background-size: auto, cover !important;
+  background-position: center, center !important;
+  background-blend-mode: normal, soft-light;
+  box-shadow: 0 20px 40px rgba(40, 28, 14, 0.15);
   overflow: visible;
   color: var(--parchment-ink);
-  -webkit-mask-image: var(--paper-hero-mask);
-  mask-image: var(--paper-hero-mask);
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  mask-position: center;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
 }
 html[data-theme="dark"] .nest-world .next-chapter {
-  background-color: #fff2d6;
-  background-image:
-    linear-gradient(160deg, rgba(255, 250, 236, 0.45) 0%, rgba(255, 236, 200, 0.22) 100%),
-    var(--paper-fill),
-    var(--paper-hero);
-  background-size: auto, 160px 160px, 100% 100%;
+  background-color: var(--parchment) !important;
+  background-image: var(--parchment-surface) !important;
   color: var(--parchment-ink);
 }
 
@@ -251,23 +219,16 @@ html[data-theme="dark"] .nest-world .next-chapter {
   padding-left: 1.85rem;
 }
 
-/* Journal inset — soft paper well, not a form field */
+/* Journal inset — ruled note on the same parchment, not a nested SaaS card */
 .nest-world .next-chapter-context {
   position: relative;
   margin: 0.55rem 0 0.2rem;
-  padding: 0.95rem 1.05rem 1rem 1.15rem;
-  background-color: #fffaf0;
-  background-image:
-    linear-gradient(180deg, rgba(255, 252, 244, 0.55), rgba(255, 243, 214, 0.35)),
-    var(--paper-inset);
-  background-size: auto, cover;
-  background-position: center;
+  padding: 0.85rem 0.35rem 0.7rem 0.15rem;
+  background: transparent;
   border: 0;
-  border-radius: 18px;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.55),
-    inset 0 0 0 1px rgba(176, 146, 100, 0.28),
-    0 1px 0 rgba(90, 60, 20, 0.04);
+  border-top: 1px solid rgba(176, 146, 100, 0.28);
+  border-radius: 0;
+  box-shadow: none;
   color: var(--parchment-ink);
 }
 .nest-world .next-chapter-context::before {
@@ -354,41 +315,30 @@ html[data-theme="dark"] .nest-companions-night { display: block; }
   gap: 1rem;
 }
 .nest-world .nest-secondary-card {
-  --card-panel: var(--paper-card);
   position: relative;
   padding: 1.15rem 1.1rem 1.25rem;
-  border-radius: 0;
-  border: 0;
-  background-color: #fff5df;
-  background-image:
-    linear-gradient(180deg, rgba(255, 252, 244, 0.4), rgba(255, 240, 210, 0.22)),
-    var(--paper-fill),
-    var(--card-panel);
-  background-size: auto, 140px 140px, 100% 100%;
-  background-position: center, center, center;
-  background-repeat: no-repeat, repeat, no-repeat;
-  box-shadow: 0 14px 32px rgba(40, 28, 14, 0.14);
+  border-radius: 22px;
+  border: 1px solid var(--parchment-border);
+  background-color: var(--parchment) !important;
+  background-image: var(--parchment-surface) !important;
+  background-repeat: no-repeat !important;
+  background-size: auto, cover !important;
+  background-position: center, center !important;
+  background-blend-mode: normal, soft-light;
+  box-shadow: 0 12px 28px rgba(40, 28, 14, 0.12);
   overflow: visible;
   color: var(--parchment-ink);
-  -webkit-mask-image: var(--card-panel);
-  mask-image: var(--card-panel);
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
 }
-.nest-world .nest-secondary-card[data-kind="canvas"] { --card-panel: var(--paper-card); }
-.nest-world .nest-secondary-card[data-kind="solo"] { --card-panel: var(--paper-card-b); }
-.nest-world .nest-secondary-card[data-kind="guide"] { --card-panel: var(--paper-card-c); }
-.nest-world .nest-secondary-card[data-kind="membership"] { --card-panel: var(--paper-card-portrait); }
+.nest-world .nest-secondary-card[data-kind="solo"],
+.nest-world .nest-secondary-card[data-kind="guide"] {
+  background-image: var(--parchment-surface) !important;
+}
 
 html[data-theme="dark"] .nest-world .nest-secondary-card {
-  background-color: #fff2d6;
-  background-image:
-    linear-gradient(180deg, rgba(255, 250, 236, 0.42), rgba(244, 228, 198, 0.28)),
-    var(--paper-fill),
-    var(--card-panel);
-  background-size: auto, 140px 140px, 100% 100%;
+  background-color: var(--parchment) !important;
+  background-image: var(--parchment-surface) !important;
   color: var(--parchment-ink);
 }
 .nest-world .nest-secondary-card > .nest-secondary-link,
@@ -482,9 +432,29 @@ html[data-theme="dark"] .nest-world .mobile-bar-link.is-active {
 /* ── Mobile: compact chapter, companions in their own band, reachable cards ── */
 @media (max-width: 980px) {
   .nest-page.nest-world {
+    /* cover = fill full scroll height; 140% auto only painted a short top strip */
     background-attachment: scroll;
-    background-size: auto, auto 52vh;
-    background-position: center top, center top;
+    background-image:
+      linear-gradient(180deg, rgba(247, 241, 230, 0.05) 0%, rgba(247, 241, 230, 0.18) 55%, rgba(185, 165, 122, 0.35) 100%),
+      var(--world-day);
+    background-size: auto, cover;
+    background-position: center top, center 20%;
+    background-repeat: no-repeat, no-repeat;
+    background-color: #8f7a52;
+  }
+  html[data-theme="dark"] .nest-page.nest-world {
+    background-image:
+      linear-gradient(180deg, rgba(15, 36, 51, 0.1) 0%, rgba(15, 36, 51, 0.4) 60%, rgba(15, 36, 51, 0.62) 100%),
+      var(--world-night);
+    background-color: #0a1a24;
+    background-size: auto, cover;
+    background-position: center top, center 24%;
+  }
+  .nest-world .nest-home-block,
+  .nest-world .nest-dash,
+  .nest-world .nest-home-stage,
+  .nest-world #view-dashboard {
+    background: transparent !important;
   }
   .nest-world .nest-rail { display: none; }
 
@@ -620,7 +590,12 @@ html[data-theme="dark"] .nest-world .mobile-bar-link.is-active {
 
 @media (max-width: 560px) {
   .nest-page.nest-world {
-    background-size: auto, auto 44vh;
+    background-size: auto, cover;
+    background-position: center top, center 14%;
+  }
+  html[data-theme="dark"] .nest-page.nest-world {
+    background-size: auto, cover;
+    background-position: center top, center 18%;
   }
   .nest-companions-stage img {
     width: min(78vw, 260px);
