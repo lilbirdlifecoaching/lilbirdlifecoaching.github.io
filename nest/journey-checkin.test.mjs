@@ -167,10 +167,23 @@ test('page wires check-in UI and shared focus helper', () => {
   const focus = readFileSync(new URL('./journey-focus.js', import.meta.url), 'utf8');
   const sql = readFileSync(new URL('../docs/migrations/journey-checkins.sql', import.meta.url), 'utf8');
   assert.match(page, /resolveActiveFocus/);
-  assert.match(page, /Last time, this felt important to you/);
+  assert.match(page, /How has this next step been going\?/);
+  assert.match(page, /data-toggle-checkin/);
+  assert.match(page, /data-toggle-history/);
+  assert.match(page, /data-toggle-details/);
+  assert.match(page, /aria-controls="details-/);
+  assert.match(page, /aria-controls="checkin-/);
+  assert.match(page, /aria-controls="history-/);
+  assert.match(page, /toggleJourneyPanel/);
+  assert.match(page, /resolveJourneyPanel/);
   assert.match(page, /data-choose-again/);
+  assert.match(page, /data-jump-tools/);
+  assert.match(page, /id="journey-tools"/);
   assert.match(page, /journey_checkins/);
   assert.match(page, /checkinsError/);
+  assert.match(page, /focusAction/);
+  assert.equal(page.includes('gentle check-in'), false);
+  assert.equal(page.includes('Steps you saved'), false);
   assert.match(client, /What\'s next\?/);
   assert.match(client, /LilbirdJourneyFocus/);
   assert.match(client, /refreshJourneySignals/);
@@ -191,7 +204,7 @@ test('page wires check-in UI and shared focus helper', () => {
 test('Home and Journey share one resolveActiveFocus implementation', async () => {
   const mod = await import('./journey-focus.js');
   assert.equal(typeof mod.resolveActiveFocus, 'function');
-  assert.equal(mod.FOCUS_API_VERSION, 2);
+  assert.equal(mod.FOCUS_API_VERSION, 3);
   // Simulate what nest-client does after the module assigns window.LilbirdJourneyFocus.
   const viaWindow = globalThis.LilbirdJourneyFocus.resolveActiveFocus;
   assert.equal(viaWindow, mod.resolveActiveFocus);

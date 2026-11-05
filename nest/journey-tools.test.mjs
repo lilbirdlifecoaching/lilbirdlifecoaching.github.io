@@ -133,7 +133,7 @@ test('the page keeps recommendation text out of storage and out of the reflectio
   assert.match(page, /id="journey-reflections"/);
   assert.match(page, /Saved to My Journey\./);
   assert.match(page, /data-view-saved/);
-  assert.match(page, /Open this reflection/);
+  assert.match(page, /Read reflection/);
   assert.match(page, /\.eq\('user_id', user\.id\)/);
   assert.match(page, /Another perspective/);
   assert.match(page, /id="journey-recommend"/);
