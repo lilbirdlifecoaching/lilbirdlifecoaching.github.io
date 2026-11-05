@@ -1,0 +1,717 @@
+{
+  "version": "2.0",
+  "count": 79,
+  "assets": [
+    {
+      "name": "panorama-day",
+      "folder": "backgrounds",
+      "width": 846,
+      "height": 214,
+      "transparent": false,
+      "usage": "Opaque landscape strip. Layer behind real HTML; CSS background-size:cover.",
+      "quality": "concept-extracted; review cropping"
+    },
+    {
+      "name": "panorama-night",
+      "folder": "backgrounds",
+      "width": 846,
+      "height": 211,
+      "transparent": false,
+      "usage": "Opaque landscape strip. Layer behind real HTML; CSS background-size:cover.",
+      "quality": "concept-extracted; review cropping"
+    },
+    {
+      "name": "valley-day",
+      "folder": "backgrounds",
+      "width": 854,
+      "height": 227,
+      "transparent": false,
+      "usage": "Opaque landscape strip. Layer behind real HTML; CSS background-size:cover.",
+      "quality": "concept-extracted; review cropping"
+    },
+    {
+      "name": "valley-night",
+      "folder": "backgrounds",
+      "width": 854,
+      "height": 238,
+      "transparent": false,
+      "usage": "Opaque landscape strip. Layer behind real HTML; CSS background-size:cover.",
+      "quality": "concept-extracted; review cropping"
+    },
+    {
+      "name": "wide-day",
+      "folder": "backgrounds",
+      "width": 567,
+      "height": 272,
+      "transparent": false,
+      "usage": "Opaque landscape strip. Layer behind real HTML; CSS background-size:cover.",
+      "quality": "concept-extracted; review cropping"
+    },
+    {
+      "name": "wide-night",
+      "folder": "backgrounds",
+      "width": 553,
+      "height": 273,
+      "transparent": false,
+      "usage": "Opaque landscape strip. Layer behind real HTML; CSS background-size:cover.",
+      "quality": "concept-extracted; review cropping"
+    },
+    {
+      "name": "approved-original-day",
+      "folder": "backgrounds",
+      "width": 1671,
+      "height": 463,
+      "transparent": false,
+      "usage": "Approved standalone panoramic scene; opaque background.",
+      "quality": "approved original"
+    },
+    {
+      "name": "approved-original-night",
+      "folder": "backgrounds",
+      "width": 1671,
+      "height": 472,
+      "transparent": false,
+      "usage": "Approved standalone panoramic scene; opaque background.",
+      "quality": "approved original"
+    },
+    {
+      "name": "companions-group-on-gold",
+      "folder": "companions",
+      "width": 513,
+      "height": 356,
+      "transparent": false,
+      "usage": "Original grouped character vignette, gold backdrop included. Use blend/clip.",
+      "quality": "concept-extracted"
+    },
+    {
+      "name": "companions-group-soft-edge",
+      "folder": "companions",
+      "width": 513,
+      "height": 356,
+      "transparent": true,
+      "usage": "Feathered rectangular character vignette. Not a true transparent silhouette; gold halo remains.",
+      "quality": "preview only; needs dedicated clean transparent master"
+    },
+    {
+      "name": "approved-companions-day-blended",
+      "folder": "companions",
+      "width": 953,
+      "height": 463,
+      "transparent": true,
+      "usage": "Approved artwork with landscape background and feathered rectangular perimeter, not clean alpha cutout.",
+      "quality": "approved art; derived vignette"
+    },
+    {
+      "name": "approved-companions-night-blended",
+      "folder": "companions",
+      "width": 953,
+      "height": 472,
+      "transparent": true,
+      "usage": "Approved artwork with landscape background and feathered rectangular perimeter, not clean alpha cutout.",
+      "quality": "approved art; derived vignette"
+    },
+    {
+      "name": "parchment-hero-large",
+      "folder": "panels",
+      "width": 479,
+      "height": 236,
+      "transparent": true,
+      "usage": "Illustrated textured paper surface; add live text in HTML. Alpha perimeter approximate.",
+      "quality": "production-candidate; verify edges"
+    },
+    {
+      "name": "parchment-hero-horizontal",
+      "folder": "panels",
+      "width": 318,
+      "height": 116,
+      "transparent": true,
+      "usage": "Illustrated textured paper surface; add live text in HTML. Alpha perimeter approximate.",
+      "quality": "production-candidate; verify edges"
+    },
+    {
+      "name": "parchment-hero-small",
+      "folder": "panels",
+      "width": 148,
+      "height": 115,
+      "transparent": true,
+      "usage": "Illustrated textured paper surface; add live text in HTML. Alpha perimeter approximate.",
+      "quality": "production-candidate; verify edges"
+    },
+    {
+      "name": "parchment-card-portrait",
+      "folder": "panels",
+      "width": 146,
+      "height": 165,
+      "transparent": true,
+      "usage": "Illustrated textured paper surface; add live text in HTML. Alpha perimeter approximate.",
+      "quality": "production-candidate; verify edges"
+    },
+    {
+      "name": "paper-sidebar-tall",
+      "folder": "panels",
+      "width": 146,
+      "height": 315,
+      "transparent": true,
+      "usage": "Paper panel texture with approximate transparent edge; use live content overlay.",
+      "quality": "concept-extracted; check gold edge"
+    },
+    {
+      "name": "paper-wide",
+      "folder": "panels",
+      "width": 628,
+      "height": 168,
+      "transparent": true,
+      "usage": "Paper panel texture with approximate transparent edge; use live content overlay.",
+      "quality": "concept-extracted; check gold edge"
+    },
+    {
+      "name": "paper-card-a",
+      "folder": "panels",
+      "width": 214,
+      "height": 124,
+      "transparent": true,
+      "usage": "Paper panel texture with approximate transparent edge; use live content overlay.",
+      "quality": "concept-extracted; check gold edge"
+    },
+    {
+      "name": "paper-card-b",
+      "folder": "panels",
+      "width": 204,
+      "height": 124,
+      "transparent": true,
+      "usage": "Paper panel texture with approximate transparent edge; use live content overlay.",
+      "quality": "concept-extracted; check gold edge"
+    },
+    {
+      "name": "paper-card-c",
+      "folder": "panels",
+      "width": 199,
+      "height": 122,
+      "transparent": true,
+      "usage": "Paper panel texture with approximate transparent edge; use live content overlay.",
+      "quality": "concept-extracted; check gold edge"
+    },
+    {
+      "name": "golden-canopy",
+      "folder": "botanicals",
+      "width": 463,
+      "height": 115,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "yellow-flower-spray",
+      "folder": "botanicals",
+      "width": 76,
+      "height": 150,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "purple-lupines",
+      "folder": "botanicals",
+      "width": 83,
+      "height": 152,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "sage-leaves",
+      "folder": "botanicals",
+      "width": 78,
+      "height": 148,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "white-daisies",
+      "folder": "botanicals",
+      "width": 83,
+      "height": 150,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "orange-flowers",
+      "folder": "botanicals",
+      "width": 93,
+      "height": 151,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "pale-leaves",
+      "folder": "botanicals",
+      "width": 120,
+      "height": 147,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "pine-forest",
+      "folder": "botanicals",
+      "width": 270,
+      "height": 78,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "misty-mountains",
+      "folder": "botanicals",
+      "width": 261,
+      "height": 82,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "flower-meadow",
+      "folder": "botanicals",
+      "width": 90,
+      "height": 139,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "pink-flowers",
+      "folder": "botanicals",
+      "width": 74,
+      "height": 143,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "yellow-wildflowers",
+      "folder": "botanicals",
+      "width": 98,
+      "height": 145,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "branch-olive",
+      "folder": "botanicals",
+      "width": 220,
+      "height": 102,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "branch-gold",
+      "folder": "botanicals",
+      "width": 195,
+      "height": 99,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "night-pines",
+      "folder": "botanicals",
+      "width": 348,
+      "height": 128,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "rock-grass-cluster",
+      "folder": "accents",
+      "width": 256,
+      "height": 83,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "small-rock",
+      "folder": "accents",
+      "width": 130,
+      "height": 77,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "pine-tree-pair",
+      "folder": "accents",
+      "width": 257,
+      "height": 91,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "snowy-peaks",
+      "folder": "accents",
+      "width": 235,
+      "height": 79,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "winding-trail",
+      "folder": "accents",
+      "width": 230,
+      "height": 87,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "golden-leaf-sprig",
+      "folder": "accents",
+      "width": 216,
+      "height": 121,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "mountain-horizon",
+      "folder": "accents",
+      "width": 319,
+      "height": 91,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "sunset-cloud-wash",
+      "folder": "accents",
+      "width": 379,
+      "height": 79,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "star-cloud-wash",
+      "folder": "accents",
+      "width": 353,
+      "height": 89,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "moonlight-hills",
+      "folder": "accents",
+      "width": 393,
+      "height": 80,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "wayfinder-sign",
+      "folder": "accents",
+      "width": 134,
+      "height": 151,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "stone-path",
+      "folder": "accents",
+      "width": 198,
+      "height": 74,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "blue-mountain-silhouette",
+      "folder": "accents",
+      "width": 206,
+      "height": 92,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "mountains-watercolor",
+      "folder": "icons",
+      "width": 201,
+      "height": 92,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "open-book-watercolor",
+      "folder": "icons",
+      "width": 191,
+      "height": 92,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "lantern-watercolor",
+      "folder": "icons",
+      "width": 79,
+      "height": 89,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "compass-watercolor",
+      "folder": "icons",
+      "width": 116,
+      "height": 101,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "folded-map-watercolor",
+      "folder": "icons",
+      "width": 186,
+      "height": 96,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "binoculars-watercolor",
+      "folder": "icons",
+      "width": 182,
+      "height": 102,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "tea-cup-watercolor",
+      "folder": "icons",
+      "width": 97,
+      "height": 98,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "stacked-stones-watercolor",
+      "folder": "icons",
+      "width": 91,
+      "height": 105,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "feather-watercolor",
+      "folder": "icons",
+      "width": 84,
+      "height": 99,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "nest-watercolor",
+      "folder": "icons",
+      "width": 203,
+      "height": 103,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "yellow-bird-perched",
+      "folder": "icons",
+      "width": 117,
+      "height": 96,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "yellow-bird-flying",
+      "folder": "icons",
+      "width": 151,
+      "height": 155,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "book-mini",
+      "folder": "icons",
+      "width": 105,
+      "height": 66,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "compass-mini",
+      "folder": "icons",
+      "width": 74,
+      "height": 80,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "mountain-mini",
+      "folder": "icons",
+      "width": 143,
+      "height": 76,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "lantern-mini",
+      "folder": "icons",
+      "width": 90,
+      "height": 87,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "leaf-mini",
+      "folder": "icons",
+      "width": 74,
+      "height": 73,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "wayfinder-mini",
+      "folder": "icons",
+      "width": 138,
+      "height": 141,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "sunset-wash",
+      "folder": "textures",
+      "width": 183,
+      "height": 71,
+      "transparent": false,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "opaque watercolor texture"
+    },
+    {
+      "name": "blue-wash",
+      "folder": "textures",
+      "width": 178,
+      "height": 78,
+      "transparent": false,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "opaque watercolor texture"
+    },
+    {
+      "name": "starry-wash",
+      "folder": "textures",
+      "width": 199,
+      "height": 78,
+      "transparent": false,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "opaque watercolor texture"
+    },
+    {
+      "name": "cream-grain",
+      "folder": "textures",
+      "width": 57,
+      "height": 70,
+      "transparent": false,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "opaque watercolor texture"
+    },
+    {
+      "name": "gold-grain",
+      "folder": "textures",
+      "width": 57,
+      "height": 70,
+      "transparent": false,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "opaque watercolor texture"
+    },
+    {
+      "name": "blue-grain",
+      "folder": "textures",
+      "width": 60,
+      "height": 70,
+      "transparent": false,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "opaque watercolor texture"
+    },
+    {
+      "name": "paper-sample",
+      "folder": "textures",
+      "width": 479,
+      "height": 235,
+      "transparent": false,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "opaque watercolor texture"
+    },
+    {
+      "name": "ink-feather",
+      "folder": "accents",
+      "width": 59,
+      "height": 89,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "nest-eggs",
+      "folder": "accents",
+      "width": 193,
+      "height": 104,
+      "transparent": true,
+      "usage": "Decorative layer only. Avoid baked text; test on day/night background.",
+      "quality": "alpha-extracted; inspect halo"
+    },
+    {
+      "name": "upper-golden-leaves",
+      "folder": "accents",
+      "width": 523,
+      "height": 121,
+      "transparent": true,
+      "usage": "Soft-edge painted vignette, translucent at rectangular edges.",
+      "quality": "concept-extracted"
+    },
+    {
+      "name": "valley-night-stars",
+      "folder": "accents",
+      "width": 354,
+      "height": 85,
+      "transparent": true,
+      "usage": "Soft-edge painted vignette, translucent at rectangular edges.",
+      "quality": "concept-extracted"
+    },
+    {
+      "name": "valley-day-clouds",
+      "folder": "accents",
+      "width": 378,
+      "height": 82,
+      "transparent": true,
+      "usage": "Soft-edge painted vignette, translucent at rectangular edges.",
+      "quality": "concept-extracted"
+    }
+  ]
+}

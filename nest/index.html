@@ -26,11 +26,12 @@
   <link rel="stylesheet" href="./nest-tour.css?v=3" />
   <link rel="stylesheet" href="/css/lilbird-nest-theme.css?v=20260917m" />
   <link rel="stylesheet" href="/css/lilbird-nest-redesign.css?v=20261105p1" />
+  <link rel="stylesheet" href="/css/lilbird-nest-world.css?v=20261105c5" />
   <!-- Google Tag Manager -->
   <script src="/lilbird-gtm-id.js"></script>
   <script src="/lilbird-gtm.js"></script>
 </head>
-<body class="nest-page">
+<body class="nest-page nest-world">
   <!-- Google Tag Manager (noscript) -->
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NG8ZFNX2" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div id="view-auth" class="view active">
@@ -97,6 +98,14 @@
   </div>
 
   <div id="view-dashboard" class="view nest-app" data-nest-area="home">
+    <div class="nest-world-decor" aria-hidden="true">
+      <img class="world-canopy world-canopy-day" src="./assets/lilbird-kit/botanicals/golden-canopy.webp" alt="" width="463" height="115" decoding="async" />
+      <img class="world-canopy world-canopy-night" src="./assets/lilbird-kit/accents/upper-golden-leaves.webp" alt="" width="523" height="121" decoding="async" />
+      <img class="world-stars" src="./assets/lilbird-kit/accents/star-cloud-wash.webp" alt="" width="353" height="89" decoding="async" />
+      <img class="world-lupines" src="./assets/lilbird-kit/botanicals/purple-lupines.webp" alt="" width="83" height="152" decoding="async" />
+      <img class="world-flowers" src="./assets/lilbird-kit/botanicals/yellow-wildflowers.webp" alt="" width="98" height="145" decoding="async" />
+      <img class="world-rocks" src="./assets/lilbird-kit/accents/rock-grass-cluster.webp" alt="" width="256" height="83" decoding="async" />
+    </div>
     <header class="top-nav nest-chrome">
       <a class="nest-brand" href="/" aria-label="lil' bird home">
         <img class="nest-brand-logo nest-logo-day" src="/bird-logo-teal.png" alt="" width="36" height="36" />
@@ -173,35 +182,30 @@
       <div class="nest-home-block" id="nest-home-block">
         <p class="nest-greeting" id="nest-greeting" hidden></p>
 
-        <section class="next-chapter" id="next-chapter" aria-labelledby="next-chapter-title" data-state="loading">
-          <div class="next-chapter-accents" aria-hidden="true">
-            <img class="accent-leaf" src="./assets/leaf-sprig.svg" alt="" width="64" height="64" decoding="async" />
-            <img class="accent-wayfinder" src="./assets/wayfinder-sign.svg" alt="" width="72" height="72" decoding="async" />
-          </div>
-          <div class="next-chapter-copy">
-            <p class="next-chapter-kicker" id="next-chapter-kicker">Your next chapter</p>
-            <h2 class="next-chapter-title" id="next-chapter-title">Finding your bearings</h2>
-            <p class="next-chapter-body" id="next-chapter-body">Loading your Nest…</p>
-            <div class="next-chapter-context" id="next-chapter-context" hidden>
-              <p class="next-chapter-context-kicker" id="next-chapter-context-kicker"></p>
-              <h3 class="next-chapter-context-title" id="next-chapter-context-title"></h3>
-              <p class="next-chapter-context-body" id="next-chapter-context-body"></p>
+        <div class="nest-home-stage">
+          <section class="next-chapter" id="next-chapter" aria-labelledby="next-chapter-title" data-state="loading">
+            <div class="next-chapter-accents" aria-hidden="true">
+              <img class="accent-leaf" src="./assets/lilbird-kit/accents/golden-leaf-sprig.webp" alt="" width="64" height="64" decoding="async" />
+              <img class="accent-wayfinder" src="./assets/lilbird-kit/accents/wayfinder-sign.webp" alt="" width="72" height="72" decoding="async" />
             </div>
-            <div class="next-chapter-actions" id="next-chapter-actions"></div>
-          </div>
-          <div class="next-chapter-art" aria-hidden="true">
-            <div class="companions-slot">
-              <picture class="companions-picture companions-day">
-                <source type="image/webp" srcset="./assets/companions-day.webp" />
-                <img class="companions-img" src="./assets/companions-day.png" alt="" width="1671" height="463" decoding="async" />
-              </picture>
-              <picture class="companions-picture companions-night">
-                <source type="image/webp" srcset="./assets/companions-night.webp" />
-                <img class="companions-img" src="./assets/companions-night.png" alt="" width="1671" height="472" decoding="async" />
-              </picture>
+            <div class="next-chapter-copy">
+              <p class="next-chapter-kicker" id="next-chapter-kicker">Your next chapter</p>
+              <h2 class="next-chapter-title" id="next-chapter-title">Finding your bearings</h2>
+              <p class="next-chapter-body" id="next-chapter-body">Loading your Nest…</p>
+              <div class="next-chapter-context" id="next-chapter-context" hidden>
+                <p class="next-chapter-context-kicker" id="next-chapter-context-kicker"></p>
+                <h3 class="next-chapter-context-title" id="next-chapter-context-title"></h3>
+                <p class="next-chapter-context-body" id="next-chapter-context-body"></p>
+              </div>
+              <div class="next-chapter-actions" id="next-chapter-actions"></div>
             </div>
+          </section>
+          <div class="nest-companions-stage" aria-hidden="true">
+            <!-- Night landscape already includes a lantern — use no-lantern cutout to avoid duplicates. -->
+            <img class="nest-companions-day" src="./assets/lilbird-kit/companions/nest-companions-day.webp" alt="" width="1611" height="1095" decoding="async" />
+            <img class="nest-companions-night" src="./assets/lilbird-kit/companions/nest-companions-night-no-lantern.webp" alt="" width="1611" height="1095" decoding="async" />
           </div>
-        </section>
+        </div>
 
         <section class="nest-secondary" id="nest-secondary" aria-label="Quick paths"></section>
       </div>
@@ -327,7 +331,7 @@
   <script src="/js/lilbird-solo-access.js?v=1"></script>
   <script src="./nest-tour.js?v=16"></script>
   <script type="module" src="./journey-focus.js?v=3"></script>
-  <script src="./nest-client.js?v=69"></script>
+  <script src="./nest-client.js?v=71"></script>
   <script type="module" src="./nest-letters-ui.js?v=3"></script>
   <script type="module" src="./journey.js?v=12"></script>
 </body>
