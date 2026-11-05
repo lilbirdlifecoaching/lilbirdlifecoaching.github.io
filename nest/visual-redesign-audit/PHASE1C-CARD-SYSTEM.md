@@ -10,15 +10,14 @@
 3. **Page `::before`** also tiled the same cream-grain stamp over the Nest shell.
 4. **Mobile flat beige band:** `background-size: 140% auto` sized the valley panorama to ~viewport width with height from aspect ratio (~144px), so only a short top strip painted; the rest of the scroll filled with solid `background-color`.
 
-**Correction:** Removed all cream-grain tiling and full-card masks. Cards/rail use opaque warm parchment fills + a single `paper-sample.webp` cover grain (soft-light, no repeat). Deckled panel images are no longer used as scalable masks. Corner leaf accents remain as separate artwork. Mobile landscape uses `background-size: cover` so companions sit in the painted world.
+**Correction:** Removed all cream-grain tiling and full-card masks. Cards/rail/Journey/side panels use fully opaque warm parchment CSS fills (no texture images — `paper-sample.webp` bright-center wash also read as pale circles). Deckled panel images are not used as scalable masks. Corner leaf accents remain as separate artwork. Mobile landscape uses `background-size: cover`.
 
 ## Asset audit (what the kit already had)
 
 ### Used now for cards
 | Role | Asset | Notes |
 | --- | --- | --- |
-| Card / rail body fill | CSS `#fff8e8` + soft vertical wash | Opaque; no mask |
-| Subtle paper grain | `textures/paper-sample.webp` | Single `cover` layer, soft-light blend — **never** `cream-grain.webp` |
+| Card / rail / Journey / sidebar fill | CSS `#fff8e8` + soft vertical wash | Fully opaque; no mask; no texture image |
 | Context leaf mark | `icons/leaf-mini.webp` | Marks “Where you left off” |
 | Chapter corner botanical | `accents/golden-leaf-sprig.webp` | Top-left, concept #3 placement |
 | Life Canvas art | `icons/folded-map-watercolor.webp` | Prominent destination illustration |
