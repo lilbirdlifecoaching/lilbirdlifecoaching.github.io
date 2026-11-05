@@ -4,16 +4,15 @@
 **Status:** Direction approved; CSS/layout pass in progress — **do not merge.**  
 **Base:** Phase 1 tip (PR #40) — keep #40 unmerged; this PR continues the visual track.
 
-### Review pass (Nov 5) — CSS/layout fixes, artwork still pending
-- Fixed day-mode star wash leak (`.nest-world-decor img` had been overriding `display: none`)
-- Night “Where you left off” inset forced to warm parchment with stronger ink contrast
-- Mobile: shorter chapter (hides redundant body when context is present), tucked companions, secondary cards earlier in the viewport
-- Decor canopy kept off chrome / greeting; wayfinder accent removed (was covering CTAs)
-- Fresh review shots: `phase1b-world/01–04` and `phase1b-world/review-pass2/`
-- Still awaiting replacement assets (no CSS blur/mask concealment):
-  - High-res day/night landscapes (current valley art still soft when covered)
-  - Coherent daytime sky (residual blue texture is in the day background asset itself)
-  - Clean companion cutouts (rectangular landscape halos remain)
+### Review pass (Nov 5) — CSS/layout + art replacements
+- Fixed day-mode star wash leak; night reflection inset → warm parchment; mobile chapter tightened
+- Integrated `lilbird_nest_art_replacements.zip`:
+  - Backgrounds: `nest-valley-day.webp` / `nest-valley-night.webp`
+  - Companions: `nest-companions-day.webp` + `nest-companions-night-no-lantern.webp` (night valley already has a lantern)
+- Hid old overlapping botanical decor layers (new panoramas already include them)
+- Notes: landscapes are Lanczos-upscaled from ~915px sources — sharper at Nest widths, not true 4K paint
+- Fresh shots: `phase1b-world/01–04` and `phase1b-world/review-pass2/`
+
 
 ## What changed
 

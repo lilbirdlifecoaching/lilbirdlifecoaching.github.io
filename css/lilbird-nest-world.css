@@ -5,8 +5,9 @@
    do not “fix” soft edges or low-res backgrounds with blur/mask filters. */
 
 .nest-page.nest-world {
-  --world-day: url("/nest/assets/lilbird-kit/backgrounds/valley-day.webp");
-  --world-night: url("/nest/assets/lilbird-kit/backgrounds/valley-night.webp");
+  /* Nov 5 replacements — opaque panoramas; companions are separate RGBA cutouts */
+  --world-day: url("/nest/assets/lilbird-kit/backgrounds/nest-valley-day.webp");
+  --world-night: url("/nest/assets/lilbird-kit/backgrounds/nest-valley-night.webp");
   --paper-grain: url("/nest/assets/lilbird-kit/textures/cream-grain.webp");
   --paper-hero: url("/nest/assets/lilbird-kit/panels/paper-wide.webp");
   --paper-card: url("/nest/assets/lilbird-kit/panels/paper-card-a.webp");
@@ -34,7 +35,7 @@
   background-image:
     linear-gradient(180deg, rgba(247, 241, 230, 0.06) 0%, rgba(247, 241, 230, 0.18) 55%, rgba(201, 184, 146, 0.5) 100%),
     var(--world-day);
-  background-position: center top, center 18%;
+  background-position: center top, center 28%;
   background-size: auto, cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
@@ -59,7 +60,7 @@ html[data-theme="dark"] .nest-page.nest-world {
   background-image:
     linear-gradient(180deg, rgba(15, 36, 51, 0.12) 0%, rgba(15, 36, 51, 0.42) 70%, rgba(15, 36, 51, 0.7) 100%),
     var(--world-night);
-  background-position: center top, center 20%;
+  background-position: center top, center 30%;
   background-size: auto, cover;
 }
 
@@ -75,71 +76,20 @@ html[data-theme="dark"] .nest-page.nest-world::before {
   mix-blend-mode: soft-light;
 }
 
-/* ── Decorative world layers (non-interactive) ── */
+/* ── Decorative world layers ──
+   New valley panoramas already include canopy, botanicals, rocks, and night stars.
+   Keep the decor slot in the DOM, but hide the old overlapping accents. */
 .nest-world-decor {
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 0;
   overflow: hidden;
+  display: none;
 }
 .nest-world-decor img {
   position: absolute;
   max-width: none;
-}
-/* Specificity must beat `.nest-world-decor img` so theme toggles actually hide layers */
-.nest-world-decor .world-canopy,
-.nest-world-decor .world-lupines,
-.nest-world-decor .world-flowers,
-.nest-world-decor .world-rocks,
-.nest-world-decor .world-stars {
-  display: block;
-}
-.nest-world-decor .world-canopy {
-  top: -4%;
-  left: -6%;
-  width: min(34vw, 400px);
-  opacity: 0.72;
-  /* Stay clear of theme toggle + avatar in the top-right chrome */
-  max-width: calc(100vw - 220px);
-}
-.nest-world-decor .world-canopy-night { display: none; }
-html[data-theme="dark"] .nest-world-decor .world-canopy-day { display: none; }
-html[data-theme="dark"] .nest-world-decor .world-canopy-night {
-  display: block;
-  opacity: 0.5;
-}
-.nest-world-decor .world-lupines {
-  left: -1%;
-  bottom: 4%;
-  width: min(12vw, 120px);
-  opacity: 0.85;
-}
-.nest-world-decor .world-flowers {
-  right: 1%;
-  bottom: 5%;
-  width: min(10vw, 100px);
-  opacity: 0.72;
-  /* Keep clear of secondary card row on typical desktop widths */
-  z-index: 0;
-}
-.nest-world-decor .world-rocks {
-  left: 30%;
-  bottom: -2%;
-  width: min(24vw, 280px);
-  opacity: 0.7;
-}
-.nest-world-decor .world-stars {
-  display: none;
-  top: 3%;
-  right: 4%;
-  width: min(36vw, 380px);
-  opacity: 0.65;
-}
-html[data-theme="dark"] .nest-world-decor .world-stars { display: block; }
-html[data-theme="dark"] .nest-world-decor .world-lupines,
-html[data-theme="dark"] .nest-world-decor .world-flowers {
-  opacity: 0.4;
 }
 
 .nest-app,
@@ -170,8 +120,10 @@ html[data-theme="dark"] .nest-world .nest-chrome {
   margin-right: auto;
 }
 html[data-theme="dark"] .nest-world .nest-greeting {
-  color: #f7f1e6;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+  color: #fff9ef;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.65),
+    0 0 18px rgba(15, 36, 51, 0.55);
 }
 
 /* ── Rail as tall parchment panel ── */
@@ -290,15 +242,16 @@ html[data-theme="dark"] .nest-world .next-chapter {
   position: relative;
   z-index: 1;
   pointer-events: none;
-  min-height: 220px;
+  min-height: 260px;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  margin-bottom: -0.35rem;
+  margin-bottom: -0.5rem;
 }
 .nest-companions-stage img {
   width: 100%;
-  max-width: 420px;
+  max-width: 380px;
+  max-height: min(46vh, 420px);
   height: auto;
   object-fit: contain;
   object-position: bottom center;
@@ -409,19 +362,6 @@ html[data-theme="dark"] .nest-world .mobile-bar-link.is-active {
     background-size: auto, auto 52vh;
     background-position: center top, center top;
   }
-  /* Keep sky clear of floating canopy over greeting / chrome */
-  .nest-world-decor .world-canopy,
-  .nest-world-decor .world-lupines,
-  .nest-world-decor .world-flowers,
-  .nest-world-decor .world-rocks {
-    display: none;
-  }
-  .nest-world-decor .world-stars {
-    width: min(48vw, 200px);
-    top: 1%;
-    right: -6%;
-    opacity: 0.4;
-  }
   .nest-world .nest-rail { display: none; }
 
   .nest-world .nest-greeting {
@@ -488,15 +428,16 @@ html[data-theme="dark"] .nest-world .mobile-bar-link.is-active {
 
   .nest-companions-stage {
     min-height: 0;
-    margin: -2.1rem 0.1rem -0.55rem auto;
+    margin: -1.6rem 0.1rem -0.4rem auto;
     justify-content: flex-end;
-    width: min(58vw, 220px);
+    width: min(52vw, 200px);
     align-self: flex-end;
     z-index: 1;
   }
   .nest-companions-stage img {
     width: 100%;
-    max-width: 220px;
+    max-width: 200px;
+    max-height: 210px;
   }
 
   .nest-world .nest-secondary {
@@ -528,11 +469,12 @@ html[data-theme="dark"] .nest-world .mobile-bar-link.is-active {
     background-size: auto, auto 44vh;
   }
   .nest-companions-stage {
-    margin-top: -1.55rem;
+    margin-top: -1.35rem;
+    width: min(48vw, 176px);
   }
   .nest-companions-stage img {
-    width: min(52vw, 188px);
-    max-width: 188px;
+    max-width: 176px;
+    max-height: 184px;
   }
   .nest-world .nest-secondary-watercolor {
     width: 2.45rem;
