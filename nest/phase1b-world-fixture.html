@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="./nest-styles.css?v=50" />
   <link rel="stylesheet" href="/css/lilbird-nest-theme.css?v=20260917m" />
   <link rel="stylesheet" href="/css/lilbird-nest-redesign.css?v=20261105p1" />
-  <link rel="stylesheet" href="/css/lilbird-nest-world.css?v=20261105w5" />
+  <link rel="stylesheet" href="/css/lilbird-nest-world.css?v=20261105c2" />
   <style>
     .fixture-banner {
       position: sticky; top: 0; z-index: 60;
@@ -173,11 +173,11 @@
         return null;
       }
       function icon(kind) {
-        var src = kit + 'nest-watercolor.webp';
-        if (kind === 'canvas') src = kit + 'folded-map-watercolor.webp';
-        if (kind === 'solo') src = kit + 'open-book-watercolor.webp';
-        if (kind === 'guide') src = kit + 'lantern-watercolor.webp';
-        return '<img class="nest-secondary-watercolor" src="' + src + '" alt="" width="64" height="64" decoding="async" />';
+        var src = kit + 'nest-watercolor.webp', w = 203, h = 103;
+        if (kind === 'canvas') { src = kit + 'folded-map-watercolor.webp'; w = 186; h = 96; }
+        if (kind === 'solo') { src = kit + 'open-book-watercolor.webp'; w = 191; h = 92; }
+        if (kind === 'guide') { src = kit + 'lantern-watercolor.webp'; w = 79; h = 89; }
+        return '<span class="nest-secondary-art" aria-hidden="true"><img class="nest-secondary-watercolor" src="' + src + '" alt="" width="' + w + '" height="' + h + '" decoding="async" /></span>';
       }
       function render() {
         var m = members[member];
