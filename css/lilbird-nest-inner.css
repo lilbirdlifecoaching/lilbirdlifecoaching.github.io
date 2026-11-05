@@ -1,0 +1,240 @@
+/* lil' bird Nest — inner screens in the concept #3 language.
+ * Loaded after lilbird-nest-concept.css. Uses the same torn-paper filters
+ * (js/lilbird-deckle.js) for: Learn & grow, My Journey, Life Canvas,
+ * My Guide, Picture & email, letters, the right-hand sidebar and the tour.
+ * Paper is painted on ::before, so text and inputs are never filtered.
+ */
+
+/* ── Header actions sit top-right (brand lives in the rail on desktop) ── */
+.nest-world .nest-chrome-actions { margin-left: auto; }
+
+/* The CMYK theme wipe belongs to the marketing site, not the painted Nest */
+.nest-world .theme-wipe { display: none !important; }
+
+/* ── Torn-paper panels ── */
+html[data-theme] body.nest-world :is(
+  .product-card, .lc-card, .journey-home, .journey-exercise,
+  .guide-presence, .guide-talk, .nest-settings, .nest-letters-card,
+  .sidebar-card, .plan-badge, .nest-mobile-more
+) {
+  position: relative;
+  isolation: isolate;
+  background: transparent !important;
+  background-image: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  color: var(--ink);
+}
+body.nest-world :is(
+  .product-card, .lc-card, .journey-home, .journey-exercise,
+  .guide-presence, .guide-talk, .nest-settings, .nest-letters-card,
+  .sidebar-card, .plan-badge, .nest-mobile-more
+)::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 18px;
+  background: var(--paper);
+  filter: var(--paper-shadow);
+  pointer-events: none;
+}
+html.lb-deckle-ready body.nest-world :is(.product-card, .lc-card, .journey-home, .journey-exercise, .guide-talk, .nest-settings, .nest-letters-card)::before {
+  border-radius: 20px 16px 22px 18px;
+  filter: url(#lb-deckle-c) var(--paper-shadow);
+}
+html.lb-deckle-ready body.nest-world :is(.product-card, .lc-card):nth-of-type(even)::before {
+  border-radius: 16px 22px 18px 24px;
+  filter: url(#lb-deckle-a) var(--paper-shadow);
+}
+html.lb-deckle-ready body.nest-world :is(.guide-presence, .sidebar-card, .plan-badge, .nest-mobile-more)::before {
+  border-radius: 16px 12px 18px 14px;
+  filter: url(#lb-deckle-soft) var(--paper-shadow);
+}
+/* Locked products: same paper, quieter */
+body.nest-world .product-card.locked::before {
+  background:
+    linear-gradient(rgba(240, 225, 195, 0.35), rgba(240, 225, 195, 0.35)),
+    var(--paper);
+}
+
+/* Breathing room so torn edges never touch text */
+body.nest-world :is(.product-card, .lc-card, .journey-home, .journey-exercise, .guide-talk, .nest-letters-card) {
+  padding: 1.5rem 1.65rem 1.6rem !important;
+}
+body.nest-world .sidebar-card { padding: 1rem 1.15rem 1.1rem !important; }
+body.nest-world .plan-badge { padding: 0.7rem 1.1rem 0.8rem !important; display: inline-grid; }
+body.nest-world :is(.product-card, .lc-card, .sidebar-card, .journey-home) + :is(.product-card, .lc-card, .sidebar-card) {
+  margin-top: 1.1rem;
+}
+
+/* ── Type: one voice. Kickers = spaced DM Sans in honey, no typewriter mono ── */
+body.nest-world :is(
+  .eyebrow, .sidebar-eyebrow, .banner-title, .lc-kicker, .journey-kicker,
+  .ic-snap-kicker, .plan-badge-label, .guide-kicker, .soon-tag
+) {
+  font-family: var(--font-sans) !important;
+  font-size: 0.7rem !important;
+  font-weight: 500;
+  letter-spacing: 0.13em !important;
+  text-transform: uppercase;
+  color: var(--honey) !important;
+}
+body.nest-world :is(
+  .status-badge, .lock-pill, .lci-badge, .journey-focus-badge,
+  .journey-area-count, .lc-bar-num, .lci-session-num, .ic-snap-types, .ic-snap-cta
+) {
+  font-family: var(--font-sans) !important;
+  letter-spacing: 0.04em !important;
+}
+body.nest-world :is(.product-card, .lc-card, .sidebar-card, .journey-home, .journey-exercise, .nest-letters-card, .nest-settings) :is(h2, h3, h4, .plan-badge-name) {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  color: var(--ink) !important;
+}
+body.nest-world :is(.product-card, .lc-card, .sidebar-card, .journey-home, .journey-exercise, .guide-presence, .guide-talk, .nest-letters-card) :is(p, li) {
+  color: var(--ink-soft);
+}
+body.nest-world .plan-badge-name { color: var(--ink) !important; }
+body.nest-world .plan-badge-note { color: var(--ink-soft) !important; }
+
+/* ── Buttons: teal pill primary, outlined pill secondary ── */
+body.nest-world .dash-grid .btn,
+body.nest-world .nest-settings .btn,
+body.nest-world .nest-tour-card .btn-tour {
+  font-family: var(--font-sans) !important;
+  font-size: 0.88rem !important;
+  font-weight: 500;
+  letter-spacing: 0.01em !important;
+  text-transform: none !important;
+  border-radius: 999px !important;
+  padding: 0.62rem 1.15rem !important;
+  box-shadow: none;
+}
+body.nest-world .dash-grid :is(.btn-gold, .btn-ember),
+body.nest-world .nest-settings :is(.btn-gold, .btn-ember),
+html[data-theme="dark"] body.nest-world .dash-grid :is(.btn-gold, .btn-ember) {
+  background: #17485b !important;
+  border: 1px solid #17485b !important;
+  color: #fff9ef !important;
+}
+body.nest-world .dash-grid :is(.btn-gold, .btn-ember):hover { background: #1f5b72 !important; }
+body.nest-world .dash-grid .btn-outline,
+body.nest-world .nest-settings .btn-outline,
+html[data-theme="dark"] body.nest-world .dash-grid .btn-outline {
+  background: rgba(255, 252, 244, 0.6) !important;
+  border: 1.5px solid rgba(42, 34, 27, 0.5) !important;
+  color: var(--ink) !important;
+}
+body.nest-world :is(.lock-pill, .status-badge, .soon-tag) {
+  border-radius: 999px;
+  background: rgba(240, 222, 184, 0.55) !important;
+  color: var(--ink-soft) !important;
+  border-color: rgba(169, 124, 63, 0.3) !important;
+}
+
+/* ── Inputs: an inset on the paper ── */
+body.nest-world .dash-grid :is(textarea, input[type="text"], input[type="email"], input[type="search"], .journey-search, .journey-recommend-input),
+body.nest-world .nest-settings input {
+  background: rgba(255, 252, 244, 0.85) !important;
+  border: 1px solid rgba(169, 124, 63, 0.35) !important;
+  border-radius: 12px !important;
+  color: var(--ink) !important;
+  font-family: var(--font-sans) !important;
+}
+
+/* ── My Journey: area tiles as soft watercolor washes, not app tiles ── */
+body.nest-world .journey-area {
+  font-family: var(--font-sans) !important;
+  border-radius: 16px 12px 18px 14px !important;
+  border: 1px solid rgba(169, 124, 63, 0.22) !important;
+  box-shadow: none !important;
+  background-color: rgba(255, 250, 238, 0.7) !important;
+}
+body.nest-world .journey-area.tone-clay { background-image: linear-gradient(135deg, rgba(222, 150, 120, 0.22), transparent 70%) !important; }
+body.nest-world .journey-area.tone-ember { background-image: linear-gradient(135deg, rgba(232, 160, 90, 0.24), transparent 70%) !important; }
+body.nest-world .journey-area.tone-gold { background-image: linear-gradient(135deg, rgba(232, 190, 90, 0.26), transparent 70%) !important; }
+body.nest-world .journey-area.tone-green { background-image: linear-gradient(135deg, rgba(130, 170, 110, 0.24), transparent 70%) !important; }
+body.nest-world .journey-area.tone-tide { background-image: linear-gradient(135deg, rgba(100, 150, 180, 0.22), transparent 70%) !important; }
+body.nest-world .journey-area.tone-violet { background-image: linear-gradient(135deg, rgba(150, 120, 190, 0.22), transparent 70%) !important; }
+body.nest-world .journey-area :is(h3, h4, strong) { font-family: var(--font-serif); font-weight: 400; color: var(--ink); }
+body.nest-world .journey-reflection.is-active-focus,
+body.nest-world .journey-reflection.is-returning {
+  background: rgba(240, 222, 184, 0.4) !important;
+  border-radius: 12px;
+}
+
+/* ── Life Canvas bars on paper ── */
+body.nest-world .lc-track { background: rgba(169, 124, 63, 0.14) !important; border-radius: 999px; }
+
+/* ── My Guide: the chat sits on the paper, not in a grey box ── */
+body.nest-world .chat-messages,
+html[data-theme] body.nest-world .chat-messages {
+  background: rgba(255, 252, 244, 0.55) !important;
+  border: 1px solid rgba(169, 124, 63, 0.18) !important;
+  border-radius: 14px !important;
+}
+body.nest-world .guide-presence .luke-portrait img { border-radius: 14px; }
+
+/* ── Tour: a torn note, same voice as Home ── */
+body.nest-world .nest-tour-card {
+  position: absolute;
+  isolation: isolate;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: var(--ink);
+  padding: 1.15rem 1.3rem 1.05rem !important;
+}
+body.nest-world .nest-tour-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 16px 12px 18px 14px;
+  background: var(--paper-day);
+  filter: var(--paper-shadow);
+}
+html.lb-deckle-ready body.nest-world .nest-tour-card::before {
+  filter: url(#lb-deckle-soft) var(--paper-shadow);
+}
+body.nest-world :is(.nest-tour-kicker, .nest-tour-progress, .nest-tour-tip) {
+  font-family: var(--font-sans) !important;
+  letter-spacing: 0.12em;
+  color: var(--honey) !important;
+}
+body.nest-world .nest-tour-progress { letter-spacing: 0.04em; color: var(--ink-soft) !important; }
+body.nest-world .nest-tour-title { font-family: var(--font-serif); font-weight: 400; color: var(--ink) !important; }
+body.nest-world .nest-tour-body { font-family: var(--font-sans); color: var(--ink-soft) !important; }
+body.nest-world .nest-tour-card .btn-tour {
+  background: #17485b !important;
+  border: 1px solid #17485b !important;
+  color: #fff9ef !important;
+}
+body.nest-world .nest-tour-skip {
+  font-family: var(--font-sans) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  border-radius: 999px !important;
+  border: 1.5px solid rgba(42, 34, 27, 0.4) !important;
+  background: transparent !important;
+  color: var(--ink) !important;
+}
+body.nest-world .nest-tour-backdrop { background: rgba(28, 22, 14, 0.38) !important; }
+
+/* Marketing-site CMYK stripe doesn't belong in the painted Nest */
+.nest-world .cmyk-stripe { display: none !important; }
+
+/* Journey: inner blocks are soft insets on the paper, dates in the body face */
+body.nest-world .journey-home .journey-block,
+body.nest-world .journey-home .journey-tools-section {
+  background: rgba(255, 252, 244, 0.6) !important;
+  border: 1px solid rgba(169, 124, 63, 0.2) !important;
+  border-radius: 16px 12px 18px 14px !important;
+  box-shadow: none !important;
+}
+body.nest-world :is(.journey-date, .journey-reflection time, .journey-reflection-date) {
+  font-family: var(--font-sans) !important;
+  letter-spacing: 0.06em;
+  color: var(--honey);
+}

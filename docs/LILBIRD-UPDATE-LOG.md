@@ -22,6 +22,12 @@ If a change touches pricing, booking, worker logic, or public copy, log it here.
 
 ## 2026-11-05 (Claude)
 
+### Nest inner screens in the torn-paper style
+- **Status:** `deployed` (Pages only)
+- New `css/lilbird-nest-inner.css?v=20261105i1`: Learn & grow, My Journey, Life Canvas, My Guide, settings, letters, sidebar and the first-run tour on torn paper; kickers in DM Sans (no typewriter mono); teal pill primary / outlined pill secondary buttons; soft watercolor washes for Journey area tiles; chat on paper, not a grey box.
+- Fixes: header day/night switch + avatar now top-right on desktop (were stuck top-left on the real page); CMYK stripe and theme wipe hidden inside the Nest.
+- Checked on the signed-in test account (Intensive) in the desktop app browser before release.
+
 ### Nest Home — new layered artwork (v3) live
 - **Status:** `deployed` (Pages only)
 - ChatGPT layered set dropped in: `nest/assets/lilbird-kit/v3/` (scene day/night, companions day/night with lantern at night, meadow strip day/night, four card spots: mountains, book, lantern, nest). WebP derivatives; day/night pairs share one crop so they line up.
