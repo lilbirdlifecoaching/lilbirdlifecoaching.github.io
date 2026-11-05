@@ -22,6 +22,12 @@ If a change touches pricing, booking, worker logic, or public copy, log it here.
 
 ## 2026-11-05 (Claude)
 
+### Solo part 2: phone header + all 15 tools
+- **Status:** `deployed` (Pages only)
+- Solo phone header (`lilbird-solo-journal.css?v=20261105s3`): one row; lilbird.life link, email and the "Day/Night" word hidden under 600px.
+- New `css/lilbird-solo-tools-journal.css?v=20261105t1` linked from every `solo/tools/tool-*.html` (+ deckle script + `solo-journal` class). Standalone: painted scene behind a torn-paper sheet (`.page`). Inside a session iframe (`html.tool-embedded`): transparent so the tool sits on the session paper. Tool session colours kept for accents.
+- Known small leftovers: SVG chart labels still in the mono face; Glow Map clips the "Energy & Wellbeing" label (pre-existing).
+
 ### Nest kids pinned to the scene; Solo field-journal pass (part 1)
 - **Status:** `deployed` (Pages only)
 - Nest Home desktop: kids are `position: fixed` with the painted scene (`lilbird-nest-concept.css?v=20261105c3`), so panels scroll over them.

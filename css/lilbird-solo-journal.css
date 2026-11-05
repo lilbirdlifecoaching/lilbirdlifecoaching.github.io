@@ -250,3 +250,18 @@ html.solo-journal :is(.session-archive-title, .session-title, .continue-panel h3
   font-weight: 400;
   font-size: 1.05rem;
 }
+
+/* ── Phone header: one tidy row ── */
+html.solo-journal .nav-title { white-space: nowrap; }
+@media (max-width: 600px) {
+  html.solo-journal :is(.dash-nav, .session-nav) { flex-wrap: nowrap !important; gap: 0.4rem; padding-left: 0.75rem !important; padding-right: 0.75rem !important; }
+  html.solo-journal .nav-right,
+  html.solo-journal .session-nav > div:last-child { flex-wrap: nowrap !important; gap: 0.35rem !important; }
+  /* lilbird.life link and email live elsewhere; keep Nest, sign out, sessions */
+  html.solo-journal :is(.dash-nav, .session-nav) a.lilbird-nav-nest:not([id]),
+  html.solo-journal .nav-user,
+  html.solo-journal .session-nav-label,
+  html.solo-journal .theme-toggle-label { display: none !important; }
+  html.solo-journal :is(.lilbird-nav-nest, .btn-ghost, .btn-back-dash) { padding: 0.35rem 0.65rem !important; font-size: 0.8rem !important; white-space: nowrap; }
+  html.solo-journal .nav-title { font-size: 1rem !important; }
+}

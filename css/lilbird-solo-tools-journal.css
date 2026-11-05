@@ -1,0 +1,157 @@
+/* lil' bird Solo tools — field-journal pass.
+ * Shared by all solo/tools/tool-*.html. Activated by html.solo-journal.
+ * Standalone: painted scene behind a torn-paper sheet (.page).
+ * Inside a session (iframe, html.tool-embedded): transparent, so the tool
+ * sits directly on the session's paper.
+ * Each tool keeps its own session colour (--session-col) for accents.
+ */
+html.solo-journal {
+  --paper: radial-gradient(120% 90% at 30% 20%, #fffdf6 0%, #fff7e6 48%, #f8ebcf 82%, #efdcb4 100%);
+  --paper-shadow: drop-shadow(0 14px 24px rgba(48, 32, 12, 0.2)) drop-shadow(0 2px 3px rgba(48, 32, 12, 0.12));
+  --ink: #2a221b;
+  --ink-soft: #54493d;
+  --honey: #b8781f;
+  --text: #2a221b;
+  --text-main: #2a221b;
+  --text-dim: #54493d;
+  --text-muted: #7a6d5d;
+  --dark: #fff9ef;
+  --dark-mid: rgba(240, 222, 184, 0.4);
+  --dark-card: rgba(255, 252, 244, 0.78);
+  --dark-hover: rgba(240, 222, 184, 0.55);
+  --gold-dim: rgba(240, 190, 95, 0.16);
+  --gold-border: rgba(169, 124, 63, 0.3);
+  --gold-line: rgba(169, 124, 63, 0.3);
+  --gold-faint: rgba(240, 190, 95, 0.12);
+  --session-dim: rgba(240, 190, 95, 0.16);
+  --session-border: rgba(169, 124, 63, 0.3);
+  --font-mono: "DM Sans", system-ui, sans-serif;
+  color-scheme: light;
+}
+html.solo-journal[data-theme="dark"] {
+  --paper: radial-gradient(120% 90% at 30% 20%, #fbf2de 0%, #f5e8cb 50%, #ecdab4 84%, #e1c995 100%);
+  --paper-shadow: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.45)) drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
+}
+
+/* ── Backdrop ── */
+html.solo-journal,
+html.solo-journal body {
+  background: #d9c79e !important;
+  color: var(--ink) !important;
+}
+html.solo-journal[data-theme="dark"],
+html.solo-journal[data-theme="dark"] body { background: #0d2232 !important; }
+html.solo-journal:not(.tool-embedded) body::before {
+  content: "" !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  opacity: 1 !important;
+  pointer-events: none;
+  background:
+    url("/nest/assets/lilbird-kit/v3/meadow-day.webp") center bottom / max(100%, 1100px) auto no-repeat,
+    url("/nest/assets/lilbird-kit/v3/scene-day.webp") center bottom / cover no-repeat !important;
+}
+html.solo-journal[data-theme="dark"]:not(.tool-embedded) body::before {
+  background-image:
+    url("/nest/assets/lilbird-kit/v3/meadow-night.webp"),
+    url("/nest/assets/lilbird-kit/v3/scene-night.webp") !important;
+}
+html.solo-journal.tool-embedded,
+html.solo-journal.tool-embedded body { background: transparent !important; }
+html.solo-journal.tool-embedded body::before { content: none !important; }
+html.solo-journal :is(.cmyk-stripe, .theme-wipe, #particles, .particles) { display: none !important; }
+
+/* ── The sheet ── */
+html.solo-journal:not(.tool-embedded) .page {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+  margin-top: 2rem !important;
+  margin-bottom: 3rem !important;
+  padding: 2.2rem 2.4rem 2.6rem !important;
+}
+html.solo-journal:not(.tool-embedded) .page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 24px 18px 26px 16px;
+  background: var(--paper);
+  filter: var(--paper-shadow);
+  pointer-events: none;
+}
+html.solo-journal.lb-deckle-ready:not(.tool-embedded) .page::before {
+  filter: url(#lb-deckle-c) var(--paper-shadow);
+}
+@media (max-width: 560px) {
+  html.solo-journal:not(.tool-embedded) .page { padding: 1.6rem 1.25rem 2rem !important; margin: 0.8rem 0.6rem 2rem !important; }
+}
+
+/* ── Header row ── */
+html.solo-journal .nav-left { color: var(--ink-soft) !important; letter-spacing: 0.1em; }
+html.solo-journal :is(.nav-back, .btn-back-session) {
+  font-family: "DM Sans", sans-serif !important;
+  text-transform: none !important;
+  letter-spacing: 0.01em !important;
+  font-size: 0.85rem !important;
+  border-radius: 999px !important;
+  background: rgba(255, 252, 244, 0.85) !important;
+  border: 1px solid rgba(169, 124, 63, 0.35) !important;
+  color: var(--ink) !important;
+  padding: 0.38rem 0.85rem !important;
+  text-decoration: none !important;
+}
+html.solo-journal .theme-toggle {
+  background: rgba(255, 252, 244, 0.92) !important;
+  border: 1px solid rgba(176, 146, 100, 0.4) !important;
+  box-shadow: none !important;
+  outline: none;
+}
+html.solo-journal .theme-toggle:focus-visible { outline: 2px solid #18495c; outline-offset: 3px; }
+
+/* ── Type ── */
+html.solo-journal :is(h1, h2, h3, h4) { color: var(--ink) !important; }
+html.solo-journal :is(.eyebrow, .tool-eyebrow) { color: var(--honey) !important; letter-spacing: 0.13em; }
+
+/* ── White boxes become soft slips on the paper ── */
+html.solo-journal .page :is(
+  [class$="-card"], [class*="-card "], .chart-wrap, .panel, .points-panel, .timeline-wrap,
+  .compass-visual, .forest-visual, .section-card, .prompt-card
+) {
+  background-color: rgba(255, 252, 244, 0.62) !important;
+  border-color: rgba(169, 124, 63, 0.24) !important;
+  box-shadow: none !important;
+  border-radius: 16px 12px 18px 14px !important;
+}
+html.solo-journal .page :is(input[type="text"], input[type="email"], input:not([type]), textarea, select) {
+  background: rgba(255, 252, 244, 0.92) !important;
+  border: 1px solid rgba(169, 124, 63, 0.38) !important;
+  border-radius: 12px !important;
+  color: var(--ink) !important;
+  font-family: "DM Sans", sans-serif !important;
+}
+
+/* ── Buttons: save = teal pill; back/add = outlined pill ── */
+html.solo-journal :is(.btn-save, .btn, .btn-primary) {
+  font-family: "DM Sans", sans-serif !important;
+  text-transform: none !important;
+  letter-spacing: 0.01em !important;
+  font-size: 0.92rem !important;
+  border-radius: 999px !important;
+  background: #17485b !important;
+  border: 1px solid #17485b !important;
+  color: #fff9ef !important;
+  box-shadow: none !important;
+}
+html.solo-journal :is(.btn-save, .btn, .btn-primary):hover { background: #1f5b72 !important; }
+html.solo-journal :is(.btn-back2, .btn-add, .btn-add-person, .btn-add-entry) {
+  font-family: "DM Sans", sans-serif !important;
+  text-transform: none !important;
+  letter-spacing: 0.01em !important;
+  border-radius: 999px !important;
+  background: rgba(255, 252, 244, 0.7) !important;
+  border: 1.5px solid rgba(42, 34, 27, 0.4) !important;
+  color: var(--ink) !important;
+  box-shadow: none !important;
+}
