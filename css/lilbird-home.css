@@ -2061,9 +2061,15 @@ footer, .site-footer {
 }
 .nest-showcase-inner {
   display: grid;
-  gap: 1.45rem;
+  gap: 1.35rem;
   max-width: 1180px;
   margin: 0 auto;
+}
+.nest-showcase-main {
+  display: grid;
+  gap: 1.15rem;
+  align-content: start;
+  min-width: 0;
 }
 .nest-showcase-intro {
   max-width: 38rem;
@@ -2084,12 +2090,12 @@ footer, .site-footer {
   line-height: 1.5;
 }
 
-/* Shot + tiers side by side — shot stays true landscape */
+/* Left: hero copy + landscape shot. Right: tiers from hero top to shot bottom. */
 .nest-showcase-split {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(250px, 0.68fr);
   gap: 1.1rem 1.35rem;
-  align-items: start;
+  align-items: stretch;
 }
 
 .nest-shot-stage {
@@ -2154,15 +2160,20 @@ html:not([data-theme]) .nest-shot-day { display: block; }
 }
 
 .nest-tiers {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.7rem;
-  align-content: start;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-self: stretch;
+  min-height: 100%;
+  gap: 0.65rem;
+  /* Top card lines up with hero copy; bottom card with bottom of landscape shot */
+  height: 100%;
 }
 .nest-tier {
   display: flex;
   flex-direction: column;
   gap: 0.28rem;
+  flex: 0 1 auto;
   min-height: 0;
   padding: 0.95rem 1rem 1.05rem;
   border-radius: 14px;
@@ -2265,7 +2276,9 @@ html:not([data-theme]) .nest-shot-day { display: block; }
     max-width: none;
   }
   .nest-tiers {
-    grid-template-columns: 1fr;
+    height: auto;
+    min-height: 0;
+    justify-content: flex-start;
   }
   .nest-showcase { padding-top: 2rem; padding-bottom: 2.25rem; }
   .nest-shot-caption { font-size: 0.62rem; left: 0.75rem; bottom: 0.7rem; }
