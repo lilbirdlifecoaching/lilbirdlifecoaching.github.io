@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Solo Start / Continue — before &amp; after</title>
+  <link rel="stylesheet" href="/css/lilbird-solo-theme.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" />
+  <style>
+    body { margin: 0; font-family: "DM Sans", system-ui, sans-serif; background: #f4efe6; color: #2a241c; }
+    .bar { display:flex; flex-wrap:wrap; gap:.4rem; padding:.7rem 1rem; position:sticky; top:0; z-index:5; background:rgba(244,239,230,.96); border-bottom:1px solid rgba(176,120,24,.25); }
+    .bar button { font:inherit; border-radius:999px; padding:.3rem .7rem; border:1px solid rgba(176,120,24,.35); background:transparent; cursor:pointer; color:inherit; }
+    .bar button.is-on { background:rgba(245,200,66,.22); }
+    .compare { display:grid; grid-template-columns:1fr; gap:1.25rem; max-width:720px; margin:0 auto; padding:1rem 1rem 3rem; }
+    @media (min-width: 1100px) { .compare { grid-template-columns:1fr 1fr; max-width:1180px; } }
+    .col { background:rgba(255,255,255,.55); border:1px solid rgba(176,120,24,.18); border-radius:16px; padding:1.1rem 1rem 1.4rem; }
+    .col h2 { font-family:"DM Mono",monospace; font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; color:#b07818; margin:0 0 1rem; font-weight:500; }
+    .dash-greeting { font-family:"Playfair Display",serif; font-size:1.7rem; margin:0 0 .35rem; font-weight:400; font-style:italic; }
+    .dash-subtext { color:#6b6358; margin:0 0 1rem; max-width:34rem; line-height:1.55; }
+    .progress-meta { display:flex; justify-content:space-between; margin-bottom:.45rem; font-family:"DM Mono",monospace; font-size:.66rem; letter-spacing:.08em; text-transform:uppercase; color:#6b6358; }
+    .progress-count { color:#b07818; }
+    .progress-track { height:3px; background:rgba(0,0,0,.08); border-radius:99px; overflow:hidden; margin-bottom:1.1rem; }
+    .progress-fill { height:100%; background:linear-gradient(90deg,#e8734a,#f5c842); }
+    .continue-panel { margin:0 0 1.1rem; padding:1rem 0 1.15rem; border-top:1px solid rgba(176,120,24,.18); border-bottom:1px solid rgba(176,120,24,.18); }
+    .continue-panel-eyebrow { font-family:"DM Mono",monospace; font-size:.62rem; letter-spacing:.12em; text-transform:uppercase; color:#b07818; margin-bottom:.4rem; }
+    .continue-panel h3 { font-family:"Playfair Display",serif; font-size:1.35rem; font-weight:400; font-style:italic; margin:0 0 .4rem; }
+    .continue-panel p { color:#6b6358; font-size:.9rem; line-height:1.55; margin:0 0 .75rem; }
+    .continue-panel-meta { font-family:"DM Mono",monospace; font-size:.66rem; color:#8a8176; margin:-.2rem 0 .75rem; }
+    .btn-continue-main { background:#c9a227; color:#1e2028; border:none; border-radius:6px; padding:.7rem 1.1rem; font-family:"DM Mono",monospace; font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; }
+    .btn-ready { background:transparent; border:1px solid #c9a227; color:#8a6a12; border-radius:6px; padding:.55rem 1rem; font-family:"DM Mono",monospace; font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; }
+    .sessions-overview-label { font-family:"DM Mono",monospace; font-size:.66rem; letter-spacing:.12em; text-transform:uppercase; color:#8a8176; margin:0 0 .65rem; }
+    .sessions-grid { display:grid; gap:.55rem; }
+    .session-card { display:grid; grid-template-columns:auto 1fr auto; gap:.7rem; align-items:center; padding:.75rem .85rem; border:1px solid rgba(176,120,24,.18); border-radius:12px; background:rgba(255,255,255,.65); }
+    .session-card.locked { opacity:.55; }
+    .session-card.in-progress { border-color:#c9a227; }
+    .session-num { width:2.1rem; height:2.1rem; border-radius:8px; display:grid; place-items:center; font-family:"DM Mono",monospace; font-size:.7rem; }
+    .session-eyebrow { font-family:"DM Mono",monospace; font-size:.58rem; letter-spacing:.1em; text-transform:uppercase; }
+    .session-title { font-family:"Playfair Display",serif; font-size:1rem; }
+    .session-teaser { color:#6b6358; font-size:.8rem; font-style:italic; }
+    .status-pill { font-family:"DM Mono",monospace; font-size:.55rem; letter-spacing:.08em; text-transform:uppercase; padding:.2rem .4rem; border-radius:999px; }
+    .pill-available { background:rgba(122,158,126,.15); color:#4f7a55; }
+    .pill-progress { background:rgba(232,115,74,.15); color:#c45a2e; }
+    .pill-complete { background:rgba(122,158,126,.2); color:#3f6b45; }
+    .pill-locked { background:rgba(0,0,0,.06); color:#6b6358; }
+    .nest-card { margin-top:1rem; padding:1rem; border:1px solid rgba(176,120,24,.2); border-radius:14px; background:rgba(255,255,255,.7); }
+    .nest-card .eyebrow { font-family:"DM Mono",monospace; font-size:.58rem; letter-spacing:.1em; text-transform:uppercase; color:#b07818; }
+    .nest-card h3 { font-family:"Playfair Display",serif; font-size:1.15rem; margin:.35rem 0; font-weight:400; }
+    .nest-card p { color:#6b6358; font-size:.88rem; margin:0 0 .75rem; }
+    .nest-cta { display:inline-block; background:#c9a227; color:#1e2028; padding:.45rem .8rem; border-radius:6px; font-family:"DM Mono",monospace; font-size:.62rem; letter-spacing:.08em; text-transform:uppercase; text-decoration:none; }
+  </style>
+</head>
+<body>
+  <div class="bar">
+    <strong>Start / Continue</strong>
+    <button type="button" data-view="new" class="is-on">New owner</button>
+    <button type="button" data-view="progress0">Session 0 in progress</button>
+    <button type="button" data-view="returning">Two complete</button>
+    <button type="button" data-view="locked">Time-locked</button>
+    <button type="button" data-view="near">Seven complete</button>
+    <button type="button" data-view="done">All complete</button>
+  </div>
+  <div class="compare" id="frame"></div>
+  <script>
+    const sessions = [
+      [0,'Orientation','First Flight','Name where you are.','#F5C842'],
+      [1,'Session 01','Story','Know where you’ve been.','#7a9e7e'],
+      [2,'Session 02','Vision & Goals','Clarify where you’re going.','#7eb8c9'],
+      [3,'Session 03','Identity & Insight','Know who you are.','#a89060'],
+      [4,'Session 04','Working Through Transitions','Choose your next step.','#8a9ab0'],
+      [5,'Session 05','Life Rhythms & Routines','Design a life that fits.','#9dbf8a'],
+      [6,'Session 06','Relationships & Community','Who’s in your forest.','#c4956a'],
+      [7,'Session 07','Full Flight','Bring it together.','#F5C842'],
+    ];
+    function card(s, status) {
+      const labels = { available:['pill-available','Ready'], in_progress:['pill-progress','In progress'], complete:['pill-complete','Complete'], locked:['pill-locked','Locked'] };
+      const [pill, label] = labels[status];
+      const locked = status === 'locked';
+      return `<div class="session-card ${status.replace('_','-')}">
+        <div class="session-num" style="background:${locked?'rgba(0,0,0,.04)':s[4]+'22'};color:${locked?'#6b6358':s[4]}">${s[0]===0?'✦':String(s[0]).padStart(2,'0')}</div>
+        <div><div class="session-eyebrow" style="color:${locked?'#6b6358':s[4]}">${s[1]}</div><div class="session-title">${s[2]}</div><div class="session-teaser">${s[3]}</div></div>
+        <div class="status-pill ${pill}">${label}</div>
+      </div>`;
+    }
+    function grid(statuses) {
+      return '<div class="sessions-overview-label">All sessions</div><div class="sessions-grid">' +
+        sessions.map((s,i)=>card(s, statuses[i])).join('') + '</div>';
+    }
+    function before(greeting, sub, completed, statuses) {
+      return `<h2>Before</h2>
+        <h1 class="dash-greeting">${greeting}</h1>
+        <p class="dash-subtext">${sub}</p>
+        <div class="progress-meta"><span>Course progress</span><span class="progress-count">${completed} of 8 sessions</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:${(completed/8)*100}%"></div></div>
+        <div class="sessions-grid">${sessions.map((s,i)=>card(s, statuses[i])).join('')}</div>
+        <div class="nest-card"><div class="eyebrow">Nest · Learn &amp; grow</div><h3>Life Change Sessions: Solo</h3>
+          <p>${completed === 8 ? '8/8 sessions' : completed === 0 ? 'Continue → (no start distinction)' : completed + '/8 · next up: Session N'}</p>
+          <span class="nest-cta">${completed === 8 ? 'Your Flight Plan →' : 'Continue →'}</span>
+        </div>`;
+    }
+    function after(opts) {
+      const { greeting, sub, completed, statuses, panel, nest } = opts;
+      return `<h2>After</h2>
+        <h1 class="dash-greeting">${greeting}</h1>
+        <p class="dash-subtext">${sub}</p>
+        <div class="progress-meta"><span>Course progress</span><span class="progress-count">${completed} of 8 sessions</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:${(completed/8)*100}%"></div></div>
+        ${panel || ''}
+        ${completed < 8 ? grid(statuses) : ''}
+        <div class="nest-card"><div class="eyebrow">Nest · Learn &amp; grow</div><h3>Life Change Sessions: Solo</h3>
+          <p>${nest.line}</p>
+          <span class="nest-cta">${nest.cta}</span>
+        </div>`;
+    }
+    const views = {
+      new: () => {
+        const statuses = ['available','locked','locked','locked','locked','locked','locked','locked'];
+        return `<div class="col">${before('Good afternoon, Maya.','Pick up where you left off. The work you do between sessions matters as much as the sessions themselves.',0,statuses)}</div>
+          <div class="col">${after({
+            greeting:'Good afternoon, Maya.',
+            sub:'Welcome to Solo. Eight sessions: a short video, a guided conversation, and tools for each one.',
+            completed:0, statuses,
+            panel:`<section class="continue-panel"><div class="continue-panel-eyebrow">Start here</div><h3>Start Session 0 · First Flight</h3><p>Welcome to Solo. Eight sessions at your pace: a short video, a guided conversation, and tools that keep the work moving. Begin with orientation.</p><button class="btn-continue-main">Start Session 0 →</button></section>`,
+            nest:{ line:'Ready to begin · Session 0 · First Flight', cta:'Start Session 0 →' }
+          })}</div>`;
+      },
+      progress0: () => {
+        const statuses = ['in_progress','locked','locked','locked','locked','locked','locked','locked'];
+        return `<div class="col">${before('Good evening, Maya.','Pick up where you left off.',0,statuses)}</div>
+          <div class="col">${after({
+            greeting:'Good evening, Maya.',
+            sub:"Here's where you are in the course, and what to open next.",
+            completed:0, statuses,
+            panel:`<section class="continue-panel"><div class="continue-panel-eyebrow">Continue</div><h3>Session 0 · First Flight</h3><p>You still have work open in this session. Continue where you left the conversation.</p><div class="continue-panel-meta">0 of 8 sessions complete</div><button class="btn-continue-main">Continue Session 0 · First Flight →</button></section>`,
+            nest:{ line:'0% complete · next: Session 0 · First Flight', cta:'Continue Solo Course →' }
+          })}</div>`;
+      },
+      returning: () => {
+        const statuses = ['complete','complete','available','locked','locked','locked','locked','locked'];
+        return `<div class="col">${before('Good morning, Maya.','Pick up where you left off. The work you do between sessions matters as much as the sessions themselves.',2,statuses)}</div>
+          <div class="col">${after({
+            greeting:'Good morning, Maya.',
+            sub:"Here's where you are in the course, and what to open next.",
+            completed:2, statuses,
+            panel:`<section class="continue-panel"><div class="continue-panel-eyebrow">Continue</div><h3>Session 02 · Vision &amp; Goals</h3><p>This session is open. Open it when you want to keep going.</p><div class="continue-panel-meta">2 of 8 sessions complete</div><button class="btn-continue-main">Continue →</button></section>`,
+            nest:{ line:'25% complete · next: Session 02 · Vision & Goals', cta:'Continue Solo Course →' }
+          })}</div>`;
+      },
+      locked: () => {
+        const statuses = ['complete','complete','locked','locked','locked','locked','locked','locked'];
+        return `<div class="col">${before('Good afternoon, Maya.','Pick up where you left off.',2,statuses)}</div>
+          <div class="col">${after({
+            greeting:'Good afternoon, Maya.',
+            sub:"You're between sessions. The next one opens after a short pause, or unlock it when you're ready.",
+            completed:2, statuses,
+            panel:`<section class="continue-panel"><div class="continue-panel-eyebrow">Next up</div><h3>Session 02 · Vision &amp; Goals</h3><p>Your next session opens after a short pause so you can use your take-home. If you're ready sooner, unlock it now.</p><div class="continue-panel-meta">Unlocks in 18h 12m · 2 of 8 sessions complete</div><button class="btn-ready">I'm ready →</button></section>`,
+            nest:{ line:'25% complete · next: Session 02 · Vision & Goals (opens after a short pause)', cta:'Continue Solo Course →' }
+          })}</div>`;
+      },
+      near: () => {
+        const statuses = ['complete','complete','complete','complete','complete','complete','complete','available'];
+        return `<div class="col">${before('Good morning, Maya.','Pick up where you left off.',7,statuses)}</div>
+          <div class="col">${after({
+            greeting:'Good morning, Maya.',
+            sub:"Here's where you are in the course, and what to open next.",
+            completed:7, statuses,
+            panel:`<section class="continue-panel"><div class="continue-panel-eyebrow">Continue</div><h3>Session 07 · Full Flight</h3><p>This session is open. Open it when you want to keep going.</p><div class="continue-panel-meta">7 of 8 sessions complete</div><button class="btn-continue-main">Continue →</button></section>`,
+            nest:{ line:'88% complete · next: Session 07 · Full Flight', cta:'Continue Solo Course →' }
+          })}</div>`;
+      },
+      done: () => {
+        return `<div class="col">${before('Good evening, Maya.','Pick up where you left off.',8,['complete','complete','complete','complete','complete','complete','complete','complete'])}
+          <p class="dash-subtext" style="margin-top:1rem">Complete state already used Flight Plan tabs — before still showed returning language above the list.</p>
+        </div>
+          <div class="col"><h2>After</h2>
+            <span style="font-family:DM Mono,monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:#4f7a55;border:1px solid rgba(122,158,126,.3);padding:.2rem .5rem;border-radius:999px">Course complete</span>
+            <h1 class="dash-greeting" style="margin-top:.7rem">You finished all eight sessions.</h1>
+            <p class="dash-subtext">No Continue action. Full Flight Plan, Takeaways, and Sessions stay as they are.</p>
+            <div class="nest-card"><div class="eyebrow">Nest · Learn &amp; grow</div><h3>Life Change Sessions: Solo</h3>
+              <p>8/8 sessions · your Full Flight Plan is ready when you are.</p>
+              <span class="nest-cta">Your Flight Plan →</span>
+            </div>
+          </div>`;
+      }
+    };
+    function apply(v) {
+      document.getElementById('frame').innerHTML = (views[v] || views.new)();
+      document.querySelectorAll('[data-view]').forEach((b) => b.classList.toggle('is-on', b.dataset.view === v));
+    }
+    document.querySelectorAll('[data-view]').forEach((b) => b.addEventListener('click', () => apply(b.dataset.view)));
+    apply(new URLSearchParams(location.search).get('view') || 'new');
+  </script>
+</body>
+</html>

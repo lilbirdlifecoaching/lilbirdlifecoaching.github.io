@@ -138,11 +138,82 @@
     .btn-ghost { background: none; border: 1px solid var(--gold-border); border-radius: 6px; padding: 0.4rem 0.85rem; font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); cursor: pointer; transition: border-color 0.2s, color 0.2s; }
     .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
     .dash-body { flex: 1; max-width: 900px; width: 100%; margin: 0 auto; padding: 3rem 2rem 5rem; }
-    .dash-welcome { margin-bottom: 3rem; animation: fadeUp 0.5s ease both; }
+    .dash-welcome { margin-bottom: 2rem; animation: fadeUp 0.5s ease both; }
     .dash-eyebrow { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.6rem; }
     .dash-welcome h2 { font-family: var(--font-display); font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 400; font-style: italic; line-height: 1.2; margin-bottom: 0.75rem; }
     .dash-welcome p { color: var(--text-dim); font-size: 0.95rem; max-width: 520px; line-height: 1.7; }
-    .dash-progress { margin-bottom: 3rem; animation: fadeUp 0.5s 0.1s ease both; }
+    .continue-panel {
+      margin: 0 0 2.25rem;
+      padding: 1.35rem 0 1.6rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      animation: fadeUp 0.5s 0.05s ease both;
+    }
+    html[data-theme="light"] .continue-panel {
+      border-top-color: rgba(30,32,40,0.08);
+      border-bottom-color: rgba(30,32,40,0.08);
+    }
+    .continue-panel-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.55rem;
+    }
+    .continue-panel h3 {
+      font-family: var(--font-display);
+      font-size: clamp(1.35rem, 3vw, 1.85rem);
+      font-weight: 400;
+      font-style: italic;
+      line-height: 1.25;
+      margin: 0 0 0.55rem;
+      overflow-wrap: anywhere;
+    }
+    .continue-panel p {
+      color: var(--text-dim);
+      font-size: 0.92rem;
+      line-height: 1.65;
+      max-width: 34rem;
+      margin: 0 0 1.1rem;
+    }
+    .continue-panel-meta {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin: -0.35rem 0 1rem;
+    }
+    .continue-panel-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; }
+    .btn-continue-main {
+      background: var(--gold);
+      color: var(--dark);
+      border: none;
+      border-radius: 6px;
+      padding: 0.85rem 1.35rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      max-width: 100%;
+      white-space: normal;
+      text-align: center;
+      line-height: 1.35;
+    }
+    .btn-continue-main:hover { background: #fff; transform: translateY(-1px); }
+    html[data-theme="light"] .btn-continue-main:hover { background: #1e2028; color: #f5f2eb; }
+    .sessions-overview-label {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin: 0 0 0.85rem;
+    }
+    .dash-progress { margin-bottom: 1.75rem; animation: fadeUp 0.5s 0.1s ease both; }
     .progress-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; }
     .progress-label { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
     .progress-count { font-family: var(--font-mono); font-size: 0.68rem; color: var(--gold); }
@@ -1008,8 +1079,8 @@
     <div class="dash-body">
       <div class="dash-welcome">
         <div class="dash-eyebrow">your sessions</div>
-        <h2 id="dash-greeting">Welcome back.</h2>
-        <p id="dash-subtext">Pick up where you left off, or begin when you're ready.</p>
+        <h2 id="dash-greeting">Welcome.</h2>
+        <p id="dash-subtext">Eight sessions at your pace. Conversation, a short video, and tools for each one.</p>
       </div>
       <div class="dash-progress" id="dash-progress" style="display:none;">
         <div class="progress-meta"><span class="progress-label">Course progress</span><span class="progress-count" id="progress-count">0 of 8 sessions</span></div>
@@ -1095,7 +1166,7 @@
   <script>
     const SUPABASE_URL  = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
-    const SOLO_SHELL_BUILD = 'v1.16-access-mobile-info-20261104';
+    const SOLO_SHELL_BUILD = 'v1.17-start-continue-20261104';
     const WORKER_URL    = 'https://worker-solo.cwwq46sn7m.workers.dev';
     console.info("lil' bird Solo shell", SOLO_SHELL_BUILD, '| worker:', WORKER_URL);
     // Stripe publishable key — safe to ship in client code.
@@ -1721,6 +1792,120 @@
       if (cta) cta.addEventListener('click', () => openSession(3));
     }
 
+    function sessionLabel(session) {
+      if (!session) return '';
+      if (session.number === 0) return 'Session 0 · First Flight';
+      return session.tag + ' · ' + session.title;
+    }
+
+    function unlockCountdown(unlocksAt) {
+      if (!unlocksAt) return '';
+      const diffMs = new Date(unlocksAt) - Date.now();
+      if (diffMs <= 0) return '';
+      const hrs = Math.floor(diffMs / 3600000);
+      const mins = Math.floor((diffMs % 3600000) / 60000);
+      return hrs + 'h ' + mins + 'm';
+    }
+
+    /** Where the member should go next — never skips an unfinished session. */
+    function getSoloFocus() {
+      const completed = sessionData.filter((s) => s.status === 'complete').length;
+      const inProgress = sessionData.find((s) => s.status === 'in_progress');
+      if (inProgress) {
+        const session = SESSIONS.find((s) => s.number === inProgress.session_number);
+        return { kind: 'continue', session, progress: inProgress, completed, resume: true };
+      }
+      const available = sessionData.find((s) => s.status === 'available');
+      if (available) {
+        const session = SESSIONS.find((s) => s.number === available.session_number);
+        const isNew = completed === 0 && available.session_number === 0;
+        return {
+          kind: isNew ? 'start' : 'continue',
+          session,
+          progress: available,
+          completed,
+          resume: false,
+        };
+      }
+      const waiting = sessionData.find(
+        (s) => s.status === 'locked' && s.unlocks_at && new Date(s.unlocks_at) - Date.now() > 0
+      );
+      if (waiting) {
+        const session = SESSIONS.find((s) => s.number === waiting.session_number);
+        return { kind: 'waiting', session, progress: waiting, completed, resume: false };
+      }
+      return { kind: 'none', session: null, progress: null, completed, resume: false };
+    }
+
+    function renderContinuePanel(focus) {
+      if (!focus || focus.kind === 'none' || !focus.session) return '';
+      const label = sessionLabel(focus.session);
+      const progressLine = focus.completed + ' of 8 sessions complete';
+      if (focus.kind === 'start') {
+        return (
+          '<section class="continue-panel" aria-label="Start Solo Course">' +
+            '<div class="continue-panel-eyebrow">Start here</div>' +
+            '<h3>Start ' + label + '</h3>' +
+            '<p>Welcome to Solo. Eight sessions at your pace: a short video, a guided conversation, and tools that keep the work moving. Begin with orientation.</p>' +
+            '<div class="continue-panel-actions">' +
+              '<button type="button" class="btn-continue-main" data-open-session="' + focus.session.number + '">Start Session 0 →</button>' +
+            '</div>' +
+          '</section>'
+        );
+      }
+      if (focus.kind === 'waiting') {
+        const left = unlockCountdown(focus.progress && focus.progress.unlocks_at);
+        return (
+          '<section class="continue-panel" aria-label="Next session waiting">' +
+            '<div class="continue-panel-eyebrow">Next up</div>' +
+            '<h3>' + label + '</h3>' +
+            '<p>Your next session opens after a short pause so you can use your take-home. If you\'re ready sooner, unlock it now.</p>' +
+            (left ? '<div class="continue-panel-meta">Unlocks in ' + left + ' · ' + progressLine + '</div>' : '<div class="continue-panel-meta">' + progressLine + '</div>') +
+            '<div class="continue-panel-actions">' +
+              '<button type="button" class="btn-ready" data-next="' + focus.session.number + '">I\'m ready →</button>' +
+            '</div>' +
+          '</section>'
+        );
+      }
+      const sub = focus.resume
+        ? 'You still have work open in this session. Continue where you left the conversation.'
+        : 'This session is open. Open it when you want to keep going.';
+      const cta = focus.resume ? 'Continue ' + label + ' →' : 'Continue →';
+      return (
+        '<section class="continue-panel" aria-label="Continue Solo Course">' +
+          '<div class="continue-panel-eyebrow">Continue</div>' +
+          '<h3>' + label + '</h3>' +
+          '<p>' + sub + '</p>' +
+          '<div class="continue-panel-meta">' + progressLine + '</div>' +
+          '<div class="continue-panel-actions">' +
+            '<button type="button" class="btn-continue-main" data-open-session="' + focus.session.number + '">' + cta + '</button>' +
+          '</div>' +
+        '</section>'
+      );
+    }
+
+    function canOpenSession(sessionNumber) {
+      const row = sessionData.find((s) => s.session_number === sessionNumber);
+      if (!row) return false;
+      return row.status === 'available' || row.status === 'in_progress' || row.status === 'complete';
+    }
+
+    function bindContinuePanel() {
+      document.querySelectorAll('[data-open-session]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const n = parseInt(btn.dataset.openSession, 10);
+          if (!canOpenSession(n)) return;
+          openSession(n);
+        });
+      });
+      document.querySelectorAll('.continue-panel .btn-ready').forEach((btn) => {
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          await bypassGate(parseInt(btn.dataset.next, 10));
+        });
+      });
+    }
+
     function renderDashboard() {
       const name = userProfile?.full_name?.split(' ')[0] || '';
       const hour = new Date().getHours();
@@ -1733,7 +1918,6 @@
         document.getElementById('dash-subtext').textContent = 'Eight sessions at your pace, with the same depth as working with a coach, in a format built around you.';
         content.innerHTML = renderPurchaseGate(); bindPurchaseGate(); return;
       }
-      document.getElementById('dash-subtext').textContent = 'Pick up where you left off. The work you do between sessions matters as much as the sessions themselves.';
       const completed = sessionData.filter(s => s.status === 'complete').length;
       document.getElementById('dash-progress').style.display = 'block';
       if (isCourseComplete()) {
@@ -1753,18 +1937,30 @@
         bindCompleteDashboard();
         return;
       }
-      document.getElementById('dash-subtext').style.display = '';
+      const focus = getSoloFocus();
+      const subEl = document.getElementById('dash-subtext');
+      subEl.style.display = '';
+      if (focus.kind === 'start') {
+        subEl.textContent = 'Welcome to Solo. Eight sessions: a short video, a guided conversation, and tools for each one.';
+      } else if (focus.kind === 'waiting') {
+        subEl.textContent = 'You\'re between sessions. The next one opens after a short pause, or unlock it when you\'re ready.';
+      } else {
+        subEl.textContent = 'Here\'s where you are in the course, and what to open next.';
+      }
       document.querySelector('.progress-label').textContent = 'Course progress';
       document.getElementById('progress-count').textContent = completed + ' of 8 sessions';
       document.getElementById('progress-fill').style.width = ((completed / 8) * 100) + '%';
-      let html = renderDeepProfileCard();
+      let html = renderContinuePanel(focus);
+      html += renderDeepProfileCard();
+      html += '<div class="sessions-overview-label">All sessions</div>';
       html += '<div class="sessions-grid">';
       SESSIONS.forEach(session => { const progress = sessionData.find(s => s.session_number === session.number); html += renderSessionCard(session, progress?.status || 'locked', progress); });
       html += '</div>';
       content.innerHTML = html;
+      bindContinuePanel();
       bindDeepProfileCard();
       document.querySelectorAll('.session-card.available, .session-card.in-progress, .session-card.complete').forEach(card => { card.addEventListener('click', () => openSession(parseInt(card.dataset.session))); });
-      document.querySelectorAll('.btn-ready').forEach(btn => { btn.addEventListener('click', async (e) => { e.stopPropagation(); await bypassGate(parseInt(btn.dataset.next)); }); });
+      document.querySelectorAll('.sessions-grid .btn-ready').forEach(btn => { btn.addEventListener('click', async (e) => { e.stopPropagation(); await bypassGate(parseInt(btn.dataset.next)); }); });
       // Lazily fetch the deep profile (and re-render once) so the dashboard
       // doesn't block on the network. If the data was already cached this is
       // a no-op and the card keeps its current state.
@@ -2103,6 +2299,11 @@
       }
       const session = SESSIONS[sessionNumber];
       if (!session) return;
+      // Locked sessions stay closed — Continue / cards only open available, in-progress, or complete.
+      if (!canOpenSession(sessionNumber)) {
+        renderDashboard();
+        return;
+      }
       activeSession = session;
       setSessionInfoOpen(false);
       chatMsgs = []; isTyping = false; exchangeCount = 0; sessionContext = {};

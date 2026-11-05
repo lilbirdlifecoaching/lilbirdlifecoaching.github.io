@@ -437,7 +437,34 @@
       entitlements = new Set((entRes.data || []).map((r) => r.product));
       nestPlusGrantedBy = (entRes.data || []).find((r) => r.product === 'nest_plus')?.granted_by || '';
       courseProfile = courseRes.data || null;
-      sessionProgress = progressRes.data || [];
+      // Same rule as Solo loadSessionProgress: locked + unlocks_at <= now → available.
+      // Only for Solo owners; never touches rows without unlocks_at (later locked sessions).
+      {
+        const rows = progressRes.data || [];
+        sessionProgress = rows;
+        const soloOwner = hasSoloCourseAccess();
+        const nowIso = new Date().toISOString();
+        const due = soloOwner && rows.some((s) => s.status === 'locked' && s.unlocks_at && s.unlocks_at <= nowIso);
+        if (due) {
+          const unlockRes = await sb
+            .from('session_progress')
+            .update({ status: 'available' })
+            .eq('user_id', uid)
+            .eq('status', 'locked')
+            .not('unlocks_at', 'is', null)
+            .lte('unlocks_at', nowIso);
+          if (unlockRes.error) {
+            console.warn('session_progress unlock-on-hydrate:', unlockRes.error);
+          } else {
+            const refreshed = await sb
+              .from('session_progress')
+              .select('*')
+              .eq('user_id', uid)
+              .order('session_number');
+            if (!refreshed.error && refreshed.data) sessionProgress = refreshed.data;
+          }
+        }
+      }
       deepNestId = linkRes.data?.nest_id || null;
       intensiveEnrolment = intensiveRes.data || null;
       lciSessions = lciRes.data || [];
@@ -1295,7 +1322,18 @@
         href: '/intensive/enrol.html?from=nest'
       });
       if (hasSolo) {
-        steps.push({ done: false, text: 'Continue Solo', href: '/solo/' });
+        const soloFocus = progressSummary();
+        const soloText =
+          soloFocus.state === 'complete'
+            ? 'Open your Full Flight Plan'
+            : soloFocus.state === 'start'
+              ? 'Start Solo · ' + soloFocus.next
+              : 'Continue Solo Course · ' + soloFocus.next;
+        steps.push({
+          done: soloFocus.state === 'complete',
+          text: soloText,
+          href: soloFocus.state === 'complete' ? '/solo/?view=plan' : '/solo/',
+        });
       }
       steps.push({
         done: !!youngerYouPhotoUrl(),
@@ -1528,13 +1566,69 @@
     return '/workbooks/view.html?w=' + key;
   }
 
+  const SOLO_SESSION_TITLES = {
+    0: 'First Flight',
+    1: 'Story',
+    2: 'Vision & Goals',
+    3: 'Identity & Insight',
+    4: 'Working Through Transitions',
+    5: 'Life Rhythms & Routines',
+    6: 'Relationships & Community',
+    7: 'Full Flight',
+  };
+
+  function soloSessionLabel(sessionNumber) {
+    const n = Number(sessionNumber);
+    const title = SOLO_SESSION_TITLES[n] || 'Session';
+    if (n === 0) return 'Session 0 · First Flight';
+    const tag = 'Session ' + String(n).padStart(2, '0');
+    return tag + ' · ' + title;
+  }
+
   function progressSummary() {
-    if (!sessionProgress.length) return { pct: 0, next: 'Session 0 · First Flight' };
+    if (!sessionProgress.length) {
+      return { pct: 0, next: 'Session 0 · First Flight', state: 'start', nextNumber: 0 };
+    }
     const complete = sessionProgress.filter((s) => s.status === 'complete').length;
     const pct = Math.round((complete / 8) * 100);
-    const next = sessionProgress.find((s) => s.status === 'available' || s.status === 'in_progress');
-    const nextName = next ? `Session ${next.session_number}` : 'All sessions complete';
-    return { pct, next: nextName };
+    // Prefer an unfinished session so we never skip work in progress.
+    const inProgress = sessionProgress.find((s) => s.status === 'in_progress');
+    if (inProgress) {
+      return {
+        pct,
+        next: soloSessionLabel(inProgress.session_number),
+        state: 'continue',
+        nextNumber: inProgress.session_number,
+        resume: true,
+      };
+    }
+    const available = sessionProgress.find((s) => s.status === 'available');
+    if (available) {
+      const isStart = complete === 0 && available.session_number === 0;
+      return {
+        pct,
+        next: soloSessionLabel(available.session_number),
+        state: isStart ? 'start' : 'continue',
+        nextNumber: available.session_number,
+        resume: false,
+      };
+    }
+    const waiting = sessionProgress.find(
+      (s) => s.status === 'locked' && s.unlocks_at && new Date(s.unlocks_at) > Date.now()
+    );
+    if (waiting) {
+      return {
+        pct,
+        next: soloSessionLabel(waiting.session_number),
+        state: 'waiting',
+        nextNumber: waiting.session_number,
+        resume: false,
+      };
+    }
+    if (pct >= 100) {
+      return { pct: 100, next: 'All sessions complete', state: 'complete', nextNumber: null };
+    }
+    return { pct, next: 'Open Solo', state: 'continue', nextNumber: null };
   }
 
   function cardProduct(key) {
@@ -1681,7 +1775,7 @@
       const soloUnlocked = hasSoloCourseAccess();
       if (soloUnlocked) {
         const p = progressSummary();
-        if (p.pct >= 100) {
+        if (p.state === 'complete' || p.pct >= 100) {
           return `
           <article class="product-card" data-product="solo_course">
             <span class="status-badge">complete</span>
@@ -1695,13 +1789,33 @@
             </div>
           </article>`;
         }
+        if (p.state === 'start') {
+          return `
+          <article class="product-card" data-product="solo_course">
+            <p class="eyebrow">self-guided course</p>
+            <h3>Life Change Sessions: Solo</h3>
+            <p>Ready to begin · ${escapeHtml(p.next)}</p>
+            <div class="progress"><div class="progress-fill" style="width:${p.pct}%"></div></div>
+            <div class="btn-row"><a class="btn btn-gold" href="/solo/">Start Session 0 →</a></div>
+          </article>`;
+        }
+        if (p.state === 'waiting') {
+          return `
+          <article class="product-card" data-product="solo_course">
+            <p class="eyebrow">self-guided course</p>
+            <h3>Life Change Sessions: Solo</h3>
+            <p>${p.pct}% complete · next: ${escapeHtml(p.next)} (opens after a short pause)</p>
+            <div class="progress"><div class="progress-fill" style="width:${p.pct}%"></div></div>
+            <div class="btn-row"><a class="btn btn-gold" href="/solo/">Continue Solo Course →</a></div>
+          </article>`;
+        }
         return `
           <article class="product-card" data-product="solo_course">
             <p class="eyebrow">self-guided course</p>
             <h3>Life Change Sessions: Solo</h3>
-            <p>${p.pct}% complete · next up: ${escapeHtml(p.next)}</p>
+            <p>${p.pct}% complete · next: ${escapeHtml(p.next)}</p>
             <div class="progress"><div class="progress-fill" style="width:${p.pct}%"></div></div>
-            <div class="btn-row"><a class="btn btn-gold" href="/solo/">Continue →</a></div>
+            <div class="btn-row"><a class="btn btn-gold" href="/solo/">Continue Solo Course →</a></div>
           </article>`;
       }
       return `
@@ -2546,7 +2660,7 @@
 
     if (hasSoloCourseAccess()) {
       const p = progressSummary();
-      if (p.pct >= 100) {
+      if (p.state === 'complete' || p.pct >= 100) {
         el.innerHTML = `
         <p class="sidebar-eyebrow">session context</p>
         <h4>Solo complete</h4>
@@ -2556,11 +2670,21 @@
         <a class="btn btn-outline full" href="${coachingHref}">Book coaching · $249</a>`;
         return;
       }
+      if (p.state === 'start') {
+        el.innerHTML = `
+        <p class="sidebar-eyebrow">session context</p>
+        <h4>Start Solo</h4>
+        <p>Begin with ${escapeHtml(p.next)}. Prefer a live session? Book from your Nest.</p>
+        <a class="btn btn-outline full" href="/solo/">Start Session 0 →</a>
+        <a class="btn btn-ember full" href="/first-flight/book.html?code=IMREADY">Book First Flight · $149</a>
+        <a class="btn btn-outline full" href="${coachingHref}">Book coaching · $249</a>`;
+        return;
+      }
       el.innerHTML = `
         <p class="sidebar-eyebrow">session context</p>
-        <h4>Solo next step</h4>
-        <p>Next up: ${escapeHtml(p.next)}. Prefer a live session? Book from your Nest.</p>
-        <a class="btn btn-outline full" href="/solo/">Continue Solo →</a>
+        <h4>Continue Solo Course</h4>
+        <p>Next: ${escapeHtml(p.next)}. Prefer a live session? Book from your Nest.</p>
+        <a class="btn btn-outline full" href="/solo/">Continue Solo Course →</a>
         <a class="btn btn-ember full" href="/first-flight/book.html?code=IMREADY">Book First Flight · $149</a>
         <a class="btn btn-outline full" href="${coachingHref}">Book coaching · $249</a>`;
       return;
