@@ -1,3 +1,250 @@
+/* lil' bird Solo — field-journal pass in the Nest's painted world.
+ * Applies to the signed-in course (dashboard, session, sign-in, post-purchase).
+ * The public sales page (#view-landing) keeps its own look for now.
+ * Paper is drawn on ::before with the deckle filters from /js/lilbird-deckle.js.
+ */
+
+/* ── Palette: content always sits on cream paper, so use day ink in both themes ── */
+html.solo-journal body:not(:has(#view-landing.active)) {
+  --paper: radial-gradient(120% 90% at 30% 20%, #fffdf6 0%, #fff7e6 48%, #f8ebcf 82%, #efdcb4 100%);
+  --paper-shadow: drop-shadow(0 14px 24px rgba(48, 32, 12, 0.2)) drop-shadow(0 2px 3px rgba(48, 32, 12, 0.12));
+  --ink: #2a221b;
+  --ink-soft: #54493d;
+  --honey: #b8781f;
+  --teal: #17485b;
+  --text: #2a221b;
+  --text-dim: #54493d;
+  --text-muted: #7a6d5d;
+  --gold: #b8781f;
+  --gold-dim: rgba(240, 190, 95, 0.18);
+  --gold-border: rgba(169, 124, 63, 0.3);
+  --session-col: #b8781f;
+  --session-dim: rgba(240, 190, 95, 0.18);
+  --session-border: rgba(169, 124, 63, 0.3);
+  --dark: #fff9ef;
+  --dark-mid: rgba(240, 222, 184, 0.42);
+  --dark-card: rgba(255, 252, 244, 0.75);
+  --dark-hover: rgba(240, 222, 184, 0.55);
+  --mist: rgba(169, 124, 63, 0.08);
+  /* One voice: the typewriter face becomes the body face everywhere in Solo */
+  --font-mono: "DM Sans", system-ui, sans-serif;
+  color: var(--ink);
+  background: #d9c79e !important;
+}
+html.solo-journal[data-theme="dark"] body:not(:has(#view-landing.active)) {
+  --paper: radial-gradient(120% 90% at 30% 20%, #fbf2de 0%, #f5e8cb 50%, #ecdab4 84%, #e1c995 100%);
+  --paper-shadow: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.45)) drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
+  background: #0d2232 !important;
+}
+
+/* ── Painted scene ── */
+html.solo-journal body:not(:has(#view-landing.active))::before {
+  content: "" !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  opacity: 1 !important;
+  pointer-events: none;
+  background:
+    url("/nest/assets/lilbird-kit/v3/meadow-day.webp") center bottom / max(100%, 1100px) auto no-repeat,
+    url("/nest/assets/lilbird-kit/v3/scene-day.webp") center bottom / cover no-repeat !important;
+}
+html.solo-journal[data-theme="dark"] body:not(:has(#view-landing.active))::before {
+  background-image:
+    url("/nest/assets/lilbird-kit/v3/meadow-night.webp"),
+    url("/nest/assets/lilbird-kit/v3/scene-night.webp") !important;
+}
+html.solo-journal :is(#view-dashboard, #view-session, #view-auth, #view-post-purchase, #view-loading) {
+  position: relative;
+  z-index: 1;
+  background: transparent !important;
+}
+html.solo-journal :is(.cmyk-stripe, .theme-wipe) { display: none !important; }
+
+/* ── Top bars: soft parchment strip ── */
+html.solo-journal :is(.dash-nav, .session-nav) {
+  background: rgba(255, 248, 232, 0.9) !important;
+  border-bottom: 1px solid rgba(169, 124, 63, 0.25) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--ink);
+}
+html.solo-journal[data-theme="dark"] :is(.dash-nav, .session-nav) {
+  background: rgba(13, 34, 50, 0.88) !important;
+  border-bottom-color: rgba(90, 118, 138, 0.35) !important;
+}
+html.solo-journal[data-theme="dark"] :is(.nav-title, .session-nav-label, .nav-user) { color: #fbf3e2 !important; }
+html.solo-journal :is(.session-nav-label, .nav-user) { text-transform: none; letter-spacing: 0.02em; }
+html.solo-journal :is(.lilbird-nav-nest, .btn-ghost, .btn-back-dash) {
+  font-family: "DM Sans", sans-serif !important;
+  text-transform: none !important;
+  letter-spacing: 0.01em !important;
+  font-size: 0.85rem !important;
+  border-radius: 999px !important;
+  background: rgba(255, 252, 244, 0.85) !important;
+  border: 1px solid rgba(169, 124, 63, 0.35) !important;
+  color: var(--ink) !important;
+  padding: 0.4rem 0.85rem !important;
+}
+html.solo-journal .theme-toggle {
+  background: rgba(255, 252, 244, 0.92) !important;
+  border: 1px solid rgba(176, 146, 100, 0.4) !important;
+  box-shadow: none !important;
+  outline: none;
+}
+html.solo-journal .theme-toggle:focus-visible { outline: 2px solid #18495c; outline-offset: 3px; }
+
+/* ── Greeting on the scene ── */
+html.solo-journal .dash-welcome :is(h2, #dash-greeting) {
+  color: #221a12 !important;
+  text-shadow: 0 0 22px rgba(255, 250, 238, 0.95), 0 0 8px rgba(255, 250, 238, 0.85);
+}
+html.solo-journal .dash-welcome :is(p, .dash-eyebrow) {
+  color: #3e3328 !important;
+  text-shadow: 0 0 14px rgba(255, 250, 238, 0.95);
+}
+html.solo-journal[data-theme="dark"] .dash-welcome :is(h2, #dash-greeting, p, .dash-eyebrow) {
+  color: #fbf3e2 !important;
+  text-shadow: 0 0 22px rgba(8, 22, 36, 0.95), 0 0 8px rgba(8, 22, 36, 0.85);
+}
+html.solo-journal .dash-progress {
+  background: rgba(255, 248, 232, 0.88);
+  border-radius: 14px 10px 16px 12px;
+  padding: 0.6rem 0.9rem 0.75rem;
+}
+html.solo-journal .progress-track { background: rgba(169, 124, 63, 0.2) !important; }
+html.solo-journal .progress-fill { background: linear-gradient(90deg, #d79a3a, #b8781f) !important; }
+
+/* ── Torn-paper panels ── */
+html.solo-journal :is(
+  .complete-hero, .complete-dash-panel, .flight-plan-block, .session-card, .continue-panel,
+  .sessions-archive, .chat-container, .session-info, .auth-card, .post-purchase-card,
+  .gate-card, .deep-snapshot, .complete-panel, .purchase-gate
+) {
+  position: relative;
+  isolation: isolate;
+  background: transparent !important;
+  background-image: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  color: var(--ink);
+}
+html.solo-journal :is(
+  .complete-hero, .flight-plan-block, .session-card, .continue-panel,
+  .sessions-archive, .chat-container, .session-info, .auth-card, .post-purchase-card,
+  .gate-card, .deep-snapshot, .complete-panel, .purchase-gate
+)::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 20px;
+  background: var(--paper);
+  filter: var(--paper-shadow);
+  pointer-events: none;
+}
+html.solo-journal.lb-deckle-ready :is(.complete-hero, .continue-panel, .auth-card, .post-purchase-card, .gate-card, .purchase-gate, .session-info)::before {
+  border-radius: 24px 18px 26px 16px;
+  filter: url(#lb-deckle-a) var(--paper-shadow);
+}
+html.solo-journal.lb-deckle-ready :is(.flight-plan-block, .sessions-archive, .session-card, .deep-snapshot, .complete-panel)::before {
+  border-radius: 18px 14px 20px 16px;
+  filter: url(#lb-deckle-c) var(--paper-shadow);
+}
+/* The chat needs a calm edge: soft deckle, not a ragged one */
+html.solo-journal.lb-deckle-ready .chat-container::before {
+  border-radius: 20px 16px 22px 18px;
+  filter: url(#lb-deckle-soft) var(--paper-shadow);
+}
+html.solo-journal .chat-container { overflow: visible !important; }
+html.solo-journal .chat-container > .tool-embed-wrap { border-radius: 18px; overflow: hidden; }
+html.solo-journal .session-card.locked::before {
+  background: linear-gradient(rgba(240, 225, 195, 0.4), rgba(240, 225, 195, 0.4)), var(--paper);
+}
+
+/* Session headers on paper */
+html.solo-journal .session-info { padding: 1.4rem 1.5rem 1.5rem !important; }
+html.solo-journal .chat-header { border-bottom-color: rgba(169, 124, 63, 0.2) !important; background: transparent !important; }
+html.solo-journal :is(h1, h2, h3, h4, .session-title, .flight-plan-north) { color: var(--ink); }
+
+/* ── Labels, pills, tabs ── */
+html.solo-journal :is(.dash-eyebrow, .session-eyebrow, .flight-plan-label, .flight-plan-takeaway-label, .continue-panel-eyebrow, .sessions-overview-label, .progress-label, .progress-count, .complete-hero-stat) {
+  color: var(--honey) !important;
+  letter-spacing: 0.12em;
+}
+html.solo-journal :is(.status-pill, .complete-badge, .pill-complete, .pill-available, .pill-progress, .pill-locked, .flight-plan-commit-pill, .takeaway-session-pill) {
+  border-radius: 999px !important;
+  background: rgba(240, 222, 184, 0.6) !important;
+  border: 1px solid rgba(169, 124, 63, 0.3) !important;
+  color: var(--ink-soft) !important;
+}
+html.solo-journal .complete-tab {
+  font-family: "DM Sans", sans-serif !important;
+  border-radius: 999px !important;
+  background: rgba(255, 252, 244, 0.85) !important;
+  border: 1px solid rgba(169, 124, 63, 0.3) !important;
+  color: var(--ink) !important;
+  text-transform: none !important;
+  letter-spacing: 0.02em !important;
+  padding: 0.4rem 0.95rem !important;
+}
+html.solo-journal .complete-tab.active {
+  background: #17485b !important;
+  border-color: #17485b !important;
+  color: #fff9ef !important;
+}
+
+/* ── Buttons: teal pill primary, outlined pill secondary ── */
+html.solo-journal :is(.btn-primary, .btn-continue-main, .btn-complete, .btn-purchase, .btn-ready, .btn-deep-snap-cta, .btn-flight-plan, .solo-landing-buy, .btn-apply-promo) {
+  font-family: "DM Sans", sans-serif !important;
+  text-transform: none !important;
+  letter-spacing: 0.01em !important;
+  font-size: 0.92rem !important;
+  border-radius: 999px !important;
+  background: #17485b !important;
+  border: 1px solid #17485b !important;
+  color: #fff9ef !important;
+  box-shadow: none !important;
+}
+html.solo-journal :is(.btn-primary, .btn-continue-main, .btn-complete, .btn-purchase, .btn-ready, .btn-flight-plan):hover { background: #1f5b72 !important; }
+html.solo-journal .btn-send {
+  border-radius: 999px !important;
+  background: #17485b !important;
+  color: #fff9ef !important;
+  border: 0 !important;
+}
+html.solo-journal .btn-send:disabled { background: rgba(23, 72, 91, 0.35) !important; }
+html.solo-journal .btn-close-tool {
+  font-family: "DM Sans", sans-serif !important;
+  text-transform: none !important;
+  border-radius: 999px !important;
+}
+
+/* ── Chat ── */
+html.solo-journal .chat-messages { background: transparent !important; }
+html.solo-journal .msg.assistant .msg-bubble {
+  background: rgba(255, 252, 244, 0.92) !important;
+  border: 1px solid rgba(169, 124, 63, 0.25) !important;
+  color: var(--ink) !important;
+}
+html.solo-journal .msg.user .msg-bubble {
+  background: #17485b !important;
+  border: 1px solid #17485b !important;
+  color: #fff9ef !important;
+}
+html.solo-journal :is(.chat-textarea, .form-group input, .promo-input) {
+  background: rgba(255, 252, 244, 0.92) !important;
+  border: 1px solid rgba(169, 124, 63, 0.38) !important;
+  border-radius: 14px !important;
+  color: var(--ink) !important;
+}
+html.solo-journal .chat-input-wrap { background: transparent !important; border-top-color: rgba(169, 124, 63, 0.2) !important; }
+
+/* ── Session list rows ── */
+html.solo-journal .session-archive-row { border-bottom-color: rgba(169, 124, 63, 0.18) !important; }
+html.solo-journal .session-archive-row:hover { background: rgba(240, 190, 95, 0.12) !important; }
+html.solo-journal :is(.session-archive-num, .session-num) { color: var(--honey) !important; }
+html.solo-journal .session-archive-open { color: var(--teal) !important; text-transform: none !important; letter-spacing: 0.02em !important; }
 html.solo-journal :is(.session-archive-title, .session-title, .continue-panel h3, .complete-hero h3) {
   font-family: "Playfair Display", Georgia, serif !important;
   font-weight: 400;
