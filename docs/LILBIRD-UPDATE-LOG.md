@@ -20,6 +20,16 @@ If a change touches pricing, booking, worker logic, or public copy, log it here.
 
 ---
 
+## 2026-11-05 (Claude)
+
+### Nest Home — code-drawn torn paper + one painted scene layer
+- **Status:** `built in repo` (Pages only, no worker or data changes)
+- New `js/lilbird-deckle.js`: injects SVG filters (`#lb-deckle-a/b/c/soft`) that tear panel edges from noise, so edges stay crisp at any card height. Replaces stretched `panels/*.webp` masks.
+- New `css/lilbird-nest-concept.css?v=20261105c1`, loaded after `lilbird-nest-world.css`: paper drawn on a `::before` layer (text never distorted); painted scene on the fixed `.nest-world-decor` layer (works on iPhone); greeting on the scene with a soft glow, no box; desktop header floats over the scene; honey brush behind the active rail item; leftover panel boxes from older theme rules cleared.
+- Companions switched to the crisp cutouts `nest-companions-day.webp` / `nest-companions-night.webp` (lantern). Removed the shadow filter on them (large filtered images failed to paint in Chromium).
+- Art slots ready for ChatGPT layered art: swap `--scene-day/--scene-night`, the companion `src`, and fill `.nest-companions-stage::after` with the transparent meadow strip.
+- `nest/index.html` + `nest/phase1b-world-fixture.html` updated together. Pre-existing test failures (4, closure copy + solo access) unchanged.
+
 ## 2026-10-01
 
 ### Security pass, 5 Voices retired, email sequence + unsubscribe
