@@ -667,8 +667,19 @@
     setTimeout(() => void hydrateDashboard(), 2500);
   }
 
-  /** Solo unlock: Nest entitlement row and/or legacy course_users purchase (same Supabase login). */
+  /**
+   * Solo unlock — shared policy with /solo/ and worker-solo (LilbirdSoloAccess).
+   * solo_course | nest_premium (active rows) | course_users.purchased_at.
+   * Nest Plus alone does not grant.
+   */
   function hasSoloCourseAccess() {
+    const api = window.LilbirdSoloAccess;
+    if (api && typeof api.hasSoloCourseAccess === 'function') {
+      return api.hasSoloCourseAccess({
+        products: entitlements,
+        purchasedAt: courseProfile?.purchased_at || null,
+      });
+    }
     return entitlements.has('solo_course') || entitlements.has('nest_premium') || !!courseProfile?.purchased_at;
   }
 
