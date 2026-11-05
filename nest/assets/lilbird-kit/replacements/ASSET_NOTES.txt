@@ -1,0 +1,37 @@
+Lil Bird Nest / PR #41 art replacements
+
+FILES:
+ nest-valley-day.webp / night.webp: opaque watercolor panorama backgrounds
+ nest-companions-day.webp / night.webp: actual RGBA transparency, extracted from composite, no baked rectangular scene
+ Native PNG crops provided for fidelity comparisons. PNG companions provided as alternatives.
+ PREVIEW.jpg shows compositing, not a page screenshot.
+
+IMPORTANT LIMITATION: This is an extraction of the generated 1536x1024 illustration sheet. The source panoramas are only about 915px wide. 3840px export is resampled, NOT truly high-resolution painting. These are suitable for integration/prototyping but do not fully solve the background sharpness problem at large desktop widths. Alpha extraction is algorithmic; inspect flyaway hairs and edges at 100%.
+
+CURSOR: Use the WEBPs in nest/assets. Background image uses cover with fixed focal point; avoid enlarging beyond native visual detail where possible. Companions are foreground <img> with contain, position right on desktop and under chapter on mobile. Keep decorative alt empty. Replace existing blended companion assets and review desktop/mobile day/night. No CSS blur/masks to hide image halos. Do not merge until signed-in screenshot approval.
+
+Metadata: {
+  "source": "Generated watercolor composite (1536x1024)",
+  "important": "Landscape WEBPs exported at 3840px wide via Lanczos resampling from ~915px-wide source crops; they do NOT contain genuine 4K detail. Companion transparency is extracted algorithmically from white background, not originally generated with alpha. Review fine edges before shipping.",
+  "landscapes": {
+    "day": [
+      3840,
+      1011
+    ],
+    "night": [
+      3840,
+      961
+    ]
+  },
+  "companions": {
+    "day": [
+      1611,
+      1095
+    ],
+    "night": [
+      1293,
+      720
+    ]
+  }
+}
+ALTERNATE: nest-companions-night-no-lantern.webp is a color-graded version of the day companion illustration, supplied because the night landscape already contains a lantern. Use this if the night-specific companion creates duplicate lanterns.
