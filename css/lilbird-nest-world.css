@@ -641,9 +641,11 @@ html[data-theme="dark"] .nest-world .mobile-bar-link.is-active {
   .nest-world .nest-greeting {
     font-size: clamp(1.05rem, 4.2vw, 1.25rem);
     line-height: 1.35;
-    margin-bottom: 0.55rem;
+    margin: 0 0 0.65rem;
+    width: 100%;
     max-width: 100%;
     text-align: left;
+    padding: 0.65rem 1rem 0.7rem;
   }
 
   .nest-home-stage {
