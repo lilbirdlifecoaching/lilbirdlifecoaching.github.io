@@ -26,7 +26,7 @@
   <link rel="stylesheet" href="./nest-tour.css?v=3" />
   <link rel="stylesheet" href="/css/lilbird-nest-theme.css?v=20260917m" />
   <link rel="stylesheet" href="/css/lilbird-nest-redesign.css?v=20261105p1" />
-  <link rel="stylesheet" href="/css/lilbird-nest-world.css?v=20261105c9" />
+  <link rel="stylesheet" href="/css/lilbird-nest-world.css?v=20261105d1" />
   <!-- Google Tag Manager -->
   <script src="/lilbird-gtm-id.js"></script>
   <script src="/lilbird-gtm.js"></script>
@@ -107,7 +107,7 @@
       <img class="world-rocks" src="./assets/lilbird-kit/accents/rock-grass-cluster.webp" alt="" width="256" height="83" decoding="async" />
     </div>
     <header class="top-nav nest-chrome">
-      <a class="nest-brand" href="/" aria-label="lil' bird home">
+      <a class="nest-brand nest-brand-chrome" href="/" aria-label="lil' bird home">
         <img class="nest-brand-logo nest-logo-day" src="/bird-logo-teal.png" alt="" width="36" height="36" />
         <img class="nest-brand-logo nest-logo-night" src="/bird-logo.png" alt="" width="36" height="36" />
         <span class="nest-brand-text">
@@ -144,6 +144,14 @@
 
     <div class="nest-shell">
       <aside class="nest-rail" aria-label="Nest navigation">
+        <a class="nest-brand nest-brand-rail" href="/" aria-label="lil' bird home">
+          <img class="nest-brand-logo nest-logo-day" src="/bird-logo-teal.png" alt="" width="36" height="36" />
+          <img class="nest-brand-logo nest-logo-night" src="/bird-logo.png" alt="" width="36" height="36" />
+          <span class="nest-brand-text">
+            <span class="nest-brand-name">lil' bird</span>
+            <span class="nest-brand-sub">Your Nest</span>
+          </span>
+        </a>
         <button type="button" class="rail-link is-active" data-nest-area="home" id="rail-home">
           <i class="ti ti-home"></i><span>Home</span>
         </button>
@@ -180,13 +188,15 @@
       <div id="dash-loading" class="dash-loading hidden">Loading your Nest…</div>
 
       <div class="nest-home-block" id="nest-home-block">
-        <p class="nest-greeting" id="nest-greeting" hidden></p>
+        <div class="nest-greeting" id="nest-greeting" hidden>
+          <p class="nest-greeting-title" id="nest-greeting-title"></p>
+          <p class="nest-greeting-sub" id="nest-greeting-sub"></p>
+        </div>
 
         <div class="nest-home-stage">
           <section class="next-chapter" id="next-chapter" aria-labelledby="next-chapter-title" data-state="loading">
             <div class="next-chapter-accents" aria-hidden="true">
               <img class="accent-leaf" src="./assets/lilbird-kit/accents/golden-leaf-sprig.webp" alt="" width="64" height="64" decoding="async" />
-              <img class="accent-wayfinder" src="./assets/lilbird-kit/accents/wayfinder-sign.webp" alt="" width="72" height="72" decoding="async" />
             </div>
             <div class="next-chapter-copy">
               <p class="next-chapter-kicker" id="next-chapter-kicker">Your next chapter</p>
@@ -329,9 +339,9 @@
   <script src="/js/lilbird-theme.js"></script>
   <script src="/js/lilbird-theme-nav.js"></script>
   <script src="/js/lilbird-solo-access.js?v=1"></script>
-  <script src="./nest-tour.js?v=16"></script>
+  <script src="./nest-tour.js?v=17"></script>
   <script type="module" src="./journey-focus.js?v=3"></script>
-  <script src="./nest-client.js?v=71"></script>
+  <script src="./nest-client.js?v=72"></script>
   <script type="module" src="./nest-letters-ui.js?v=3"></script>
   <script type="module" src="./journey.js?v=12"></script>
 </body>

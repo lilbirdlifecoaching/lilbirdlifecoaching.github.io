@@ -1010,7 +1010,7 @@
     }
     if (journeySignals.activeFocus?.status === 'resting') return 'resting';
     if (journeySignals.rows.length > 0) return 'reflections';
-    if (Array.isArray(canvasHistory) && canvasHistory.length > 0) return 'canvas';
+    if (hasNestPlus() && Array.isArray(canvasHistory) && canvasHistory.length > 0) return 'canvas';
     if (hasInnerCompassComplete()) return 'compass';
     if (youngerYouPhotoUrl()) return 'returning-soft';
     return 'new';
@@ -1033,6 +1033,54 @@
     return part || '';
   }
 
+  const GREETING_SUB_LINES = [
+    'You are not walking through this alone.',
+    'One home for what matters next.',
+    'Take the next small step when you are ready.',
+    'Your Nest keeps the thread for you.'
+  ];
+  const GREETING_VISIT_KEY = 'lilbird-nest-home-visits';
+  let greetingVisitRecorded = false;
+
+  function nestHomeVisitCount() {
+    try {
+      const raw = localStorage.getItem(GREETING_VISIT_KEY);
+      const n = parseInt(raw || '0', 10);
+      return Number.isFinite(n) && n > 0 ? n : 0;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  function bumpNestHomeVisit() {
+    if (greetingVisitRecorded) return nestHomeVisitCount();
+    greetingVisitRecorded = true;
+    try {
+      const next = nestHomeVisitCount() + 1;
+      localStorage.setItem(GREETING_VISIT_KEY, String(next));
+      return next;
+    } catch (e) {
+      return nestHomeVisitCount() + 1;
+    }
+  }
+
+  function greetingSubline(visitCount) {
+    if (visitCount <= 3) return GREETING_SUB_LINES[0];
+    const idx = (visitCount - 1) % GREETING_SUB_LINES.length;
+    return GREETING_SUB_LINES[idx];
+  }
+
+  function renderNestGreeting(name) {
+    const greeting = document.getElementById('nest-greeting');
+    const titleEl = document.getElementById('nest-greeting-title');
+    const subEl = document.getElementById('nest-greeting-sub');
+    if (!greeting || !titleEl || !subEl) return;
+    const visits = bumpNestHomeVisit();
+    greeting.hidden = false;
+    titleEl.textContent = name ? 'Welcome back, ' + name + '.' : 'Welcome to your Nest.';
+    subEl.textContent = greetingSubline(visits);
+  }
+
   function renderNextChapter() {
     const root = document.getElementById('next-chapter');
     if (!root) return;
@@ -1040,7 +1088,6 @@
     const title = document.getElementById('next-chapter-title');
     const body = document.getElementById('next-chapter-body');
     const actions = document.getElementById('next-chapter-actions');
-    const greeting = document.getElementById('nest-greeting');
     const context = document.getElementById('next-chapter-context');
     const contextKicker = document.getElementById('next-chapter-context-kicker');
     const contextTitle = document.getElementById('next-chapter-context-title');
@@ -1050,13 +1097,8 @@
     root.dataset.state = chapterStateFromData();
     root.dataset.focus = focus;
 
-    // Welcome carries the name; hero copy should not repeat it.
-    if (greeting) {
-      greeting.hidden = false;
-      greeting.textContent = name
-        ? 'Welcome back, ' + name + '. You are not walking through this alone.'
-        : 'Welcome to your Nest. You are not walking through this alone.';
-    }
+    // Welcome: large title + quieter subline (rotates after early visits).
+    renderNestGreeting(name);
 
     let cfg = null;
     if (focus === 'active') {
@@ -1098,8 +1140,8 @@
     } else if (focus === 'reflections') {
       cfg = {
         kicker: 'Your next chapter',
-        title: 'A little further along.',
-        body: "You've already started exploring what matters to you. Pick up where you left off.",
+        title: 'Your reflections are waiting.',
+        body: "You've already started. Here's where you were.",
         context: {
           kicker: 'Where you left off',
           title: 'Your reflections',
@@ -1111,8 +1153,8 @@
     } else if (focus === 'canvas') {
       cfg = {
         kicker: 'Your next chapter',
-        title: 'A little further along.',
-        body: 'You have already checked in with your life. Take another look when you are ready.',
+        title: 'Time for another look?',
+        body: "You've already started. Here's where you were.",
         context: {
           kicker: 'Where you left off',
           title: 'Your Life Canvas',
@@ -1124,8 +1166,8 @@
     } else if (focus === 'compass') {
       cfg = {
         kicker: 'Your next chapter',
-        title: 'A little further along.',
-        body: 'You have already begun to understand yourself. Return to that clarity, or take a new step.',
+        title: 'Back to what you found.',
+        body: "You've already started. Here's where you were.",
         context: {
           kicker: 'Where you left off',
           title: 'Your Inner Compass',
@@ -1154,10 +1196,9 @@
       };
     }
 
-    // Entitled Solo owners: promote Start / Continue / Flight Plan as the quiet secondary CTA.
-    const soloEntry = soloHomeEntry();
-    if (soloEntry) {
-      cfg.secondary = { label: soloEntry.label, href: soloEntry.href };
+    // Solo owners already have a Solo secondary card — keep chapter secondary as Journey.
+    if (soloHomeEntry()) {
+      cfg.secondary = { label: 'Open My Journey', action: 'journey' };
     }
 
     if (kicker) kicker.textContent = cfg.kicker;
@@ -1237,9 +1278,9 @@
     let w = 203;
     let h = 103;
     if (kind === 'canvas') {
-      src = kit + 'folded-map-watercolor.webp';
-      w = 186;
-      h = 96;
+      src = kit + 'mountains-watercolor.webp';
+      w = 201;
+      h = 92;
     } else if (kind === 'guide') {
       src = kit + 'lantern-watercolor.webp';
       w = 79;
@@ -1254,20 +1295,36 @@
       '</span>';
   }
 
-  function renderNestSecondary() {
-    const host = document.getElementById('nest-secondary');
-    if (!host) return;
-    const membership = membershipCardCopy();
-    const guide = guideCardCopy();
-    const cards = [
-      {
-        kind: 'canvas',
-        kicker: 'Life Canvas',
+  function canvasCardCopy() {
+    if (hasNestPlus()) {
+      return {
         title: canvasHistory.length ? 'See where you stand' : 'A picture of your life',
         body: canvasHistory.length
           ? 'Open your check-in and see how the different parts of your life feel right now.'
           : 'Five parts of your life on one page. Useful when you want a clearer picture.',
         action: 'canvas'
+      };
+    }
+    return {
+      title: 'A picture of your life',
+      body: 'Five parts of your life on one page. Included with Nest Plus.',
+      action: 'products'
+    };
+  }
+
+  function renderNestSecondary() {
+    const host = document.getElementById('nest-secondary');
+    if (!host) return;
+    const membership = membershipCardCopy();
+    const guide = guideCardCopy();
+    const canvas = canvasCardCopy();
+    const cards = [
+      {
+        kind: 'canvas',
+        kicker: 'Life Canvas',
+        title: canvas.title,
+        body: canvas.body,
+        action: canvas.action
       },
       {
         kind: 'guide',
@@ -1281,7 +1338,7 @@
         kicker: 'Your Nest',
         title: membership.title,
         body: membership.body,
-        action: 'products'
+        action: membership.action || 'products'
       }
     ];
 
@@ -1337,19 +1394,22 @@
     // The First Flight *session* ($149) is a separate entitlement — do not imply it is free.
     if (entitlements.has('nest_premium') || entitlements.has('solo_course')) {
       return {
-        title: 'What you have',
-        body: 'Your Nest includes Solo and live coaching when those are open for you.'
+        title: "What's in your Nest",
+        body: 'Your Nest includes Solo and live coaching when those are open for you.',
+        action: 'products'
       };
     }
     if (hasNestPlus()) {
       return {
-        title: 'What you have',
-        body: 'Nest Plus: the guide, Life Canvas, the full Inner Compass read, and related tools.'
+        title: "What's in your Nest",
+        body: 'Nest Plus: the guide, Life Canvas, the full Inner Compass read, and related tools.',
+        action: 'products'
       };
     }
     return {
-      title: 'What you have',
-      body: 'Free Nest includes My Journey, coaching notes, and the First Flight workbook.'
+      title: "What's in your Nest",
+      body: 'My Journey, coaching notes and the First Flight workbook are yours. Nest Plus adds your guide, Life Canvas and the full read.',
+      action: 'products'
     };
   }
 
@@ -3067,6 +3127,12 @@
   function renderLifeCanvas() {
     const pane = document.getElementById('pane-canvas');
     if (!pane) return;
+    if (!hasNestPlus()) {
+      pane.innerHTML = '<div class="lc-shell"><article class="lc-card"><p class="lc-kicker">Life Canvas</p><h2 class="lc-title">A picture of your life</h2><p class="lc-lead">Five parts of your life on one page — passion and purpose, connections, spaces, resources, and energy. Included with Nest Plus.</p><div class="lc-empty-actions"><button type="button" class="btn btn-ember" data-upgrade="nest_plus">Add Nest Plus · $7.99/month →</button></div></article></div>';
+      const plusBtn = pane.querySelector('[data-upgrade]');
+      plusBtn?.addEventListener('click', (e) => void startUpgrade('nest_plus', e.currentTarget));
+      return;
+    }
     if (canvasAccessNote) {
       pane.innerHTML = '<div class="lc-shell"><article class="lc-card"><p class="lc-kicker">Life Canvas</p><h2 class="lc-title">This read is not open from this login</h2><p class="lc-lead">' + escapeHtml(canvasAccessNote) + '</p><div class="lc-empty-actions"><a class="btn btn-ember" href="' + escapeHtml(innerCompassHref()) + '">Open the Inner Compass →</a></div></article></div>';
       return;

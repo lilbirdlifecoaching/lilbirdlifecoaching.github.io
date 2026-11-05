@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="./nest-styles.css?v=50" />
   <link rel="stylesheet" href="/css/lilbird-nest-theme.css?v=20260917m" />
   <link rel="stylesheet" href="/css/lilbird-nest-redesign.css?v=20261105p1" />
-  <link rel="stylesheet" href="/css/lilbird-nest-world.css?v=20261105c9" />
+  <link rel="stylesheet" href="/css/lilbird-nest-world.css?v=20261105d1" />
   <style>
     .fixture-banner {
       position: sticky; top: 0; z-index: 60;
@@ -102,17 +102,19 @@
 
       <main class="dash-wrap nest-dash">
         <div class="nest-home-block">
-          <p class="nest-greeting" id="greeting">Welcome back, Maya. You are not walking through this alone.</p>
+          <div class="nest-greeting" id="greeting">
+            <p class="nest-greeting-title" id="greeting-title">Welcome back, Maya.</p>
+            <p class="nest-greeting-sub" id="greeting-sub">You are not walking through this alone.</p>
+          </div>
           <div class="nest-home-stage">
             <section class="next-chapter" id="chapter">
               <div class="next-chapter-accents" aria-hidden="true">
                 <img class="accent-leaf" src="./assets/lilbird-kit/accents/golden-leaf-sprig.webp" alt="" width="64" height="64" />
-                <img class="accent-wayfinder" src="./assets/lilbird-kit/accents/wayfinder-sign.webp" alt="" width="72" height="72" />
               </div>
               <div class="next-chapter-copy">
                 <p class="next-chapter-kicker">Your next chapter</p>
-                <h2 class="next-chapter-title" id="title">A little further along.</h2>
-                <p class="next-chapter-body" id="body">You've already started exploring what matters to you. Pick up where you left off.</p>
+                <h2 class="next-chapter-title" id="title">Your reflections are waiting.</h2>
+                <p class="next-chapter-body" id="body">You've already started. Here's where you were.</p>
                 <div class="next-chapter-context" id="ctx">
                   <p class="next-chapter-context-kicker">Where you left off</p>
                   <h3 class="next-chapter-context-title">Your reflections</h3>
@@ -152,14 +154,16 @@
       var kit = './assets/lilbird-kit/icons/';
       var members = {
         returning: {
-          greeting: 'Welcome back, Maya. You are not walking through this alone.',
-          title: 'A little further along.',
-          body: "You've already started exploring what matters to you. Pick up where you left off.",
+          titleLine: 'Welcome back, Maya.',
+          subLine: 'You are not walking through this alone.',
+          title: 'Your reflections are waiting.',
+          body: "You've already started. Here's where you were.",
           ctx: true,
           primary: 'Continue reflecting →'
         },
         new: {
-          greeting: 'Welcome to your Nest. You are not walking through this alone.',
+          titleLine: 'Welcome to your Nest.',
+          subLine: 'You are not walking through this alone.',
           title: 'Finding your bearings',
           body: "You don't need to have everything figured out. Tell us a little about where you are, and we'll help you find a good place to begin.",
           ctx: false,
@@ -167,14 +171,14 @@
         }
       };
       function soloEntry() {
-        if (solo === 'start') return { label: 'Start Solo Course →', title: 'Start Solo Course', body: 'Begin with Session 0 · First Flight.', href: '/solo/' };
+        if (solo === 'start') return { label: 'Start Solo Course →', title: 'Start Solo Course', body: 'Begin with Session 0 · Orientation.', href: '/solo/' };
         if (solo === 'continue') return { label: 'Continue Solo Course →', title: 'Continue Solo Course', body: 'Next: Session 2 · Vision & Goals.', href: '/solo/' };
         if (solo === 'complete') return { label: 'View My Flight Plan →', title: 'View My Flight Plan', body: 'All sessions complete. Revisit your Full Flight Plan anytime.', href: '/solo/?view=plan' };
         return null;
       }
       function icon(kind) {
         var src = kit + 'nest-watercolor.webp', w = 203, h = 103;
-        if (kind === 'canvas') { src = kit + 'folded-map-watercolor.webp'; w = 186; h = 96; }
+        if (kind === 'canvas') { src = kit + 'mountains-watercolor.webp'; w = 201; h = 92; }
         if (kind === 'solo') { src = kit + 'open-book-watercolor.webp'; w = 191; h = 92; }
         if (kind === 'guide') { src = kit + 'lantern-watercolor.webp'; w = 79; h = 89; }
         return '<span class="nest-secondary-art" aria-hidden="true"><img class="nest-secondary-watercolor" src="' + src + '" alt="" width="' + w + '" height="' + h + '" decoding="async" /></span>';
@@ -183,12 +187,13 @@
         var m = members[member];
         var s = soloEntry();
         document.getElementById('label').textContent = member + ' · ' + (solo === 'off' ? 'non-owner' : 'Solo ' + solo);
-        document.getElementById('greeting').textContent = m.greeting;
+        document.getElementById('greeting-title').textContent = m.titleLine;
+        document.getElementById('greeting-sub').textContent = m.subLine;
         document.getElementById('title').textContent = m.title;
         document.getElementById('body').textContent = m.body;
         document.getElementById('ctx').hidden = !m.ctx;
         var secondary = s
-          ? '<a class="btn-quiet" href="' + s.href + '">' + s.label + '</a>'
+          ? '<button type="button" class="btn-quiet">Open My Journey</button>'
           : (member === 'new'
             ? '<a class="btn-quiet" href="/inner-compass/?from=nest">Try the free Inner Compass</a>'
             : '<button type="button" class="btn-quiet">Browse Learn &amp; grow</button>');
@@ -201,14 +206,14 @@
         document.getElementById('nest-mobile-bar').classList.toggle('has-solo', entitled);
         document.getElementById('nonowner-note').hidden = entitled;
         var cards = [
-          { kind: 'canvas', kicker: 'Life Canvas', title: 'See where you stand', body: 'Open your check-in and see how the different parts of your life feel right now.' }
+          { kind: 'canvas', kicker: 'Life Canvas', title: member === 'new' ? 'A picture of your life' : 'See where you stand', body: member === 'new' ? 'Five parts of your life on one page. Useful when you want a clearer picture.' : 'Open your check-in and see how the different parts of your life feel right now.' }
         ];
         if (s) {
           cards.push({ kind: 'solo', kicker: 'Solo Course', title: s.title, body: s.body, href: s.href });
           cards.push({ kind: 'guide', kicker: 'My Guide', title: 'Talk it through', body: 'Ask about what is in front of you. Your guide is ready when you are.' });
         } else {
           cards.push({ kind: 'guide', kicker: 'My Guide', title: 'Talk it through', body: 'A place to bring hard questions. Included with Nest Plus.' });
-          cards.push({ kind: 'membership', kicker: 'Your Nest', title: 'What you have', body: 'Free Nest includes My Journey, coaching notes, and the First Flight workbook. Solo stays on Learn & grow until unlocked.' });
+          cards.push({ kind: 'membership', kicker: 'Your Nest', title: "What's in your Nest", body: 'My Journey, coaching notes and the First Flight workbook are yours. Nest Plus adds your guide, Life Canvas and the full read.' });
         }
         document.getElementById('secondary').innerHTML = cards.map(function (c) {
           var inner = icon(c.kind) + '<p class="nest-secondary-kicker">' + c.kicker + '</p><h3 class="nest-secondary-title">' + c.title + '</h3><p class="nest-secondary-body">' + c.body + '</p>';
