@@ -432,3 +432,21 @@ html[data-theme="dark"] .nest-world .nest-secondary-watercolor {
     max-width: 400px;
   }
 }
+
+/* Kids are part of the painting: fixed to the scene, not the scrolling page.
+   Panels scroll over them. Same spot at every desktop size. */
+@media (min-width: 981px) {
+  .nest-world .nest-companions-stage {
+    position: fixed;
+    top: auto;
+    left: auto;
+    right: 4vw;
+    bottom: 15vh;
+    width: clamp(360px, 33vw, 640px);
+    z-index: 1;
+  }
+  .nest-world .nest-companions-stage img {
+    width: 100%;
+    max-height: 62vh;
+  }
+}
