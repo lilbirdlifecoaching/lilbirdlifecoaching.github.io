@@ -4,7 +4,7 @@ import {
   cleanAnswers,
   fallbackInsight,
   stageValueOk,
-} from './journey-reflect.js?v=4';
+} from './journey-reflect.js?v=5';
 import { createJourneySession, saveOutcome } from './journey-session.js';
 import {
   CHECKIN_RESPONSES,
@@ -30,7 +30,7 @@ import {
   resolveToolLink,
   searchTools,
   toolById,
-} from './journey-tools.js?v=1';
+} from './journey-tools.js?v=2';
 
 const session = createJourneySession();
 let linkHandled = false;
@@ -349,6 +349,12 @@ function toolsSectionHtml() {
     '<section class="journey-block journey-tools-section" id="journey-tools">' +
       '<h3>Find a tool</h3>' +
       '<p class="journey-lead">Short exercises for when something feels stuck. Saving is optional.</p>' +
+      '<div class="journey-featured">' +
+        '<p class="journey-kicker">Thinking about a career change?</p>' +
+        '<h4>Career Crossroads</h4>' +
+        '<p>For when you want to change careers and don’t know where to start. Leave with two things to look into and one small way to find out more. About 12 minutes.</p>' +
+        '<button type="button" class="btn btn-gold" data-start-tool="career-crossroads">Start Career Crossroads</button>' +
+      '</div>' +
       '<label class="journey-kicker" for="journey-search">Search</label>' +
       '<input id="journey-search" class="journey-search" type="search" maxlength="160" placeholder="What’s on your mind?" value="' +
         escapeHtml(state.query) + '">' +

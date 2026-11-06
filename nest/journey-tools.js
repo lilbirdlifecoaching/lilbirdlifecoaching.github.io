@@ -1,6 +1,6 @@
 /**
  * Tools for the Tangle.
- * Fifteen exercises, each with its own questions.
+ * Sixteen exercises, each with its own questions.
  * Searching, recommending, and opening a link all happen on the page.
  * Recommendation text is not sent anywhere and is not a saved reflection.
  */
@@ -205,7 +205,7 @@ export const TOOLS = [
     detailKey: 'known',
     fallbackQuestion: 'What would that next step teach you that you do not know yet?',
     reflectAim: 'They compared options and named what they already know.',
-    phrases: ['cant decide', 'two options', 'whether to leave', 'stay or go', 'choice', 'stuck between', 'should i'],
+    phrases: ['cant decide', 'two options', 'whether to leave', 'stay or go', 'choice', 'stuck between', 'should i', 'career', 'change careers', 'new job', 'quit my job', 'job offer', 'retrain', 'go back to school'],
     stages: [
       stage('decision', 'The decision', 'What choice is in front of you?', 'Say it as a fork, not a failure. Staying as you are can be one of the paths.', 'I am choosing between...'),
       stage('optionA', 'One path', 'What does the first path feel like?', 'Costs, reliefs, and the texture of an ordinary Tuesday on that path.', 'This path feels like...'),
@@ -228,13 +228,13 @@ export const TOOLS = [
     detailKey: 'carry',
     fallbackQuestion: 'What would it look like to carry that with you, just for this week?',
     reflectAim: 'They mapped an ending, a middle, and something to carry.',
-    phrases: ['in between', 'starting over', 'what is ending', 'new chapter', 'moving on', 'transition', 'limbo'],
+    phrases: ['in between', 'starting over', 'what is ending', 'new chapter', 'moving on', 'transition', 'limbo', 'career', 'career change', 'redundancy', 'redundant', 'laid off', 'lost my job', 'return to work', 'back to work', 'career break', 'job'],
     stages: [
       stage('ending', 'Ending', 'What is ending?', 'A role, a place, a way of being known. Even a quiet ending counts.', 'What is ending is...'),
       stage('middle', 'The middle', 'What are you in the middle of?', 'The part that is neither the old shape nor the new one.', 'Right now I am...'),
       stage('carry', 'Carry with you', 'What do you want to carry into what is next?', 'A skill, a friendship, a way you want to treat yourself.', 'I want to bring...'),
       stage('leave', 'Leave behind', 'What are you allowed to leave behind?', 'Optional. Leaving something is not the same as calling it a waste.', 'I can leave...', true),
-      stage('nextStep', 'Next step', 'What is one sign you could tend this week?', 'Not the whole next chapter. A phone call, a box, a boundary, a rest.', 'This week I will...'),
+      stage('nextStep', 'Next step', 'What small thing will you do this week?', 'Not the whole next chapter. A phone call, a box, a boundary, a rest.', 'This week I will...'),
     ],
   }),
   tool({
@@ -250,7 +250,7 @@ export const TOOLS = [
     detailKey: 'leak',
     fallbackQuestion: 'What would make that step likely on a tired day, not only on a good one?',
     reflectAim: 'They named what fills them, what drains them, and one leak.',
-    phrases: ['exhausted', 'drained', 'burned out', 'no energy', 'tired all the time', 'what fills me', 'depleted'],
+    phrases: ['exhausted', 'drained', 'burned out', 'no energy', 'tired all the time', 'what fills me', 'depleted', 'hate my job', 'job is draining', 'work stress', 'career burnout'],
     stages: [
       stage('filled', 'Filled you', 'What filled you recently?', 'A task, a person, a kind of quiet. Something from real days, not an ideal week.', 'I felt fuller when...'),
       stage('drained', 'Drained you', 'What spent you?', 'Be specific. A meeting, a tone, a time of day, a kind of helping.', 'I felt spent after...'),
@@ -361,13 +361,35 @@ export const TOOLS = [
     detailKey: 'needs',
     fallbackQuestion: 'Who or what would make that move possible before the list grows back?',
     reflectAim: 'They sorted a workload into what needs them and what can wait or be shared.',
-    phrases: ['too much work', 'on my plate', 'overloaded', 'cant keep up', 'deadline pile', 'asking for help', 'scope'],
+    phrases: ['too much work', 'on my plate', 'overloaded', 'cant keep up', 'deadline pile', 'asking for help', 'scope', 'job', 'career', 'purpose at work', 'meaningful work', 'my role'],
     stages: [
       stage('plate', 'On the plate', 'What is actually on your plate?', 'The real list, including the invisible coordination. A sketch is enough.', 'On my plate: ...'),
       stage('needs', 'Needs you', 'What actually needs you?', 'The part that uses your particular care, skill, or yes. Not everything that has your name on it.', 'This needs me: ...'),
       stage('wait', 'Wait, shrink, or share', 'What could wait, shrink, or be shared?', 'Name at least one. Perfect fairness is not required.', 'This could...'),
       stage('for', 'What it is for', 'What is this work for, beyond the list?', 'Optional. A person, a craft, a reason that still matters.', 'Beyond the list, it is for...', true),
       stage('nextStep', 'Next step', 'What will you move, pause, or ask about?', 'One item. A sentence to a person counts.', 'I will...'),
+    ],
+  }),
+  tool({
+    id: 'career-crossroads',
+    version: 1,
+    title: 'Career Crossroads',
+    category: 'work',
+    minutes: 'about 12 minutes',
+    description: 'For when you want to change careers and do not know where to start. Leave with two things to look into and one small way to find out more.',
+    intro: 'You do not need to know your next career today. This is about getting from stuck to curious: what you have to work around, what gives you energy, and one small way to learn more this week. The possibilities are yours, and they are guesses to test, not answers.',
+    completionTitle: 'Two things to look into, and one way to find out.',
+    completionLead: 'You did not have to pick a career. You picked something to learn. Here is what you wrote.',
+    detailKey: 'possibilities',
+    fallbackQuestion: 'What would you most like to find out from that step?',
+    reflectAim: 'They named their constraints, the tasks that give them energy, two possibilities to investigate, and one small information-finding step with a date.',
+    phrases: ['career', 'career change', 'change careers', 'new career', 'dont know what job', 'what should i do with my life', 'stuck in my job', 'stuck in my career', 'hate my job', 'job', 'work change', 'redundancy', 'laid off', 'return to work', 'back to work', 'purpose', 'what work', 'switch careers', 'career path'],
+    stages: [
+      stage('constraints', 'What you work around', 'What do you have to work around right now?', 'Money, hours, family, location, health. Name the real limits so the next step fits your life, not an ideal one.', 'I need to keep... I can give about... hours a week'),
+      stage('energy', 'What gives you energy', 'Which tasks give you energy, even in a job you want to leave?', 'Tasks, not titles. Explaining things, fixing a process, calming a customer, making something tidy.', 'I come alive when I am...'),
+      stage('possibilities', 'Two to look into', 'What are two kinds of work you are curious about?', 'Guesses are fine. Use the tasks above as a clue. You are not choosing, just naming two things worth looking into.', 'I am curious about... and...'),
+      stage('unknown', 'What you do not know yet', 'What would you need to find out before either felt real?', 'Optional. Pay, a typical day, what it takes to start, whether people like you do it.', 'I do not know yet...', true),
+      stage('nextStep', 'Next step', 'What is one small way to find out more, and when?', 'A conversation with someone who does the work, reading three real job descriptions, or a small trial. Add a day.', 'By [day] I will...'),
     ],
   }),
 ];
@@ -409,7 +431,7 @@ function toolHaystack(item) {
 export function searchTools(query, categoryId) {
   const category = categoryId || 'all';
   const q = normalizeSearch(query);
-  return TOOLS.filter((item) => {
+  const found = TOOLS.filter((item) => {
     if (category !== 'all' && item.category !== category) return false;
     if (!q) return true;
     const hay = toolHaystack(item);
@@ -417,6 +439,12 @@ export function searchTools(query, categoryId) {
     const words = q.split(' ').filter((word) => word.length > 2);
     return words.some((word) => hay.includes(word));
   });
+  if (!q) return found;
+  // Best match first (stable for ties), so "career" leads with the career tool.
+  return found
+    .map((item, i) => ({ item, i, score: scoreTool(item, q) }))
+    .sort((a, b) => b.score - a.score || a.i - b.i)
+    .map((entry) => entry.item);
 }
 
 function scoreTool(item, q) {

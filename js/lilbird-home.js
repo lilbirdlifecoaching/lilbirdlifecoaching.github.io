@@ -515,6 +515,12 @@
         kicker: 'One of the rocks',
         phrase: 'I\'m not in crisis. I\'m just stuck. And I\'m tired of it.',
         href: '/articles/feeling-stuck-in-your-late-twenties.html'
+      },
+      '5': {
+        label: 'Career',
+        kicker: 'One of the rocks',
+        phrase: 'I want to change careers, but I don\'t know where to start.',
+        href: '/articles/how-to-get-unstuck-in-your-career.html'
       }
     };
 

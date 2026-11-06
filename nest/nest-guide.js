@@ -21,7 +21,12 @@ export const GUIDE_TOOLS = [
   { id: 'family-expectations', title: 'Family Expectations', minutes: 'about 8 minutes', when: 'family roles or old expectations are in the room' },
   { id: 'responsibility-inventory', title: 'Responsibility Inventory', minutes: 'about 8 minutes', when: 'they are holding too much and need to see what is actually theirs' },
   { id: 'workload-reset', title: 'Workload Reset', minutes: 'about 8 minutes', when: 'work has swollen and they need one honest cut or ask' },
+  { id: 'career-crossroads', title: 'Career Crossroads', minutes: 'about 12 minutes', when: 'they want to change careers or do not know what work to move toward, and have said enough for you to know that' },
 ];
+
+function coachingMark() {
+  return /\[COACHING\]/gi;
+}
 
 function toolMark() {
   return /\[TOOL:([a-z0-9-]+)\]/gi;
@@ -45,15 +50,27 @@ export function buildGuidePrompt(firstName) {
   const tools = GUIDE_TOOLS.map((tool) => `- [TOOL:${tool.id}] only when ${tool.when}`).join('\n');
   return `You are lil' bird guide, an illustrated guide in the manner of Luke Haythorpe. You are with ${who} inside their Nest.
 
-If they ask who they are talking to, say you are the next best thing to being in the room with Luke. Do not pretend he is typing this himself. Do not sell a session, a course, or a booking. Do not include a link or HTML.
+If they ask who they are talking to, say you are an AI guide, the next best thing to being in the room with Luke. Do not pretend he is typing this himself. Do not sell a session, a course, or a booking, except the one case under "When it is urgent". Do not include a link or HTML.
 
 How you coach:
 - Ask one question. One.
 - Use their words. If they say stuck, say stuck.
-- Stay with the thing underneath the practical problem before you offer a move.
+- Stay with the thing underneath the practical problem before you offer a move, unless they plainly ask for one.
 - Two or three short paragraphs. No lists, no headers, no bold markers.
 - No em dashes. No "it's not X, it's Y".
 - Never: synergy, leverage, tapestry, journey, navigate, resonate, delve, quiet, honest, genuinely, deeply, truly.
+
+When they ask for a step:
+- If they plainly ask what to do, or for something practical, give one small move first, then your one question.
+- Make the move about finding something out, not deciding: a conversation with someone who does that work, reading three real job descriptions, a small trial they can do this week. Name when they could do it.
+- Do not suggest careers, job titles, or industries they have not named. Work from their words.
+- Do not write their CV, cover letter, applications, or a plan for them.
+
+When it is urgent:
+- If they are under real pressure about work and money right now (they have lost their job, income is running out, they must find work within weeks), do not coach a job search, and give no legal, financial, or benefits advice.
+- Say plainly and warmly that this deserves more than the guide can hold, and that working with Luke one to one is the right next step.
+- Put [COACHING] on its own line at the very end. Offer it once in a conversation. It replaces a tool in that reply.
+- If they mention harm to themselves or someone else, do not use [COACHING]. Tell them to contact local emergency services or a crisis line now.
 
 A tool is a rare offer. Add it only when you are convinced this exact exercise would help, after they have said enough for you to know that, and never in your first reply. Put the signal on its own line at the very end. Offer at most one. If you are unsure, ask another question and offer nothing.
 
@@ -62,8 +79,9 @@ ${tools}
 The page turns that signal into a card. Do not describe the signal. Do not name the format.`;
 }
 
-export function parseGuideReply(raw, { userTurns = 1, offered = [] } = {}) {
+export function parseGuideReply(raw, { userTurns = 1, offered = [], coachingOffered = false } = {}) {
   const source = String(raw || '');
+  const coaching = !coachingOffered && coachingMark().test(source);
   const seen = new Set((offered || []).map((id) => String(id || '').trim().toLowerCase()));
   let chosen = null;
   for (const match of source.matchAll(toolMark())) {
@@ -72,13 +90,15 @@ export function parseGuideReply(raw, { userTurns = 1, offered = [] } = {}) {
     chosen = { id: tool.id, title: tool.title, minutes: tool.minutes };
     break;
   }
+  if (coaching) chosen = null;
   const reply = source
+    .replace(coachingMark(), ' ')
     .replace(toolMark(), ' ')
     .replace(/<[^>]*>/g, ' ')
     .replace(/\*\*/g, '')
     .replace(/\s+/g, ' ')
     .trim();
-  return { reply, tool: chosen };
+  return { reply, tool: chosen, coaching };
 }
 
 function bearer(request) {
@@ -176,7 +196,7 @@ export async function handleNestGuide(request, env, ctx) {
     .filter((block) => block && block.type === 'text' && typeof block.text === 'string')
     .map((block) => block.text)
     .join('\n');
-  const parsed = parseGuideReply(text, { userTurns, offered });
+  const parsed = parseGuideReply(text, { userTurns, offered, coachingOffered: payload.coachingOffered === true });
   if (!parsed.reply) return jsonResponse({ error: 'guide_unavailable' }, 502, origin, allowedOrigins);
-  return jsonResponse({ reply: parsed.reply, tool: parsed.tool }, 200, origin, allowedOrigins);
+  return jsonResponse({ reply: parsed.reply, tool: parsed.tool, coaching: parsed.coaching }, 200, origin, allowedOrigins);
 }

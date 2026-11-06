@@ -250,3 +250,31 @@ html.solo-journal .btn-close-session-info {
 
 /* Scroll-back targets clear the sticky top bar. */
 body.nest-world :is(.tab-pane, #pane-journey, .journey-note, #chat-messages, #chat-input) { scroll-margin-top: 88px; }
+
+/* Career change entry points (Nest Home strip + Journey featured card) */
+.nest-career-strip {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem; width: 100%;
+  margin: 1.1rem 0 0; padding: 0.95rem 1.3rem; text-align: left; cursor: pointer;
+  background: rgba(255, 250, 238, 0.94); border: 1px solid rgba(138, 90, 23, 0.32);
+  border-radius: 18px 14px 20px 16px; box-shadow: 0 8px 22px rgba(48, 32, 12, 0.16);
+  color: #2a221b; font-family: "DM Sans", system-ui, sans-serif; font-size: 0.95rem; line-height: 1.4;
+}
+.nest-career-strip strong { font-weight: 700; }
+.nest-career-strip-text span { color: #6b5d4c; font-size: 0.86rem; white-space: nowrap; }
+.nest-career-strip-go { flex: 0 0 auto; background: #17485b; color: #fff9ef; border-radius: 999px; padding: 0.42rem 0.95rem; font-weight: 600; font-size: 0.88rem; }
+.nest-career-strip:hover .nest-career-strip-go { background: #1f5b72; }
+.nest-career-strip:focus-visible { outline: 2px solid #17485b; outline-offset: 3px; }
+@media (max-width: 640px) { .nest-career-strip { flex-direction: column; align-items: flex-start; } .nest-career-strip-text span { white-space: normal; display: block; margin-top: 0.2rem; } }
+.journey-featured {
+  margin: 0.4rem 0 1.2rem; padding: 1rem 1.15rem; border-radius: 16px 12px 18px 14px;
+  background: rgba(240, 222, 184, 0.45); border: 1px solid rgba(138, 90, 23, 0.28);
+}
+.journey-featured h4 { margin: 0.15rem 0 0.35rem; font-family: "Playfair Display", serif; font-style: italic; font-size: 1.2rem; color: #2a221b; }
+.journey-featured p:not(.journey-kicker) { margin: 0 0 0.8rem; color: #3e342a; font-size: 0.92rem; line-height: 1.55; }
+
+/* Guide: plain AI labelling and the 1:1 coaching card */
+.guide-ai-note { font-size: 0.8rem; line-height: 1.45; color: #6b5d4c; margin: 0.4rem 0 0; }
+.guide-composer-note { font-size: 0.74rem; color: #7a6d5d; margin: 0.45rem 0.2rem 0; }
+.guide-stage.is-locked .guide-composer-note { display: none; }
+a.guide-tool.guide-coaching { text-decoration: none; border-color: rgba(23, 72, 91, 0.45) !important; }
+a.guide-tool.guide-coaching strong { color: #17485b; }

@@ -297,14 +297,15 @@
     <div class="rocks-stage reveal reveal-delay-2" id="rocks-stage">
       <div class="rocks-art-frame">
         <img class="rocks-art" src="/images/home/backpack-rocks.png" alt="Sketched blue backpack on the grass with four large rocks and a yellow childhood toy spilling out" width="1536" height="1024" loading="lazy" decoding="async" />
-        <svg class="rocks-hotspots" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 1024" width="1536" height="1024" aria-label="Four interactive rock hotspots" role="group">
+        <svg class="rocks-hotspots" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 1024" width="1536" height="1024" aria-label="Five interactive rock hotspots" role="group">
           <title>Rock hotspot silhouettes</title>
-          <desc>Rock 1 left foreground, rock 2 center foreground, rock 3 right foreground, rock 4 near backpack opening. Cast shadows excluded.</desc>
+          <desc>Rock 1 left foreground, rock 2 center foreground, rock 3 right foreground, rock 4 near backpack opening, rock 5 inside the backpack opening. Cast shadows excluded.</desc>
           <g fill="transparent" stroke="none" pointer-events="visibleFill">
             <path id="rock-1" class="rock-path" data-rock="1" role="button" tabindex="0" aria-label="Uncertainty: I know something needs to change" d="M 231,758 L 242,733 L 267,706 L 305,683 L 349,659 L 387,643 L 429,638 L 468,642 L 497,660 L 529,692 L 559,727 L 577,756 L 581,779 L 568,797 L 546,813 L 505,826 L 466,839 L 418,851 L 372,851 L 324,847 L 286,838 L 259,820 L 242,801 L 229,781 Z"/>
             <path id="rock-2" class="rock-path" data-rock="2" role="button" tabindex="0" aria-label="Overthinking: same conversations going nowhere" d="M 644,841 L 654,806 L 675,779 L 713,751 L 758,723 L 795,706 L 829,701 L 878,704 L 923,710 L 960,730 L 988,753 L 1016,787 L 1036,815 L 1049,842 L 1052,869 L 1039,892 L 1012,912 L 974,931 L 930,944 L 877,958 L 827,956 L 783,950 L 742,938 L 699,926 L 667,908 L 646,882 L 640,862 Z"/>
             <path id="rock-3" class="rock-path" data-rock="3" role="button" tabindex="0" aria-label="Disconnection: on paper my life looks fine" d="M 1032,722 L 1042,692 L 1055,661 L 1080,638 L 1117,623 L 1154,610 L 1194,606 L 1236,614 L 1276,629 L 1314,649 L 1350,663 L 1374,683 L 1387,708 L 1398,736 L 1405,761 L 1404,780 L 1390,798 L 1364,808 L 1323,814 L 1277,820 L 1236,825 L 1194,823 L 1147,816 L 1104,804 L 1070,790 L 1046,770 L 1033,747 Z"/>
             <path id="rock-4" class="rock-path" data-rock="4" role="button" tabindex="0" aria-label="Feeling stuck: not in crisis, just stuck" d="M 579,553 L 599,522 L 629,503 L 670,487 L 709,477 L 750,478 L 788,490 L 817,511 L 842,534 L 866,555 L 883,573 L 887,598 L 877,623 L 858,648 L 825,668 L 790,680 L 754,690 L 715,683 L 676,671 L 637,655 L 604,635 L 585,611 L 574,583 Z"/>
+            <path id="rock-5" class="rock-path" data-rock="5" role="button" tabindex="0" aria-label="Career: I want to change careers but I don't know where to start" d="M 690,452 L 700,432 L 722,418 L 750,412 L 778,414 L 800,424 L 812,442 L 814,462 L 806,478 L 786,488 L 758,492 L 730,490 L 708,482 L 694,468 Z"/>
           </g>
         </svg>
         <div class="rock-tip" id="rock-tip" hidden></div>
@@ -320,6 +321,7 @@
         <button type="button" class="rocks-fallback-btn" data-rock="2">Overthinking</button>
         <button type="button" class="rocks-fallback-btn" data-rock="3">Disconnection</button>
         <button type="button" class="rocks-fallback-btn" data-rock="4">Feeling stuck</button>
+        <button type="button" class="rocks-fallback-btn" data-rock="5">Career</button>
       </div>
     </div>
   </section>
@@ -615,7 +617,7 @@
 <script src="/first-flight-booking.js"></script>
 <script src="/lb-chat-safe.js"></script>
 <script src="/js/lilbird-theme.js?v=20261103a"></script>
-<script src="/js/lilbird-home.js?v=20261105pathfinder"></script>
+<script src="/js/lilbird-home.js?v=20261106career"></script>
 <script src="/js/lilbird-chat.js"></script>
 </body>
 </html>

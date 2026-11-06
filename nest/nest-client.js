@@ -60,6 +60,7 @@
   let lciSessions = [];
   let chatMsgs = [];
   let guideOffered = [];
+  let guideCoachingOffered = false;
   let suppressDashboard = false;
   let dashboardHydrateToken = 0;
 
@@ -1366,6 +1367,14 @@
       }
       return '<article class="nest-secondary-card" data-kind="' + escapeHtml(card.kind) + '"><button type="button" data-secondary-action="' + escapeHtml(card.action) + '">' + inner + '</button></article>';
     }).join('');
+    const careerStrip = document.getElementById('nest-career-strip');
+    if (careerStrip && !careerStrip.dataset.wired) {
+      careerStrip.dataset.wired = '1';
+      careerStrip.addEventListener('click', () => {
+        if (window.LilbirdJourney && window.LilbirdJourney.openTool) window.LilbirdJourney.openTool('career-crossroads');
+        else setTab('journey');
+      });
+    }
     host.querySelectorAll('[data-secondary-action]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const act = btn.getAttribute('data-secondary-action');
@@ -3169,7 +3178,7 @@
     const when = latest ? canvasDateLabel(latest.date) : '';
     pane.innerHTML = '<div class="lc-shell"><article class="lc-card"><p class="lc-kicker">Life Canvas</p><div class="lc-hero">' +
       canvasRadarSvg(scores) +
-      '<div><h2 class="lc-title">Today</h2><div class="lc-overall-num">' + overall + '</div><p class="lc-overall-meta">out of 100' +
+      '<div><h2 class="lc-title">Latest check-in</h2><div class="lc-overall-num">' + overall + '</div><p class="lc-overall-meta">out of 100' +
       (chrono.length > 1 ? ' · <span class="lc-delta" style="color:' + canvasDeltaColor(delta) + '">' + canvasDeltaText(delta) + ' since you began</span>' : '') +
       (when ? ' · ' + escapeHtml(when) : '') + '</p></div></div><div class="lc-bars">' + bars + '</div>' + synthesis + status + '</article>' +
       '<article class="lc-card"><p class="lc-kicker">History</p><h2 class="lc-title">How this has moved</h2>' + canvasHistoryHtml(chrono) + '</article>' +
@@ -3372,6 +3381,7 @@
     setDashLoading(false);
     chatMsgs = [];
     guideOffered = [];
+    guideCoachingOffered = false;
     const chatWrap = document.getElementById('chat-messages');
     if (chatWrap) chatWrap.innerHTML = '';
     document.getElementById('pane-products').innerHTML = '';
@@ -3490,7 +3500,7 @@
       copy.textContent = "The next best thing to being in the room with Luke.";
     }
   }
-  function renderChatMsg(role, content, tool) {
+  function renderChatMsg(role, content, tool, coaching) {
     const row = document.createElement('div');
     row.className = `msg ${role === 'user' ? 'user' : 'bot'}`;
     const text = document.createElement('p');
@@ -3516,6 +3526,18 @@
         }
       });
       row.appendChild(card);
+    }
+    if (coaching && role !== 'user') {
+      // Urgent career or income pressure: the guide points to real 1:1 coaching.
+      const link = document.createElement('a');
+      link.className = 'guide-tool guide-coaching';
+      link.href = '/book.html#coaching';
+      const title = document.createElement('strong');
+      title.textContent = 'Work with Luke one to one';
+      const meta = document.createElement('span');
+      meta.textContent = 'See coaching times and book';
+      link.append(title, meta);
+      row.appendChild(link);
     }
     const wrap = document.getElementById('chat-messages');
     wrap.appendChild(row);
@@ -3579,7 +3601,7 @@
       const response = await fetch(CHAT_WORKER_URL + 'guide', {
         method: 'POST',
         headers: Object.assign({ 'Content-Type': 'application/json' }, await authHeaders()),
-        body: JSON.stringify({ messages: chatMsgs.slice(-12), offered: guideOffered.slice() })
+        body: JSON.stringify({ messages: chatMsgs.slice(-12), offered: guideOffered.slice(), coachingOffered: guideCoachingOffered })
       });
       let data = null;
       try { data = await response.json(); } catch (_) { data = null; }
@@ -3596,7 +3618,9 @@
       chatMsgs.push({ role: 'assistant', content: msg });
       const tool = data && data.tool && data.tool.id ? data.tool : null;
       if (tool) guideOffered.push(tool.id);
-      renderChatMsg('assistant', msg, tool);
+      const coaching = !!(data && data.coaching === true) && !guideCoachingOffered;
+      if (coaching) guideCoachingOffered = true;
+      renderChatMsg('assistant', msg, tool, coaching);
     } catch (e) {
       renderChatMsg('assistant', "I couldn't reach the guide just now. Try again in a moment.");
     } finally {

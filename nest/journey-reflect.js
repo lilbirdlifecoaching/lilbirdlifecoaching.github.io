@@ -4,7 +4,7 @@
  * The worker never writes these answers. The page inserts a row only after Save.
  *
  * The live worker is still v1.28-journey and only accepts Boundary Untangler.
- * This file accepts all fifteen tools. Copy it, with journey-tools.js, beside
+ * This file accepts all sixteen tools. Copy it, with journey-tools.js, beside
  * the worker on an approved deploy. Do not deploy it as part of the site review.
  */
 

@@ -28,6 +28,7 @@ const IDS = [
   'family-expectations',
   'responsibility-inventory',
   'workload-reset',
+  'career-crossroads',
 ];
 
 function filled(tool, overrides) {
@@ -38,8 +39,8 @@ function filled(tool, overrides) {
   return Object.assign(answers, overrides || {});
 }
 
-test('the library has the fifteen tools, each with its own shape', () => {
-  assert.equal(TOOLS.length, 15);
+test('the library has the sixteen tools, each with its own shape', () => {
+  assert.equal(TOOLS.length, 16);
   assert.deepEqual(TOOLS.map((tool) => tool.id), IDS);
   const categories = new Set(CATEGORIES.map((item) => item.id));
   TOOLS.forEach((tool) => {
@@ -73,7 +74,7 @@ test('an optional stage can be skipped, and a short optional answer cannot', () 
 });
 
 test('search matches titles, categories, and everyday phrases', () => {
-  assert.equal(searchTools('', 'all').length, 15);
+  assert.equal(searchTools('', 'all').length, 16);
   assert.deepEqual(searchTools('', 'family').map((tool) => tool.id), ['family-expectations', 'responsibility-inventory']);
   assert.equal(searchTools('texts at night', 'all')[0].id, 'boundary-untangler');
   assert.equal(searchTools('family', 'work').length, 0);
