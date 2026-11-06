@@ -263,16 +263,7 @@
   }
 </script>
 <script>
-  const { createClient } = supabase;
-  const _urlParams = new URLSearchParams(window.location.search);
-  const _token = _urlParams.get('token') ? decodeURIComponent(_urlParams.get('token')) : null;
-  // JWT in Authorization header so reads/writes (course_users, tool_outputs,
-  // full_flight_plan) honour RLS as the authenticated user. setSession with
-  // an empty refresh_token silently fails in Supabase v2.
-  const sb = createClient('https://mebqqzbuwkogdxvnihrq.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU', {
-    auth: { persistSession: false, autoRefreshToken: false },
-    global: _token ? { headers: { Authorization: 'Bearer ' + _token } } : {}
-  });
+  const { sb, uid: embedUid } = LilbirdEmbed.createEmbedClient();
 
   let currentUser = null, saveTimer = null;
   let portraitUrl = null, portraitIsIllustration = false;
@@ -432,7 +423,7 @@
 
   (async () => {
     const params = new URLSearchParams(window.location.search);
-    const urlUid = params.get('uid');
+    const urlUid = embedUid || params.get('uid');
     if (urlUid) {
       currentUser = { id: urlUid };
     } else {
@@ -441,9 +432,9 @@
         if (session?.user) currentUser = session.user;
       } catch(e) {}
     }
-    if (currentUser) {
+    if (!LilbirdEmbed.isRedo() && currentUser) {
       loadPortrait();
-      const { data } = await sb.from('tool_outputs').select('output_data').eq('user_id', currentUser.id).eq('tool_name', 'full_flight_plan').single();
+      const { data } = await sb.from('tool_outputs').select('output_data').eq('user_id', currentUser.id).eq('tool_name', 'full_flight_plan').maybeSingle();
       if (data?.output_data) { setData(data.output_data); return; }
     }
     buildCommitments([]); buildSupport([]);

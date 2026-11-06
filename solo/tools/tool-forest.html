@@ -382,17 +382,25 @@
       } catch (e) {}
     }
 
-    if (currentUser) {
-      const { data, error } = await sb
-        .from('tool_outputs')
-        .select('output_data')
-        .eq('user_id', currentUser.id)
-        .eq('tool_name', TOOL_KEY)
-        .maybeSingle();
-      if (!error && data?.output_data) {
-        people = normalizePeople(data.output_data.people);
-        if (data.output_data.intention) {
-          document.getElementById('intention').value = data.output_data.intention;
+    if (LilbirdEmbed.isRedo()) {
+      people = [];
+    } else {
+      const preload = LilbirdEmbed.readPreload();
+      if (preload && preload.people) {
+        people = normalizePeople(preload.people);
+        if (preload.intention) document.getElementById('intention').value = preload.intention;
+      } else if (currentUser) {
+        const { data, error } = await sb
+          .from('tool_outputs')
+          .select('output_data')
+          .eq('user_id', currentUser.id)
+          .eq('tool_name', TOOL_KEY)
+          .maybeSingle();
+        if (!error && data?.output_data) {
+          people = normalizePeople(data.output_data.people);
+          if (data.output_data.intention) {
+            document.getElementById('intention').value = data.output_data.intention;
+          }
         }
       }
     }

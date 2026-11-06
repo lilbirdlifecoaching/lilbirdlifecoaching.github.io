@@ -225,18 +225,49 @@ function renderPreview() {
     return;
   }
   const view = reflectionView(latest);
+  const when = latest.created_at
+    ? '<p class="sidebar-meta">' + escapeHtml(view.title) + ' · ' + escapeHtml(formatWhen(latest.created_at)) + '</p>'
+    : '<p class="sidebar-meta">' + escapeHtml(view.title) + '</p>';
   card.innerHTML = '<p class="sidebar-eyebrow">my journey</p><h4>Your next step</h4><p>' +
     escapeHtml(latest.next_step) +
-    '</p><p>' + escapeHtml(view.title) + '</p><button type="button" class="btn btn-outline full" data-open-journey>Open My Journey</button>';
+    '</p>' + when +
+    '<button type="button" class="btn btn-outline full" data-open-journey>Open My Journey</button>';
+}
+
+function latestReflectionForTool(toolId) {
+  const id = String(toolId || '');
+  return state.rows.find((row) => row && String(row.tool_id) === id) || null;
 }
 
 function toolCardHtml(item) {
+  const saved = latestReflectionForTool(item.id);
+  if (!saved) {
+    return (
+      '<article class="journey-tool-card">' +
+        '<p class="journey-kicker">' + escapeHtml(categoryLabel(item.category)) + ' · ' + escapeHtml(item.minutes) + '</p>' +
+        '<h3>' + escapeHtml(item.title) + '</h3>' +
+        '<p>' + escapeHtml(item.description) + '</p>' +
+        '<button type="button" class="btn btn-gold" data-start-tool="' + escapeHtml(item.id) + '">Begin</button>' +
+      '</article>'
+    );
+  }
+  const view = reflectionView(saved);
+  const step = saved.next_step
+    ? '<p class="journey-card-step">' + escapeHtml(saved.next_step) + '</p>'
+    : (view.nextStep ? '<p class="journey-card-step">' + escapeHtml(view.nextStep) + '</p>' : '');
+  const when = saved.created_at
+    ? '<p class="journey-kicker">Saved · ' + escapeHtml(formatWhen(saved.created_at)) + '</p>'
+    : '<p class="journey-kicker">Saved</p>';
   return (
-    '<article class="journey-tool-card">' +
-      '<p class="journey-kicker">' + escapeHtml(categoryLabel(item.category)) + ' · ' + escapeHtml(item.minutes) + '</p>' +
+    '<article class="journey-tool-card is-saved">' +
+      when +
       '<h3>' + escapeHtml(item.title) + '</h3>' +
-      '<p>' + escapeHtml(item.description) + '</p>' +
-      '<button type="button" class="btn btn-gold" data-start-tool="' + escapeHtml(item.id) + '">Begin</button>' +
+      step +
+      '<div class="journey-card-actions">' +
+        '<button type="button" class="btn btn-gold" data-view-tool-reflection="' + escapeHtml(saved.id) + '">View</button>' +
+        '<button type="button" class="btn btn-outline" data-redo-tool="' + escapeHtml(item.id) + '"' +
+          ' data-redo-reflection="' + escapeHtml(saved.id) + '">Redo</button>' +
+      '</div>' +
     '</article>'
   );
 }
@@ -707,11 +738,21 @@ function completionHtml(tool) {
 }
 
 function savedHtml() {
+  const row = state.rows.find((item) => item && String(item.id) === String(state.savedId || state.highlightId)) || null;
+  const view = row ? reflectionView(row) : null;
+  const summary = view
+    ? '<div class="journey-summary">' +
+        view.fields.map((field) =>
+          '<p><span>' + escapeHtml(field.label) + '</span> ' + escapeHtml(field.value) + '</p>'
+        ).join('') +
+        (view.nextStep ? '<p><span>Next step</span> ' + escapeHtml(view.nextStep) + '</p>' : '') +
+      '</div>'
+    : '<p class="journey-lead">It is at the top of My Journey, with your other saved reflections. Only you can open it.</p>';
   return (
     '<div class="journey-exercise">' +
       '<p class="journey-kicker">' + escapeHtml(state.savedTitle || 'My Journey') + '</p>' +
       '<h2>Saved to My Journey.</h2>' +
-      '<p class="journey-lead">It is at the top of My Journey, with your other saved reflections. Only you can open it.</p>' +
+      summary +
       '<div class="journey-actions">' +
         '<button type="button" class="btn btn-gold" data-view-saved>View saved reflection</button>' +
         '<button type="button" class="btn btn-outline" data-close-exercise>Back to the tools</button>' +
@@ -959,25 +1000,51 @@ async function viewSaved() {
   openReflection(id, { focusAction: true });
 }
 
-async function deleteReflection(id) {
+async function deleteReflection(id, options = {}) {
   const api = host();
   const user = api && api.getUser ? api.getUser() : null;
-  if (!api || !user?.id || !id) return;
-  if (!window.confirm('Delete this reflection? It will be removed from your Journey.')) return;
+  if (!api || !user?.id || !id) return false;
+  if (!options.skipConfirm) {
+    if (!window.confirm('Delete this reflection? It will be removed from your Journey.')) return false;
+  }
   const result = await api.sb.from('journey_reflections').delete().eq('id', id).eq('user_id', user.id);
   if (result.error) {
     state.status = 'That reflection could not be deleted.';
     render();
-    return;
+    return false;
   }
   state.rows = state.rows.filter((row) => row.id !== id);
   if (state.highlightId === id) state.highlightId = '';
   if (state.checkinUi && state.checkinUi.reflectionId === id) state.checkinUi = null;
   if (state.panel && String(state.panel.reflectionId) === String(id)) state.panel = null;
-  state.status = 'Deleted.';
+  if (!options.quiet) state.status = 'Deleted.';
   await loadCheckins();
-  render();
+  if (!options.skipRender) render();
   notifyHostFocus();
+  return true;
+}
+
+async function redoTool(toolId, reflectionId) {
+  const tool = toolById(toolId);
+  const name = tool ? tool.title : 'this exercise';
+  if (!window.confirm('Redo will delete your last saved ' + name + ' reflection and start fresh. Continue?')) {
+    return;
+  }
+  if (reflectionId) {
+    const ok = await deleteReflection(reflectionId, { skipConfirm: true, quiet: true, skipRender: true });
+    if (!ok) return;
+  }
+  startTool(toolId);
+}
+
+function viewToolReflection(reflectionId) {
+  if (!reflectionId) return;
+  state.mode = 'home';
+  state.highlightId = reflectionId;
+  state.panel = { reflectionId: String(reflectionId), kind: 'details' };
+  state.status = '';
+  render();
+  openReflection(reflectionId, { focusAction: true });
 }
 
 function scrollToReflectionCard(card) {
@@ -1107,6 +1174,8 @@ function onClick(event) {
   }
   if (!pane()?.contains(target)) return;
   if ('startTool' in target.dataset) startTool(target.dataset.startTool);
+  else if (target.dataset.viewToolReflection) viewToolReflection(target.dataset.viewToolReflection);
+  else if (target.dataset.redoTool) void redoTool(target.dataset.redoTool, target.dataset.redoReflection || '');
   else if ('beginStages' in target.dataset) beginStages();
   else if ('closeExercise' in target.dataset) closeExercise();
   else if ('stageNext' in target.dataset) nextStage();
@@ -1250,9 +1319,17 @@ window.LilbirdJourney = {
   show() {
     if (state.mode === 'home') render();
   },
-  openTool(toolId) {
+  openTool(toolId, options = {}) {
     host()?.setTab('journey');
+    const saved = latestReflectionForTool(toolId);
+    if (saved && !options.forceNew) {
+      viewToolReflection(saved.id);
+      return;
+    }
     startTool(toolId);
+  },
+  latestReflectionForTool(toolId) {
+    return latestReflectionForTool(toolId);
   },
   focusReflection(preferredId, options) {
     return focusReflection(preferredId, options);

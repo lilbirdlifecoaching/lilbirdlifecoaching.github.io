@@ -162,12 +162,7 @@
   }
 </script>
 <script>
-  const { createClient } = supabase;
-  const _urlParams = new URLSearchParams(window.location.search);
-  const _token = _urlParams.get('token') ? decodeURIComponent(_urlParams.get('token')) : null;
-  const sb = createClient('https://mebqqzbuwkogdxvnihrq.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU', {
-    auth: { persistSession: false, autoRefreshToken: false }
-  });
+  const { sb, uid: embedUid } = LilbirdEmbed.createEmbedClient();
 
   let shadows = [], sparks = [], currentUser = null, saveTimer = null;
 
@@ -232,18 +227,17 @@
 
   (async () => {
     const params = new URLSearchParams(window.location.search);
-    const urlUid = params.get('uid');
+    const urlUid = embedUid || params.get('uid');
     if (urlUid) {
       currentUser = { id: urlUid };
-      if (_token) { try { await sb.auth.setSession({ access_token: _token, refresh_token: '' }); } catch(e) {} }
     } else {
       try {
         const { data: { session } } = await sb.auth.getSession();
         if (session?.user) currentUser = session.user;
       } catch(e) {}
     }
-    if (currentUser) {
-      const { data } = await sb.from('tool_outputs').select('output_data').eq('user_id', currentUser.id).eq('tool_name', 'shadows_sparks').single();
+    if (!LilbirdEmbed.isRedo() && currentUser) {
+      const { data } = await sb.from('tool_outputs').select('output_data').eq('user_id', currentUser.id).eq('tool_name', 'shadows_sparks').maybeSingle();
       if (data?.output_data) {
         shadows = data.output_data.shadows || [];
         sparks  = data.output_data.sparks  || [];

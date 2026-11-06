@@ -103,6 +103,7 @@
 </div>
 
 <script src="/js/vendor/supabase-js-2.117.3.js"></script>
+<script src="embed-supabase.js"></script>
 <script>
   function goBack() {
     if (window.parent !== window) {
@@ -113,12 +114,7 @@
   }
 </script>
 <script>
-  const { createClient } = supabase;
-  const _urlParams = new URLSearchParams(window.location.search);
-  const _token = _urlParams.get('token') ? decodeURIComponent(_urlParams.get('token')) : null;
-  const sb = createClient('https://mebqqzbuwkogdxvnihrq.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU', {
-    auth: { persistSession: false, autoRefreshToken: false }
-  });
+  const { sb, uid: embedUid } = LilbirdEmbed.createEmbedClient();
 
 
   const AXES = [
@@ -249,12 +245,10 @@
     await autoSave();
     const s = document.getElementById('save-status');
     s.classList.add('visible');
-    if (window.parent !== window) {
-      // Send save data to parent so it can update the chat card immediately
-      window.parent.postMessage({ type: 'tool-save', toolKey: 'glow-map', data: { scores: { ...scores } } }, '*');
-      setTimeout(function() {
-        window.parent.postMessage({ type: 'tool-close' }, '*');
-      }, 600);
+    if (window.parent !== window && window.LilbirdEmbed) {
+      LilbirdEmbed.finishEmbedSave('glow-map', { scores: { ...scores } });
+    } else if (window.parent !== window) {
+      window.parent.postMessage({ type: 'tool-saved', toolKey: 'glow-map', output: { scores: { ...scores } }, close: true }, '*');
     } else {
       setTimeout(() => s.classList.remove('visible'), 2500);
     }
@@ -262,7 +256,7 @@
 
   (async () => {
     const params = new URLSearchParams(window.location.search);
-    const urlUid = params.get('uid');
+    const urlUid = (typeof embedUid !== 'undefined' && embedUid) ? embedUid : params.get('uid');
 
     // Read ?preload= scores passed from parent (existing scores — skip DB round-trip)
     const preloadParam = params.get('preload');
@@ -273,7 +267,6 @@
 
     if (urlUid) {
       currentUser = { id: urlUid };
-      if (_token) { try { await sb.auth.setSession({ access_token: _token, refresh_token: '' }); } catch(e) {} }
     } else {
       try {
         const { data: { session } } = await sb.auth.getSession();
@@ -281,7 +274,9 @@
       } catch(e) {}
     }
 
-    if (preloadScores && Object.keys(preloadScores).length) {
+    if (LilbirdEmbed.isRedo()) {
+      // fresh start after Redo — leave default scores
+    } else if (preloadScores && Object.keys(preloadScores).length) {
       // Use preloaded scores — no DB fetch needed for current scores
       scores = { ...scores, ...preloadScores };
     } else if (currentUser) {

@@ -3497,16 +3497,23 @@
     text.textContent = content;
     row.appendChild(text);
     if (tool && tool.id && tool.title) {
+      const saved = window.LilbirdJourney && typeof window.LilbirdJourney.latestReflectionForTool === 'function'
+        ? window.LilbirdJourney.latestReflectionForTool(tool.id)
+        : null;
       const card = document.createElement('button');
       card.type = 'button';
-      card.className = 'guide-tool';
+      card.className = 'guide-tool' + (saved ? ' is-saved' : '');
       const title = document.createElement('strong');
       title.textContent = tool.title;
       const meta = document.createElement('span');
-      meta.textContent = tool.minutes ? tool.minutes + ' in My Journey' : 'Open in My Journey';
+      meta.textContent = saved
+        ? ('Saved · view in My Journey')
+        : (tool.minutes ? tool.minutes + ' in My Journey' : 'Open in My Journey');
       card.append(title, meta);
       card.addEventListener('click', () => {
-        if (window.LilbirdJourney && window.LilbirdJourney.openTool) window.LilbirdJourney.openTool(tool.id);
+        if (window.LilbirdJourney && window.LilbirdJourney.openTool) {
+          window.LilbirdJourney.openTool(tool.id);
+        }
       });
       row.appendChild(card);
     }

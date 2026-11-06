@@ -801,6 +801,10 @@ body.nest-page { line-height: 1.5; }
   cursor: pointer;
 }
 .guide-tool span { color: var(--text-muted); font-size: 0.78rem; }
+.guide-tool.is-saved {
+  background: rgba(122, 158, 126, 0.12);
+  border-color: rgba(122, 158, 126, 0.45);
+}
 .luke-portrait {
   position: relative;
   width: min(100%, 188px);
@@ -1099,6 +1103,21 @@ body.nest-page { line-height: 1.5; }
   padding: 0.9rem 1rem;
 }
 .journey-tool-card, .journey-summary { display: grid; gap: 0.55rem; }
+.journey-tool-card.is-saved {
+  border-color: rgba(122, 158, 126, 0.42);
+  background: color-mix(in srgb, var(--dark-card) 88%, rgba(122, 158, 126, 0.18));
+}
+.journey-tool-card .journey-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.15rem;
+}
+.sidebar-card .sidebar-meta {
+  margin: 0.15rem 0 0.65rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
 .journey-saved {
   display: grid;
   gap: 0;

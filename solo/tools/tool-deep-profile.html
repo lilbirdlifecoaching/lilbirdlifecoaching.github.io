@@ -266,19 +266,7 @@
   }
 </script>
 <script>
-  const { createClient } = supabase;
-  const _urlP2 = new URLSearchParams(window.location.search);
-  const _tok2  = _urlP2.get('token') ? decodeURIComponent(_urlP2.get('token')) : null;
-  const SUPABASE_URL  = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
-  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
-  const sb = createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON,
-    {
-      auth: { persistSession: false, autoRefreshToken: false },
-      global: _tok2 ? { headers: { Authorization: 'Bearer ' + _tok2 } } : undefined,
-    }
-  );
+  const { sb, uid: embedUid, token: embedToken } = LilbirdEmbed.createEmbedClient();
   const ASSESSMENT_WORKER_URL = 'https://lilbird-assessment.cwwq46sn7m.workers.dev';
   const ASSESSMENT_FRONTEND_URL = 'https://lilbird.life/inner-compass/';
 
@@ -449,7 +437,7 @@
         .maybeSingle();
       if (link.error || !link.data || !link.data.nest_id) return;
       const res = await fetch(ASSESSMENT_WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(link.data.nest_id), {
-        headers: _tok2 ? { Authorization: 'Bearer ' + _tok2 } : {}
+        headers: embedToken ? { Authorization: 'Bearer ' + embedToken } : {}
       });
       if (!res.ok) return;
       const payload = await res.json();
@@ -496,8 +484,8 @@
     try {
       // When embedded in iframe, use URL params; otherwise use localStorage
       var _dpParams = new URLSearchParams(window.location.search);
-      var _dpUid    = _dpParams.get('uid');
-      var _dpTok    = _dpParams.get('token') ? decodeURIComponent(_dpParams.get('token')) : null;
+      var _dpUid    = embedUid || _dpParams.get('uid');
+      var _dpTok    = embedToken || (_dpParams.get('token') ? decodeURIComponent(_dpParams.get('token')) : null);
       if (_dpUid && _dpTok) {
         currentUser = { id: _dpUid };
       } else {
@@ -509,27 +497,32 @@
         currentUser = { id: user.id, email: user.email };
       }
 
-      var result = await sb.from('tool_outputs')
-        .select('output_data')
-        .eq('user_id', currentUser.id)
-        .eq('tool_name', 'identity_profile')
-        .single();
-
-      if (result.data && result.data.output_data) {
-        var d = result.data.output_data;
-        if (d.mbti) {
-          document.getElementById('mbti-input').value = d.mbti;
-          var chip = document.querySelector('.type-chip[data-val="' + d.mbti + '"]');
-          if (chip) chip.classList.add('selected');
+      if (!LilbirdEmbed.isRedo()) {
+        var preload = LilbirdEmbed.readPreload();
+        var d = preload || null;
+        if (!d) {
+          var result = await sb.from('tool_outputs')
+            .select('output_data')
+            .eq('user_id', currentUser.id)
+            .eq('tool_name', 'identity_profile')
+            .maybeSingle();
+          d = result.data && result.data.output_data;
         }
-        if (d.enneagram) {
-          document.getElementById('enneagram-input').value = d.enneagram;
-          var echip = document.querySelector('.type-chip[data-val="' + d.enneagram + '"]');
-          if (echip) echip.classList.add('selected');
+        if (d) {
+          if (d.mbti) {
+            document.getElementById('mbti-input').value = d.mbti;
+            var chip = document.querySelector('.type-chip[data-val="' + d.mbti + '"]');
+            if (chip) chip.classList.add('selected');
+          }
+          if (d.enneagram) {
+            document.getElementById('enneagram-input').value = d.enneagram;
+            var echip = document.querySelector('.type-chip[data-val="' + d.enneagram + '"]');
+            if (echip) echip.classList.add('selected');
+          }
+          if (d.other)      document.getElementById('other-input').value = d.other;
+          if (d.reflection) document.getElementById('type-reflection').value = d.reflection;
+          showSavedState();
         }
-        if (d.other)      document.getElementById('other-input').value = d.other;
-        if (d.reflection) document.getElementById('type-reflection').value = d.reflection;
-        showSavedState();
       }
 
       await loadLinkedProfileIfAny();

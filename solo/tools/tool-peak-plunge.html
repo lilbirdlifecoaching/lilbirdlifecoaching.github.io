@@ -726,19 +726,8 @@
   }
 </script>
   <script>
-  const { createClient } = supabase;
-
-  const SUPABASE_URL  = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
-  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
-
-  const _urlP = new URLSearchParams(window.location.search);
-  const _tok  = _urlP.get('token') ? decodeURIComponent(_urlP.get('token')) : null;
-  const sb = createClient(SUPABASE_URL, SUPABASE_ANON, { auth: { persistSession: false, autoRefreshToken: false } });
-  // setSession moved to init (awaited)
-
-  // ── Get user from URL param ──────────────────────────────────
-  const params  = new URLSearchParams(window.location.search);
-  const urlUid  = params.get('uid');
+  const { sb, uid: urlUid } = LilbirdEmbed.createEmbedClient();
+  const params = new URLSearchParams(window.location.search);
 
   // ── State ────────────────────────────────────────────────────
   let currentUser = null;
@@ -1290,8 +1279,8 @@
         output_data: birthYear ? { points, birthYear } : { points },
         updated_at:  new Date().toISOString(),
       }, { onConflict: 'user_id,tool_name' });
-    } catch {
-      // silent fail — will retry on manual save
+    } catch (e) {
+      console.warn('peak-plunge autosave failed', e);
     }
   }
 
@@ -1311,29 +1300,32 @@
 
   // ── Init ────────────────────────────────────────────────────
   async function init() {
-    // Get current user - use URL params when embedded in iframe
-    const _pp = new URLSearchParams(window.location.search);
-    const _ppUid = _pp.get('uid');
-    const _ppTok = _pp.get('token') ? decodeURIComponent(_pp.get('token')) : null;
-    if (_ppUid && _ppTok) {
-      try { await sb.auth.setSession({ access_token: _ppTok, refresh_token: '' }); } catch(e) {}
-      currentUser = { id: _ppUid };
+    if (urlUid) {
+      currentUser = { id: urlUid };
     } else {
-      const { data: { session } } = await sb.auth.getSession();
-      if (session?.user) currentUser = session.user;
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        if (session?.user) currentUser = session.user;
+      } catch (e) {}
     }
-    if (currentUser) {
 
-      // Load existing tool data
-      const { data: toolData } = await sb
-        .from('tool_outputs')
-        .select('output_data')
-        .eq('user_id', currentUser.id)
-        .eq('tool_name', 'peak_plunge')
-        .single();
-
-      if (toolData?.output_data?.points) {
-        points = toolData.output_data.points;
+    const skipRestore = LilbirdEmbed.isRedo();
+    const preload = LilbirdEmbed.readPreload();
+    if (!skipRestore && preload && Array.isArray(preload.points)) {
+      points = preload.points;
+    } else if (!skipRestore && currentUser) {
+      try {
+        const { data: toolData } = await sb
+          .from('tool_outputs')
+          .select('output_data')
+          .eq('user_id', currentUser.id)
+          .eq('tool_name', 'peak_plunge')
+          .maybeSingle();
+        if (toolData?.output_data?.points) {
+          points = toolData.output_data.points;
+        }
+      } catch (e) {
+        console.warn('peak-plunge restore failed', e);
       }
       const by = parseInt(toolData?.output_data?.birthYear, 10);
       if (by >= 1920 && by <= CURRENT_YEAR) birthYear = by;

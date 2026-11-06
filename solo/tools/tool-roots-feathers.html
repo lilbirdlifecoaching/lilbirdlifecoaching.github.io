@@ -602,15 +602,7 @@
   }
 </script>
   <script>
-    const { createClient } = supabase;
-
-    const SUPABASE_URL  = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
-    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
-
-    const _urlP = new URLSearchParams(window.location.search);
-  const _tok  = _urlP.get('token') ? decodeURIComponent(_urlP.get('token')) : null;
-  const sb = createClient(SUPABASE_URL, SUPABASE_ANON, { auth: { persistSession: false, autoRefreshToken: false } });
-
+    const { sb, uid: embedUid } = LilbirdEmbed.createEmbedClient();
 
     let currentUser = null;
     let roots       = [];   // [{ id, text }]
@@ -741,30 +733,41 @@
       createParticles();
 
       const params = new URLSearchParams(window.location.search);
-      const urlUid = params.get('uid');
+      const urlUid = embedUid || params.get('uid');
       if (urlUid) {
         currentUser = { id: urlUid };
-        if (_tok) { try { await sb.auth.setSession({ access_token: _tok, refresh_token: '' }); } catch(e) {} }
       } else {
         try {
           const { data: { session } } = await sb.auth.getSession();
           if (session?.user) currentUser = session.user;
         } catch(e) {}
       }
-      if (currentUser) {
+      const preload = LilbirdEmbed.readPreload();
+      if (LilbirdEmbed.isRedo()) {
+        roots = [];
+        feathers = [];
+        document.getElementById('reflection-area').value = '';
+      } else if (preload && (preload.roots || preload.feathers)) {
+        roots = preload.roots || [];
+        feathers = preload.feathers || [];
+        document.getElementById('reflection-area').value = preload.reflection || '';
+      } else if (currentUser) {
+        try {
+          const { data: toolData } = await sb
+            .from('tool_outputs')
+            .select('output_data')
+            .eq('user_id', currentUser.id)
+            .eq('tool_name', 'roots_feathers')
+            .maybeSingle();
 
-        const { data: toolData } = await sb
-          .from('tool_outputs')
-          .select('output_data')
-          .eq('user_id', currentUser.id)
-          .eq('tool_name', 'roots_feathers')
-          .single();
-
-        if (toolData?.output_data) {
-          roots    = toolData.output_data.roots    || [];
-          feathers = toolData.output_data.feathers || [];
-          const reflection = toolData.output_data.reflection || '';
-          document.getElementById('reflection-area').value = reflection;
+          if (toolData?.output_data) {
+            roots    = toolData.output_data.roots    || [];
+            feathers = toolData.output_data.feathers || [];
+            const reflection = toolData.output_data.reflection || '';
+            document.getElementById('reflection-area').value = reflection;
+          }
+        } catch (e) {
+          console.warn('roots-feathers restore failed', e);
         }
       }
 
