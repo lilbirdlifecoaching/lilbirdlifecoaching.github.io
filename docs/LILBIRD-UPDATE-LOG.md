@@ -22,6 +22,8 @@ If a change touches pricing, booking, worker logic, or public copy, log it here.
 
 ## 2026-11-06 (Claude)
 
+- `built in repo` Deep Roots: opens straight into the tool (no summary panel). Reopening a finished reflection shows every question in full with the whole answer and an Edit button each; editing returns to the full list. Finishing now saves `currentIndex = 5` (older saves that reached the last question count as finished). Previous answers while working show the question text too. Chat/sidebar snapshot no longer quotes two answers without context; it says "N of 5 reflections saved · open to read or edit".
+
 - `built in repo` Peak & Plunge opens straight into the timeline (saved moments loaded, click/tap to add) instead of the read-only "Saved result" summary, which had hidden the timeline since Cursor's 12:37 change. Other tools keep the summary-first view. (`EDIT_FIRST` in `openToolEmbed`.)
 
 - `built in repo` Solo "Saved result" panel (Cursor's new tool view) was unreadable on the parchment theme (pale dark-theme text on cream). Restyled in ink; snapshot text in chat cards and the session list too. Added **Open & keep adding** (opens the tool with saved data, `forceEdit`) beside Redo, so editing no longer requires wiping. `lilbird-solo-journal.css?v=20261106s6`.

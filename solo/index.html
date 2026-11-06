@@ -2813,7 +2813,7 @@
 
       // Saved result first — unless caller forces a fresh editor (Redo).
       // Tools you keep adding to (timelines) open straight into the editor with saved data.
-      var EDIT_FIRST = { 'peak-plunge': true };
+      var EDIT_FIRST = { 'peak-plunge': true, 'deep-roots': true };
       if (existing && !options.forceEdit && !options.redo && !EDIT_FIRST[toolKey]) {
         showToolResultPanel(toolKey, toolInfo, existing);
         return;
@@ -3140,8 +3140,9 @@
         if(north) html+='<div class="snap-row"><span class="snap-badge snap-badge-north">North Star</span><span class="snap-text">'+north+'</span></div>';
       }
       else if (k === 'deep-roots') {
-        var responses=data.responses||{}, rkeys=Object.keys(responses).slice(0,2);
-        rkeys.forEach(rk=>{var val=responses[rk]; if(val) html+='<div class="snap-row"><span class="snap-text" style="font-style:italic;color:rgba(240,236,228,0.5)">'+val.slice(0,80)+(val.length>80?'..':'')+'</span></div>';});
+        // No quotes out of context: just how many reflections are saved.
+        var responses=data.responses||{}, answered=Object.keys(responses).filter(function(rk){return responses[rk]&&String(responses[rk]).trim();}).length;
+        if(answered) html+='<div class="snap-count">'+answered+' of 5 reflections saved · open to read or edit</div>';
       }
       else if (k === 'tangle-within') {
         var fear=data['vine-fear']||'',truth=data['truth-release']||'';

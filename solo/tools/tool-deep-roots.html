@@ -431,6 +431,16 @@
       margin-bottom: 0.3rem;
     }
 
+    .summary-question { font-size: 0.86rem; color: var(--ink, #2a221b); line-height: 1.55; margin: 0 0 0.45rem; opacity: 0.8; }
+    .summary-item-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.75rem; }
+    .btn-edit-answer {
+      flex: 0 0 auto; font-family: 'DM Sans', system-ui, sans-serif; font-size: 0.78rem; cursor: pointer;
+      background: rgba(255, 252, 244, 0.85); border: 1px solid rgba(42, 34, 27, 0.3); color: #2a221b;
+      border-radius: 999px; padding: 0.25rem 0.75rem;
+    }
+    .btn-edit-answer:hover { border-color: #17485b; color: #17485b; }
+    .summary-a.is-empty { opacity: 0.55; }
+    .prev-question { font-size: 0.8rem; color: var(--text-dim); line-height: 1.5; margin-bottom: 0.35rem; }
     .summary-a {
       font-size: 0.85rem;
       color: var(--text-dim);
@@ -515,8 +525,8 @@
     <!-- Completion screen -->
     <div class="completion-screen" id="completion-screen">
       <span class="completion-glyph">🌿</span>
-      <h2>You've looked at your roots.</h2>
-      <p>What you carry from where you came from is part of what makes you, you. Some of it you'll want to keep. Some of it we'll look at again. For now, it's named.</p>
+      <h2 id="completion-title">You've looked at your roots.</h2>
+      <p id="completion-copy">What you carry from where you came from is part of what makes you, you. Some of it you'll want to keep. Some of it we'll look at again. For now, it's named.</p>
       <div class="completion-summary" id="completion-summary"></div>
       <a href="javascript:void(0)" onclick="goBack()" class="btn-return">Return to session →</a>
     </div>
@@ -662,7 +672,8 @@
         item.innerHTML = `
           <div class="prev-content">
             <div class="prev-prompt">${prompt.label}</div>
-            <div class="prev-response">${response.replace(/\n/g, '<br>')}</div>
+            <div class="prev-question">${escapeHtml(prompt.text)}</div>
+            <div class="prev-response">${escapeHtml(response).replace(/\n/g, '<br>')}</div>
           </div>
         `;
         previousEl.appendChild(item);
@@ -693,37 +704,75 @@
       responses[key] = responseArea.value.trim();
       await saveToSupabase();
 
+      if (editingOne) {
+        await saveToSupabase();
+        editingOne = false;
+        if (editReturnIndex != null) currentIndex = editReturnIndex;
+        editReturnIndex = null;
+        showCompletion(true);
+        return;
+      }
       if (currentIndex < PROMPTS.length - 1) {
         currentIndex++;
         renderPrevious();
         showPrompt(currentIndex);
+        await saveToSupabase();
       } else {
-        // All done — show completion
+        // All done: remember it's finished so reopening shows every answer
+        currentIndex = PROMPTS.length;
+        await saveToSupabase();
         showCompletion();
       }
     });
 
     // ── Show completion screen ────────────────────────────────
-    function showCompletion() {
+    let editingOne = false;
+    function escapeHtml(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+    // Every question with the full answer, each one editable.
+    function showCompletion(returning) {
       promptCard.style.display   = 'none';
       previousEl.style.display  = 'none';
       progressDotsEl.style.display = 'none';
       completionScreen.classList.add('visible');
-
-      // Build summary
+      if (returning) {
+        document.getElementById('completion-title').textContent = 'Your roots, in your words.';
+        document.getElementById('completion-copy').textContent = 'Here is everything you wrote. Edit any answer if something has shifted.';
+      }
       const summaryEl = document.getElementById('completion-summary');
-      summaryEl.innerHTML = `<div class="summary-label">What you explored today</div>`;
-      PROMPTS.forEach(prompt => {
+      summaryEl.innerHTML = `<div class="summary-label">Your reflections</div>` + PROMPTS.map((prompt, i) => {
         const response = responses[prompt.key];
-        if (!response) return;
-        summaryEl.innerHTML += `
+        return `
           <div class="summary-item">
-            <div class="summary-q">${prompt.label}</div>
-            <div class="summary-a">${response.slice(0, 180)}${response.length > 180 ? '...' : ''}</div>
-          </div>
-        `;
-      });
+            <div class="summary-item-head">
+              <div class="summary-q">${escapeHtml(prompt.label)}</div>
+              <button type="button" class="btn-edit-answer" data-edit="${i}">${response ? 'Edit' : 'Answer'}</button>
+            </div>
+            <p class="summary-question">${escapeHtml(prompt.text)}</p>
+            <div class="summary-a${response ? '' : ' is-empty'}">${response ? escapeHtml(response).replace(/\n/g, '<br>') : 'Not answered yet.'}</div>
+          </div>`;
+      }).join('');
+      try { window.scrollTo(0, 0); } catch (e) {}
     }
+    document.getElementById('completion-summary').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-edit]');
+      if (!b) return;
+      const i = parseInt(b.dataset.edit, 10);
+      editingOne = true;
+      completionScreen.classList.remove('visible');
+      promptCard.style.display = '';
+      progressDotsEl.style.display = 'none';
+      previousEl.style.display = 'none';
+      const prevIndex = currentIndex;
+      currentIndex = i;
+      showPrompt(i);
+      currentIndex = i;
+      btnNext.textContent = 'Save & see all answers →';
+      editReturnIndex = prevIndex;
+      try { window.scrollTo(0, 0); } catch (e) {}
+    });
+    let editReturnIndex = null;
 
     // ── Save to Supabase ──────────────────────────────────────
     async function saveToSupabase() {
@@ -732,7 +781,7 @@
         await sb.from('tool_outputs').upsert({
           user_id:     currentUser.id,
           tool_name:   'deep_roots',
-          output_data: { responses, currentIndex },
+          output_data: { responses, currentIndex: editingOne && editReturnIndex != null ? editReturnIndex : currentIndex },
           updated_at:  new Date().toISOString(),
         }, { onConflict: 'user_id,tool_name' });
       } catch {
@@ -746,11 +795,18 @@
         return responses[k] && String(responses[k]).trim();
       });
       if (window.LilbirdEmbed && hasContent) {
-        LilbirdEmbed.finishEmbedSave('deep-roots', { responses: { ...responses }, currentIndex: currentIndex });
+        LilbirdEmbed.finishEmbedSave('deep-roots', { responses: { ...responses }, currentIndex: editingOne && editReturnIndex != null ? editReturnIndex : currentIndex });
       } else {
         window.parent.postMessage({ type: 'tool-cancel' }, '*');
       }
     };
+
+    function isFinished() {
+      if (currentIndex >= PROMPTS.length) return true;
+      // Older saves stopped at the last question; treat "reached the end with answers" as done.
+      const answered = PROMPTS.filter(p => responses[p.key] && String(responses[p.key]).trim()).length;
+      return currentIndex >= PROMPTS.length - 1 && answered >= 2 && !!(responses[PROMPTS[PROMPTS.length - 1].key] || '').trim();
+    }
 
     // ── Init ─────────────────────────────────────────────────
     async function init() {
@@ -773,8 +829,8 @@
       } else if (preload && preload.responses) {
         responses = preload.responses || {};
         currentIndex = preload.currentIndex || 0;
-        if (currentIndex >= PROMPTS.length) {
-          showCompletion();
+        if (isFinished()) {
+          showCompletion(true);
           return;
         }
       } else if (currentUser) {
@@ -790,8 +846,8 @@
             responses    = toolData.output_data.responses    || {};
             currentIndex = toolData.output_data.currentIndex || 0;
 
-            if (currentIndex >= PROMPTS.length) {
-              showCompletion();
+            if (isFinished()) {
+              showCompletion(true);
               return;
             }
           }
