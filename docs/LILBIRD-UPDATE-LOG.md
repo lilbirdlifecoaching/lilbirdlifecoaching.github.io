@@ -22,6 +22,11 @@ If a change touches pricing, booking, worker logic, or public copy, log it here.
 
 ## 2026-11-06 (Claude)
 
+### Solo session left card
+- **Status:** `deployed`. `lilbird-parchment.css?v=20261106p3`.
+- `.session-info` scrolls inside itself, so its `::before` paper scrolled away and left session details + tools on bare scene. Paper is now on the element (border-image frame + padding-box fill). Video framed 9:16 at 240px wide (all session files are 1280x720 with a centred portrait recording, so the black side bars are cropped). Meta row + tools on cream slips. Phone sheet header bar no longer white.
+- GitHub Pages: three deploys failed with "Deployment failed, try again later" while GitHub re-ran the lilbird.life DNS check; a fresh deploy after "DNS check successful" worked. Design screenshots/reference art excluded from the published site (~70 MB).
+
 ### Parchment peeking + Nest Home spacing
 - **Status:** `deployed` (Pages only). `lilbird-parchment.css?v=20261106p2`.
 - Sheet backings pulled further inside the torn edge; sidebar cards (Intensive "ember" card, hint card, checklist) lose their own tinted box so nothing shows around the paper.
