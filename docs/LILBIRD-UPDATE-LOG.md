@@ -22,6 +22,8 @@ If a change touches pricing, booking, worker logic, or public copy, log it here.
 
 ## 2026-11-06 (Claude)
 
+- `built in repo` Nest scroll-back: switching tabs starts the new screen at its top; each Journey step (intro → stages → done → saved, Back, Close) brings the top of the exercise into view; a new coaching note scrolls into view; stage inputs no longer yank the page on focus. Guide chat: your message shows the end of the thread, a reply opens at its first line (not its last), and the chat box is brought on screen if it was scrolled away. `nest-client.js?v=74`, `journey.js?v=13`, parchment `v=20261106p5`.
+
 - `built in repo` Solo session card: cream fill now reaches under the torn frame (no floating inner panel). Parchment CSS cache → `v=20261106p4` on all pages.
 - `built in repo` Peak & Plunge: optional birth-year field (timeline starts at birth, ticks show year + age, "Born" marker); darker peak/plunge colours, bolder story line with area wash, larger dots and "YYYY · age N" labels. Birth year saved in `output_data.birthYear`; old saves (plain points) still load.
 

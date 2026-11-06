@@ -3297,6 +3297,7 @@
 
   // tabs
   function setTab(name) {
+    const prevPane = document.querySelector('#view-dashboard .tab-pane.active');
     document.querySelectorAll('.dash-tab').forEach((el) => el.classList.remove('active'));
     document.querySelectorAll('#view-dashboard .tab-pane').forEach((el) => el.classList.remove('active'));
     const tab = document.getElementById(`tab-${name}`);
@@ -3317,6 +3318,13 @@
     if (name === 'journey' && window.LilbirdJourney) window.LilbirdJourney.show();
     closeAccountMenu();
     closeMobileMore();
+    // A new screen starts at its top, not wherever the last one was scrolled to.
+    if (pane && prevPane !== pane) {
+      const rect = pane.getBoundingClientRect();
+      if (rect.top < 0 || rect.top > (window.innerHeight || 800) * 0.6) {
+        pane.scrollIntoView({ behavior: 'auto', block: 'start' });
+      }
+    }
   }
   window.__nestSetTab = setTab;
   window.__nestGoHome = goHome;
@@ -3504,7 +3512,23 @@
     }
     const wrap = document.getElementById('chat-messages');
     wrap.appendChild(row);
-    wrap.scrollTop = wrap.scrollHeight;
+    revealChatMsg(wrap, row, role);
+  }
+  /* Your message: show the bottom of the thread. A reply: show where it
+     starts, so a long answer is read from the top instead of the end.
+     If the chat box itself is off screen (phone, scrolled page), bring it in. */
+  function revealChatMsg(wrap, row, role) {
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const behavior = reduce ? 'auto' : 'smooth';
+    const top = role === 'user' ? wrap.scrollHeight : Math.max(0, row.offsetTop - wrap.offsetTop - 12);
+    if (typeof wrap.scrollTo === 'function') wrap.scrollTo({ top, behavior });
+    else wrap.scrollTop = top;
+    const box = wrap.getBoundingClientRect();
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    if (box.height && (box.bottom > vh || box.top < 60)) {
+      const target = role === 'user' ? (document.getElementById('chat-input') || wrap) : wrap;
+      target.scrollIntoView({ behavior, block: role === 'user' ? 'end' : 'start' });
+    }
   }
   function bootGuide() {
     syncGuideAccess();

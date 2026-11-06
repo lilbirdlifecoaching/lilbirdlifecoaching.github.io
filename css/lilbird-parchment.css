@@ -247,3 +247,6 @@ html.solo-journal .btn-close-session-info {
   font-family: "DM Sans", sans-serif !important;
   text-transform: none !important;
 }
+
+/* Scroll-back targets clear the sticky top bar. */
+body.nest-world :is(.tab-pane, #pane-journey, .journey-note, #chat-messages, #chat-input) { scroll-margin-top: 88px; }

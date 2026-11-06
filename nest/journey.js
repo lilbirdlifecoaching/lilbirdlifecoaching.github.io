@@ -735,7 +735,38 @@ function render() {
   }
   renderPreview();
   const input = document.getElementById('journey-stage-input');
-  if (input) input.focus();
+  if (input) input.focus({ preventScroll: true });
+  revealAfterRender(el);
+}
+
+/* Keep the member's place after each step. When the screen changes
+   (intro → stage → next stage → done → saved, or back to the library),
+   bring the top of the Journey pane into view; when a coaching note
+   arrives, bring the note into view. Same-screen re-renders don't move. */
+let lastScreenSig = '';
+function revealAfterRender(el) {
+  const sig = [state.mode, state.toolId, state.stage].join('|');
+  const insightSig = state.insight ? 'note:' + state.insight.length : '';
+  const prev = lastScreenSig;
+  lastScreenSig = sig + '#' + insightSig;
+  if (!prev || prev === lastScreenSig) return;
+  const [prevSig, prevInsight] = prev.split('#');
+  // Home re-renders that target a saved card scroll themselves (openReflection).
+  if (state.mode === 'home' && state.highlightId) return;
+  let target = null;
+  if (prevSig !== sig) target = el;
+  else if (insightSig && insightSig !== prevInsight) target = el.querySelector('.journey-note') || el;
+  if (target) revealTop(target);
+}
+
+function revealTop(target) {
+  if (!target || typeof target.getBoundingClientRect !== 'function') return;
+  const rect = target.getBoundingClientRect();
+  const vh = window.innerHeight || document.documentElement.clientHeight;
+  // Already comfortably on screen: leave it.
+  if (rect.top >= 70 && rect.top <= vh * 0.45) return;
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  requestAnimationFrame(() => target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }));
 }
 
 function readStage() {
