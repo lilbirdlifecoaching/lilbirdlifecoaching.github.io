@@ -22,6 +22,8 @@ If a change touches pricing, booking, worker logic, or public copy, log it here.
 
 ## 2026-11-06 (Claude)
 
+- `built in repo` Peak & Plunge opens straight into the timeline (saved moments loaded, click/tap to add) instead of the read-only "Saved result" summary, which had hidden the timeline since Cursor's 12:37 change. Other tools keep the summary-first view. (`EDIT_FIRST` in `openToolEmbed`.)
+
 - `built in repo` Solo "Saved result" panel (Cursor's new tool view) was unreadable on the parchment theme (pale dark-theme text on cream). Restyled in ink; snapshot text in chat cards and the session list too. Added **Open & keep adding** (opens the tool with saved data, `forceEdit`) beside Redo, so editing no longer requires wiping. `lilbird-solo-journal.css?v=20261106s6`.
 
 - `built in repo` Peak & Plunge: clicking/tapping a dot opens the full moment (date + whole note) with Edit and Remove, instead of deleting it instantly. Edit reopens the dialog prefilled ("Save changes"). Clicking a note in the lists below also edits; ✕ in the lists and Remove both ask to confirm.

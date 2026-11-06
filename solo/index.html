@@ -2811,8 +2811,10 @@
         existing = enrichGlowMapSnapshot(existing, activeSession.number);
       }
 
-      // Saved result first — unless caller forces a fresh editor (Redo)
-      if (existing && !options.forceEdit && !options.redo) {
+      // Saved result first — unless caller forces a fresh editor (Redo).
+      // Tools you keep adding to (timelines) open straight into the editor with saved data.
+      var EDIT_FIRST = { 'peak-plunge': true };
+      if (existing && !options.forceEdit && !options.redo && !EDIT_FIRST[toolKey]) {
         showToolResultPanel(toolKey, toolInfo, existing);
         return;
       }
