@@ -946,7 +946,7 @@
     }
   </style>
   <link rel="stylesheet" href="/css/lilbird-solo-theme.css?v=20260922b" />
-  <link rel="stylesheet" href="/css/lilbird-solo-journal.css?v=20261105s5" />
+  <link rel="stylesheet" href="/css/lilbird-solo-journal.css?v=20261106s6" />
   <link rel="stylesheet" href="/css/lilbird-parchment.css?v=20261106p5" />
   <script>document.documentElement.classList.add('solo-journal');</script>
   <!-- Google Tag Manager -->
@@ -1234,6 +1234,7 @@
             <div class="tool-result-panel" id="tool-result-panel" hidden>
               <div class="tool-result-body" id="tool-result-body"></div>
               <div class="tool-result-actions">
+                <button type="button" class="btn-tool-edit" id="btn-tool-edit">Open &amp; keep adding</button>
                 <button type="button" class="btn-tool-redo" id="btn-tool-redo">Redo</button>
                 <button type="button" class="btn-tool-back" id="btn-tool-result-back">Back to session</button>
               </div>
@@ -3397,6 +3398,7 @@
     document.addEventListener('click',function(e){
       if(e.target&&e.target.id==='btn-close-tool'){e.preventDefault();e.stopPropagation();closeToolEmbed();return;}
       if(e.target&&e.target.id==='btn-tool-result-back'){e.preventDefault();e.stopPropagation();closeToolEmbed({skipPipeline:true});return;}
+      if(e.target&&e.target.id==='btn-tool-edit'){e.preventDefault();e.stopPropagation();if(lastToolKey&&TOOL_MAP[lastToolKey]) openToolEmbed(lastToolKey, TOOL_MAP[lastToolKey], { forceEdit: true });return;}
       if(e.target&&e.target.id==='btn-tool-redo'){e.preventDefault();e.stopPropagation();if(lastToolKey) redoToolEmbed(lastToolKey);return;}
     });
     window.addEventListener('message', function (e) {

@@ -22,6 +22,8 @@ If a change touches pricing, booking, worker logic, or public copy, log it here.
 
 ## 2026-11-06 (Claude)
 
+- `built in repo` Solo "Saved result" panel (Cursor's new tool view) was unreadable on the parchment theme (pale dark-theme text on cream). Restyled in ink; snapshot text in chat cards and the session list too. Added **Open & keep adding** (opens the tool with saved data, `forceEdit`) beside Redo, so editing no longer requires wiping. `lilbird-solo-journal.css?v=20261106s6`.
+
 - `built in repo` Peak & Plunge: clicking/tapping a dot opens the full moment (date + whole note) with Edit and Remove, instead of deleting it instantly. Edit reopens the dialog prefilled ("Save changes"). Clicking a note in the lists below also edits; ✕ in the lists and Remove both ask to confirm.
 
 - `built in repo` Peak & Plunge life chapters: with a birth year, the timeline splits into Childhood (0–12), Teen years (13–19), Young adult (20–29), Building years (30–44), Midlife (45–59), Later life (60+), each given equal width; ages on the axis with years beneath. Chips (and chapter titles) zoom into one chapter, where labels show the note. Phones (≤560px) run top to bottom: high to the right, low to the left, ages in a left margin; a swipe no longer adds a moment by accident. Add dialog takes year, age, or "pick a chapter" (stored with `approx: true`, shown as "~"). Without a birth year it falls back to plain years. Notes now escaped in the list.

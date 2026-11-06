@@ -371,3 +371,30 @@ html.solo-journal .solo-landing-brand-name { white-space: nowrap; }
   html.solo-journal .solo-landing-top-actions .theme-toggle-label { display: none !important; }
   html.solo-journal :is(.solo-landing-back, .solo-landing-signin) { padding: 0.35rem 0.65rem !important; font-size: 0.8rem !important; white-space: nowrap; }
 }
+
+/* ── Saved tool result + snapshots: ink on paper (were pale dark-theme colours) ── */
+html.solo-journal .tool-result-panel,
+html.solo-journal .tool-embed-wrap { background: #fff9ef !important; }
+html.solo-journal .tool-embed-header,
+html.solo-journal .tool-result-actions { background: rgba(244, 228, 196, 0.55) !important; border-color: rgba(138, 90, 23, 0.2) !important; }
+html.solo-journal .tool-result-meta { color: #8a5a17 !important; font-weight: 600; }
+html.solo-journal :is(.tool-snapshot, .tool-result-body, .tool-item-snap) .snap-text { color: #2a221b !important; }
+html.solo-journal :is(.tool-snapshot, .tool-result-body, .tool-item-snap) :is(.snap-count, .snap-bar-label, .snap-glow-legend, .snap-delta-flat) { color: #6b5d4c !important; }
+html.solo-journal :is(.tool-snapshot, .tool-result-body, .tool-item-snap) [style*="240,236,228"],
+html.solo-journal :is(.tool-snapshot, .tool-result-body, .tool-item-snap) [style*="240, 236, 228"] { color: #6b5d4c !important; }
+html.solo-journal .snap-divider { background: rgba(138, 90, 23, 0.18) !important; }
+html.solo-journal .snap-bar-track { background: rgba(138, 90, 23, 0.14) !important; }
+html.solo-journal .snap-badge-peak   { background: rgba(79, 125, 62, 0.14) !important; color: #3f6a30 !important; }
+html.solo-journal .snap-badge-plunge { background: rgba(176, 101, 42, 0.14) !important; color: #8f4f1f !important; }
+html.solo-journal .snap-badge-soar   { color: #3f6a30 !important; }
+html.solo-journal .snap-badge-steady { color: #8f4f1f !important; }
+html.solo-journal .snap-badge-spark  { color: #8a5a17 !important; }
+html.solo-journal .snap-badge-north  { color: #17485b !important; }
+html.solo-journal .tool-result-actions :is(.btn-tool-edit, .btn-tool-redo, .btn-tool-back) {
+  font-family: "DM Sans", sans-serif !important; text-transform: none !important; letter-spacing: 0.01em !important;
+  font-size: 0.88rem !important; border-radius: 999px !important; padding: 0.5rem 1.05rem !important; cursor: pointer;
+}
+html.solo-journal .tool-result-actions .btn-tool-edit { background: #17485b !important; border: 1px solid #17485b !important; color: #fff9ef !important; }
+html.solo-journal .tool-result-actions .btn-tool-edit:hover { background: #1f5b72 !important; }
+html.solo-journal .tool-result-actions .btn-tool-redo { background: transparent !important; border: 1px solid rgba(143, 79, 31, 0.45) !important; color: #8f4f1f !important; }
+html.solo-journal .tool-result-actions .btn-tool-back { background: rgba(255, 252, 244, 0.85) !important; border: 1px solid rgba(42, 34, 27, 0.3) !important; color: #2a221b !important; }
