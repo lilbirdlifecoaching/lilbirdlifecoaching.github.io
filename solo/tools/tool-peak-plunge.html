@@ -219,6 +219,14 @@
     }
 
     .point-popover.visible { display: block; }
+    .point-popover { background: #fffaf0 !important; border: 1px solid rgba(138,90,23,0.35) !important; box-shadow: 0 10px 28px rgba(48,32,12,0.18); max-width: min(300px, calc(100% - 16px)); }
+    .point-popover .popover-value { line-height: 1.5; white-space: pre-wrap; }
+    .popover-actions { display: none; gap: 0.4rem; margin-top: 0.7rem; align-items: center; }
+    .point-popover.pinned { pointer-events: auto; }
+    .point-popover.pinned .popover-actions { display: flex; }
+    .pop-btn { font-family: 'DM Sans', system-ui, sans-serif; font-size: 0.8rem; padding: 0.3rem 0.8rem; border-radius: 999px; cursor: pointer; background: #17485b; color: #fff9ef; border: 1px solid #17485b; }
+    .pop-btn.pop-remove { background: transparent; color: #8a3f1a; border-color: rgba(138,63,26,0.45); }
+    .pop-btn.pop-close { margin-left: auto; background: transparent; color: #54493d; border-color: transparent; padding: 0.3rem 0.5rem; }
 
     .popover-label {
       font-family: var(--font-mono);
@@ -286,6 +294,7 @@
       padding-top: 1px;
     }
 
+    .point-note { cursor: pointer; }
     .point-note {
       font-size: 0.82rem;
       color: var(--text-dim);
@@ -632,7 +641,7 @@
   <div class="instructions">
     <div class="instruction-chip"><span class="chip-icon">▲</span> <span id="hint-high">Click above centre → high season</span></div>
     <div class="instruction-chip"><span class="chip-icon">▼</span> <span id="hint-low">Click below centre → low season</span></div>
-    <div class="instruction-chip"><span class="chip-icon">✕</span> <span id="hint-remove">Click a dot to remove it</span></div>
+    <div class="instruction-chip"><span class="chip-icon">✕</span> <span id="hint-remove">Click a dot to read or edit it</span></div>
   </div>
 
   <!-- Birth year sets the start of the timeline -->
@@ -662,6 +671,11 @@
     <div class="point-popover" id="point-popover">
       <div class="popover-label" id="popover-label"></div>
       <div class="popover-value" id="popover-value"></div>
+      <div class="popover-actions" id="popover-actions">
+        <button type="button" class="pop-btn" id="pop-edit">Edit</button>
+        <button type="button" class="pop-btn pop-remove" id="pop-remove">Remove</button>
+        <button type="button" class="pop-btn pop-close" id="pop-close" aria-label="Close">✕</button>
+      </div>
     </div>
   </div>
 
@@ -1004,10 +1018,9 @@
     svg.appendChild(svgEl('circle', { cx, cy, r: 14, fill: col, opacity: 0.18, 'pointer-events': 'none' }));
     const dot = svgEl('circle', { cx, cy, r: vertical ? 9 : 8, fill: col, stroke: PAPER, 'stroke-width': 2.5, cursor: 'pointer' });
     dot.dataset.pointId = p.id;
-    dot.appendChild(svgEl('title', {}, 'Remove this moment'));
-    dot.addEventListener('mouseenter', (e) => showPopover(p, e));
-    dot.addEventListener('mouseleave', hidePopover);
-    dot.addEventListener('click', (e) => { e.stopPropagation(); removePoint(p.id); });
+    dot.addEventListener('mouseenter', () => { if (!pinnedId) showPopover(p); });
+    dot.addEventListener('mouseleave', () => { if (!pinnedId) hidePopover(); });
+    dot.addEventListener('click', (e) => { e.stopPropagation(); showPopover(p, true); });
     svg.appendChild(dot);
 
     const when = birthYear ? (p.year >= birthYear ? 'age ' + (p.year - birthYear) : String(p.year)) : String(p.year);
@@ -1061,8 +1074,11 @@
   });
 
   // ── Popover ──────────────────────────────────────────────────
-  function showPopover(p) {
+  let pinnedId = null;
+  function showPopover(p, pin) {
     const popover  = document.getElementById('point-popover');
+    pinnedId = pin ? p.id : null;
+    popover.classList.toggle('pinned', !!pin);
     const timeWrap = document.querySelector('.timeline-wrap');
     const rect     = timeWrap.getBoundingClientRect();
     const when = birthYear && p.year >= birthYear ? `${p.year} · age ${p.year - birthYear}` : String(p.year);
@@ -1071,16 +1087,31 @@
     const svgRect = svg.getBoundingClientRect();
     const sx = svgRect.width / layout.W, sy = svgRect.height / layout.H;
     const pp = pointPos(p);
-    let left = pp.x * sx + svgRect.left - rect.left + 14;
-    const maxLeft = rect.width - 240;
-    if (left > maxLeft) left = Math.max(8, pp.x * sx + svgRect.left - rect.left - 250);
-    popover.style.left = left + 'px';
-    popover.style.top  = (pp.y * sy + svgRect.top - rect.top - 20) + 'px';
     popover.classList.add('visible');
+    const pw = popover.offsetWidth || 240;
+    const dx = pp.x * sx + svgRect.left - rect.left;
+    let left = dx + 16;
+    if (left + pw > rect.width - 8) left = dx - pw - 16;
+    left = Math.max(8, Math.min(rect.width - pw - 8, left));
+    popover.style.left = left + 'px';
+    popover.style.top  = (pp.y * sy + svgRect.top - rect.top + 18) + 'px';
   }
   function hidePopover() {
-    document.getElementById('point-popover').classList.remove('visible');
+    pinnedId = null;
+    const pop = document.getElementById('point-popover');
+    pop.classList.remove('visible', 'pinned');
   }
+  document.getElementById('pop-close').addEventListener('click', hidePopover);
+  document.getElementById('pop-remove').addEventListener('click', () => {
+    const id = pinnedId;
+    if (!id) return;
+    if (!window.confirm || window.confirm('Remove this moment from your timeline?')) removePoint(id);
+  });
+  document.getElementById('pop-edit').addEventListener('click', () => {
+    const p = points.find(x => x.id === pinnedId);
+    hidePopover();
+    if (p) openAddModal({ normY: p.normY, type: p.type }, p.year, p);
+  });
 
   // ── Tap / click on the timeline to add a moment ─────────────
   // A tap adds a moment; a scroll or swipe does not.
@@ -1100,6 +1131,7 @@
 
   svg.addEventListener('click', (e) => {
     if (e.target.tagName === 'circle' && e.target.dataset.pointId) return;
+    if (pinnedId) { hidePopover(); return; }
     const chapterLabel = e.target.closest && e.target.closest('[data-chapter]');
     if (chapterLabel) { setView(chapterLabel.dataset.chapter); return; }
 
@@ -1161,9 +1193,11 @@
     syncWhenUi();
   });
 
-  function openAddModal(pending, guessYear) {
+  let editingId = null;
+  function openAddModal(pending, guessYear, existing) {
     pendingPoint = pending;
     pickedChapter = null;
+    editingId = existing ? existing.id : null;
     renderWhenChapters();
     const modal = document.getElementById('modal-overlay');
     const typeTag = document.getElementById('modal-type-tag');
@@ -1171,7 +1205,8 @@
     modalYear.value = guessYear;
     modalAge.value = birthYear && guessYear >= birthYear ? guessYear - birthYear : '';
     syncWhenUi();
-    document.getElementById('modal-note').value = '';
+    document.getElementById('modal-note').value = existing ? (existing.note || '') : '';
+    document.getElementById('btn-add-point').textContent = existing ? 'Save changes' : 'Add to timeline';
     typeTag.textContent = pending.type === 'peak' ? '▲ High season' : '▼ Low season';
     typeTag.className   = `modal-type-tag ${pending.type}`;
     title.textContent   = pending.type === 'peak' ? 'What made this a high?' : 'What made this a low?';
@@ -1198,9 +1233,18 @@
       try { modalYear.focus({ preventScroll: true }); } catch (e) { modalYear.focus(); }
       return;
     }
-    const newPoint = { id: crypto.randomUUID(), year, note, type: pendingPoint.type, normY: pendingPoint.normY };
-    if (pickedChapter) newPoint.approx = true;
-    points.push(newPoint);
+    const existing = editingId ? points.find(p => p.id === editingId) : null;
+    if (existing) {
+      const yearChanged = existing.year !== year;
+      existing.year = year;
+      existing.note = note;
+      if (pickedChapter) existing.approx = true;
+      else if (yearChanged) delete existing.approx;
+    } else {
+      const newPoint = { id: crypto.randomUUID(), year, note, type: pendingPoint.type, normY: pendingPoint.normY };
+      if (pickedChapter) newPoint.approx = true;
+      points.push(newPoint);
+    }
     closeModal();
     drawGrid();
     renderPointsList();
@@ -1210,6 +1254,7 @@
   function closeModal() {
     document.getElementById('modal-overlay').classList.remove('visible');
     pendingPoint = null;
+    editingId = null;
   }
 
   // ── Remove a point ───────────────────────────────────────────
@@ -1231,7 +1276,7 @@
       return `
         <div class="point-entry">
           <span class="point-year">${p.approx ? '~' : ''}${p.year}${age}${ch ? `<small>${escapeHtml(ch.label)}</small>` : ''}</span>
-          <span class="point-note">${p.note ? escapeHtml(p.note) : '<em style="opacity:0.5">No note</em>'}</span>
+          <span class="point-note" role="button" tabindex="0" title="Edit" onclick="editPointById('${escapeHtml(p.id)}')">${p.note ? escapeHtml(p.note) : '<em style="opacity:0.5">No note</em>'}</span>
           <span class="point-remove" role="button" tabindex="0" aria-label="Remove" onclick="removePointById('${escapeHtml(p.id)}')">✕</span>
         </div>`;
     };
@@ -1244,7 +1289,11 @@
   }
 
   window.removePointById = function(id) {
-    removePoint(id);
+    if (!window.confirm || window.confirm('Remove this moment from your timeline?')) removePoint(id);
+  };
+  window.editPointById = function(id) {
+    const p = points.find(x => x.id === id);
+    if (p) openAddModal({ normY: p.normY, type: p.type }, p.year, p);
   };
 
   // ── Orientation: top-to-bottom on narrow screens ────────────
@@ -1258,7 +1307,7 @@
     const rm = document.getElementById('hint-remove');
     if (hi) hi.textContent = vertical ? 'Tap right of centre → high season' : 'Click above centre → high season';
     if (lo) lo.textContent = vertical ? 'Tap left of centre → low season' : 'Click below centre → low season';
-    if (rm) rm.textContent = vertical ? 'Tap a dot to remove it' : 'Click a dot to remove it';
+    if (rm) rm.textContent = vertical ? 'Tap a dot to read or edit it' : 'Click a dot to read or edit it';
     return changed;
   }
   let resizeTimer = null;
