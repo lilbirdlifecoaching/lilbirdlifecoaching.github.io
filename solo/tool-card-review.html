@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Solo tool card review</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --text: #1e2028;
+    --text-dim: rgba(30, 32, 40, 0.58);
+    --text-muted: rgba(30, 32, 40, 0.38);
+    --dark-card: #ffffff;
+    --session-col: #18495c;
+    --session-dim: rgba(24, 73, 92, 0.1);
+    --session-border: rgba(24, 73, 92, 0.28);
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-mono: 'DM Mono', ui-monospace, monospace;
+    --font-sans: 'DM Sans', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 1.5rem; font-family: var(--font-sans);
+    background: #f5f2eb; color: var(--text);
+  }
+  h1 {
+    font-family: var(--font-display); font-weight: 400; font-style: italic;
+    font-size: 1.6rem; margin: 0 0 0.35rem;
+  }
+  .lede { color: var(--text-dim); margin: 0 0 1.5rem; max-width: 40rem; line-height: 1.5; }
+  .review-grid { display: grid; gap: 1.35rem; max-width: 680px; }
+  .review-block {
+    background: rgba(255,255,255,0.65);
+    border: 1px solid rgba(201,161,48,0.22);
+    border-radius: 18px; padding: 1rem;
+  }
+  .review-block h2 {
+    font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--text-muted); margin: 0 0 0.75rem;
+  }
+  .chat-mock { background: rgba(245,242,235,0.95); border-radius: 14px; padding: 0.85rem; }
+  
+.tool-card-msg {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  max-width: 100%;
+  width: 100%;
+}
+.tool-card-stack {
+  flex: 1;
+  min-width: 0;
+  max-width: 34rem;
+  display: flex;
+  flex-direction: column;
+  background: var(--dark-card);
+  border: 1px solid var(--session-border);
+  border-radius: 16px;
+  border-top-left-radius: 4px;
+  overflow: hidden;
+}
+.tool-card-stack.has-saved {
+  border-color: color-mix(in srgb, var(--session-col) 55%, transparent);
+  background: color-mix(in srgb, var(--session-dim) 55%, var(--dark-card));
+}
+.tool-card {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0.95rem 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+.tool-card-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: var(--session-dim); border: 1px solid var(--session-border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; flex-shrink: 0;
+}
+.tool-card-body { flex: 1; min-width: 0; }
+.tool-card-label {
+  font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--session-col); margin-bottom: 0.25rem;
+}
+.tool-card-name {
+  font-family: var(--font-display); font-size: 1rem; font-style: italic;
+  color: var(--text); margin: 0; line-height: 1.25;
+  overflow-wrap: anywhere; word-break: break-word;
+}
+.tool-card-arrow { font-size: 0.9rem; color: var(--session-col); flex-shrink: 0; }
+.tool-snapshot { padding: 0.75rem 1.1rem; border-top: 1px solid rgba(30,32,40,0.08); }
+.snap-row { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+.snap-badge { font-family: var(--font-mono); font-size: 0.55rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
+.snap-badge-soar   { background: rgba(157,191,138,0.15); color: #5f7f5f; }
+.snap-badge-steady { background: rgba(196,149,106,0.15); color: #8a6438; }
+.snap-badge-peak   { background: rgba(122,158,126,0.15); color: #4f7354; }
+.snap-badge-plunge { background: rgba(138,154,176,0.15); color: #55657a; }
+.snap-badge-shadow { background: rgba(138,154,176,0.15); color: #55657a; }
+.snap-badge-spark  { background: rgba(245,200,66,0.18);  color: #8a6d12; }
+.snap-badge-north  { background: rgba(126,184,201,0.18); color: #3d6f7f; }
+.snap-text {
+  font-size: 0.75rem; color: rgba(30,32,40,0.72); line-height: 1.4;
+  flex: 1; min-width: 0; overflow: hidden;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; white-space: normal;
+}
+.snap-count { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.06em; color: rgba(30,32,40,0.4); margin: 0 0 0.45rem; }
+.snap-divider { height: 1px; background: rgba(30,32,40,0.08); margin: 6px 0; }
+.snap-bar-wrap { margin-bottom: 8px; }
+.snap-bar-label {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 0.65rem;
+  font-size: 0.72rem; color: rgba(30,32,40,0.5); margin-bottom: 4px; line-height: 1.3;
+}
+.snap-bar-label > span:first-child { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.snap-bar-val { color: var(--session-col); flex-shrink: 0; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.snap-bar-track { height: 3px; background: rgba(30,32,40,0.08); border-radius: 2px; overflow: hidden; }
+.snap-bar-fill { height: 100%; border-radius: 2px; background: var(--session-col); }
+.snap-mini-svg { width: 100%; max-width: 140px; display: block; margin: 0 0 8px; }
+.tool-card-actions { display: flex; gap: 0; border-top: 1px solid rgba(30,32,40,0.08); }
+.tool-card-action {
+  flex: 1; padding: 7px 10px; font-family: var(--font-mono); font-size: 0.58rem;
+  letter-spacing: 0.08em; text-transform: uppercase; color: rgba(30,32,40,0.42);
+  cursor: pointer; text-align: center; border: none; background: none;
+}
+.tool-card-action:first-child { border-right: 1px solid rgba(30,32,40,0.08); }
+
+</style>
+</head>
+<body>
+  <h1>Saved tool cards in chat</h1>
+  <p class="lede">Each block is how a completed tool appears in Solo chat after save — header card stacked above the snapshot, with View / Redo / Hide.</p>
+  <div class="review-grid" id="review-grid"></div>
+<script>
+var GLOW_MAP_AXES = ['connections', 'spaces', 'purpose', 'resources', 'wellbeing'];
+    var GLOW_MAP_LABELS = {
+      connections: 'Connections',
+      spaces: 'Spaces',
+      purpose: 'Passion & purpose',
+      resources: 'Resources',
+      wellbeing: 'Energy & wellbeing',
+    };
+function buildGlowMapCompareSvg(nowScores, thenScores, compareSession) {
+      // Square viewport so radar chart renders correctly (was 280x72 — too squished)
+      var s = 120, cx = 60, cy = 60, r = 44, n = GLOW_MAP_AXES.length;
+      function polyPoints(scores) {
+        return GLOW_MAP_AXES.map(function (key, i) {
+          var angle = (i / n) * Math.PI * 2 - Math.PI / 2;
+          var val = Math.max(0, Math.min(10, scores[key] || 5)) / 10;
+          var x = cx + r * val * Math.cos(angle);
+          var y = cy + r * val * Math.sin(angle);
+          return x.toFixed(1) + ',' + y.toFixed(1);
+        }).join(' ');
+      }
+      // Grid rings
+      var rings = '';
+      [0.25, 0.5, 0.75, 1].forEach(function(pct) {
+        var pts = GLOW_MAP_AXES.map(function(_, i) {
+          var angle = (i / n) * Math.PI * 2 - Math.PI / 2;
+          return (cx + r * pct * Math.cos(angle)).toFixed(1) + ',' + (cy + r * pct * Math.sin(angle)).toFixed(1);
+        }).join(' ');
+        rings += '<polygon points="' + pts + '" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.8"/>';
+      });
+      // Axis lines
+      var axes = GLOW_MAP_AXES.map(function(_, i) {
+        var angle = (i / n) * Math.PI * 2 - Math.PI / 2;
+        return '<line x1="' + cx + '" y1="' + cy + '" x2="' + (cx + r * Math.cos(angle)).toFixed(1) + '" y2="' + (cy + r * Math.sin(angle)).toFixed(1) + '" stroke="rgba(255,255,255,0.05)" stroke-width="0.8"/>';
+      }).join('');
+      var svg =
+        '<svg class="snap-mini-svg" viewBox="0 0 ' + s + ' ' + s + '" xmlns="http://www.w3.org/2000/svg">' +
+        rings + axes +
+        (thenScores ? '<polygon points="' + polyPoints(thenScores) + '" fill="rgba(160,152,128,0.12)" stroke="rgba(160,152,128,0.5)" stroke-width="1.5" stroke-linejoin="round"/>' : '') +
+        '<polygon points="' + polyPoints(nowScores) + '" fill="rgba(126,184,201,0.15)" stroke="#7eb8c9" stroke-width="2" stroke-linejoin="round"/>' +
+        '</svg>';
+      if (thenScores) {
+        svg += '<div class="snap-glow-legend"><span>Session ' + compareSession + '</span><span style="color:#7eb8c9">Now</span></div>';
+      }
+      return svg;
+    }
+function escapeSnapText(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+function renderToolSnapshot(toolKey, data) {
+      if (!data) return '';
+      var html = '';
+      var k = toolKey.replace(/_/g,'-');
+
+      if (k === 'soar-steady') {
+        var items = data.items||[], soar=items.filter(i=>i.zone==='soar').slice(0,2), steady=items.filter(i=>i.zone==='steady').slice(0,2);
+        var total=items.filter(i=>i.zone==='soar'||i.zone==='steady').length, soarPct=total?Math.round((items.filter(i=>i.zone==='soar').length/total)*100):0;
+        soar.forEach(i=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-soar">Soar ▲</span><span class="snap-text">'+escapeSnapText(i.text)+'</span></div>';});
+        if(soar.length&&steady.length) html+='<div class="snap-divider"></div>';
+        steady.forEach(i=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-steady">Steady ▼</span><span class="snap-text">'+escapeSnapText(i.text)+'</span></div>';});
+        if(total>0) html+='<div class="snap-bar-wrap" style="margin-top:8px"><div class="snap-bar-label"><span>Energy split</span><span class="snap-bar-val">'+soarPct+'% Soar</span></div><div class="snap-bar-track"><div class="snap-bar-fill" style="width:'+soarPct+'%"></div></div></div>';
+      }
+      else if (k === 'peak-plunge') {
+        var allPts = (data.points || data.events || []).slice();
+        if (allPts.length) {
+          var peaks = allPts.filter(function (p) { return p.type === 'peak'; }).sort(function (a, b) { return (a.year || 0) - (b.year || 0); });
+          var plunges = allPts.filter(function (p) { return p.type === 'plunge'; }).sort(function (a, b) { return (a.year || 0) - (b.year || 0); });
+          html += '<div class="snap-count">' + peaks.length + ' peak' + (peaks.length === 1 ? '' : 's') + ' · ' + plunges.length + ' plunge' + (plunges.length === 1 ? '' : 's') + '</div>';
+          var chartPts = allPts.slice().sort(function (a, b) { return (a.year || 0) - (b.year || 0); }).slice(0, 8);
+          var w = 280, h = 36, n = chartPts.length;
+          var ys = chartPts.map(function (p) { return p.value !== undefined ? p.value : (p.type === 'peak' ? 2 : 8); });
+          var minY = Math.min.apply(null, ys), maxY = Math.max.apply(null, ys), range = maxY - minY || 1;
+          var coords = chartPts.map(function (p, i) {
+            var x = n === 1 ? w / 2 : (i / (n - 1)) * w;
+            var val = p.value !== undefined ? p.value : (p.type === 'peak' ? 2 : 8);
+            var y = h - 4 - ((val - minY) / range) * (h - 8);
+            return [Math.round(x), Math.round(y)];
+          });
+          var polyline = coords.map(function (c) { return c.join(','); }).join(' ');
+          var polygon = polyline + ' ' + w + ',' + h + ' 0,' + h;
+          html += '<svg class="snap-mini-svg" viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg"><line x1="0" y1="' + (h / 2) + '" x2="' + w + '" y2="' + (h / 2) + '" stroke="rgba(255,255,255,0.06)" stroke-width="1"/><polygon points="' + polygon + '" fill="rgba(122,158,126,0.1)"/><polyline points="' + polyline + '" fill="none" stroke="#7a9e7e" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>';
+          function ppRow(p) {
+            var badge = p.type === 'peak' ? 'snap-badge-peak' : 'snap-badge-plunge';
+            var icon = p.type === 'peak' ? '▲' : '▼';
+            var label = escapeSnapText(p.label || p.note || p.event || '');
+            var year = p.year || '';
+            return '<div class="snap-row"><span class="snap-badge ' + badge + '">' + icon + '</span><span class="snap-text">' + label + '</span><span style="font-family:var(--font-mono);font-size:0.62rem;color:rgba(240,236,228,0.3);flex-shrink:0;margin-left:4px">' + year + '</span></div>';
+          }
+          if (peaks.length) html += ppRow(peaks[peaks.length - 1]);
+          if (plunges.length) html += ppRow(plunges[plunges.length - 1]);
+          if (!peaks.length && !plunges.length) {
+            allPts.slice(0, 3).forEach(function (p) { html += ppRow(p); });
+          }
+        }
+      }
+      else if (k === 'glow-map') {
+        var scores = data.scores || {};
+        var thenScores = data.compareScores || null;
+        var compareSession = data.compareSession || 2;
+        if (thenScores) {
+          html += buildGlowMapCompareSvg(scores, thenScores, compareSession);
+          GLOW_MAP_AXES.forEach(function (axis) {
+            var now = scores[axis] || 0;
+            var then = thenScores[axis] || 0;
+            var delta = now - then;
+            var deltaCls = delta > 0 ? 'snap-delta-up' : delta < 0 ? 'snap-delta-down' : 'snap-delta-flat';
+            var deltaTxt = delta === 0 ? '—' : (delta > 0 ? '+' : '') + delta;
+            var pct = Math.round((now / 10) * 100);
+            html +=
+              '<div class="snap-bar-wrap"><div class="snap-bar-label"><span>' +
+              (GLOW_MAP_LABELS[axis] || axis) +
+              '</span><span class="snap-bar-val ' +
+              deltaCls +
+              '">' +
+              then +
+              '→' +
+              now +
+              ' <span style="opacity:0.85">(' +
+              deltaTxt +
+              ')</span></span></div><div class="snap-bar-track"><div class="snap-bar-fill" style="width:' +
+              pct +
+              '%"></div></div></div>';
+          });
+        } else {
+          if (data._glowCompareMissing && false) {
+            html += '<p style="font-size:0.72rem;color:rgba(240,236,228,0.45);margin:0 0 8px;line-height:1.45;">No Session 2 Glow Map on file yet. Complete Session 2’s map once to unlock before/after here.</p>';
+          }
+          var entries = Object.entries(scores).sort(function (a, b) { return b[1] - a[1]; }).slice(0, 5);
+          entries.forEach(function (e) {
+            var pct = Math.round((e[1] / 10) * 100);
+            var label = GLOW_MAP_LABELS[e[0]] || e[0];
+            html +=
+              '<div class="snap-bar-wrap"><div class="snap-bar-label"><span>' +
+              label +
+              '</span><span class="snap-bar-val">' +
+              e[1] +
+              '/10</span></div><div class="snap-bar-track"><div class="snap-bar-fill" style="width:' +
+              pct +
+              '%"></div></div></div>';
+          });
+        }
+      }
+      else if (k === 'shadows-sparks') {
+        var shadows=(data.shadows||[]).slice(0,2),sparks=(data.sparks||[]).slice(0,2);
+        shadows.forEach(s=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-shadow">Shadow</span><span class="snap-text">'+escapeSnapText(s.text)+'</span></div>';});
+        if(shadows.length&&sparks.length) html+='<div class="snap-divider"></div>';
+        sparks.forEach(s=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-spark">Spark</span><span class="snap-text">'+escapeSnapText(s.text)+'</span></div>';});
+      }
+      else if (k === 'courage-compass') {
+        var dirs=[{key:'dir-north',label:'North',cls:'snap-badge-north'},{key:'dir-east',label:'East',cls:'snap-badge-plunge'}];
+        dirs.forEach(d=>{var val=data[d.key]||'';if(val) html+='<div class="snap-row"><span class="snap-badge '+d.cls+'">'+d.label+'</span><span class="snap-text">'+val+'</span></div>';});
+        if(data['brave-step']) html+='<div class="snap-divider"></div><div class="snap-row"><span class="snap-badge snap-badge-spark">Step</span><span class="snap-text">'+data['brave-step']+'</span></div>';
+      }
+      else if (k === 'birdsong') {
+        var cur=data.current||{},modes=['solo','melody','harmony','lullaby','resonance'],modeColors={solo:'#8a9ab0',melody:'#9dbf8a',harmony:'#F5C842',lullaby:'#c4956a',resonance:'#7eb8c9'};
+        modes.slice(0,3).forEach(m=>{var pct=Math.round(((cur[m]||1)/10)*100),col=modeColors[m]||'var(--session-col)';html+='<div class="snap-bar-wrap"><div class="snap-bar-label"><span style="text-transform:capitalize">'+m+'</span><span style="color:'+col+'">'+(cur[m]||1)+'/10</span></div><div class="snap-bar-track"><div class="snap-bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div></div>';});
+      }
+      else if (k === 'forest') {
+        var peopleObj = data.people || {};
+        var layerDefs = [
+          { key: 'canopy', label: 'Canopy', cls: 'snap-badge-soar', max: 2 },
+          { key: 'understory', label: 'Understory', cls: 'snap-badge-spark', max: 1 },
+          { key: 'floor', label: 'Floor', cls: 'snap-badge-steady', max: 1 },
+          { key: 'lone', label: 'Lone', cls: 'snap-badge-plunge', max: 1 },
+        ];
+        var totalPeople = 0;
+        layerDefs.forEach(function (layer) {
+          var list = (peopleObj[layer.key] || []).slice(0, layer.max);
+          totalPeople += (peopleObj[layer.key] || []).length;
+          list.forEach(function (p) {
+            if (!p || !p.name) return;
+            html +=
+              '<div class="snap-row"><span class="snap-badge ' +
+              layer.cls +
+              '">' +
+              layer.label +
+              '</span><span class="snap-text">' +
+              escapeSnapText(p.name) +
+              '</span></div>';
+          });
+        });
+        if (data.intention) {
+          html +=
+            '<div class="snap-divider"></div><div class="snap-row"><span class="snap-text" style="font-style:italic;color:rgba(240,236,228,0.55)">' +
+            escapeSnapText(String(data.intention).slice(0, 100)) +
+            (String(data.intention).length > 100 ? '…' : '') +
+            '</span></div>';
+        }
+        if (!html && totalPeople > 0) {
+          html +=
+            '<div class="snap-row"><span class="snap-text">' +
+            totalPeople +
+            ' connection' +
+            (totalPeople === 1 ? '' : 's') +
+            ' mapped</span></div>';
+        }
+      }
+      // FIX 3: missing tool snapshot handlers added below
+      else if (k === 'nurture-prune') {
+        var people=(data.people||[]).filter(p=>p.quadrant!=='unplaced');
+        var flourishing=people.filter(p=>p.quadrant==='flourishing').slice(0,2);
+        var pruning=people.filter(p=>p.quadrant==='pruning').slice(0,2);
+        flourishing.forEach(p=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-soar">Flourishing</span><span class="snap-text">'+p.name+'</span></div>';});
+        if(flourishing.length&&pruning.length) html+='<div class="snap-divider"></div>';
+        pruning.forEach(p=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-steady">Pruning</span><span class="snap-text">'+p.name+'</span></div>';});
+      }
+      else if (k === 'roots-feathers') {
+        var roots=(data.roots||[]).slice(0,2),feathers=(data.feathers||[]).slice(0,2);
+        roots.forEach(r=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-peak">Root</span><span class="snap-text">'+escapeSnapText(r.text)+'</span></div>';});
+        if(roots.length&&feathers.length) html+='<div class="snap-divider"></div>';
+        feathers.forEach(f=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-plunge">Release</span><span class="snap-text">'+escapeSnapText(f.text)+'</span></div>';});
+        // Reflection fallback so the snapshot isn't empty when the user only journaled.
+        if (!html && data.reflection) {
+          html+='<div class="snap-row"><span class="snap-text" style="font-style:italic;color:rgba(240,236,228,0.55)">"'+String(data.reflection).slice(0,140)+(String(data.reflection).length>140?'…':'')+'"</span></div>';
+        }
+      }
+      else if (k === 'adventure-map') {
+        var now=data['stop-now']||'',north=data['stop-north-title']||'';
+        if(now) html+='<div class="snap-row"><span class="snap-badge snap-badge-plunge">Now</span><span class="snap-text">'+now+'</span></div>';
+        if(north) html+='<div class="snap-row"><span class="snap-badge snap-badge-north">North Star</span><span class="snap-text">'+north+'</span></div>';
+      }
+      else if (k === 'deep-roots') {
+        var responses=data.responses||{}, rkeys=Object.keys(responses).slice(0,2);
+        rkeys.forEach(rk=>{var val=responses[rk]; if(val) html+='<div class="snap-row"><span class="snap-text" style="font-style:italic;color:rgba(240,236,228,0.5)">'+val.slice(0,80)+(val.length>80?'..':'')+'</span></div>';});
+      }
+      else if (k === 'tangle-within') {
+        var fear=data['vine-fear']||'',truth=data['truth-release']||'';
+        if(fear) html+='<div class="snap-row"><span class="snap-badge snap-badge-shadow">Fear</span><span class="snap-text">'+fear.slice(0,60)+'</span></div>';
+        if(truth) { html+='<div class="snap-divider"></div><div class="snap-row"><span class="snap-text" style="font-style:italic;color:rgba(240,236,228,0.5)">'+truth.slice(0,80)+'</span></div>'; }
+      }
+      else if (k === 'deep-profile') {
+        var mbti=data.mbti||'',enn=data.enneagram||'';
+        if(mbti) html+='<div class="snap-row"><span class="snap-badge snap-badge-north">MBTI</span><span class="snap-text">'+escapeSnapText(mbti)+'</span></div>';
+        if(enn) html+='<div class="snap-row"><span class="snap-badge snap-badge-spark">Enneagram</span><span class="snap-text">'+escapeSnapText(enn)+'</span></div>';
+      }
+      else if (k === 'full-flight-plan') {
+        if (data.north_star) {
+          html +=
+            '<div class="snap-row"><span class="snap-badge snap-badge-north">North star</span><span class="snap-text">' +
+            escapeSnapText(String(data.north_star).slice(0, 90)) +
+            (String(data.north_star).length > 90 ? '…' : '') +
+            '</span></div>';
+        }
+        (data.commitments || [])
+          .filter(function (c) {
+            return c && String(c).trim();
+          })
+          .slice(0, 2)
+          .forEach(function (c) {
+            html +=
+              '<div class="snap-row"><span class="snap-badge snap-badge-spark">Commit</span><span class="snap-text">' +
+              escapeSnapText(String(c).slice(0, 70)) +
+              '</span></div>';
+          });
+      }
+      else if (k === 'childhood-photo') {
+        if (data.photo_url) {
+          html +=
+            '<div class="snap-row"><span class="snap-badge snap-badge-soar">Photo</span><span class="snap-text">Younger-you photo saved to your Nest and Full Flight Plan</span></div>';
+        }
+      }
+
+      // Universal fallback — if no specific handler produced content, scan the
+      // saved data for any text/journal-style field and show the first line.
+      // This guarantees a completed card always shows *something*.
+      if (!html && data && typeof data === 'object') {
+        var candidateKeys = ['reflection','intention','resonance','notes','journal','journal_text','summary','answer','text','content','first_action'];
+        for (var i = 0; i < candidateKeys.length; i++) {
+          var v = data[candidateKeys[i]];
+          if (v && typeof v === 'string' && v.trim()) {
+            html += '<div class="snap-row"><span class="snap-text" style="font-style:italic;color:rgba(240,236,228,0.55)">"'+v.slice(0,140)+(v.length>140?'…':'')+'"</span></div>';
+            break;
+          }
+        }
+      }
+
+      return html ? '<div class="tool-snapshot">' + html + '</div>' : '';
+    }
+
+  const TOOLS = {
+    'peak-plunge': { icon: '📈', name: 'Peak & Plunge Timeline' },
+    'nurture-prune': { icon: '🌿', name: 'Nurture & Prune Matrix' },
+    'deep-roots': { icon: '🌱', name: 'Deep Roots Reflection' },
+    'roots-feathers': { icon: '🪶', name: 'Roots & Feathers Practice' },
+    'glow-map': { icon: '✨', name: 'Glow Map' },
+    'soar-steady': { icon: '⚡', name: 'Soar & Steady' },
+    'adventure-map': { icon: '🗺️', name: 'Adventure Map' },
+    'shadows-sparks': { icon: '✨', name: 'Shadows & Sparks' },
+    'tangle-within': { icon: '🌿', name: 'The Tangle Within' },
+    'deep-profile': { icon: '🧭', name: 'Identity Profile' },
+    'courage-compass': { icon: '🧭', name: 'Courage Compass' },
+    'birdsong': { icon: '🎵', name: 'Birdsong Scale' },
+    'forest': { icon: '🌲', name: 'Forest of Connections' },
+    'full-flight-plan': { icon: '🪶', name: 'Full Flight Plan' },
+    'childhood-photo': { icon: '🖼️', name: 'Younger You' },
+  };
+
+  const SAMPLES = {
+    'peak-plunge': { points: [
+      { type: 'peak', year: 2012, note: 'Moved abroad for the first time' },
+      { type: 'plunge', year: 2016, note: 'Burned out and left the job' },
+      { type: 'peak', year: 2019, note: 'Became a parent' },
+      { type: 'plunge', year: 2021, note: 'Lost a close friendship' },
+    ]},
+    'nurture-prune': { people: [
+      { name: 'Maya', quadrant: 'flourishing' },
+      { name: 'Dad', quadrant: 'flourishing' },
+      { name: 'Old boss', quadrant: 'pruning' },
+      { name: 'College friend', quadrant: 'pruning' },
+    ]},
+    'deep-roots': { responses: {
+      home_picture: 'The quiet house at the end of the street, always a little too tidy.',
+      family_culture: 'Work hard, do not make a fuss, keep the peace.',
+    }},
+    'roots-feathers': {
+      roots: [{ text: 'Loyalty to the people I love' }, { text: 'Showing up even when it is hard' }],
+      feathers: [{ text: 'Needing to be the strong one' }, { text: 'Never asking for help' }],
+      reflection: 'I can keep loyalty without carrying everyone.',
+    },
+    'glow-map': { scores: { connections: 9, purpose: 7, spaces: 6, resources: 4, wellbeing: 4 } },
+    'soar-steady': { items: [
+      { zone: 'soar', text: 'Long walks without my phone' },
+      { zone: 'soar', text: 'Deep conversations that go somewhere' },
+      { zone: 'steady', text: 'Endless Slack threads' },
+      { zone: 'steady', text: 'Saying yes when I mean maybe' },
+    ]},
+    'adventure-map': {
+      'stop-now': 'Standing between the job that pays and the work that fits.',
+      'stop-north-title': 'A life where my days match what I care about.',
+    },
+    'shadows-sparks': {
+      shadows: [{ text: 'If I slow down, I will fall behind' }, { text: 'People will think I am selfish' }],
+      sparks: [{ text: 'Making something beautiful with my hands' }, { text: 'Helping someone feel less alone' }],
+    },
+    'tangle-within': {
+      'vine-fear': 'That I will waste the years I have left.',
+      'truth-release': 'I do not have to earn rest before I take it.',
+    },
+    'deep-profile': { mbti: 'ENFP', enneagram: 'Type 4' },
+    'courage-compass': {
+      'dir-north': 'A calmer, truer way of working.',
+      'dir-east': 'The people who already believe in me.',
+      'brave-step': 'Have the conversation I have been avoiding this week.',
+    },
+    'birdsong': { current: { solo: 6, melody: 7, harmony: 4, lullaby: 5, resonance: 3 } },
+    'forest': {
+      people: {
+        canopy: [{ name: 'Sam' }, { name: 'Jordan' }],
+        understory: [{ name: 'Priya' }],
+        floor: [{ name: 'Work group chat' }],
+        lone: [{ name: 'Old mentor' }],
+      },
+      intention: 'Spend one real evening with Sam this month.',
+    },
+    'full-flight-plan': {
+      north_star: 'Build a life that feels spacious and honest.',
+      commitments: ['Protect mornings for deep work', 'One honest check-in each week'],
+    },
+    'childhood-photo': { photo_url: 'https://example.com/photo.jpg' },
+  };
+
+  const grid = document.getElementById('review-grid');
+  Object.keys(TOOLS).forEach(function (key) {
+    const info = TOOLS[key];
+    const data = SAMPLES[key];
+    const snap = renderToolSnapshot(key, data) || '<div class="tool-snapshot"><div class="snap-row"><span class="snap-text">No snapshot yet</span></div></div>';
+    const block = document.createElement('section');
+    block.className = 'review-block';
+    block.dataset.tool = key;
+    block.innerHTML =
+      '<h2>' + key + '</h2>' +
+      '<div class="chat-mock">' +
+        '<div class="tool-card-msg">' +
+          '<div class="msg-avatar" style="background:var(--session-col);width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0;margin-top:2px;">✨</div>' +
+          '<div class="tool-card-stack has-saved">' +
+            '<div class="tool-card used" data-key="' + key + '">' +
+              '<div class="tool-card-icon">' + info.icon + '</div>' +
+              '<div class="tool-card-body">' +
+                '<div class="tool-card-label">Saved</div>' +
+                '<div class="tool-card-name">' + info.name + '</div>' +
+              '</div>' +
+              '<div class="tool-card-arrow">✓</div>' +
+            '</div>' +
+            snap +
+            '<div class="tool-card-actions">' +
+              '<button type="button" class="tool-card-action">View</button>' +
+              '<button type="button" class="tool-card-action">Redo</button>' +
+              '<button type="button" class="tool-card-action">Hide</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    grid.appendChild(block);
+  });
+</script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- solo shell build: v1.15-tool-result-redo-20261106 -->
+<!-- solo shell build: v1.16-tool-card-stack-20261106 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -503,40 +503,59 @@
     .tool-card-msg {
       display: flex;
       gap: 0.75rem;
+      align-items: flex-start;
       animation: msgIn 0.35s ease both;
       max-width: 100%;
       width: 100%;
       align-self: stretch;
     }
-    .tool-card {
+    .tool-card-stack {
+      flex: 1;
+      min-width: 0;
+      max-width: 34rem;
+      display: flex;
+      flex-direction: column;
       background: var(--dark-card);
       border: 1px solid var(--session-border);
       border-radius: 16px;
       border-top-left-radius: 4px;
-      padding: 1rem 1.25rem;
+      overflow: hidden;
+    }
+    .tool-card-stack.has-saved {
+      border-color: color-mix(in srgb, var(--session-col) 55%, transparent);
+      background: color-mix(in srgb, var(--session-dim) 55%, var(--dark-card));
+    }
+    .tool-card {
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      padding: 0.95rem 1.1rem;
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 0.85rem;
       cursor: pointer;
-      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+      transition: background 0.2s;
       min-width: 0;
-      max-width: 100%;
       width: 100%;
       box-sizing: border-box;
     }
-    .tool-card:hover { background: var(--session-dim); border-color: var(--session-col); transform: translateY(-1px); }
+    .tool-card:hover { background: color-mix(in srgb, var(--session-dim) 80%, transparent); }
     .tool-card-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--session-dim); border: 1px solid var(--session-border); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
     .tool-card-body { flex: 1; min-width: 0; }
-    .tool-card-label { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--session-col); margin-bottom: 0.2rem; }
-    .tool-card-name { font-family: var(--font-display); font-size: 0.92rem; font-style: italic; color: var(--text); margin-bottom: 0.15rem; }
-    .tool-card-hint { font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; }
-    .tool-card-arrow { font-size: 0.9rem; color: var(--session-col); flex-shrink: 0; }
-    .tool-card.used {
-      cursor: pointer;
-      opacity: 1;
-      border-color: color-mix(in srgb, var(--session-col) 55%, transparent);
-      background: color-mix(in srgb, var(--session-dim) 70%, transparent);
+    .tool-card-label { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--session-col); margin-bottom: 0.25rem; }
+    .tool-card-name {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-style: italic;
+      color: var(--text);
+      margin: 0;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
+    .tool-card-hint { font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; margin-top: 0.2rem; }
+    .tool-card-arrow { font-size: 0.9rem; color: var(--session-col); flex-shrink: 0; }
+    .tool-card.used { cursor: pointer; opacity: 1; }
     .tool-card.used .tool-card-label { color: var(--session-col); }
 
     .tool-embed-wrap { display: none; position: absolute; inset: 0; background: var(--dark); z-index: 10; flex-direction: column; border-radius: 28px; overflow: hidden; animation: slideIn 0.3s ease both; }
@@ -648,12 +667,31 @@
       margin: 0 0 0.45rem;
     }
     .snap-divider { height: 1px; background: rgba(255,255,255,0.05); margin: 6px 0; }
-    .snap-bar-wrap { margin-bottom: 5px; }
-    .snap-bar-label { display: flex; justify-content: space-between; font-size: 0.68rem; color: rgba(240,236,228,0.38); margin-bottom: 3px; }
-    .snap-bar-val { color: var(--session-col); }
+    .snap-bar-wrap { margin-bottom: 8px; }
+    .snap-bar-label {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.65rem;
+      font-size: 0.72rem;
+      color: rgba(240,236,228,0.5);
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+    .snap-bar-label > span:first-child {
+      flex: 1;
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+    .snap-bar-val {
+      color: var(--session-col);
+      flex-shrink: 0;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
     .snap-bar-track { height: 3px; background: rgba(255,255,255,0.07); border-radius: 2px; overflow: hidden; }
     .snap-bar-fill { height: 100%; border-radius: 2px; background: var(--session-col); }
-    .snap-mini-svg { width: 100%; max-width: 90px; display: block; margin: 0 auto 6px; }
+    .snap-mini-svg { width: 100%; max-width: 140px; display: block; margin: 0 0 8px; }
     .snap-glow-legend { display: flex; justify-content: space-between; font-size: 0.62rem; color: rgba(240,236,228,0.4); margin-bottom: 6px; font-family: var(--font-mono); letter-spacing: 0.06em; }
     .snap-delta-up { color: #9dbf8a; }
     .snap-delta-down { color: #e8734a; }
@@ -2757,6 +2795,8 @@
       delete openedTools[toolKey];
       document.querySelectorAll('.tool-card[data-key="' + toolKey + '"]').forEach(function (card) {
         var msg = card.closest('.tool-card-msg');
+        var stack = card.closest('.tool-card-stack');
+        if (stack) stack.classList.remove('has-saved');
         card.classList.remove('used');
         var lbl = card.querySelector('.tool-card-label'); if (lbl) lbl.textContent = 'Tool ready';
         var arr = card.querySelector('.tool-card-arrow'); if (arr) arr.innerHTML = '&rarr;';
@@ -2772,9 +2812,10 @@
         } else if (hint) {
           hint.style.display = '';
         }
-        if (msg) {
-          var oldSnap = msg.querySelector('.tool-snapshot'); if (oldSnap) oldSnap.remove();
-          var oldAct = msg.querySelector('.tool-card-actions'); if (oldAct) oldAct.remove();
+        if (stack || msg) {
+          var root = stack || msg;
+          var oldSnap = root.querySelector('.tool-snapshot'); if (oldSnap) oldSnap.remove();
+          var oldAct = root.querySelector('.tool-card-actions'); if (oldAct) oldAct.remove();
         }
       });
       var toolList = document.querySelector('.tool-list');
@@ -3250,7 +3291,21 @@
       var actHtml = isUsed
         ? '<div class="tool-card-actions"><button type="button" class="tool-card-action tool-revisit-btn">View</button><button type="button" class="tool-card-action tool-redo-btn">Redo</button><button type="button" class="tool-card-action tool-dismiss-btn">Hide</button></div>'
         : '';
-      wrap.innerHTML = '<div class="msg-avatar" style="background:var(--session-col);width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0;margin-top:2px;">' + emoji + '</div><div class="tool-card' + (isUsed ? ' used' : '') + '" data-key="' + toolKey + '"><div class="tool-card-icon">' + toolInfo.icon + '</div><div class="tool-card-body"><div class="tool-card-label">' + (isUsed ? 'Saved' : 'Tool ready') + '</div><div class="tool-card-name">' + toolInfo.name + '</div>' + (isUsed ? '' : '<div class="tool-card-hint">' + toolInfo.hint + '</div>') + '</div><div class="tool-card-arrow">' + (isUsed ? '&#x2713;' : '&rarr;') + '</div></div>' + snapHtml + actHtml;
+      wrap.innerHTML =
+        '<div class="msg-avatar" style="background:var(--session-col);width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0;margin-top:2px;">' + emoji + '</div>' +
+        '<div class="tool-card-stack' + (isUsed ? ' has-saved' : '') + '">' +
+          '<div class="tool-card' + (isUsed ? ' used' : '') + '" data-key="' + toolKey + '">' +
+            '<div class="tool-card-icon">' + toolInfo.icon + '</div>' +
+            '<div class="tool-card-body">' +
+              '<div class="tool-card-label">' + (isUsed ? 'Saved' : 'Tool ready') + '</div>' +
+              '<div class="tool-card-name">' + toolInfo.name + '</div>' +
+              (isUsed ? '' : '<div class="tool-card-hint">' + toolInfo.hint + '</div>') +
+            '</div>' +
+            '<div class="tool-card-arrow">' + (isUsed ? '&#x2713;' : '&rarr;') + '</div>' +
+          '</div>' +
+          snapHtml +
+          actHtml +
+        '</div>';
       bindToolCardActions(wrap, toolKey, toolInfo);
       container.appendChild(wrap);
       scrollChatToToolCard(toolKey);
@@ -3259,8 +3314,10 @@
     function updateToolCardSnapshot(toolKey, snapData) {
       document.querySelectorAll('.tool-card[data-key="' + toolKey + '"]').forEach(function (card) {
         var msg = card.closest('.tool-card-msg'); if (!msg) return;
-        var old = msg.querySelector('.tool-snapshot'); if (old) old.remove();
-        var oldAct = msg.querySelector('.tool-card-actions'); if (oldAct) oldAct.remove();
+        var stack = card.closest('.tool-card-stack') || msg;
+        var old = stack.querySelector('.tool-snapshot'); if (old) old.remove();
+        var oldAct = stack.querySelector('.tool-card-actions'); if (oldAct) oldAct.remove();
+        stack.classList.add('has-saved');
         card.classList.add('used');
         var lbl = card.querySelector('.tool-card-label'); if (lbl) lbl.textContent = 'Saved';
         var arr = card.querySelector('.tool-card-arrow'); if (arr) arr.innerHTML = '&#x2713;';
