@@ -207,9 +207,9 @@
     var visuals = layout.querySelectorAll('.pathfinder-visual');
     var caption = document.getElementById('pathfinder-visual-caption');
     var captions = [
-      'Stage one · The Nest',
-      'Stage two · Nest Plus',
-      'Stage three · With Luke'
+      'Stage one · First Flight',
+      'Stage two · Coaching',
+      'Stage three · Life Change Intensive'
     ];
     var activeIdx = '0';
     var observer = null;
