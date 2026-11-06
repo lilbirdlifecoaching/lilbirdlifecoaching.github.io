@@ -38,3 +38,13 @@ Live test after the first deploy: the urgent case worked (coaching card shown). 
 Fix is in `nest/nest-guide.js` only: the step rule now explicitly comes before "stay with the thing underneath", the reply must open with the move, the move can use the person's own words as job-listing search terms (no job titles from the AI), there is a worked example, Career Crossroads can be offered once someone has said they want to change careers, and em dashes are stripped from replies as a safety net.
 
 Copy `nest/nest-guide.js` beside the `lilbird-chat` worker again and redeploy. Same check: "I love helping new starters. I want to change careers, I have two hours a week. Give me one practical thing to do this week." Expect the reply to open with a concrete step and a day, then one question.
+
+### 3b. Solo paragraph, tightened
+
+Live Solo test after the first deploy: it opened with a step (good), but suggested job titles the person never named ("Learning & Development Coordinator", "Training Officer") and used an em dash. In `worker-solo`, replace the paragraph added in section 2 with this one, then redeploy:
+
+```
+When they plainly ask for something practical, open your reply with one small move, then ask your one question. Make the move about finding something out, not deciding: a conversation with someone who does that kind of work, reading three real job listings, or a small trial this week, with a day attached. If they do not know the field yet, build the move from tasks they said they enjoy and use their own words as search words, for example: search job listings for "helping people learn" and notice which roles keep appearing. Never name job titles, careers, or industries they have not named themselves. Do not use em dashes. If they are under urgent pressure about work and money (job loss, income running out), do not coach a job search or give financial advice; say that working with Luke one to one is the right next step.
+```
+
+If the Solo worker has a reply clean-up step, also replace em dashes there: `text.replace(/\s*—\s*/g, ', ')`.
