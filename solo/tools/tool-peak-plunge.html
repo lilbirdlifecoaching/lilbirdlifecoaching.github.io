@@ -282,7 +282,7 @@
       font-size: 0.68rem;
       font-weight: 400;
       color: var(--text-muted);
-      min-width: 36px;
+      min-width: 64px; font-weight: 600 !important; color: var(--text) !important;
       padding-top: 1px;
     }
 
@@ -566,6 +566,36 @@
       .timeline-wrap { padding: 1rem; }
       #timeline-svg { max-height: 200px; }
     }
+
+    /* ── Life chapters ── */
+    .chapter-chips { display: flex; flex-wrap: wrap; gap: 0.45rem; margin: -0.6rem 0 1rem; }
+    .chapter-chips[hidden], .chapter-nudge[hidden], .when-chapters-wrap[hidden], .when-field[hidden] { display: none !important; }
+    .chapter-chip {
+      font-family: 'DM Sans', system-ui, sans-serif; font-size: 0.82rem; font-weight: 500;
+      padding: 0.38rem 0.8rem; border-radius: 999px; cursor: pointer;
+      background: rgba(255, 252, 244, 0.85); border: 1px solid rgba(138, 90, 23, 0.32); color: #2a221b;
+      display: inline-flex; align-items: center; gap: 0.35rem;
+    }
+    .chapter-chip:hover { border-color: rgba(138, 90, 23, 0.6); }
+    .chapter-chip.is-on { background: #17485b; border-color: #17485b; color: #fff9ef; }
+    .chapter-chip:focus-visible { outline: 2px solid #17485b; outline-offset: 2px; }
+    .chip-count { font-size: 0.7rem; font-weight: 700; background: rgba(138, 90, 23, 0.14); color: #8a5a17; border-radius: 999px; padding: 0.05rem 0.42rem; }
+    .chapter-chip.is-on .chip-count { background: rgba(255, 249, 239, 0.22); color: #fff9ef; }
+    .chapter-nudge { margin: -0.6rem 0 0.9rem; font-size: 0.82rem; color: var(--text-dim); }
+    .tl-chapter { cursor: zoom-in; }
+    .when-row { display: flex; gap: 0.75rem; }
+    .when-field { flex: 1; }
+    .when-field span, .when-hint { display: block; font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.3rem; }
+    .when-chapters-wrap { margin: -0.3rem 0 1rem; }
+    .when-chapters { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .when-chapters .chapter-chip { font-size: 0.78rem; padding: 0.32rem 0.7rem; }
+    .point-year small { display: block; font-size: 0.68rem; font-weight: 500; color: var(--text-dim); letter-spacing: 0.02em; text-transform: none; }
+    html.pp-vertical .timeline-wrap { padding: 1rem 0.6rem; }
+    html.pp-vertical .timeline-legend { margin-bottom: 1rem; flex-wrap: wrap; gap: 0.6rem 1rem; }
+    html.pp-vertical .chapter-chips { flex-wrap: nowrap; overflow-x: auto; margin: 0 -0.6rem 0.8rem; padding: 0 0.6rem 0.3rem; scrollbar-width: none; }
+    html.pp-vertical .chapter-chips::-webkit-scrollbar { display: none; }
+    html.pp-vertical .chapter-chip { flex: 0 0 auto; }
+    html.pp-vertical #timeline-svg { touch-action: pan-y; cursor: pointer; }
   </style>
   <link rel="stylesheet" href="/css/lilbird-solo-tools-theme.css" />
 <link rel="stylesheet" href="/css/lilbird-tokens.css" />
@@ -600,16 +630,16 @@
 
   <!-- Instructions -->
   <div class="instructions">
-    <div class="instruction-chip"><span class="chip-icon">▲</span> Click above centre → high season</div>
-    <div class="instruction-chip"><span class="chip-icon">▼</span> Click below centre → low season</div>
-    <div class="instruction-chip"><span class="chip-icon">✕</span> Click a dot to remove it</div>
+    <div class="instruction-chip"><span class="chip-icon">▲</span> <span id="hint-high">Click above centre → high season</span></div>
+    <div class="instruction-chip"><span class="chip-icon">▼</span> <span id="hint-low">Click below centre → low season</span></div>
+    <div class="instruction-chip"><span class="chip-icon">✕</span> <span id="hint-remove">Click a dot to remove it</span></div>
   </div>
 
   <!-- Birth year sets the start of the timeline -->
   <div class="birth-row">
     <label for="birth-year">The year you were born</label>
     <input type="number" id="birth-year" inputmode="numeric" placeholder="e.g. 1992" min="1920" />
-    <span class="birth-hint">So your timeline starts where your story does. Only you see this.</span>
+    <span class="birth-hint">Your timeline then opens up into life chapters, from childhood to now. Only you see this.</span>
   </div>
 
   <!-- Timeline canvas -->
@@ -624,7 +654,9 @@
         Low seasons: plunges
       </div>
     </div>
-    <svg id="timeline-svg" viewBox="0 0 800 280" xmlns="http://www.w3.org/2000/svg">
+    <div class="chapter-chips" id="chapter-chips" role="group" aria-label="Show a life chapter" hidden></div>
+    <p class="chapter-nudge" id="chapter-nudge">Add the year you were born above to see your story in life chapters.</p>
+    <svg id="timeline-svg" viewBox="0 0 800 340" xmlns="http://www.w3.org/2000/svg">
       <!-- Defined in JS -->
     </svg>
     <div class="point-popover" id="point-popover">
@@ -664,8 +696,15 @@
   <div class="modal">
     <div class="modal-type-tag" id="modal-type-tag">Peak</div>
     <h3 id="modal-title">What happened here?</h3>
-    <label>Year (approx)</label>
-    <input type="number" id="modal-year" placeholder="e.g. 2015" min="1920" />
+    <label>When was this?</label>
+    <div class="when-row">
+      <div class="when-field"><span>Year</span><input type="number" id="modal-year" inputmode="numeric" placeholder="e.g. 2015" min="1920" /></div>
+      <div class="when-field" id="when-age-wrap" hidden><span>or your age</span><input type="number" id="modal-age" inputmode="numeric" placeholder="e.g. 8" min="0" /></div>
+    </div>
+    <div class="when-chapters-wrap" id="when-chapters-wrap" hidden>
+      <span class="when-hint">Not sure exactly? Pick a chapter.</span>
+      <div class="when-chapters" id="when-chapters"></div>
+    </div>
     <label>A few words about this season</label>
     <textarea id="modal-note" placeholder="What made this time a high or low? What do you remember most?"></textarea>
     <div class="modal-actions">
@@ -707,19 +746,52 @@
   let pendingPoint = null;  // point being added
 
   // ── SVG setup ────────────────────────────────────────────────
-  const svg       = document.getElementById('timeline-svg');
-  const SVG_W     = 800;
-  const SVG_H     = 280;
-  const MIDLINE_Y = SVG_H / 2;  // 140
-  const PADDING   = { left: 48, right: 24, top: 24, bottom: 44 };
+  const svg = document.getElementById('timeline-svg');
 
   const PEAK_COL   = '#4f7d3e';
   const PLUNGE_COL = '#b0652a';
   const INK        = '#2a221b';
+  const HONEY      = '#8a5a17';
+  const PAPER      = '#fff8ea';
   const CURRENT_YEAR = new Date().getFullYear();
   let birthYear = null;
 
-  // Timeline runs from birth (or the earliest moment, or 1960) to this year
+  // Life chapters (ages, inclusive). Each chapter gets equal room on the
+  // timeline, so a busy childhood isn't squeezed into a sliver.
+  const CHAPTERS = [
+    { key: 'childhood', label: 'Childhood',      from: 0,  to: 12 },
+    { key: 'teens',     label: 'Teen years',     from: 13, to: 19 },
+    { key: 'young',     label: 'Young adult',    from: 20, to: 29 },
+    { key: 'building',  label: 'Building years', from: 30, to: 44 },
+    { key: 'midlife',   label: 'Midlife',        from: 45, to: 59 },
+    { key: 'later',     label: 'Later life',     from: 60, to: 120 },
+  ];
+  let view = 'all';        // 'all' or a chapter key (zoomed in)
+  let vertical = false;    // phones: timeline runs top to bottom
+  let layout = null;       // rebuilt on every draw
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+  function ageOf(year) { return birthYear ? year - birthYear : null; }
+  function currentAge() { return birthYear ? CURRENT_YEAR - birthYear : null; }
+
+  // Chapters lived so far, with their year spans [y0, y1)
+  function lifeChapters() {
+    if (!birthYear) return [];
+    const age = currentAge();
+    return CHAPTERS.filter(c => c.from <= age).map(c => {
+      const toAge = Math.min(c.to, age);
+      return Object.assign({}, c, { toAge, y0: birthYear + c.from, y1: birthYear + toAge + 1 });
+    });
+  }
+  function chapterOfYear(year) {
+    const a = ageOf(year);
+    if (a == null) return null;
+    return CHAPTERS.find(c => a >= c.from && a <= c.to) || (a < 0 ? CHAPTERS[0] : null);
+  }
+
+  // Without a birth year: plain years, from the earliest moment (or 1960) to now
   function timelineRange() {
     const years = points.map(p => p.year).filter(Boolean);
     let start = birthYear || (years.length ? Math.min(...years) - 2 : 1960);
@@ -728,256 +800,401 @@
     return { startYear: start, endYear: CURRENT_YEAR };
   }
 
-  function svgEl(tag, attrs) {
+  function svgEl(tag, attrs, text) {
     const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
     Object.keys(attrs).forEach(k => el.setAttribute(k, attrs[k]));
+    if (text != null) el.textContent = text;
     return el;
   }
 
-  // Draw the baseline grid
+  // ── Layout: bands (chapters) and the time axis ──────────────
+  function buildLayout() {
+    const chapters = lifeChapters();
+    if (view !== 'all' && !chapters.some(c => c.key === view)) view = 'all';
+    const shown = view === 'all' ? chapters : chapters.filter(c => c.key === view);
+    let W, H, pad;
+    if (vertical) {
+      W = 360;
+      H = birthYear ? Math.max(560, view === 'all' ? shown.length * 200 : 680) : 760;
+      pad = { l: 50, r: 14, t: 34, b: 18 };
+    } else {
+      W = 800; H = 340;
+      pad = { l: 52, r: 22, t: birthYear ? 46 : 26, b: 46 };
+    }
+    const a0 = vertical ? pad.t : pad.l;
+    const a1 = vertical ? H - pad.b : W - pad.r;
+    const bands = [], segs = [];
+    if (birthYear && shown.length) {
+      const len = (a1 - a0) / shown.length;
+      shown.forEach((c, i) => {
+        const b0 = a0 + i * len, b1 = b0 + len;
+        bands.push(Object.assign({}, c, { b0, b1 }));
+        const head = vertical ? 30 : 8;
+        segs.push({ y0: c.y0, y1: c.y1, p0: b0 + head, p1: b1 - 8 });
+      });
+    } else {
+      const r = timelineRange();
+      segs.push({ y0: r.startYear, y1: r.endYear + 1, p0: a0 + 6, p1: a1 - 6 });
+    }
+    layout = { W, H, pad, a0, a1, bands, segs };
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    return layout;
+  }
+
+  function inView(year) {
+    const s = layout.segs;
+    return year >= s[0].y0 && year < s[s.length - 1].y1;
+  }
+  // Position along the time axis for a (fractional) year
+  function alongOf(yf) {
+    const s = layout.segs;
+    if (yf <= s[0].y0) return s[0].p0;
+    const last = s[s.length - 1];
+    if (yf >= last.y1) return last.p1;
+    const g = s.find(x => yf >= x.y0 && yf <= x.y1) || last;
+    return g.p0 + (yf - g.y0) / (g.y1 - g.y0) * (g.p1 - g.p0);
+  }
+  function yearAtAlong(p) {
+    const s = layout.segs;
+    let g = s.find(x => p >= x.p0 && p <= x.p1);
+    if (!g) g = s.reduce((best, x) => Math.min(Math.abs(p - x.p0), Math.abs(p - x.p1)) < Math.min(Math.abs(p - best.p0), Math.abs(p - best.p1)) ? x : best, s[0]);
+    const t = Math.max(0, Math.min(1, (p - g.p0) / (g.p1 - g.p0)));
+    return Math.max(g.y0, Math.min(g.y1 - 1, Math.floor(g.y0 + t * (g.y1 - g.y0))));
+  }
+  // Value axis: normY 0 = highest, 1 = lowest. Phones: high to the right.
+  function valOf(normY) {
+    const { W, H, pad } = layout;
+    return vertical ? (W - pad.r) - normY * (W - pad.l - pad.r) : pad.t + normY * (H - pad.t - pad.b);
+  }
+  function pos(yf, normY) {
+    const a = alongOf(yf), v = valOf(normY);
+    return vertical ? { x: v, y: a } : { x: a, y: v };
+  }
+  function pointPos(p) { return pos(p.year + 0.5, p.normY); }
+
+  // ── Draw ─────────────────────────────────────────────────────
   function drawGrid() {
     svg.innerHTML = '';
-    const { startYear, endYear } = timelineRange();
-    const span = endYear - startYear;
-    const step = span > 60 ? 10 : span > 25 ? 5 : 2;
+    const L = buildLayout();
+    const { W, H, pad } = L;
+    const mid = pos(0, 0.5);
+    const g = svgEl('g', {});
 
-    // Background grid lines
-    const gridGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-
-    const firstTick = Math.ceil(startYear / step) * step;
-    for (let y = firstTick; y <= endYear; y += step) {
-      const x = yearToX(y, startYear, endYear);
-      gridGroup.appendChild(svgEl('line', { x1: x, y1: PADDING.top, x2: x, y2: SVG_H - PADDING.bottom, stroke: 'rgba(42,34,27,0.08)', 'stroke-width': 1 }));
-      const label = svgEl('text', { x: x, y: birthYear ? SVG_H - 20 : SVG_H - 12, 'text-anchor': 'middle', fill: 'rgba(42,34,27,0.66)', 'font-size': 11, class: 'tl-label' });
-      label.textContent = y;
-      gridGroup.appendChild(label);
-      if (birthYear && y >= birthYear) {
-        const age = svgEl('text', { x: x, y: SVG_H - 6, 'text-anchor': 'middle', fill: 'rgba(42,34,27,0.45)', 'font-size': 9.5, class: 'tl-label' });
-        age.textContent = 'age ' + (y - birthYear);
-        gridGroup.appendChild(age);
+    // Chapter bands
+    L.bands.forEach((b, i) => {
+      const rect = vertical
+        ? { x: 0, y: b.b0, width: W, height: b.b1 - b.b0 }
+        : { x: b.b0, y: 0, width: b.b1 - b.b0, height: H - pad.b + 4 };
+      g.appendChild(svgEl('rect', Object.assign(rect, { fill: i % 2 ? 'rgba(184,120,31,0.035)' : 'rgba(184,120,31,0.085)', rx: 6 })));
+      if (i > 0) {
+        g.appendChild(vertical
+          ? svgEl('line', { x1: 0, y1: b.b0, x2: W, y2: b.b0, stroke: 'rgba(138,90,23,0.28)', 'stroke-width': 1, 'stroke-dasharray': '3 4' })
+          : svgEl('line', { x1: b.b0, y1: 6, x2: b.b0, y2: H - pad.b, stroke: 'rgba(138,90,23,0.28)', 'stroke-width': 1, 'stroke-dasharray': '3 4' }));
       }
+      const ages = b.toAge >= 100 ? b.from + '+' : b.from + '–' + b.toAge;
+      const zoomed = view !== 'all';
+      const title = zoomed
+        ? `${b.label} · ages ${ages} · ${b.y0}–${b.y1 - 1}`
+        : (vertical ? `${b.label} · ${ages}` : b.label);
+      const lbl = vertical
+        ? svgEl('text', { x: 12, y: b.b0 + 20, fill: HONEY, 'font-size': 13, 'font-weight': 700, class: 'tl-label tl-chapter', 'letter-spacing': '0.04em' }, title)
+        : svgEl('text', { x: zoomed ? pad.l : (b.b0 + b.b1) / 2, y: 20, 'text-anchor': zoomed ? 'start' : 'middle', fill: HONEY, 'font-size': 12.5, 'font-weight': 700, class: 'tl-label tl-chapter', 'letter-spacing': '0.03em' }, title);
+      if (!zoomed) {
+        lbl.dataset.chapter = b.key;
+        lbl.style.cursor = 'zoom-in';
+        const t = svgEl('title', {}, 'Zoom into ' + b.label);
+        lbl.appendChild(t);
+      }
+      g.appendChild(lbl);
+      if (!vertical && !zoomed) {
+        g.appendChild(svgEl('text', { x: (b.b0 + b.b1) / 2, y: 35, 'text-anchor': 'middle', fill: 'rgba(42,34,27,0.5)', 'font-size': 10.5, class: 'tl-label' }, 'ages ' + ages));
+      }
+    });
+
+    // Ticks
+    drawTicks(g);
+
+    // Midline (the spine)
+    g.appendChild(vertical
+      ? svgEl('line', { x1: mid.x, y1: L.a0, x2: mid.x, y2: L.a1, stroke: 'rgba(42,34,27,0.32)', 'stroke-width': 1.5, 'stroke-dasharray': '4 4' })
+      : svgEl('line', { x1: pad.l, y1: mid.y, x2: W - pad.r, y2: mid.y, stroke: 'rgba(42,34,27,0.32)', 'stroke-width': 1.5, 'stroke-dasharray': '4 4' }));
+
+    // High / low labels
+    if (vertical) {
+      g.appendChild(svgEl('text', { x: pad.l, y: 18, fill: PLUNGE_COL, 'font-size': 11, 'font-weight': 700, class: 'tl-label' }, '◀ LOW'));
+      g.appendChild(svgEl('text', { x: W - pad.r, y: 18, 'text-anchor': 'end', fill: PEAK_COL, 'font-size': 11, 'font-weight': 700, class: 'tl-label' }, 'HIGH ▶'));
+    } else {
+      g.appendChild(svgEl('text', { x: pad.l - 6, y: pad.t + 12, 'text-anchor': 'end', fill: PEAK_COL, 'font-size': 11, 'font-weight': 700, class: 'tl-label' }, 'HIGH'));
+      g.appendChild(svgEl('text', { x: pad.l - 6, y: H - pad.b - 4, 'text-anchor': 'end', fill: PLUNGE_COL, 'font-size': 11, 'font-weight': 700, class: 'tl-label' }, 'LOW'));
     }
+    svg.appendChild(g);
+
+    const visible = points.filter(p => inView(p.year));
+    drawPathLine(visible);
+    visible.forEach(p => drawDot(p));
+
+    if (!points.length) {
+      const c = vertical ? { x: W / 2, y: L.a0 + 70 } : { x: (pad.l + W - pad.r) / 2, y: pad.t + 34 };
+      svg.appendChild(svgEl('text', { x: c.x, y: c.y, 'text-anchor': 'middle', fill: 'rgba(42,34,27,0.5)', 'font-size': 13, class: 'tl-label', 'pointer-events': 'none' },
+        vertical ? 'Tap anywhere to add a moment' : 'Click anywhere to add your first moment'));
+    }
+    renderChapterChips();
+  }
+
+  function drawTicks(g) {
+    const L = layout;
+    const { W, H, pad } = L;
+    const minGap = vertical ? 46 : 38;
+    const ticks = [];
     if (birthYear) {
-      const bx = yearToX(birthYear, startYear, endYear);
-      gridGroup.appendChild(svgEl('line', { x1: bx, y1: PADDING.top, x2: bx, y2: SVG_H - PADDING.bottom, stroke: 'rgba(42,34,27,0.35)', 'stroke-width': 1.5 }));
-      const bl = svgEl('text', { x: bx + 4, y: PADDING.top + 10, fill: 'rgba(42,34,27,0.7)', 'font-size': 11, class: 'tl-label' });
-      bl.textContent = 'Born';
-      gridGroup.appendChild(bl);
+      L.segs.forEach((s, i) => {
+        const pxPerYear = (s.p1 - s.p0) / (s.y1 - s.y0);
+        const step = [1, 2, 5, 10, 20].find(n => n * pxPerYear >= minGap) || 20;
+        const fromAge = s.y0 - birthYear, toAge = s.y1 - 1 - birthYear;
+        ticks.push(fromAge);
+        for (let a = Math.ceil((fromAge + 1) / step) * step; a <= toAge; a += step) {
+          if ((a - fromAge) * pxPerYear >= minGap * 0.8) ticks.push(a);
+        }
+      });
+    } else {
+      const s = L.segs[0];
+      const pxPerYear = (s.p1 - s.p0) / (s.y1 - s.y0);
+      const step = [1, 2, 5, 10, 20].find(n => n * pxPerYear >= minGap) || 20;
+      for (let y = Math.ceil(s.y0 / step) * step; y < s.y1; y += step) ticks.push(y);
     }
-
-    svg.appendChild(gridGroup);
-
-    // Midline
-    const midLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    midLine.setAttribute('x1', PADDING.left);
-    midLine.setAttribute('y1', MIDLINE_Y);
-    midLine.setAttribute('x2', SVG_W - PADDING.right);
-    midLine.setAttribute('y2', MIDLINE_Y);
-    midLine.setAttribute('stroke', 'rgba(42,34,27,0.32)');
-    midLine.setAttribute('stroke-width', '1.5');
-    midLine.setAttribute('stroke-dasharray', '4 4');
-    svg.appendChild(midLine);
-
-    // Y-axis labels
-    const highLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    highLabel.setAttribute('x', PADDING.left - 6);
-    highLabel.setAttribute('y', PADDING.top + 10);
-    highLabel.setAttribute('text-anchor', 'end');
-    highLabel.setAttribute('fill', PEAK_COL);
-    highLabel.setAttribute('font-size', '11');
-    highLabel.setAttribute('class', 'tl-label');
-    highLabel.textContent = 'HIGH';
-    svg.appendChild(highLabel);
-
-    const lowLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    lowLabel.setAttribute('x', PADDING.left - 6);
-    lowLabel.setAttribute('y', SVG_H - PADDING.bottom - 4);
-    lowLabel.setAttribute('text-anchor', 'end');
-    lowLabel.setAttribute('fill', PLUNGE_COL);
-    lowLabel.setAttribute('font-size', '11');
-    lowLabel.setAttribute('class', 'tl-label');
-    lowLabel.textContent = 'LOW';
-    svg.appendChild(lowLabel);
-
-    // Draw the line connecting points (sorted by year)
-    drawPathLine(startYear, endYear);
-
-    // Draw point dots
-    points.forEach(p => drawDot(p, startYear, endYear));
+    ticks.forEach(t => {
+      const year = birthYear ? birthYear + t : t;
+      const a = alongOf(year + 0.5);
+      if (vertical) {
+        g.appendChild(svgEl('line', { x1: pad.l, y1: a, x2: W - pad.r, y2: a, stroke: 'rgba(42,34,27,0.07)', 'stroke-width': 1 }));
+        g.appendChild(svgEl('text', { x: pad.l - 8, y: birthYear ? a + 1 : a + 4, 'text-anchor': 'end', fill: 'rgba(42,34,27,0.78)', 'font-size': 12, 'font-weight': 700, class: 'tl-label', 'pointer-events': 'none' },
+          birthYear ? (t === 0 ? 'born' : String(t)) : String(year)));
+        if (birthYear) g.appendChild(svgEl('text', { x: pad.l - 8, y: a + 13, 'text-anchor': 'end', fill: 'rgba(42,34,27,0.45)', 'font-size': 9.5, class: 'tl-label', 'pointer-events': 'none' }, String(year)));
+      } else {
+        g.appendChild(svgEl('line', { x1: a, y1: pad.t, x2: a, y2: H - pad.b, stroke: 'rgba(42,34,27,0.07)', 'stroke-width': 1 }));
+        g.appendChild(svgEl('text', { x: a, y: H - pad.b + 17, 'text-anchor': 'middle', fill: 'rgba(42,34,27,0.75)', 'font-size': 11.5, 'font-weight': 600, class: 'tl-label' },
+          birthYear ? (t === 0 ? 'born' : String(t)) : String(year)));
+        if (birthYear) g.appendChild(svgEl('text', { x: a, y: H - pad.b + 31, 'text-anchor': 'middle', fill: 'rgba(42,34,27,0.45)', 'font-size': 9.5, class: 'tl-label' }, String(year)));
+      }
+    });
+    if (birthYear && !vertical) {
+      g.appendChild(svgEl('text', { x: pad.l - 6, y: H - pad.b + 17, 'text-anchor': 'end', fill: 'rgba(42,34,27,0.5)', 'font-size': 9.5, class: 'tl-label' }, 'AGE'));
+    }
   }
 
-  function yearToX(year, startYear, endYear) {
-    const ratio = (year - startYear) / (endYear - startYear);
-    return PADDING.left + ratio * (SVG_W - PADDING.left - PADDING.right);
-  }
-
-  // normalised Y: 0 = top (high), 1 = bottom (low)
-  function normYToSvg(normY) {
-    return PADDING.top + normY * (SVG_H - PADDING.top - PADDING.bottom);
-  }
-
-  function svgYToNorm(svgY) {
-    return (svgY - PADDING.top) / (SVG_H - PADDING.top - PADDING.bottom);
-  }
-
-  function drawPathLine(startYear, endYear) {
-    if (points.length < 2) return;
-
-    const sorted = [...points].sort((a, b) => a.year - b.year);
-    const pts    = sorted.map(p => ({
-      x: yearToX(p.year, startYear, endYear),
-      y: normYToSvg(p.normY),
-    }));
-
-    // Smooth curve using cubic bezier
+  function drawPathLine(list) {
+    if (list.length < 2) return;
+    const pts = [...list].sort((a, b) => a.year - b.year).map(pointPos);
     let d = `M ${pts[0].x} ${pts[0].y}`;
     for (let i = 0; i < pts.length - 1; i++) {
-      const cpx = (pts[i].x + pts[i+1].x) / 2;
-      d += ` C ${cpx} ${pts[i].y}, ${cpx} ${pts[i+1].y}, ${pts[i+1].x} ${pts[i+1].y}`;
+      const a = pts[i], b = pts[i + 1];
+      if (vertical) {
+        const cy = (a.y + b.y) / 2;
+        d += ` C ${a.x} ${cy}, ${b.x} ${cy}, ${b.x} ${b.y}`;
+      } else {
+        const cx = (a.x + b.x) / 2;
+        d += ` C ${cx} ${a.y}, ${cx} ${b.y}, ${b.x} ${b.y}`;
+      }
     }
-
-    const area = d + ` L ${pts[pts.length - 1].x} ${MIDLINE_Y} L ${pts[0].x} ${MIDLINE_Y} Z`;
-    svg.appendChild(svgEl('path', { d: area, fill: 'rgba(23,72,91,0.08)', stroke: 'none' }));
-    svg.appendChild(svgEl('path', { d: d, fill: 'none', stroke: '#17485b', 'stroke-width': 3, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+    const first = pts[0], last = pts[pts.length - 1], m = valOf(0.5);
+    const area = vertical
+      ? d + ` L ${m} ${last.y} L ${m} ${first.y} Z`
+      : d + ` L ${last.x} ${m} L ${first.x} ${m} Z`;
+    svg.appendChild(svgEl('path', { d: area, fill: 'rgba(23,72,91,0.08)', stroke: 'none', 'pointer-events': 'none' }));
+    svg.appendChild(svgEl('path', { d, fill: 'none', stroke: '#17485b', 'stroke-width': 3, 'stroke-linejoin': 'round', 'stroke-linecap': 'round', 'pointer-events': 'none' }));
   }
 
-  function drawDot(p, startYear, endYear) {
-    const cx = yearToX(p.year, startYear, endYear);
-    const cy = normYToSvg(p.normY);
+  function snippet(note, n) {
+    const s = String(note || '').replace(/\s+/g, ' ').trim();
+    return s.length > n ? s.slice(0, n - 1).trimEnd() + '…' : s;
+  }
+
+  function drawDot(p) {
+    const { x: cx, y: cy } = pointPos(p);
     const col = p.type === 'peak' ? PEAK_COL : PLUNGE_COL;
-
-    // Glow
-    const glow = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    glow.setAttribute('cx', cx);
-    glow.setAttribute('cy', cy);
-    glow.setAttribute('r', '13');
-    glow.setAttribute('fill', col);
-    glow.setAttribute('opacity', '0.18');
-    glow.dataset.pointId = p.id;
-    svg.appendChild(glow);
-
-    // Main dot
-    const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    dot.setAttribute('cx', cx);
-    dot.setAttribute('cy', cy);
-    dot.setAttribute('r', '7.5');
-    dot.setAttribute('fill', col);
-    dot.setAttribute('stroke', '#fff8ea');
-    dot.setAttribute('stroke-width', '2.5');
-    dot.setAttribute('cursor', 'pointer');
+    svg.appendChild(svgEl('circle', { cx, cy, r: 14, fill: col, opacity: 0.18, 'pointer-events': 'none' }));
+    const dot = svgEl('circle', { cx, cy, r: vertical ? 9 : 8, fill: col, stroke: PAPER, 'stroke-width': 2.5, cursor: 'pointer' });
     dot.dataset.pointId = p.id;
-
-    // Hover: show popover
-    dot.addEventListener('mouseenter', (e) => {
-      showPopover(p, e);
-    });
+    dot.appendChild(svgEl('title', {}, 'Remove this moment'));
+    dot.addEventListener('mouseenter', (e) => showPopover(p, e));
     dot.addEventListener('mouseleave', hidePopover);
-
-    // Click: remove
-    dot.addEventListener('click', (e) => {
-      e.stopPropagation();
-      removePoint(p.id);
-    });
-
+    dot.addEventListener('click', (e) => { e.stopPropagation(); removePoint(p.id); });
     svg.appendChild(dot);
 
-    // Year label above/below
-    const labelY = p.type === 'peak' ? cy - 15 : cy + 23;
-    const label  = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    label.setAttribute('x', cx);
-    label.setAttribute('y', labelY);
-    label.setAttribute('text-anchor', 'middle');
-    label.setAttribute('fill', INK);
-    label.setAttribute('font-size', '12');
-    label.setAttribute('font-weight', '600');
-    label.setAttribute('class', 'tl-label');
-    label.setAttribute('pointer-events', 'none');
-    label.setAttribute('paint-order', 'stroke');
-    label.setAttribute('stroke', '#fff8ea');
-    label.setAttribute('stroke-width', '3');
-    label.textContent = birthYear && p.year >= birthYear ? p.year + ' · age ' + (p.year - birthYear) : p.year;
-    svg.appendChild(label);
+    const when = birthYear ? (p.year >= birthYear ? 'age ' + (p.year - birthYear) : String(p.year)) : String(p.year);
+    const approx = p.approx ? '~' : '';
+    const detailed = vertical || view !== 'all';
+    const text = approx + when + (detailed && p.note ? ' · ' + snippet(p.note, vertical ? 22 : 26) : '');
+    let lx = cx, ly, anchor = 'middle';
+    if (vertical) {
+      ly = cy + 25;
+      const half = text.length * 3.3;
+      lx = Math.max(layout.pad.l + half, Math.min(layout.W - layout.pad.r - half, cx));
+    } else {
+      ly = p.type === 'peak' ? cy - 17 : cy + 26;
+      const half = text.length * 3.2;
+      lx = Math.max(layout.pad.l + half, Math.min(layout.W - layout.pad.r - half, cx));
+    }
+    svg.appendChild(svgEl('text', {
+      x: lx, y: ly, 'text-anchor': anchor, fill: INK, 'font-size': 12, 'font-weight': 600,
+      class: 'tl-label', 'pointer-events': 'none', 'paint-order': 'stroke', stroke: PAPER, 'stroke-width': 3.5,
+    }, text));
   }
+
+  // ── Chapter chips (zoom) ─────────────────────────────────────
+  function renderChapterChips() {
+    const wrap = document.getElementById('chapter-chips');
+    const nudge = document.getElementById('chapter-nudge');
+    if (!wrap) return;
+    const chs = lifeChapters();
+    if (!birthYear) {
+      wrap.hidden = true;
+      if (nudge) nudge.hidden = false;
+      return;
+    }
+    if (nudge) nudge.hidden = true;
+    wrap.hidden = false;
+    const count = (c) => points.filter(p => { const ch = chapterOfYear(p.year); return ch && ch.key === c.key; }).length;
+    wrap.innerHTML = [`<button type="button" class="chapter-chip${view === 'all' ? ' is-on' : ''}" data-view="all" aria-pressed="${view === 'all'}">Whole life</button>`]
+      .concat(chs.map(c => {
+        const n = count(c);
+        return `<button type="button" class="chapter-chip${view === c.key ? ' is-on' : ''}" data-view="${c.key}" aria-pressed="${view === c.key}">${escapeHtml(c.label)}${n ? ` <span class="chip-count">${n}</span>` : ''}</button>`;
+      })).join('');
+  }
+  function setView(v) {
+    view = v || 'all';
+    hidePopover();
+    drawGrid();
+  }
+  document.getElementById('chapter-chips').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-view]');
+    if (b) setView(b.dataset.view);
+  });
 
   // ── Popover ──────────────────────────────────────────────────
-  function showPopover(p, e) {
-    const popover   = document.getElementById('point-popover');
-    const timeWrap  = document.querySelector('.timeline-wrap');
-    const rect      = timeWrap.getBoundingClientRect();
-
-    document.getElementById('popover-label').textContent = `${p.type === 'peak' ? '▲ High season' : '▼ Low season'} · ${p.year}`;
+  function showPopover(p) {
+    const popover  = document.getElementById('point-popover');
+    const timeWrap = document.querySelector('.timeline-wrap');
+    const rect     = timeWrap.getBoundingClientRect();
+    const when = birthYear && p.year >= birthYear ? `${p.year} · age ${p.year - birthYear}` : String(p.year);
+    document.getElementById('popover-label').textContent = `${p.type === 'peak' ? '▲ High season' : '▼ Low season'} · ${p.approx ? 'around ' : ''}${when}`;
     document.getElementById('popover-value').textContent = p.note || '(no note)';
-
     const svgRect = svg.getBoundingClientRect();
-    const scale   = svgRect.width / SVG_W;
-    const _r      = timelineRange();
-    const cx      = yearToX(p.year, _r.startYear, _r.endYear) * scale + svgRect.left - rect.left;
-    const cy      = normYToSvg(p.normY) * (svgRect.height / SVG_H) + svgRect.top - rect.top;
-
-    popover.style.left = (cx + 12) + 'px';
-    popover.style.top  = (cy - 20) + 'px';
+    const sx = svgRect.width / layout.W, sy = svgRect.height / layout.H;
+    const pp = pointPos(p);
+    let left = pp.x * sx + svgRect.left - rect.left + 14;
+    const maxLeft = rect.width - 240;
+    if (left > maxLeft) left = Math.max(8, pp.x * sx + svgRect.left - rect.left - 250);
+    popover.style.left = left + 'px';
+    popover.style.top  = (pp.y * sy + svgRect.top - rect.top - 20) + 'px';
     popover.classList.add('visible');
   }
-
   function hidePopover() {
     document.getElementById('point-popover').classList.remove('visible');
   }
 
-  // ── Click on SVG to add a point ──────────────────────────────
-  // Touch support for mobile
+  // ── Tap / click on the timeline to add a moment ─────────────
+  // A tap adds a moment; a scroll or swipe does not.
+  let touchStart = null;
+  svg.addEventListener('touchstart', (e) => {
+    const t = e.touches[0];
+    touchStart = { x: t.clientX, y: t.clientY, at: Date.now() };
+  }, { passive: true });
   svg.addEventListener('touchend', (e) => {
+    const t = e.changedTouches[0];
+    const s = touchStart; touchStart = null;
+    if (!s || Math.hypot(t.clientX - s.x, t.clientY - s.y) > 10 || Date.now() - s.at > 600) return;
     e.preventDefault();
-    const touch = e.changedTouches[0];
-    const syntheticClick = new MouseEvent('click', {
-      clientX: touch.clientX,
-      clientY: touch.clientY,
-      bubbles: true,
-    });
-    svg.dispatchEvent(syntheticClick);
+    const target = document.elementFromPoint(t.clientX, t.clientY) || svg;
+    target.dispatchEvent(new MouseEvent('click', { clientX: t.clientX, clientY: t.clientY, bubbles: true }));
   });
 
   svg.addEventListener('click', (e) => {
-    const rect   = svg.getBoundingClientRect();
-    const svgX   = ((e.clientX - rect.left) / rect.width)  * SVG_W;
-    const svgY   = ((e.clientY - rect.top)  / rect.height) * SVG_H;
-
-    // Don't add if clicking a dot
     if (e.target.tagName === 'circle' && e.target.dataset.pointId) return;
+    const chapterLabel = e.target.closest && e.target.closest('[data-chapter]');
+    if (chapterLabel) { setView(chapterLabel.dataset.chapter); return; }
 
-    const normY = svgYToNorm(svgY);
-    const type  = normY < 0.5 ? 'peak' : 'plunge';
+    const rect = svg.getBoundingClientRect();
+    const sx = ((e.clientX - rect.left) / rect.width)  * layout.W;
+    const sy = ((e.clientY - rect.top)  / rect.height) * layout.H;
+    const { W, H, pad } = layout;
+    const along = vertical ? sy : sx;
+    if (along < layout.a0 || along > layout.a1) return;
+    let normY = vertical ? ((W - pad.r) - sx) / (W - pad.l - pad.r) : (sy - pad.t) / (H - pad.t - pad.b);
+    normY = Math.max(0.04, Math.min(0.96, normY));
+    const type = normY < 0.5 ? 'peak' : 'plunge';
+    openAddModal({ normY, type }, yearAtAlong(along));
+  });
 
-    // Guess year from X position
-    const { startYear, endYear } = timelineRange();
-    const xRatio      = (svgX - PADDING.left) / (SVG_W - PADDING.left - PADDING.right);
-    const guessYear   = Math.round(startYear + xRatio * (endYear - startYear));
-    const clampedYear = Math.max(startYear, Math.min(endYear, guessYear));
+  // ── Add-moment dialog: year, age, or just a chapter ─────────
+  const modalYear = document.getElementById('modal-year');
+  const modalAge  = document.getElementById('modal-age');
+  let pickedChapter = null;
 
-    pendingPoint = { normY, type };
+  function syncWhenUi() {
+    const y = parseInt(modalYear.value, 10);
+    const ch = y && birthYear ? chapterOfYear(y) : null;
+    document.querySelectorAll('#when-chapters [data-pick]').forEach(b => {
+      const on = !!ch && b.dataset.pick === ch.key;
+      b.classList.toggle('is-on', on);
+      b.setAttribute('aria-pressed', on);
+    });
+  }
+  function renderWhenChapters() {
+    const ageWrap = document.getElementById('when-age-wrap');
+    const box = document.getElementById('when-chapters-wrap');
+    if (!birthYear) { ageWrap.hidden = true; box.hidden = true; return; }
+    ageWrap.hidden = false; box.hidden = false;
+    document.getElementById('when-chapters').innerHTML = lifeChapters()
+      .map(c => `<button type="button" class="chapter-chip" data-pick="${c.key}" aria-pressed="false">${escapeHtml(c.label)}</button>`).join('');
+  }
+  modalYear.addEventListener('input', () => {
+    pickedChapter = null;
+    const y = parseInt(modalYear.value, 10);
+    modalAge.value = birthYear && y >= birthYear ? y - birthYear : '';
+    syncWhenUi();
+  });
+  modalAge.addEventListener('input', () => {
+    pickedChapter = null;
+    const a = parseInt(modalAge.value, 10);
+    if (birthYear && a >= 0 && a <= currentAge()) modalYear.value = birthYear + a;
+    syncWhenUi();
+  });
+  document.getElementById('when-chapters').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-pick]');
+    if (!b) return;
+    const c = lifeChapters().find(x => x.key === b.dataset.pick);
+    if (!c) return;
+    const age = Math.round((c.from + c.toAge) / 2);
+    modalYear.value = birthYear + age;
+    modalAge.value = age;
+    pickedChapter = c.key;
+    syncWhenUi();
+  });
 
-    // Open modal
+  function openAddModal(pending, guessYear) {
+    pendingPoint = pending;
+    pickedChapter = null;
+    renderWhenChapters();
     const modal = document.getElementById('modal-overlay');
     const typeTag = document.getElementById('modal-type-tag');
     const title = document.getElementById('modal-title');
-
-    document.getElementById('modal-year').value = clampedYear;
+    modalYear.value = guessYear;
+    modalAge.value = birthYear && guessYear >= birthYear ? guessYear - birthYear : '';
+    syncWhenUi();
     document.getElementById('modal-note').value = '';
-
-    typeTag.textContent = type === 'peak' ? '▲ High season' : '▼ Low season';
-    typeTag.className   = `modal-type-tag ${type}`;
-    title.textContent   = type === 'peak' ? 'What made this a high?' : 'What made this a low?';
-
+    typeTag.textContent = pending.type === 'peak' ? '▲ High season' : '▼ Low season';
+    typeTag.className   = `modal-type-tag ${pending.type}`;
+    title.textContent   = pending.type === 'peak' ? 'What made this a high?' : 'What made this a low?';
     modal.classList.add('visible');
-    // Keep the dialog visually tied to the viewport: autofocus scrolls the iframe
-    // document, which used to shove this fixed modal off-screen inside the embed.
+    // Keep the dialog tied to the viewport inside the session embed.
     window.scrollTo(0, 0);
     modal.scrollTop = 0;
     setTimeout(function() {
-      var y = document.getElementById('modal-year');
-      if (!y) return;
-      try { y.focus({ preventScroll: true }); } catch (e) { y.focus(); }
+      var n = document.getElementById('modal-note');
+      try { n.focus({ preventScroll: true }); } catch (e) { n.focus(); }
     }, 50);
-  });
+  }
 
   // ── Modal buttons ────────────────────────────────────────────
   document.getElementById('btn-cancel').addEventListener('click', closeModal);
@@ -986,23 +1203,14 @@
   });
 
   document.getElementById('btn-add-point').addEventListener('click', () => {
-    const year = parseInt(document.getElementById('modal-year').value);
+    const year = parseInt(modalYear.value, 10);
     const note = document.getElementById('modal-note').value.trim();
-
     if (!year || year < (birthYear || 1920) || year > CURRENT_YEAR) {
-      var yEl = document.getElementById('modal-year');
-      try { yEl.focus({ preventScroll: true }); } catch (e) { yEl.focus(); }
+      try { modalYear.focus({ preventScroll: true }); } catch (e) { modalYear.focus(); }
       return;
     }
-
-    const newPoint = {
-      id:    crypto.randomUUID(),
-      year,
-      note,
-      type:  pendingPoint.type,
-      normY: pendingPoint.normY,
-    };
-
+    const newPoint = { id: crypto.randomUUID(), year, note, type: pendingPoint.type, normY: pendingPoint.normY };
+    if (pickedChapter) newPoint.approx = true;
     points.push(newPoint);
     closeModal();
     drawGrid();
@@ -1018,44 +1226,59 @@
   // ── Remove a point ───────────────────────────────────────────
   function removePoint(id) {
     points = points.filter(p => p.id !== id);
+    hidePopover();
     drawGrid();
     renderPointsList();
     autoSave();
   }
 
-  // ── Render points lists below ────────────────────────────────
+  // ── Lists below the timeline ─────────────────────────────────
   function renderPointsList() {
     const peaksList   = document.getElementById('peaks-list');
     const plungesList = document.getElementById('plunges-list');
-
-    const peaks   = points.filter(p => p.type === 'peak').sort((a,b) => a.year - b.year);
-    const plunges = points.filter(p => p.type === 'plunge').sort((a,b) => a.year - b.year);
-
-    peaksList.innerHTML = peaks.length ? '' : '<div class="empty-hint">Click above the midline to add a high season.</div>';
-    plungesList.innerHTML = plunges.length ? '' : '<div class="empty-hint">Click below the midline to add a low season.</div>';
-
-    peaks.forEach(p => {
-      peaksList.innerHTML += `
+    const row = (p) => {
+      const ch = birthYear ? chapterOfYear(p.year) : null;
+      const age = birthYear && p.year >= birthYear ? ` · age ${p.year - birthYear}` : '';
+      return `
         <div class="point-entry">
-          <span class="point-year">${p.year}</span>
-          <span class="point-note">${p.note || '<em style="opacity:0.5">No note</em>'}</span>
-          <span class="point-remove" onclick="removePointById('${p.id}')">✕</span>
+          <span class="point-year">${p.approx ? '~' : ''}${p.year}${age}${ch ? `<small>${escapeHtml(ch.label)}</small>` : ''}</span>
+          <span class="point-note">${p.note ? escapeHtml(p.note) : '<em style="opacity:0.5">No note</em>'}</span>
+          <span class="point-remove" role="button" tabindex="0" aria-label="Remove" onclick="removePointById('${escapeHtml(p.id)}')">✕</span>
         </div>`;
-    });
-
-    plunges.forEach(p => {
-      plungesList.innerHTML += `
-        <div class="point-entry">
-          <span class="point-year">${p.year}</span>
-          <span class="point-note">${p.note || '<em style="opacity:0.5">No note</em>'}</span>
-          <span class="point-remove" onclick="removePointById('${p.id}')">✕</span>
-        </div>`;
-    });
+    };
+    const peaks   = points.filter(p => p.type === 'peak').sort((a, b) => a.year - b.year);
+    const plunges = points.filter(p => p.type === 'plunge').sort((a, b) => a.year - b.year);
+    const hi = vertical ? 'Tap right of the centre line to add a high season.' : 'Click above the midline to add a high season.';
+    const lo = vertical ? 'Tap left of the centre line to add a low season.' : 'Click below the midline to add a low season.';
+    peaksList.innerHTML = peaks.length ? peaks.map(row).join('') : `<div class="empty-hint">${hi}</div>`;
+    plungesList.innerHTML = plunges.length ? plunges.map(row).join('') : `<div class="empty-hint">${lo}</div>`;
   }
 
   window.removePointById = function(id) {
     removePoint(id);
   };
+
+  // ── Orientation: top-to-bottom on narrow screens ────────────
+  function applyOrientation() {
+    const v = window.innerWidth <= 560;
+    const changed = v !== vertical;
+    vertical = v;
+    document.documentElement.classList.toggle('pp-vertical', vertical);
+    const hi = document.getElementById('hint-high');
+    const lo = document.getElementById('hint-low');
+    const rm = document.getElementById('hint-remove');
+    if (hi) hi.textContent = vertical ? 'Tap right of centre → high season' : 'Click above centre → high season';
+    if (lo) lo.textContent = vertical ? 'Tap left of centre → low season' : 'Click below centre → low season';
+    if (rm) rm.textContent = vertical ? 'Tap a dot to remove it' : 'Click a dot to remove it';
+    return changed;
+  }
+  let resizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => { if (applyOrientation()) { drawGrid(); renderPointsList(); } }, 150);
+  });
+  applyOrientation();
+
 
   // ── Auto-save to Supabase ────────────────────────────────────
   async function autoSave() {
@@ -1124,7 +1347,9 @@
       birthYear = (v >= 1920 && v <= CURRENT_YEAR) ? v : null;
       if (!birthYear) byInput.value = '';
       document.getElementById('modal-year').min = birthYear || 1920;
+      view = 'all';
       drawGrid();
+      renderPointsList();
       autoSave();
     });
     document.getElementById('modal-year').max = CURRENT_YEAR;
