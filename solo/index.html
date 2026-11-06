@@ -648,7 +648,7 @@
     .snap-badge-north  { background: rgba(126,184,201,0.12); color: #7eb8c9; }
     .snap-text {
       font-size: 0.75rem;
-      color: rgba(240,236,228,0.75);
+      color: var(--text-dim);
       line-height: 1.4;
       flex: 1;
       min-width: 0;
@@ -657,6 +657,14 @@
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 3;
       white-space: normal;
+    }
+    .snap-text-quiet { font-style: italic; color: var(--text-dim); opacity: 0.9; }
+    .snap-meta {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      margin-left: 4px;
     }
     .tool-item-snap .snap-text { -webkit-line-clamp: 2; }
     .snap-count {
@@ -3045,7 +3053,7 @@
             var icon = p.type === 'peak' ? '▲' : '▼';
             var label = escapeSnapText(p.label || p.note || p.event || '');
             var year = p.year || '';
-            return '<div class="snap-row"><span class="snap-badge ' + badge + '">' + icon + '</span><span class="snap-text">' + label + '</span><span style="font-family:var(--font-mono);font-size:0.62rem;color:rgba(240,236,228,0.3);flex-shrink:0;margin-left:4px">' + year + '</span></div>';
+            return '<div class="snap-row"><span class="snap-badge ' + badge + '">' + icon + '</span><span class="snap-text">' + label + '</span><span class="snap-meta">' + year + '</span></div>';
           }
           if (peaks.length) html += ppRow(peaks[peaks.length - 1]);
           if (plunges.length) html += ppRow(plunges[plunges.length - 1]);
@@ -3084,7 +3092,7 @@
           });
         } else {
           if (data._glowCompareMissing && (activeSession && (activeSession.number === 7 || activeSession.number === 4))) {
-            html += '<p style="font-size:0.72rem;color:rgba(240,236,228,0.45);margin:0 0 8px;line-height:1.45;">No Session 2 Glow Map on file yet. Complete Session 2’s map once to unlock before/after here.</p>';
+            html += '<p style="font-size:0.72rem;color:var(--text-dim);margin:0 0 8px;line-height:1.45;">No Session 2 Glow Map on file yet. Complete Session 2’s map once to unlock before/after here.</p>';
           }
           var entries = Object.entries(scores).sort(function (a, b) { return b[1] - a[1]; }).slice(0, 5);
           entries.forEach(function (e) {
@@ -3142,7 +3150,7 @@
         });
         if (data.intention) {
           html +=
-            '<div class="snap-divider"></div><div class="snap-row"><span class="snap-text" style="font-style:italic;color:rgba(240,236,228,0.55)">' +
+            '<div class="snap-divider"></div><div class="snap-row"><span class="snap-text snap-text-quiet">' +
             escapeSnapText(String(data.intention).slice(0, 100)) +
             (String(data.intention).length > 100 ? '…' : '') +
             '</span></div>';
@@ -3172,7 +3180,7 @@
         feathers.forEach(f=>{html+='<div class="snap-row"><span class="snap-badge snap-badge-plunge">Release</span><span class="snap-text">'+escapeSnapText(f.text)+'</span></div>';});
         // Reflection fallback so the snapshot isn't empty when the user only journaled.
         if (!html && data.reflection) {
-          html+='<div class="snap-row"><span class="snap-text" style="font-style:italic;color:rgba(240,236,228,0.55)">"'+String(data.reflection).slice(0,140)+(String(data.reflection).length>140?'…':'')+'"</span></div>';
+          html+='<div class="snap-row"><span class="snap-text snap-text-quiet">"'+String(data.reflection).slice(0,140)+(String(data.reflection).length>140?'…':'')+'"</span></div>';
         }
       }
       else if (k === 'adventure-map') {
@@ -3188,7 +3196,7 @@
       else if (k === 'tangle-within') {
         var fear=data['vine-fear']||'',truth=data['truth-release']||'';
         if(fear) html+='<div class="snap-row"><span class="snap-badge snap-badge-shadow">Fear</span><span class="snap-text">'+fear.slice(0,60)+'</span></div>';
-        if(truth) { html+='<div class="snap-divider"></div><div class="snap-row"><span class="snap-text" style="font-style:italic;color:rgba(240,236,228,0.5)">'+truth.slice(0,80)+'</span></div>'; }
+        if(truth) { html+='<div class="snap-divider"></div><div class="snap-row"><span class="snap-text snap-text-quiet">'+truth.slice(0,80)+'</span></div>'; }
       }
       else if (k === 'deep-profile') {
         var mbti=data.mbti||'',enn=data.enneagram||'';
@@ -3230,7 +3238,7 @@
         for (var i = 0; i < candidateKeys.length; i++) {
           var v = data[candidateKeys[i]];
           if (v && typeof v === 'string' && v.trim()) {
-            html += '<div class="snap-row"><span class="snap-text" style="font-style:italic;color:rgba(240,236,228,0.55)">"'+v.slice(0,140)+(v.length>140?'…':'')+'"</span></div>';
+            html += '<div class="snap-row"><span class="snap-text snap-text-quiet">"'+v.slice(0,140)+(v.length>140?'…':'')+'"</span></div>';
             break;
           }
         }
