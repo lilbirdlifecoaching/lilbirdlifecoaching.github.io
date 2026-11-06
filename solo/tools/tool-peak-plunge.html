@@ -31,8 +31,8 @@
       --session-col: #7a9e7e;
       --session-dim: rgba(122,158,126,0.1);
       --session-border: rgba(122,158,126,0.22);
-      --peak-col:    #9dbf8a;  /* highs — sage green */
-      --plunge-col:  #c4956a;  /* lows — warm amber */
+      --peak-col:    #4f7d3e;  /* highs — sage green, dark enough for paper */
+      --plunge-col:  #b0652a;  /* lows — warm amber */
       --text:        #f0ece4;
       --text-dim:    rgba(240,236,228,0.58);
       --text-muted:  rgba(240,236,228,0.3);
@@ -187,6 +187,13 @@
       height: 10px;
       border-radius: 50%;
     }
+
+    /* Birth year */
+    .birth-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.8rem; margin: 0 0 1rem; }
+    .birth-row label { font-size: 0.85rem; font-weight: 500; color: var(--text); }
+    .birth-row input { width: 7.5rem; padding: 0.5rem 0.7rem; font-size: 0.95rem; }
+    .birth-hint { flex-basis: 100%; font-size: 0.78rem; color: var(--text-dim); }
+    .tl-label { font-family: 'DM Sans', system-ui, sans-serif; }
 
     /* SVG timeline */
     #timeline-svg {
@@ -564,7 +571,7 @@
 <link rel="stylesheet" href="/css/lilbird-tokens.css" />
 <link rel="stylesheet" href="/css/lilbird-theme-chrome.css" />
   <link rel="stylesheet" href="/css/lilbird-solo-tools-journal.css?v=20261105t2" />
-  <link rel="stylesheet" href="/css/lilbird-parchment.css?v=20261106p3" />
+  <link rel="stylesheet" href="/css/lilbird-parchment.css?v=20261106p4" />
   <script>(function(){var d=document.documentElement;d.classList.add('solo-journal');try{if(window.self!==window.top)d.classList.add('tool-embedded');}catch(e){d.classList.add('tool-embedded');}})();</script>
 </head>
 
@@ -596,6 +603,13 @@
     <div class="instruction-chip"><span class="chip-icon">▲</span> Click above centre → high season</div>
     <div class="instruction-chip"><span class="chip-icon">▼</span> Click below centre → low season</div>
     <div class="instruction-chip"><span class="chip-icon">✕</span> Click a dot to remove it</div>
+  </div>
+
+  <!-- Birth year sets the start of the timeline -->
+  <div class="birth-row">
+    <label for="birth-year">The year you were born</label>
+    <input type="number" id="birth-year" inputmode="numeric" placeholder="e.g. 1992" min="1920" />
+    <span class="birth-hint">So your timeline starts where your story does. Only you see this.</span>
   </div>
 
   <!-- Timeline canvas -->
@@ -651,7 +665,7 @@
     <div class="modal-type-tag" id="modal-type-tag">Peak</div>
     <h3 id="modal-title">What happened here?</h3>
     <label>Year (approx)</label>
-    <input type="number" id="modal-year" placeholder="e.g. 2015" min="1950" max="2026" />
+    <input type="number" id="modal-year" placeholder="e.g. 2015" min="1920" />
     <label>A few words about this season</label>
     <textarea id="modal-note" placeholder="What made this time a high or low? What do you remember most?"></textarea>
     <div class="modal-actions">
@@ -697,41 +711,58 @@
   const SVG_W     = 800;
   const SVG_H     = 280;
   const MIDLINE_Y = SVG_H / 2;  // 140
-  const PADDING   = { left: 48, right: 24, top: 24, bottom: 36 };
+  const PADDING   = { left: 48, right: 24, top: 24, bottom: 44 };
+
+  const PEAK_COL   = '#4f7d3e';
+  const PLUNGE_COL = '#b0652a';
+  const INK        = '#2a221b';
+  const CURRENT_YEAR = new Date().getFullYear();
+  let birthYear = null;
+
+  // Timeline runs from birth (or the earliest moment, or 1960) to this year
+  function timelineRange() {
+    const years = points.map(p => p.year).filter(Boolean);
+    let start = birthYear || (years.length ? Math.min(...years) - 2 : 1960);
+    if (years.length) start = Math.min(start, Math.min(...years));
+    start = Math.max(1920, Math.min(start, CURRENT_YEAR - 5));
+    return { startYear: start, endYear: CURRENT_YEAR };
+  }
+
+  function svgEl(tag, attrs) {
+    const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    Object.keys(attrs).forEach(k => el.setAttribute(k, attrs[k]));
+    return el;
+  }
 
   // Draw the baseline grid
   function drawGrid() {
     svg.innerHTML = '';
-
-    // Year labels (approximate decades on X axis)
-    const currentYear = new Date().getFullYear();
-    const startYear   = 1960;
-    const endYear     = currentYear;
-    const yearRange   = endYear - startYear;
+    const { startYear, endYear } = timelineRange();
+    const span = endYear - startYear;
+    const step = span > 60 ? 10 : span > 25 ? 5 : 2;
 
     // Background grid lines
     const gridGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 
-    for (let y = 1960; y <= currentYear; y += 10) {
+    const firstTick = Math.ceil(startYear / step) * step;
+    for (let y = firstTick; y <= endYear; y += step) {
       const x = yearToX(y, startYear, endYear);
-      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      line.setAttribute('x1', x);
-      line.setAttribute('y1', PADDING.top);
-      line.setAttribute('x2', x);
-      line.setAttribute('y2', SVG_H - PADDING.bottom);
-      line.setAttribute('stroke', 'rgba(255,255,255,0.04)');
-      line.setAttribute('stroke-width', '1');
-      gridGroup.appendChild(line);
-
-      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      label.setAttribute('x', x);
-      label.setAttribute('y', SVG_H - 10);
-      label.setAttribute('text-anchor', 'middle');
-      label.setAttribute('fill', 'rgba(240,236,228,0.25)');
-      label.setAttribute('font-size', '9');
-      label.setAttribute('font-family', 'DM Mono, monospace');
+      gridGroup.appendChild(svgEl('line', { x1: x, y1: PADDING.top, x2: x, y2: SVG_H - PADDING.bottom, stroke: 'rgba(42,34,27,0.08)', 'stroke-width': 1 }));
+      const label = svgEl('text', { x: x, y: birthYear ? SVG_H - 20 : SVG_H - 12, 'text-anchor': 'middle', fill: 'rgba(42,34,27,0.66)', 'font-size': 11, class: 'tl-label' });
       label.textContent = y;
       gridGroup.appendChild(label);
+      if (birthYear && y >= birthYear) {
+        const age = svgEl('text', { x: x, y: SVG_H - 6, 'text-anchor': 'middle', fill: 'rgba(42,34,27,0.45)', 'font-size': 9.5, class: 'tl-label' });
+        age.textContent = 'age ' + (y - birthYear);
+        gridGroup.appendChild(age);
+      }
+    }
+    if (birthYear) {
+      const bx = yearToX(birthYear, startYear, endYear);
+      gridGroup.appendChild(svgEl('line', { x1: bx, y1: PADDING.top, x2: bx, y2: SVG_H - PADDING.bottom, stroke: 'rgba(42,34,27,0.35)', 'stroke-width': 1.5 }));
+      const bl = svgEl('text', { x: bx + 4, y: PADDING.top + 10, fill: 'rgba(42,34,27,0.7)', 'font-size': 11, class: 'tl-label' });
+      bl.textContent = 'Born';
+      gridGroup.appendChild(bl);
     }
 
     svg.appendChild(gridGroup);
@@ -742,7 +773,7 @@
     midLine.setAttribute('y1', MIDLINE_Y);
     midLine.setAttribute('x2', SVG_W - PADDING.right);
     midLine.setAttribute('y2', MIDLINE_Y);
-    midLine.setAttribute('stroke', 'rgba(255,255,255,0.12)');
+    midLine.setAttribute('stroke', 'rgba(42,34,27,0.32)');
     midLine.setAttribute('stroke-width', '1.5');
     midLine.setAttribute('stroke-dasharray', '4 4');
     svg.appendChild(midLine);
@@ -752,9 +783,9 @@
     highLabel.setAttribute('x', PADDING.left - 6);
     highLabel.setAttribute('y', PADDING.top + 10);
     highLabel.setAttribute('text-anchor', 'end');
-    highLabel.setAttribute('fill', 'rgba(157,191,138,0.4)');
-    highLabel.setAttribute('font-size', '9');
-    highLabel.setAttribute('font-family', 'DM Mono, monospace');
+    highLabel.setAttribute('fill', PEAK_COL);
+    highLabel.setAttribute('font-size', '11');
+    highLabel.setAttribute('class', 'tl-label');
     highLabel.textContent = 'HIGH';
     svg.appendChild(highLabel);
 
@@ -762,9 +793,9 @@
     lowLabel.setAttribute('x', PADDING.left - 6);
     lowLabel.setAttribute('y', SVG_H - PADDING.bottom - 4);
     lowLabel.setAttribute('text-anchor', 'end');
-    lowLabel.setAttribute('fill', 'rgba(196,149,106,0.4)');
-    lowLabel.setAttribute('font-size', '9');
-    lowLabel.setAttribute('font-family', 'DM Mono, monospace');
+    lowLabel.setAttribute('fill', PLUNGE_COL);
+    lowLabel.setAttribute('font-size', '11');
+    lowLabel.setAttribute('class', 'tl-label');
     lowLabel.textContent = 'LOW';
     svg.appendChild(lowLabel);
 
@@ -805,27 +836,23 @@
       d += ` C ${cpx} ${pts[i].y}, ${cpx} ${pts[i+1].y}, ${pts[i+1].x} ${pts[i+1].y}`;
     }
 
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    path.setAttribute('d', d);
-    path.setAttribute('fill', 'none');
-    path.setAttribute('stroke', 'rgba(122,158,126,0.4)');
-    path.setAttribute('stroke-width', '2');
-    path.setAttribute('stroke-linejoin', 'round');
-    svg.appendChild(path);
+    const area = d + ` L ${pts[pts.length - 1].x} ${MIDLINE_Y} L ${pts[0].x} ${MIDLINE_Y} Z`;
+    svg.appendChild(svgEl('path', { d: area, fill: 'rgba(23,72,91,0.08)', stroke: 'none' }));
+    svg.appendChild(svgEl('path', { d: d, fill: 'none', stroke: '#17485b', 'stroke-width': 3, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
   }
 
   function drawDot(p, startYear, endYear) {
     const cx = yearToX(p.year, startYear, endYear);
     const cy = normYToSvg(p.normY);
-    const col = p.type === 'peak' ? '#9dbf8a' : '#c4956a';
+    const col = p.type === 'peak' ? PEAK_COL : PLUNGE_COL;
 
     // Glow
     const glow = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     glow.setAttribute('cx', cx);
     glow.setAttribute('cy', cy);
-    glow.setAttribute('r', '10');
+    glow.setAttribute('r', '13');
     glow.setAttribute('fill', col);
-    glow.setAttribute('opacity', '0.12');
+    glow.setAttribute('opacity', '0.18');
     glow.dataset.pointId = p.id;
     svg.appendChild(glow);
 
@@ -833,10 +860,10 @@
     const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     dot.setAttribute('cx', cx);
     dot.setAttribute('cy', cy);
-    dot.setAttribute('r', '6');
+    dot.setAttribute('r', '7.5');
     dot.setAttribute('fill', col);
-    dot.setAttribute('stroke', 'var(--dark-card)');
-    dot.setAttribute('stroke-width', '2');
+    dot.setAttribute('stroke', '#fff8ea');
+    dot.setAttribute('stroke-width', '2.5');
     dot.setAttribute('cursor', 'pointer');
     dot.dataset.pointId = p.id;
 
@@ -855,16 +882,20 @@
     svg.appendChild(dot);
 
     // Year label above/below
-    const labelY = p.type === 'peak' ? cy - 12 : cy + 18;
+    const labelY = p.type === 'peak' ? cy - 15 : cy + 23;
     const label  = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     label.setAttribute('x', cx);
     label.setAttribute('y', labelY);
     label.setAttribute('text-anchor', 'middle');
-    label.setAttribute('fill', col);
-    label.setAttribute('font-size', '9');
-    label.setAttribute('font-family', 'DM Mono, monospace');
+    label.setAttribute('fill', INK);
+    label.setAttribute('font-size', '12');
+    label.setAttribute('font-weight', '600');
+    label.setAttribute('class', 'tl-label');
     label.setAttribute('pointer-events', 'none');
-    label.textContent = p.year;
+    label.setAttribute('paint-order', 'stroke');
+    label.setAttribute('stroke', '#fff8ea');
+    label.setAttribute('stroke-width', '3');
+    label.textContent = birthYear && p.year >= birthYear ? p.year + ' · age ' + (p.year - birthYear) : p.year;
     svg.appendChild(label);
   }
 
@@ -879,7 +910,8 @@
 
     const svgRect = svg.getBoundingClientRect();
     const scale   = svgRect.width / SVG_W;
-    const cx      = yearToX(p.year, 1960, new Date().getFullYear()) * scale + svgRect.left - rect.left;
+    const _r      = timelineRange();
+    const cx      = yearToX(p.year, _r.startYear, _r.endYear) * scale + svgRect.left - rect.left;
     const cy      = normYToSvg(p.normY) * (svgRect.height / SVG_H) + svgRect.top - rect.top;
 
     popover.style.left = (cx + 12) + 'px';
@@ -916,8 +948,7 @@
     const type  = normY < 0.5 ? 'peak' : 'plunge';
 
     // Guess year from X position
-    const startYear   = 1960;
-    const endYear     = new Date().getFullYear();
+    const { startYear, endYear } = timelineRange();
     const xRatio      = (svgX - PADDING.left) / (SVG_W - PADDING.left - PADDING.right);
     const guessYear   = Math.round(startYear + xRatio * (endYear - startYear));
     const clampedYear = Math.max(startYear, Math.min(endYear, guessYear));
@@ -958,7 +989,7 @@
     const year = parseInt(document.getElementById('modal-year').value);
     const note = document.getElementById('modal-note').value.trim();
 
-    if (!year || year < 1950 || year > 2026) {
+    if (!year || year < (birthYear || 1920) || year > CURRENT_YEAR) {
       var yEl = document.getElementById('modal-year');
       try { yEl.focus({ preventScroll: true }); } catch (e) { yEl.focus(); }
       return;
@@ -1033,7 +1064,7 @@
       await sb.from('tool_outputs').upsert({
         user_id:     currentUser.id,
         tool_name:   'peak_plunge',
-        output_data: { points },
+        output_data: birthYear ? { points, birthYear } : { points },
         updated_at:  new Date().toISOString(),
       }, { onConflict: 'user_id,tool_name' });
     } catch {
@@ -1047,7 +1078,7 @@
     const status = document.getElementById('save-status');
     status.classList.add('visible');
     if (window.parent !== window && window.LilbirdEmbed) {
-      LilbirdEmbed.finishEmbedSave('peak-plunge', { points: points.slice() });
+      LilbirdEmbed.finishEmbedSave('peak-plunge', birthYear ? { points: points.slice(), birthYear } : { points: points.slice() });
     } else if (window.parent !== window) {
       setTimeout(function() { window.parent.postMessage('tool-close', '*'); }, 1800);
     } else {
@@ -1081,7 +1112,22 @@
       if (toolData?.output_data?.points) {
         points = toolData.output_data.points;
       }
+      const by = parseInt(toolData?.output_data?.birthYear, 10);
+      if (by >= 1920 && by <= CURRENT_YEAR) birthYear = by;
     }
+
+    const byInput = document.getElementById('birth-year');
+    byInput.max = CURRENT_YEAR;
+    if (birthYear) byInput.value = birthYear;
+    byInput.addEventListener('change', () => {
+      const v = parseInt(byInput.value, 10);
+      birthYear = (v >= 1920 && v <= CURRENT_YEAR) ? v : null;
+      if (!birthYear) byInput.value = '';
+      document.getElementById('modal-year').min = birthYear || 1920;
+      drawGrid();
+      autoSave();
+    });
+    document.getElementById('modal-year').max = CURRENT_YEAR;
 
     drawGrid();
     renderPointsList();

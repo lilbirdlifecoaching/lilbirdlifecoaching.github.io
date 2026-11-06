@@ -22,6 +22,9 @@ If a change touches pricing, booking, worker logic, or public copy, log it here.
 
 ## 2026-11-06 (Claude)
 
+- `built in repo` Solo session card: cream fill now reaches under the torn frame (no floating inner panel). Parchment CSS cache → `v=20261106p4` on all pages.
+- `built in repo` Peak & Plunge: optional birth-year field (timeline starts at birth, ticks show year + age, "Born" marker); darker peak/plunge colours, bolder story line with area wash, larger dots and "YYYY · age N" labels. Birth year saved in `output_data.birthYear`; old saves (plain points) still load.
+
 ### Solo session left card
 - **Status:** `deployed`. `lilbird-parchment.css?v=20261106p3`.
 - `.session-info` scrolls inside itself, so its `::before` paper scrolled away and left session details + tools on bare scene. Paper is now on the element (border-image frame + padding-box fill). Video framed 9:16 at 240px wide (all session files are 1280x720 with a centred portrait recording, so the black side bars are cropped). Meta row + tools on cream slips. Phone sheet header bar no longer white.

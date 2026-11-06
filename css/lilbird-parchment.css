@@ -205,7 +205,7 @@ html.solo-journal .session-info::after { content: none !important; display: none
 html.solo-journal .session-info {
   border: 30px solid transparent !important;
   border-image: var(--pp-frame) 15% / 30px / 0 stretch !important;
-  background: radial-gradient(130% 110% at 40% 25%, #fdf3e2 0%, #f9e9cd 70%, #f6e2c2 100%) padding-box !important;
+  background: radial-gradient(130% 110% at 40% 25%, #fdf3e2 0%, #f9e9cd 70%, #f4ddba 100%) center / calc(100% - 26px) calc(100% - 26px) no-repeat border-box !important;
   padding: 1.4rem 1.6rem 1.6rem !important;
   scrollbar-width: thin;
   scrollbar-color: rgba(169, 124, 63, 0.45) transparent;
