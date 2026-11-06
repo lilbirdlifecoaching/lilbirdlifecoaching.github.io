@@ -20,6 +20,13 @@ If a change touches pricing, booking, worker logic, or public copy, log it here.
 
 ---
 
+## 2026-11-06 (Claude)
+
+### Parchment peeking + Nest Home spacing
+- **Status:** `deployed` (Pages only). `lilbird-parchment.css?v=20261106p2`.
+- Sheet backings pulled further inside the torn edge; sidebar cards (Intensive "ember" card, hint card, checklist) lose their own tinted box so nothing shows around the paper.
+- Nest Home desktop on one 24px rhythm: menu and greeting share a top line, 24px menu→content, chapter→card row and between cards (checked at 1280/1440/1920). Menu's leftover 64px offset removed; header logo hidden on desktop (it lives in the menu). Kids sit beside the chapter card.
+
 ## 2026-11-05 (Claude)
 
 ### Aged parchment (ChatGPT parchment set) + Solo text margins

@@ -147,3 +147,52 @@ html.solo-journal .page > .nav .nav-left { background: transparent !important; }
   html.solo-journal .session-nav #nav-back-nest-session { display: none !important; }
   html.solo-journal .session-nav > div:last-child { overflow: hidden; }
 }
+
+/* ── Nothing peeks out from behind the paper ── */
+/* Sheet backings stay well inside the torn edge */
+:is(
+  .nest-world .next-chapter,
+  .nest-world #view-auth .auth-card,
+  html.solo-journal .solo-landing-hero-copy,
+  html.ic-nest #screen-results .result-header,
+  .nest-world .nest-rail,
+  .nest-world .nest-secondary-card
+)::after { inset: 18% 12% !important; }
+/* Sidebar cards that carried their own tinted box */
+html[data-theme] body.nest-world .side-col :is(.sidebar-card, .sidebar-card.ember, .sidebar-card.hint, details.sidebar-card),
+html[data-theme] body.nest-world .sidebar-card :is(summary, details) {
+  background: transparent !important;
+  background-image: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* ── Nest Home desktop: one 24px rhythm, edges lined up ──
+   menu | 24 | content; greeting and menu share a top line;
+   chapter | 24 | card row; 24 between cards. */
+@media (min-width: 981px) {
+  .nest-world { --g: 24px; }
+  .nest-world .nest-shell {
+    grid-template-columns: 204px minmax(0, 1fr) !important;
+    column-gap: var(--g) !important;
+    padding: var(--g) 32px 0 var(--g) !important;
+    align-items: start;
+  }
+  .nest-world .nest-rail { margin: 0 !important; top: 0 !important; align-self: start; width: 204px; box-sizing: border-box; }
+  .nest-world .nest-dash { padding: 0 0 56px 0 !important; }
+  .nest-world .nest-home-block { margin: 0 !important; }
+  .nest-world .nest-greeting { margin: 0 0 16px !important; padding-top: 0 !important; }
+  .nest-world .nest-home-stage { min-height: 0 !important; margin: 0 !important; }
+  .nest-world .nest-secondary { margin: var(--g) 0 0 !important; gap: var(--g) !important; }
+  /* Kids sit beside the chapter card, resting on the card row */
+  .nest-world .nest-companions-stage {
+    top: 92px !important;
+    bottom: auto !important;
+    right: 3vw !important;
+    width: clamp(340px, 33vw, 500px) !important;
+  }
+}
+@media (min-width: 981px) {
+  /* Brand lives in the menu on desktop; the floating header keeps only the actions */
+  .nest-world .nest-chrome .nest-brand { display: none !important; }
+}
