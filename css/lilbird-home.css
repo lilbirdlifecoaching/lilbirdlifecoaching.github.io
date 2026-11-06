@@ -2084,23 +2084,21 @@ footer, .site-footer {
   line-height: 1.5;
 }
 
-/* Landscape shot + tiers beside it only.
-   Shot never stretches: align-self flex-start + intrinsic aspect-ratio.
-   Tiers can still stretch to the shot’s height when they’re shorter. */
+/* Landscape shot + tiers beside it.
+   Shot owns the row height via aspect-ratio.
+   Tiers lock to that height (height:0; min-height:100%) so cards
+   line up top-to-bottom with the picture — never stretch the shot. */
 .nest-showcase-split {
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 320px);
+  align-items: start;
   gap: 1.05rem;
 }
 
 .nest-shot-stage {
   position: relative;
-  flex: 1 1 0;
+  width: 100%;
   min-width: 0;
-  width: auto;
-  height: auto;
-  align-self: flex-start;
   border-radius: 14px;
   overflow: hidden;
   border: 1px solid var(--border, rgba(245, 200, 66, 0.16));
@@ -2162,21 +2160,22 @@ html:not([data-theme]) .nest-shot-day { display: block; }
 .nest-tiers {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  flex: 0 1 320px;
-  width: min(320px, 34%);
-  min-width: 240px;
-  max-width: 340px;
-  /* stretch with the flex line (= shot height when shot is taller) */
   gap: 0.55rem;
+  width: 100%;
+  /* Match the shot’s row height without growing the grid row */
+  height: 0;
+  min-height: 100%;
+  align-self: stretch;
+  min-width: 0;
 }
 .nest-tier {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  flex: 0 0 auto;
+  justify-content: center;
+  gap: 0.35rem;
+  flex: 1 1 0;
   min-height: 0;
-  padding: 1rem 1.05rem 1.35rem;
+  padding: 0.85rem 1.05rem;
   border-radius: 14px;
   border: 1px solid rgba(176, 146, 100, 0.42);
   background: #fff8e8;
@@ -2278,19 +2277,20 @@ html:not([data-theme]) .nest-shot-day { display: block; }
 
 @media (max-width: 900px) {
   .nest-showcase-split {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     gap: 0.85rem;
   }
   .nest-shot-stage {
     width: 100%;
-    flex: none;
   }
   .nest-tiers {
+    height: auto;
+    min-height: 0;
     width: 100%;
-    max-width: none;
-    min-width: 0;
-    flex: none;
-    justify-content: flex-start;
+  }
+  .nest-tier {
+    flex: 0 0 auto;
+    padding: 1rem 1.05rem 1.15rem;
   }
   .nest-showcase { padding-top: 2rem; padding-bottom: 2.25rem; }
   .nest-shot-caption { font-size: 0.62rem; left: 0.75rem; bottom: 0.7rem; }
