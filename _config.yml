@@ -2,3 +2,6 @@ include:
   - .well-known
 exclude:
   - art-masters
+  - nest/visual-redesign-audit
+  - docs/lilbird_nest_visual_assets_v2
+  - solo/solo-start-continue-screenshots
