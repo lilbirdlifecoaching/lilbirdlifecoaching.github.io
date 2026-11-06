@@ -2159,15 +2159,16 @@ html:not([data-theme]) .nest-shot-day { display: block; }
   align-self: stretch;
   min-height: 100%;
   height: 100%;
-  gap: 0.45rem;
+  /* leftover height becomes gap between cards — cards stay content-sized */
+  gap: 0.55rem;
 }
 .nest-tier {
   display: flex;
   flex-direction: column;
-  gap: 0.32rem;
-  flex: 1 1 0;
+  gap: 0.4rem;
+  flex: 0 0 auto;
   min-height: 0;
-  padding: 0.95rem 1rem 1.2rem;
+  padding: 1rem 1.05rem 1.35rem;
   border-radius: 14px;
   border: 1px solid rgba(176, 146, 100, 0.42);
   background: #fff8e8;
@@ -2226,10 +2227,10 @@ html:not([data-theme]) .nest-shot-day { display: block; }
 }
 .nest-tier-list {
   list-style: none;
-  margin: 0.2rem 0 0;
-  padding: 0 0 0.15rem;
+  margin: 0.15rem 0 0;
+  padding: 0;
   display: grid;
-  gap: 0.28rem;
+  gap: 0.3rem;
 }
 .nest-tier-list li {
   position: relative;
