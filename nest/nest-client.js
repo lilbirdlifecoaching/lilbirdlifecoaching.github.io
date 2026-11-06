@@ -3520,7 +3520,9 @@
   function revealChatMsg(wrap, row, role) {
     const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const behavior = reduce ? 'auto' : 'smooth';
-    const top = role === 'user' ? wrap.scrollHeight : Math.max(0, row.offsetTop - wrap.offsetTop - 12);
+    const top = role === 'user'
+      ? wrap.scrollHeight
+      : Math.max(0, wrap.scrollTop + row.getBoundingClientRect().top - wrap.getBoundingClientRect().top - 12);
     if (typeof wrap.scrollTo === 'function') wrap.scrollTo({ top, behavior });
     else wrap.scrollTop = top;
     const box = wrap.getBoundingClientRect();
