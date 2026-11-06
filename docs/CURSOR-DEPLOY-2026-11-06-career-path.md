@@ -30,3 +30,11 @@ When they plainly ask for something practical, give one small move first, then y
 ```
 
 Redeploy `worker-solo`. Check: in Session 2 (Vision & Goals), say "I have two hours a week, give me one practical step". Expect one concrete find-out step plus one question, not only more noticing.
+
+## 3. Follow-up redeploy (6 Nov, afternoon)
+
+Live test after the first deploy: the urgent case worked (coaching card shown). The "give me one practical step" case still opened with a question twice, and one reply used an em dash.
+
+Fix is in `nest/nest-guide.js` only: the step rule now explicitly comes before "stay with the thing underneath", the reply must open with the move, the move can use the person's own words as job-listing search terms (no job titles from the AI), there is a worked example, Career Crossroads can be offered once someone has said they want to change careers, and em dashes are stripped from replies as a safety net.
+
+Copy `nest/nest-guide.js` beside the `lilbird-chat` worker again and redeploy. Same check: "I love helping new starters. I want to change careers, I have two hours a week. Give me one practical thing to do this week." Expect the reply to open with a concrete step and a day, then one question.

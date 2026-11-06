@@ -21,7 +21,7 @@ export const GUIDE_TOOLS = [
   { id: 'family-expectations', title: 'Family Expectations', minutes: 'about 8 minutes', when: 'family roles or old expectations are in the room' },
   { id: 'responsibility-inventory', title: 'Responsibility Inventory', minutes: 'about 8 minutes', when: 'they are holding too much and need to see what is actually theirs' },
   { id: 'workload-reset', title: 'Workload Reset', minutes: 'about 8 minutes', when: 'work has swollen and they need one honest cut or ask' },
-  { id: 'career-crossroads', title: 'Career Crossroads', minutes: 'about 12 minutes', when: 'they want to change careers or do not know what work to move toward, and have said enough for you to know that' },
+  { id: 'career-crossroads', title: 'Career Crossroads', minutes: 'about 12 minutes', when: 'they want to change careers or do not know where to begin with work, and have said so in at least one message' },
 ];
 
 function coachingMark() {
@@ -60,11 +60,13 @@ How you coach:
 - No em dashes. No "it's not X, it's Y".
 - Never: synergy, leverage, tapestry, journey, navigate, resonate, delve, quiet, honest, genuinely, deeply, truly.
 
-When they ask for a step:
-- If they plainly ask what to do, or for something practical, give one small move first, then your one question.
-- Make the move about finding something out, not deciding: a conversation with someone who does that work, reading three real job descriptions, a small trial they can do this week. Name when they could do it.
-- Do not suggest careers, job titles, or industries they have not named. Work from their words.
+When they ask for a step (this rule comes before "stay with the thing underneath"):
+- If they plainly ask what to do, for a practical step, or for one thing to try, your reply opens with one small move. Do not open with a question. Do not ask them to tell you more first. The question comes after the move.
+- Make the move about finding something out, not deciding: a conversation with someone who does that kind of work, reading three real job listings, or a small trial they can do this week. Name a day or a time.
+- If they do not know the field yet, build the move from the tasks they said they enjoy. You may use their own words as search words, for example: search job listings for "helping new starters" and notice what roles keep coming up. Do not name job titles, careers, or industries for them.
 - Do not write their CV, cover letter, applications, or a plan for them.
+
+Example. They say: "I love explaining things to new people. I have two hours a week. Give me one practical thing to do." A good reply: "This week, take thirty minutes and search job listings for the words "train new staff" and "help people learn". Save the three that make you lean in, and notice which tasks they share. Which of those tasks did you already do this month?"
 
 When it is urgent:
 - If they are under real pressure about work and money right now (they have lost their job, income is running out, they must find work within weeks), do not coach a job search, and give no legal, financial, or benefits advice.
@@ -96,6 +98,8 @@ export function parseGuideReply(raw, { userTurns = 1, offered = [], coachingOffe
     .replace(toolMark(), ' ')
     .replace(/<[^>]*>/g, ' ')
     .replace(/\*\*/g, '')
+    .replace(/\s*\u2014\s*/g, ', ')
+    .replace(/\s+\u2013\s+/g, ', ')
     .replace(/\s+/g, ' ')
     .trim();
   return { reply, tool: chosen, coaching };
