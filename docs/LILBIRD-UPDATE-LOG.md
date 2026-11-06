@@ -22,7 +22,7 @@ If a change touches pricing, booking, worker logic, or public copy, log it here.
 
 ## 2026-11-06 (Claude)
 
-- `needs worker deploy` **Guide chat is not answering live.** Browser console: `lilbird-chat.../guide` preflight rejects the `Authorization` header ("Request header field authorization is not allowed by Access-Control-Allow-Headers"). Every guide message shows "I couldn't reach the guide just now." Fix is in the Cloudflare `lilbird-chat` worker (iCloud source, not this repo): add `Authorization` to `Access-Control-Allow-Headers` on the OPTIONS response and on normal responses.
+- `deployed` (fixed by Cursor, verified 12:15 PT: guide replies again) **Guide chat was not answering live.** Browser console: `lilbird-chat.../guide` preflight rejects the `Authorization` header ("Request header field authorization is not allowed by Access-Control-Allow-Headers"). Every guide message shows "I couldn't reach the guide just now." Fix is in the Cloudflare `lilbird-chat` worker (iCloud source, not this repo): add `Authorization` to `Access-Control-Allow-Headers` on the OPTIONS response and on normal responses.
 - `built in repo` Guide chat reply scroll uses on-screen position (robust to positioned containers). `nest-client.js?v=75`.
 
 - `built in repo` Nest scroll-back: switching tabs starts the new screen at its top; each Journey step (intro → stages → done → saved, Back, Close) brings the top of the exercise into view; a new coaching note scrolls into view; stage inputs no longer yank the page on focus. Guide chat: your message shows the end of the thread, a reply opens at its first line (not its last), and the chat box is brought on screen if it was scrolled away. `nest-client.js?v=74`, `journey.js?v=13`, parchment `v=20261106p5`.
