@@ -605,6 +605,8 @@
     html.pp-vertical .chapter-chips::-webkit-scrollbar { display: none; }
     html.pp-vertical .chapter-chip { flex: 0 0 auto; }
     html.pp-vertical #timeline-svg { touch-action: pan-y; cursor: pointer; }
+    .btn-start-over { font-family: 'DM Sans', system-ui, sans-serif; font-size: 0.88rem; padding: 0.55rem 1.1rem; border-radius: 999px; cursor: pointer; background: transparent; border: 1px solid rgba(143, 79, 31, 0.45); color: #8f4f1f; }
+    .btn-start-over:hover { background: rgba(176, 101, 42, 0.08); }
   </style>
   <link rel="stylesheet" href="/css/lilbird-solo-tools-theme.css" />
 <link rel="stylesheet" href="/css/lilbird-tokens.css" />
@@ -698,6 +700,7 @@
     </div>
     <div class="save-actions">
       <a href="javascript:void(0)" onclick="goBack()" class="btn-back-session">Back to session</a>
+      <button type="button" class="btn-start-over" id="btn-start-over">Start over</button>
       <button class="btn-save" id="btn-save">Save my timeline</button>
     </div>
   </div>
@@ -1132,6 +1135,7 @@
   svg.addEventListener('click', (e) => {
     if (e.target.tagName === 'circle' && e.target.dataset.pointId) return;
     if (pinnedId) { hidePopover(); return; }
+    if (!layout) drawGrid();
     const chapterLabel = e.target.closest && e.target.closest('[data-chapter]');
     if (chapterLabel) { setView(chapterLabel.dataset.chapter); return; }
 
@@ -1333,6 +1337,18 @@
     }
   }
 
+  // ── Start over: clear every moment (keeps the birth year) ──
+  document.getElementById('btn-start-over').addEventListener('click', async () => {
+    if (!points.length) return;
+    if (!window.confirm('Start over? This removes every moment on your timeline.')) return;
+    points = [];
+    view = 'all';
+    hidePopover();
+    drawGrid();
+    renderPointsList();
+    await autoSave();
+  });
+
   // ── Manual save ──────────────────────────────────────────────
   document.getElementById('btn-save').addEventListener('click', async () => {
     await autoSave();
@@ -1349,6 +1365,9 @@
 
   // ── Init ────────────────────────────────────────────────────
   async function init() {
+    // Draw an empty, clickable timeline right away; saved moments fill in when they arrive.
+    drawGrid();
+    renderPointsList();
     if (urlUid) {
       currentUser = { id: urlUid };
     } else {
@@ -1360,8 +1379,9 @@
 
     const skipRestore = LilbirdEmbed.isRedo();
     const preload = LilbirdEmbed.readPreload();
+    let saved = null;
     if (!skipRestore && preload && Array.isArray(preload.points)) {
-      points = preload.points;
+      saved = preload;
     } else if (!skipRestore && currentUser) {
       try {
         const { data: toolData } = await sb
@@ -1370,15 +1390,14 @@
           .eq('user_id', currentUser.id)
           .eq('tool_name', 'peak_plunge')
           .maybeSingle();
-        if (toolData?.output_data?.points) {
-          points = toolData.output_data.points;
-        }
+        saved = toolData && toolData.output_data ? toolData.output_data : null;
       } catch (e) {
         console.warn('peak-plunge restore failed', e);
       }
-      const by = parseInt(toolData?.output_data?.birthYear, 10);
-      if (by >= 1920 && by <= CURRENT_YEAR) birthYear = by;
     }
+    if (saved && Array.isArray(saved.points)) points = saved.points.concat(points.filter(p => !saved.points.some(q => q.id === p.id)));
+    const by = parseInt(saved && saved.birthYear, 10);
+    if (by >= 1920 && by <= CURRENT_YEAR) birthYear = by;
 
     const byInput = document.getElementById('birth-year');
     byInput.max = CURRENT_YEAR;
@@ -1399,7 +1418,11 @@
     renderPointsList();
   }
 
-  init();
+  init().catch((e) => {
+    console.warn('peak-plunge init failed', e);
+    drawGrid();
+    renderPointsList();
+  });
 </script>
 
 

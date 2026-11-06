@@ -22,6 +22,8 @@ If a change touches pricing, booking, worker logic, or public copy, log it here.
 
 ## 2026-11-06 (Claude)
 
+- `built in repo` **Peak & Plunge click-to-add fix.** The merge of Cursor's restore code with the birth-year code referenced `toolData` outside its block → ReferenceError in `init()` on the database path → timeline never drawn, so clicks did nothing (the preload path worked, which hid it in testing). Restore rewritten (`saved` from preload or DB; birth year from either). Timeline now draws immediately and refills when data arrives; init failure still draws; click guards a missing layout. Added **Start over** (confirm; clears moments, keeps birth year) since the summary panel with Redo is skipped for this tool.
+
 - `built in repo` Deep Roots: opens straight into the tool (no summary panel). Reopening a finished reflection shows every question in full with the whole answer and an Edit button each; editing returns to the full list. Finishing now saves `currentIndex = 5` (older saves that reached the last question count as finished). Previous answers while working show the question text too. Chat/sidebar snapshot no longer quotes two answers without context; it says "N of 5 reflections saved · open to read or edit".
 
 - `built in repo` Peak & Plunge opens straight into the timeline (saved moments loaded, click/tap to add) instead of the read-only "Saved result" summary, which had hidden the timeline since Cursor's 12:37 change. Other tools keep the summary-first view. (`EDIT_FIRST` in `openToolEmbed`.)
