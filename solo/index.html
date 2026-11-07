@@ -994,6 +994,7 @@
   <link rel="stylesheet" href="/css/lilbird-solo-theme.css?v=20260922b" />
   <link rel="stylesheet" href="/css/lilbird-solo-journal.css?v=20261106s6" />
   <link rel="stylesheet" href="/css/lilbird-parchment.css?v=20261106p6" />
+  <link rel="stylesheet" href="/css/lilbird-solo-open-book.css?v=20261106d" />
   <script>document.documentElement.classList.add('solo-journal');</script>
   <!-- Google Tag Manager -->
   <script src="/lilbird-gtm-id.js"></script>
@@ -1243,7 +1244,7 @@
     <nav class="session-nav">
       <div class="session-nav-left">
         <img class="session-nav-bird-img" id="session-nav-bird" src="/bird-logo.png" alt="" width="32" height="32" data-logo-dark="/bird-logo.png" data-logo-light="/bird-logo-teal.png" />
-        <span class="session-nav-label">lil' bird · life change sessions</span>
+        <span class="session-nav-label">lil’ bird</span>
       </div>
       <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;justify-content:flex-end">
         <button type="button" class="theme-toggle" aria-pressed="true" aria-label="Switch to night mode">
@@ -1261,16 +1262,26 @@
         <button class="btn-back-dash" id="btn-back-dash">← My sessions</button>
       </div>
     </nav>
+    <header class="book-course-header"><img src="/nest/assets/lilbird-kit/icons/open-book-watercolor.webp" alt="" /><div><h2>The Solo Course</h2><p>Eight sessions to find clarity, build confidence, and take your next steps.</p></div><div id="book-progress" aria-label="Course progress"></div></header>
     <div class="session-main">
+      <aside class="book-rail" aria-label="Solo course navigation"><a href="/nest/">⌂ &nbsp; Home</a><a href="/nest/?tab=journey">♧ &nbsp; My Journey</a><a href="/deep-profile.html">♡ &nbsp; Understand myself</a><a href="/nest/?tab=ask">♧ &nbsp; My Guide</a><div class="book-rail-title">▤ &nbsp; Solo Course</div><nav id="book-session-list" aria-label="Your sessions"></nav><img class="book-rail-bird" src="/nest/assets/lilbird-kit/icons/yellow-bird-perched.webp" alt="" /></aside>
       <div class="session-info" id="session-info" role="region" aria-label="Session information" tabindex="-1"></div>
       <div class="session-chat-col">
+        <div class="book-overview">
+          <div id="book-video-slot"></div>
+          <section class="book-agenda" aria-labelledby="book-agenda-title"><h2 id="book-agenda-title">In This Session</h2><ul><li>Discover the patterns in your story</li><li>Make space for insights and reflection</li><li>Try the tools at your own pace</li><li>Choose a practical next step for real life</li></ul></section>
+          <div id="book-tools-slot"></div>
+          <div id="book-meta-slot"></div>
+          <button type="button" class="book-continue" id="book-continue">Continue this session →</button>
+        </div>
+        <div class="book-conversation-heading"><button type="button" id="book-back-overview">← Session overview</button><h2>Your Reflection</h2></div>
         <div class="chat-container" style="position:relative;overflow:hidden;">
           <div class="chat-header" id="chat-header"></div>
           <div class="chat-messages" id="chat-messages"></div>
           <div class="chat-input-wrap">
-            <textarea class="chat-textarea" id="chat-input" placeholder="Take your time..." rows="1"></textarea>
+            <textarea aria-label="Your reflection" class="chat-textarea" id="chat-input" placeholder="Take your time..." rows="1"></textarea>
             <button type="button" class="btn-mic no-speech-hide" id="chat-mic" title="Speak your answer" aria-label="Speak your answer">🎤</button>
-            <button class="btn-send" id="btn-send" disabled>↑</button>
+            <button aria-label="Send reflection" class="btn-send" id="btn-send" disabled>↑</button>
           </div>
           <div class="tool-embed-wrap" id="tool-embed-wrap">
             <div class="tool-embed-header">
@@ -1285,7 +1296,7 @@
                 <button type="button" class="btn-tool-back" id="btn-tool-result-back">Back to session</button>
               </div>
             </div>
-            <iframe class="tool-embed-frame" id="tool-embed-frame" src="about:blank"></iframe>
+            <iframe title="Session tool" class="tool-embed-frame" id="tool-embed-frame" src="about:blank"></iframe>
           </div>
         </div>
         <div class="complete-panel" id="complete-panel">
@@ -1319,11 +1330,12 @@
   <script src="/lilbird-nest-nav.js?v=2"></script>
   <script src="/js/vendor/supabase-js-2.117.3.js"></script>
   <script src="/js/lilbird-solo-access.js?v=1"></script>
+  <script src="/js/lilbird-solo-media.js"></script>
   <script src="https://js.stripe.com/v3/"></script>
   <script>
     const SUPABASE_URL  = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
-    const SOLO_SHELL_BUILD = 'v1.17-start-continue-20261104';
+    const SOLO_SHELL_BUILD = 'v1.18-open-book-review-20261106';
     const WORKER_URL    = 'https://worker-solo.cwwq46sn7m.workers.dev';
     console.info("lil' bird Solo shell", SOLO_SHELL_BUILD, '| worker:', WORKER_URL);
     // Stripe publishable key — safe to ship in client code.
@@ -1407,6 +1419,7 @@
     let sessionContext = {}, toolOutputsCache = {}, sessionMemoriesCache = {};
     let completeDashTab = 'plan';
     let sessionInfoOpen = false;
+    let sessionOpenVersion = 0;
 
     /** Shared with Nest + Worker — see /js/lilbird-solo-access.js */
     function hasSoloAccess() {
@@ -2450,6 +2463,8 @@
 
     // ── OPEN SESSION ──────────────────────────────────────────
     async function openSession(sessionNumber) {
+      // Keep in-flight chat saves and embedded tool work attached to their session.
+      if (isTyping || document.getElementById('btn-complete').disabled || document.getElementById('tool-embed-wrap').classList.contains('active')) return;
       if (!hasSoloAccess()) {
         renderDashboard();
         return;
@@ -2461,6 +2476,8 @@
         renderDashboard();
         return;
       }
+      const openVersion = ++sessionOpenVersion;
+      const isCurrent = () => openVersion === sessionOpenVersion && activeSession === session && document.getElementById('view-session').classList.contains('active');
       activeSession = session;
       setSessionInfoOpen(false);
       chatMsgs = []; isTyping = false; exchangeCount = 0; sessionContext = {};
@@ -2493,11 +2510,11 @@
           var isDone = openedTools[k] || false;
           var snapHtml = (isDone && snapData) ? ('<div class="tool-item-snap">' + renderToolSnapshot(k, snapData).replace('<div class="tool-snapshot">', '').replace(/<\/div>\s*$/, '') + '</div>') : '';
           var doneStyle = isDone ? ' style="color:var(--session-col);opacity:1"' : '';
-          return '<div class="tool-item clickable' + (isDone ? ' tool-done' : '') + '" data-tool-key="' + (k||'') + '" onclick="' + oc + '"><span class="tool-dot"></span><span>' + t.name + '</span><span class="tool-tag"' + doneStyle + '>' + (isDone ? 'Saved' : t.tag) + '</span></div>' + snapHtml;
+          return '<div role="button" tabindex="0" onkeydown="if(event.key===&quot;Enter&quot;||event.key===&quot; &quot;){event.preventDefault();this.click()}" class="tool-item clickable' + (isDone ? ' tool-done' : '') + '" data-tool-key="' + (k||'') + '" onclick="' + oc + '"><span class="tool-dot"></span><span>' + t.name + '</span><span class="tool-tag"' + doneStyle + '>' + (isDone ? 'Saved' : t.tag) + '</span></div>' + snapHtml;
         }).join('') + '</div></div>' : '';
 
-      const videoHtml = session.videoKey
-        ? `<div class="video-wrap"><div class="video-player-container"><video id="session-video" preload="metadata" playsinline></video><div class="video-poster" id="video-poster" style="background:linear-gradient(135deg,${session.color}18,${session.color}08)"><div class="video-play">▶</div><div class="video-label">A word from Luke · ${session.videoLen}</div></div></div></div>`
+      const videoHtml = (session.videoKey || session.narratedMedia)
+        ? `<div class="video-wrap"><div class="video-player-container"><video id="session-video" controls preload="metadata" playsinline></video><button type="button" aria-label="Play session introduction" class="video-poster" id="video-poster" ><div class="video-play">▶</div><div class="video-label">A word from Luke · ${session.videoLen}</div></button></div></div>`
         : `<div class="video-coming-soon"><p>🪶 &nbsp; Video coming soon</p></div>`;
 
       document.getElementById('session-info').innerHTML =
@@ -2505,20 +2522,49 @@
           '<span class="sheet-title">Session info</span>' +
           '<button type="button" class="btn-close-session-info" id="btn-close-session-info">Close</button>' +
         '</div>' +
-        '<div class="session-tag-label">' + session.tag + '</div><h1>' + session.title + '</h1><p class="session-info-desc">' + session.desc + '</p>' + videoHtml +
+        '<div class="book-course-label">The Solo Course</div><div class="session-tag-label">' + (session.number === 0 ? 'Orientation' : 'Session ' + session.number) + '</div><h1>' + session.title + '</h1><p class="session-info-desc">' + session.desc + '</p><div class="book-illustration-space" aria-hidden="true"></div>' + videoHtml +
         '<div class="session-meta-row"><div class="meta-item"><span class="meta-label">Session</span><span class="meta-value">' + (session.number===0?'Orientation':'0'+session.number+' of 07') + '</span></div><div class="meta-item"><span class="meta-label">Duration</span><span class="meta-value">' + session.duration + '</span></div>' +
         (session.tools.length ? '<div class="meta-item"><span class="meta-label">Tools</span><span class="meta-value">' + session.tools.length + ' tools</span></div>' : '') + '</div>' + toolsHtml;
+      document.querySelector('.session-main').classList.remove('book-reflecting');
+      var videoSlot = document.getElementById('book-video-slot');
+      var toolsSlot = document.getElementById('book-tools-slot');
+      videoSlot.replaceChildren(); toolsSlot.replaceChildren();
+      var metaSlot = document.getElementById('book-meta-slot');
+      metaSlot.replaceChildren();
+      var metaPanel = document.querySelector('#session-info .session-meta-row');
+      if (metaPanel) metaSlot.appendChild(metaPanel);
+      var mediaPanel = document.querySelector('#session-info .video-wrap, #session-info .video-coming-soon');
+      if (mediaPanel) videoSlot.appendChild(mediaPanel);
+      var toolsPanel = document.querySelector('#session-info .tools-section');
+      if (toolsPanel) toolsSlot.appendChild(toolsPanel);
+      else toolsSlot.innerHTML = '<p class="book-no-tools">This session begins with a conversation. Take your time.</p>';
+      document.getElementById('book-continue').textContent = 'Continue ' + (session.number === 0 ? 'orientation' : 'Session ' + session.number) + ' →';
+      document.getElementById('book-session-list').replaceChildren();
+      document.getElementById('book-progress').replaceChildren();
+      SESSIONS.forEach(function (item) {
+        var row = sessionData.find(function (p) { return p.session_number === item.number; });
+        var complete = row && row.status === 'complete';
+        var button = document.createElement('button');
+        button.type = 'button'; button.disabled = !canOpenSession(item.number);
+        button.className = complete ? 'book-session-complete' : '';
+        if (item.number === session.number) { button.classList.add('book-session-current'); button.setAttribute('aria-current', 'step'); }
+        var marker = document.createElement('span'); marker.textContent = complete ? '✓' : String(item.number);
+        marker.className = 'book-step'; marker.setAttribute('aria-hidden', 'true');
+        button.appendChild(marker); button.appendChild(document.createTextNode(item.title));
+        button.addEventListener('click', function () { openSession(item.number); });
+        document.getElementById('book-session-list').appendChild(button);
+        var step = document.createElement('span'); step.className = 'book-progress-step' + (complete ? ' complete' : '') + (item.number === session.number ? ' current' : '');
+        step.textContent = complete ? '✓' : String(item.number); step.setAttribute('aria-label', item.title + ': ' + (row ? row.status.replace('_', ' ') : 'locked'));
+        document.getElementById('book-progress').appendChild(step);
+      });
+      var sessionList = document.getElementById('book-session-list');
+      var currentStep = sessionList.querySelector('[aria-current="step"]');
       const closeInfo = document.getElementById('btn-close-session-info');
       if (closeInfo) closeInfo.addEventListener('click', () => setSessionInfoOpen(false));
 
-      if (session.videoKey) {
+      if (session.videoKey || session.narratedMedia) {
         const video = document.getElementById('session-video'), poster = document.getElementById('video-poster');
-        loadSessionVideo(video, session.videoKey);
-        poster.addEventListener('click', () => { poster.classList.add('hidden'); video.play(); });
-        video.addEventListener('click', () => { if (video.paused) { video.play(); poster.classList.add('hidden'); } else video.pause(); });
-        video.style.cursor = 'pointer';
-        video.addEventListener('pause', () => { if (!video.ended) poster.classList.remove('hidden'); });
-        video.addEventListener('ended', () => poster.classList.remove('hidden'));
+        LilbirdSoloMedia.mount(video, poster, session, loadSessionVideo);
       }
 
       document.getElementById('chat-header').innerHTML = '<div class="chat-avatar">' + session.emoji + '</div><div class="chat-avatar-info"><h3>lil\' bird</h3><p>' + session.tag.toLowerCase() + ' · ' + session.title.toLowerCase() + '</p></div><div class="chat-status"><div class="status-dot"></div>present</div>';
@@ -2535,28 +2581,43 @@
       document.getElementById('chat-input').value = '';
       document.getElementById('btn-send').disabled = true;
       showView('view-session');
-      await loadSessionContext(sessionNumber);
+      const loadedContext = await loadSessionContext(sessionNumber);
+      if (!isCurrent()) return;
+      sessionContext = loadedContext;
 
       try {
         const { data: memory } = await sb.from('ai_memory').select('messages').eq('user_id', currentUser.id).eq('session_number', sessionNumber).single();
+        if (!isCurrent()) return;
         if (memory?.messages?.length) {
           chatMsgs = memory.messages;
           chatMsgs.forEach(m => renderMessage(m.role, m.content));
           exchangeCount = chatMsgs.filter(m => m.role === 'user').length;
           const sessionStatus = sessionData.find(s => s.session_number === sessionNumber)?.status;
-          if (sessionStatus === 'complete') { setTimeout(function() { var p = document.getElementById('complete-panel'); if (p) p.classList.remove('visible'); }, 700); }
+          if (sessionStatus === 'complete') { setTimeout(function() { if (!isCurrent()) return; var p = document.getElementById('complete-panel'); if (p) p.classList.remove('visible'); }, 700); }
         } else {
-          setTimeout(() => { const g = buildGreeting(sessionNumber); renderMessage('assistant', g); chatMsgs.push({ role: 'assistant', content: g }); }, 600);
+          setTimeout(() => { if (!isCurrent()) return; const g = buildGreeting(sessionNumber); renderMessage('assistant', g); chatMsgs.push({ role: 'assistant', content: g }); }, 600);
         }
       } catch {
-        setTimeout(() => { const g = buildGreeting(sessionNumber); renderMessage('assistant', g); chatMsgs.push({ role: 'assistant', content: g }); }, 600);
+        setTimeout(() => { if (!isCurrent()) return; const g = buildGreeting(sessionNumber); renderMessage('assistant', g); chatMsgs.push({ role: 'assistant', content: g }); }, 600);
       }
 
+      if (!isCurrent()) return;
       await sb.from('session_progress').update({ status: 'in_progress', started_at: new Date().toISOString() }).eq('user_id', currentUser.id).eq('session_number', sessionNumber).eq('status', 'available');
+      if (!isCurrent()) return;
       syncSessionInfoChrome();
-      focusElNoScroll('chat-input');
+      if (currentStep) sessionList.scrollLeft = currentStep.offsetLeft - sessionList.offsetLeft - (sessionList.clientWidth - currentStep.offsetWidth) / 2;
+      document.querySelector('#book-session-list [aria-current="step"]')?.focus({ preventScroll: true });
     }
 
+    document.getElementById('book-continue').addEventListener('click', function () {
+      document.querySelector('.session-main').classList.add('book-reflecting');
+      document.getElementById('session-video')?.pause();
+      focusElNoScroll('chat-input');
+    });
+    document.getElementById('book-back-overview').addEventListener('click', function () {
+      document.querySelector('.session-main').classList.remove('book-reflecting');
+      document.getElementById('book-continue').focus();
+    });
     document.getElementById('btn-session-info')?.addEventListener('click', () => toggleSessionInfo());
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && sessionInfoOpen) {
@@ -2848,6 +2909,7 @@
     }
 
     function openToolEmbed(toolKey, toolInfo, options) {
+      document.querySelector('.session-main').classList.add('book-reflecting');
       options = options || {};
       var wrap = document.getElementById('tool-embed-wrap'), frame = document.getElementById('tool-embed-frame'), title = document.getElementById('tool-embed-title');
       if (!wrap || !frame || !toolInfo) return;
@@ -2985,11 +3047,13 @@
     async function loadSessionContext(sessionNumber) {
       try {
         const { data: memories } = await sb.from('ai_memory').select('session_number, summary, key_words').eq('user_id', currentUser.id).lt('session_number', sessionNumber).not('summary', 'is', null);
-        if (memories?.length) sessionContext = { previous_sessions: memories.map(m => ({ session_number: m.session_number, summary: m.summary, key_words: m.key_words || [] })) };
-      } catch { sessionContext = {}; }
+        return memories?.length ? { previous_sessions: memories.map(m => ({ session_number: m.session_number, summary: m.summary, key_words: m.key_words || [] })) } : {};
+      } catch { return {}; }
     }
 
     function renderMessage(role, msgContent, scrollMode) {
+      const messageSession = activeSession, messageVersion = sessionOpenVersion;
+      const isMessageCurrent = () => activeSession === messageSession && sessionOpenVersion === messageVersion;
       var el = document.getElementById('chat-messages');
       var toolMatch = msgContent.match(/\[TOOL:([a-z-]+)\]/);
       var actionMatch = msgContent.match(/\[ACTION:\s*([^\]]+)\]/i);
@@ -3002,8 +3066,8 @@
         wrap.innerHTML = '<div class="msg-avatar">' + (role==='assistant'?emoji:'✦') + '</div><div class="msg-bubble">' + safeHtml + '</div>';
         el.appendChild(wrap);
       }
-      if (toolMatch && role==='assistant') { var tk=toolMatch[1], ti=TOOL_MAP[tk]; if (ti) setTimeout(function(){renderToolCard(tk,ti,el);}, cleanContent?400:0); }
-      if (/\[COMPLETE\]/.test(msgContent) && role==='assistant') { var _sStatus = activeSession && sessionData.find(function(s){return s.session_number===activeSession.number;})?.status; if (_sStatus !== 'complete') { setTimeout(function(){ var p=document.getElementById('complete-panel'); if(p) p.classList.add('visible'); },600); } }
+      if (toolMatch && role==='assistant') { var tk=toolMatch[1], ti=TOOL_MAP[tk]; if (ti) setTimeout(function(){if (!isMessageCurrent()) return; renderToolCard(tk,ti,el);}, cleanContent?400:0); }
+      if (/\[COMPLETE\]/.test(msgContent) && role==='assistant') { var _sStatus = activeSession && sessionData.find(function(s){return s.session_number===activeSession.number;})?.status; if (_sStatus !== 'complete') { setTimeout(function(){ if (!isMessageCurrent()) return; var p=document.getElementById('complete-panel'); if(p) p.classList.add('visible'); },600); } }
       if (scrollMode !== false) el.scrollTop = el.scrollHeight;
     }
 
