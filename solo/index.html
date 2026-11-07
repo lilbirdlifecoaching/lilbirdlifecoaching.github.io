@@ -994,7 +994,7 @@
   <link rel="stylesheet" href="/css/lilbird-solo-theme.css?v=20260922b" />
   <link rel="stylesheet" href="/css/lilbird-solo-journal.css?v=20261106s6" />
   <link rel="stylesheet" href="/css/lilbird-parchment.css?v=20261106p6" />
-  <link rel="stylesheet" href="/css/lilbird-solo-open-book.css?v=20261107" />
+  <link rel="stylesheet" href="/css/lilbird-solo-open-book.css?v=20261107c" />
   <script>document.documentElement.classList.add('solo-journal');</script>
   <!-- Google Tag Manager -->
   <script src="/lilbird-gtm-id.js"></script>
@@ -1334,7 +1334,7 @@
   <script>
     const SUPABASE_URL  = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
-    const SOLO_SHELL_BUILD = 'v1.17-start-continue-20261104';
+    const SOLO_SHELL_BUILD = 'v1.18-open-book-review-20261106';
     const WORKER_URL    = 'https://worker-solo.cwwq46sn7m.workers.dev';
     console.info("lil' bird Solo shell", SOLO_SHELL_BUILD, '| worker:', WORKER_URL);
     // Stripe publishable key — safe to ship in client code.
@@ -1418,6 +1418,7 @@
     let sessionContext = {}, toolOutputsCache = {}, sessionMemoriesCache = {};
     let completeDashTab = 'plan';
     let sessionInfoOpen = false;
+    let sessionOpenVersion = 0;
 
     /** Shared with Nest + Worker — see /js/lilbird-solo-access.js */
     function hasSoloAccess() {
@@ -2461,6 +2462,8 @@
 
     // ── OPEN SESSION ──────────────────────────────────────────
     async function openSession(sessionNumber) {
+      // Keep in-flight chat saves and embedded tool work attached to their session.
+      if (isTyping || document.getElementById('btn-complete').disabled || document.getElementById('tool-embed-wrap').classList.contains('active')) return;
       if (!hasSoloAccess()) {
         renderDashboard();
         return;
@@ -2472,6 +2475,8 @@
         renderDashboard();
         return;
       }
+      const openVersion = ++sessionOpenVersion;
+      const isCurrent = () => openVersion === sessionOpenVersion && activeSession === session && document.getElementById('view-session').classList.contains('active');
       activeSession = session;
       setSessionInfoOpen(false);
       chatMsgs = []; isTyping = false; exchangeCount = 0; sessionContext = {};
@@ -2547,6 +2552,8 @@
         step.textContent = complete ? '✓' : String(item.number); step.setAttribute('aria-label', item.title + ': ' + (row ? row.status.replace('_', ' ') : 'locked'));
         document.getElementById('book-progress').appendChild(step);
       });
+      var sessionList = document.getElementById('book-session-list');
+      var currentStep = sessionList.querySelector('[aria-current="step"]');
       const closeInfo = document.getElementById('btn-close-session-info');
       if (closeInfo) closeInfo.addEventListener('click', () => setSessionInfoOpen(false));
 
@@ -2569,26 +2576,32 @@
       document.getElementById('chat-input').value = '';
       document.getElementById('btn-send').disabled = true;
       showView('view-session');
-      await loadSessionContext(sessionNumber);
+      const loadedContext = await loadSessionContext(sessionNumber);
+      if (!isCurrent()) return;
+      sessionContext = loadedContext;
 
       try {
         const { data: memory } = await sb.from('ai_memory').select('messages').eq('user_id', currentUser.id).eq('session_number', sessionNumber).single();
+        if (!isCurrent()) return;
         if (memory?.messages?.length) {
           chatMsgs = memory.messages;
           chatMsgs.forEach(m => renderMessage(m.role, m.content));
           exchangeCount = chatMsgs.filter(m => m.role === 'user').length;
           const sessionStatus = sessionData.find(s => s.session_number === sessionNumber)?.status;
-          if (sessionStatus === 'complete') { setTimeout(function() { var p = document.getElementById('complete-panel'); if (p) p.classList.remove('visible'); }, 700); }
+          if (sessionStatus === 'complete') { setTimeout(function() { if (!isCurrent()) return; var p = document.getElementById('complete-panel'); if (p) p.classList.remove('visible'); }, 700); }
         } else {
-          setTimeout(() => { const g = buildGreeting(sessionNumber); renderMessage('assistant', g); chatMsgs.push({ role: 'assistant', content: g }); }, 600);
+          setTimeout(() => { if (!isCurrent()) return; const g = buildGreeting(sessionNumber); renderMessage('assistant', g); chatMsgs.push({ role: 'assistant', content: g }); }, 600);
         }
       } catch {
-        setTimeout(() => { const g = buildGreeting(sessionNumber); renderMessage('assistant', g); chatMsgs.push({ role: 'assistant', content: g }); }, 600);
+        setTimeout(() => { if (!isCurrent()) return; const g = buildGreeting(sessionNumber); renderMessage('assistant', g); chatMsgs.push({ role: 'assistant', content: g }); }, 600);
       }
 
+      if (!isCurrent()) return;
       await sb.from('session_progress').update({ status: 'in_progress', started_at: new Date().toISOString() }).eq('user_id', currentUser.id).eq('session_number', sessionNumber).eq('status', 'available');
+      if (!isCurrent()) return;
       syncSessionInfoChrome();
-      focusElNoScroll('chat-input');
+      if (currentStep) sessionList.scrollLeft = currentStep.offsetLeft - sessionList.offsetLeft - (sessionList.clientWidth - currentStep.offsetWidth) / 2;
+      document.querySelector('#book-session-list [aria-current="step"]')?.focus({ preventScroll: true });
     }
 
     document.getElementById('book-continue').addEventListener('click', function () {
@@ -3029,11 +3042,13 @@
     async function loadSessionContext(sessionNumber) {
       try {
         const { data: memories } = await sb.from('ai_memory').select('session_number, summary, key_words').eq('user_id', currentUser.id).lt('session_number', sessionNumber).not('summary', 'is', null);
-        if (memories?.length) sessionContext = { previous_sessions: memories.map(m => ({ session_number: m.session_number, summary: m.summary, key_words: m.key_words || [] })) };
-      } catch { sessionContext = {}; }
+        return memories?.length ? { previous_sessions: memories.map(m => ({ session_number: m.session_number, summary: m.summary, key_words: m.key_words || [] })) } : {};
+      } catch { return {}; }
     }
 
     function renderMessage(role, msgContent, scrollMode) {
+      const messageSession = activeSession, messageVersion = sessionOpenVersion;
+      const isMessageCurrent = () => activeSession === messageSession && sessionOpenVersion === messageVersion;
       var el = document.getElementById('chat-messages');
       var toolMatch = msgContent.match(/\[TOOL:([a-z-]+)\]/);
       var actionMatch = msgContent.match(/\[ACTION:\s*([^\]]+)\]/i);
@@ -3046,8 +3061,8 @@
         wrap.innerHTML = '<div class="msg-avatar">' + (role==='assistant'?emoji:'✦') + '</div><div class="msg-bubble">' + safeHtml + '</div>';
         el.appendChild(wrap);
       }
-      if (toolMatch && role==='assistant') { var tk=toolMatch[1], ti=TOOL_MAP[tk]; if (ti) setTimeout(function(){renderToolCard(tk,ti,el);}, cleanContent?400:0); }
-      if (/\[COMPLETE\]/.test(msgContent) && role==='assistant') { var _sStatus = activeSession && sessionData.find(function(s){return s.session_number===activeSession.number;})?.status; if (_sStatus !== 'complete') { setTimeout(function(){ var p=document.getElementById('complete-panel'); if(p) p.classList.add('visible'); },600); } }
+      if (toolMatch && role==='assistant') { var tk=toolMatch[1], ti=TOOL_MAP[tk]; if (ti) setTimeout(function(){if (!isMessageCurrent()) return; renderToolCard(tk,ti,el);}, cleanContent?400:0); }
+      if (/\[COMPLETE\]/.test(msgContent) && role==='assistant') { var _sStatus = activeSession && sessionData.find(function(s){return s.session_number===activeSession.number;})?.status; if (_sStatus !== 'complete') { setTimeout(function(){ if (!isMessageCurrent()) return; var p=document.getElementById('complete-panel'); if(p) p.classList.add('visible'); },600); } }
       if (scrollMode !== false) el.scrollTop = el.scrollHeight;
     }
 

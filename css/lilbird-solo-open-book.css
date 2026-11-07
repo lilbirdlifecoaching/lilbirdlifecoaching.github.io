@@ -73,7 +73,7 @@ html.solo-journal #view-session .msg.assistant .msg-bubble { background:transpar
 html.solo-journal #view-session .msg-avatar { display:none; }
 html.solo-journal #view-session .chat-input-wrap { padding:12px 0 0 !important; }
 html.solo-journal #view-session :is(button,a,textarea,[role=button]):focus-visible { outline:3px solid #125567; outline-offset:3px; }
-@media(max-width:1100px) and (min-width:769px) {
+@media(max-width:1280px) and (min-width:1101px) {
  .book-course-header { padding-left:185px; } #book-progress { gap:5px; } .book-progress-step { width:23px;height:23px;font-size:12px; }
  html.solo-journal #view-session .session-main { grid-template-columns:155px minmax(0,1fr) minmax(0,1fr); padding-right:20px; }
  html.solo-journal #view-session .session-main::before { left:174px; }
@@ -82,7 +82,7 @@ html.solo-journal #view-session :is(button,a,textarea,[role=button]):focus-visib
  html.solo-journal #view-session .session-chat-col { padding:30px 25px 25px; }
  html.solo-journal #view-session .session-info-desc { font-size:16px; }
 }
-@media(max-width:768px) {
+@media(max-width:1100px) {
  html.solo-journal #view-session.view.active { height:auto; min-height:100dvh; overflow:visible; }
  .book-course-header { padding:14px 18px; gap:10px; flex-wrap:wrap; }
  .book-course-header>img { width:43px;height:43px; } .book-course-header h2 { font-size:24px; } .book-course-header p { max-width:260px;font-size:11px; }
@@ -121,13 +121,13 @@ html.solo-journal #view-session .session-meta-row { position:absolute; left:75px
 html.solo-journal #view-session .session-nav-label { font:600 25px/1 Georgia,serif; }
 html.solo-journal #view-session .session-nav-bird-img { width:42px;height:42px; }
 html.solo-journal #view-session .tools-label { text-transform:none !important; letter-spacing:0 !important; }
-@media(min-width:769px) and (max-width:1100px) {
+@media(min-width:1101px) and (max-width:1280px) {
  html.solo-journal #view-session .session-info { padding-left:42px !important;padding-right:30px !important;padding-top:60px !important; }
  html.solo-journal #view-session .session-info-desc { font-size:17px; }
  html.solo-journal #view-session .session-chat-col { padding:35px 30px; }
  html.solo-journal #view-session .session-meta-row { left:40px;right:25px; }
 }
-@media(max-width:768px) {
+@media(max-width:1100px) {
  html.solo-journal #view-session .session-main { height:auto; }
  html.solo-journal #view-session .session-info { padding:24px 23px 16px !important; }
  html.solo-journal #view-session .session-chat-col { padding:5px 23px 25px; }
@@ -138,13 +138,29 @@ html.solo-journal #view-session .tools-label { text-transform:none !important; l
  html.solo-journal #view-session .session-nav-bird-img { width:30px;height:30px; }
  html.solo-journal #view-session .session-nav a[href='/'] { display:none !important; }
 }
-@media(min-width:769px) {
+@media(min-width:1101px) {
  html.solo-journal #view-session .video-player-container { aspect-ratio:2.3/1; }
 }
-@media(max-width:768px) {
+@media(max-width:1100px) {
  #book-progress { display:none; }
  html.solo-journal #view-session .book-reflecting .session-info { display:none !important; }
  html.solo-journal #view-session .book-reflecting::before { top:78px; }
  html.solo-journal #view-session .book-reflecting .session-chat-col { padding-top:24px; }
 }
 html.solo-journal #view-session .tool-item-snap { grid-column:1 / -1; }
+
+@media(max-width:1100px) {
+ html.solo-journal #view-session .session-info-desc { max-width:none; }
+ .book-illustration-space { height:auto; aspect-ratio:1.45; max-height:480px; }
+}
+
+@media(max-width:1100px) {
+ html.solo-journal #view-session .session-nav-label { white-space:nowrap; }
+}
+@media(max-width:360px) {
+ html.solo-journal #view-session .session-nav-label { font-size:18px; }
+}
+
+@media(max-width:360px) {
+ .book-course-header>img { display:none; }
+}
