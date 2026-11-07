@@ -59,3 +59,9 @@ Captures use sample member progress and disconnected live services. Narration ca
 Final prompt:
 
 > Edit target supplied approved Lil Bird webpage. Asset extraction and cleanup for working website. Reproduce ONLY the central open book from this image, straight-on overhead view, exactly the same wide two-page book filling canvas with small margins, aspect ratio 1.6:1. Preserve all page edges, leather binding, watercolor leaves across upper corners, bottom left scene with TWO CHILDREN sitting on rock looking over river valley and small yellow bird. Preserve center crease and bookmark ribbon at bottom. Remove entire left navigation sidebar, top headers, outer cup, and all surrounding UI. Inside book REMOVE ALL text, session labels, yellow strokes, video rectangle, all resource cards, buttons and checklists. Upper half left page empty parchment, entire right page empty parchment. Beautiful subtle warm cream watercolor paper. Children and valley occupy lower 45 percent left page only, upper half left is blank. No UI text or markings anywhere. Small warm brown wooden table margin around book only. Faithful extraction of approved art, not a new design.
+
+## Readability revision
+
+Moved the session number, duration and tool count from the translucent overlay below the children to an opaque paper panel below Tools & Resources. Labels and values have explicit dark colors and larger type. Desktop spacing keeps the panel and Continue action within the book; mobile remains free of horizontal page overflow. The 26 JavaScript checks still pass.
+
+[Updated desktop details](solo-open-book-review/readable-details.jpg) · [Updated mobile](solo-open-book-review/mobile.jpg)

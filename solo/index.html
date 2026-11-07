@@ -994,7 +994,7 @@
   <link rel="stylesheet" href="/css/lilbird-solo-theme.css?v=20260922b" />
   <link rel="stylesheet" href="/css/lilbird-solo-journal.css?v=20261106s6" />
   <link rel="stylesheet" href="/css/lilbird-parchment.css?v=20261106p6" />
-  <link rel="stylesheet" href="/css/lilbird-solo-open-book.css?v=20261107c" />
+  <link rel="stylesheet" href="/css/lilbird-solo-open-book.css?v=20261106d" />
   <script>document.documentElement.classList.add('solo-journal');</script>
   <!-- Google Tag Manager -->
   <script src="/lilbird-gtm-id.js"></script>
@@ -1271,6 +1271,7 @@
           <div id="book-video-slot"></div>
           <section class="book-agenda" aria-labelledby="book-agenda-title"><h2 id="book-agenda-title">In This Session</h2><ul><li>Discover the patterns in your story</li><li>Make space for insights and reflection</li><li>Try the tools at your own pace</li><li>Choose a practical next step for real life</li></ul></section>
           <div id="book-tools-slot"></div>
+          <div id="book-meta-slot"></div>
           <button type="button" class="book-continue" id="book-continue">Continue this session →</button>
         </div>
         <div class="book-conversation-heading"><button type="button" id="book-back-overview">← Session overview</button><h2>Your Reflection</h2></div>
@@ -2528,6 +2529,10 @@
       var videoSlot = document.getElementById('book-video-slot');
       var toolsSlot = document.getElementById('book-tools-slot');
       videoSlot.replaceChildren(); toolsSlot.replaceChildren();
+      var metaSlot = document.getElementById('book-meta-slot');
+      metaSlot.replaceChildren();
+      var metaPanel = document.querySelector('#session-info .session-meta-row');
+      if (metaPanel) metaSlot.appendChild(metaPanel);
       var mediaPanel = document.querySelector('#session-info .video-wrap, #session-info .video-coming-soon');
       if (mediaPanel) videoSlot.appendChild(mediaPanel);
       var toolsPanel = document.querySelector('#session-info .tools-section');

@@ -164,3 +164,22 @@ html.solo-journal #view-session .tool-item-snap { grid-column:1 / -1; }
 @media(max-width:360px) {
  .book-course-header>img { display:none; }
 }
+
+/* Course details sit on opaque paper alongside the resources, clear of the artwork. */
+html.solo-journal #view-session #book-meta-slot .session-meta-row {
+ position:static; inset:auto; display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:12px; margin:0; padding:12px 16px; background:#fff5df;
+ border:1px solid #cfb487; border-radius:8px;
+}
+html.solo-journal #view-session #book-meta-slot .meta-label {
+ color:#665238; font-size:11px; line-height:1.4; letter-spacing:.06em;
+}
+html.solo-journal #view-session #book-meta-slot .meta-value {
+ color:#302819; font-size:14px; line-height:1.5; font-weight:500;
+}
+@media(min-width:1101px) {
+ .book-overview { gap:12px; }
+ html.solo-journal #view-session .video-player-container { aspect-ratio:2.5/1; }
+ .book-agenda li { padding-top:4px; padding-bottom:4px; }
+ html.solo-journal #view-session .tools-section { padding-top:10px; padding-bottom:10px; }
+}
