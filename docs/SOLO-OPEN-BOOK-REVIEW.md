@@ -46,3 +46,9 @@ Run `python3 scripts/preview-solo-book.py`, then visit http://127.0.0.1:8873/sol
 Final prompt:
 
 > Edit target supplied approved Lil Bird webpage. Asset extraction and cleanup for working website. Reproduce ONLY the central open book from this image, straight-on overhead view, exactly the same wide two-page book filling canvas with small margins, aspect ratio 1.6:1. Preserve all page edges, leather binding, watercolor leaves across upper corners, bottom left scene with TWO CHILDREN sitting on rock looking over river valley and small yellow bird. Preserve center crease and bookmark ribbon at bottom. Remove entire left navigation sidebar, top headers, outer cup, and all surrounding UI. Inside book REMOVE ALL text, session labels, yellow strokes, video rectangle, all resource cards, buttons and checklists. Upper half left page empty parchment, entire right page empty parchment. Beautiful subtle warm cream watercolor paper. Children and valley occupy lower 45 percent left page only, upper half left is blank. No UI text or markings anywhere. Small warm brown wooden table margin around book only. Faithful extraction of approved art, not a new design.
+
+## Browser screenshots
+
+[Desktop overview](solo-open-book-review/desktop.jpg) · [Mobile overview](solo-open-book-review/mobile.jpg) · [Reflection view](solo-open-book-review/reflection.jpg)
+
+These captures show the local review fixture with sample progress and live service connections disabled.
