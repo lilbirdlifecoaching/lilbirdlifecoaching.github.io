@@ -1335,7 +1335,7 @@
   <script>
     const SUPABASE_URL  = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
-    const SOLO_SHELL_BUILD = 'v1.18-open-book-review-20261106';
+    const SOLO_SHELL_BUILD = 'v1.18b-open-book-20261106';
     const WORKER_URL    = 'https://worker-solo.cwwq46sn7m.workers.dev';
     console.info("lil' bird Solo shell", SOLO_SHELL_BUILD, '| worker:', WORKER_URL);
     // Stripe publishable key — safe to ship in client code.
@@ -1525,6 +1525,8 @@
         document.body.style.overflow = '';
         document.documentElement.scrollLeft = 0;
         document.body.scrollLeft = 0;
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
       }
       if (id === 'view-landing' || id === 'view-auth' || id === 'view-post-purchase') {
         window.scrollTo(0, 0);
