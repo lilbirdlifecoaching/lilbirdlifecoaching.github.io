@@ -3666,7 +3666,7 @@
     if (dashView) dashView.classList.add('active');
     resetLoginButton();
     const preferTab = new URLSearchParams(window.location.search).get('tab');
-    setTab(preferTab === 'profile' || preferTab === 'ask' || preferTab === 'canvas' ? preferTab : 'products');
+    setTab(preferTab === 'profile' || preferTab === 'ask' || preferTab === 'canvas' || preferTab === 'journey' ? preferTab : 'products');
     await hydrateDashboard();
   }
 
