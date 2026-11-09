@@ -418,11 +418,12 @@
     setDashLoading(true);
 
     try {
-      const [entRes, courseRes, progressRes, linkRes, intensiveRes, lciRes] = await Promise.all([
+      const [entRes, courseRes, progressRes, linkRes, readsRes, intensiveRes, lciRes] = await Promise.all([
         sb.from('user_entitlements').select('product,active,granted_by').eq('user_id', uid).eq('active', true),
         sb.from('course_users').select('*').eq('id', uid).maybeSingle(),
         sb.from('session_progress').select('*').eq('user_id', uid).order('session_number'),
         sb.from('deep_profile_links').select('nest_id').eq('user_id', uid).maybeSingle(),
+        sb.from('nest_reads').select('nest_id,is_primary').eq('user_id', uid),
         sb.from('intensive_enrolments').select('*').eq('user_id', uid).maybeSingle(),
         sb.from('lci_sessions').select('*').eq('user_id', uid).order('session_number')
       ]);
@@ -467,6 +468,21 @@
         }
       }
       deepNestId = linkRes.data?.nest_id || null;
+      const nestReadIds = [];
+      {
+        const seen = new Set();
+        const addNest = (id) => {
+          const nestId = String(id || '').trim();
+          if (!nestId || seen.has(nestId)) return;
+          seen.add(nestId);
+          nestReadIds.push(nestId);
+        };
+        addNest(deepNestId);
+        const rows = Array.isArray(readsRes.data) ? readsRes.data.slice() : [];
+        rows.sort((a, b) => Number(!!b?.is_primary) - Number(!!a?.is_primary));
+        rows.forEach((row) => addNest(row?.nest_id));
+        if (readsRes.error) console.warn('nest_reads query:', readsRes.error);
+      }
       intensiveEnrolment = intensiveRes.data || null;
       lciSessions = lciRes.data || [];
       if (lciRes.error) {
@@ -497,21 +513,30 @@
       canvasTexts = null;
 
       canvasAccessNote = '';
-      if (deepNestId) {
-        try {
-          const res = await fetch(ASSESSMENT_WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(deepNestId), {
-            headers: await authHeaders()
-          });
-          const payload = await res.json().catch(() => null);
-          if (res.ok && payload) {
-            deepProfile = parseAssessmentProfile(payload);
+      deepProfile = null;
+      deepReadPaid = false;
+      if (nestReadIds.length) {
+        for (const candidateId of nestReadIds) {
+          try {
+            const res = await fetch(ASSESSMENT_WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(candidateId), {
+              headers: await authHeaders()
+            });
+            const payload = await res.json().catch(() => null);
+            if (!res.ok || !payload) {
+              if (!canvasAccessNote) canvasAccessNote = assessmentDenialMessage(payload, res.status);
+              continue;
+            }
+            const profile = parseAssessmentProfile(payload);
+            if (!profile) continue;
+            deepNestId = candidateId;
+            deepProfile = profile;
             deepReadPaid = payload?.paid === true;
             applyCanvasPayload(payload);
-          } else {
-            canvasAccessNote = assessmentDenialMessage(payload, res.status);
+            canvasAccessNote = '';
+            break;
+          } catch (e) {
+            console.error('Could not load deep profile:', e);
           }
-        } catch (e) {
-          console.error('Could not load deep profile:', e);
         }
       }
 

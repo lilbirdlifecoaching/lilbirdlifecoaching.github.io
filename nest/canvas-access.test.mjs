@@ -95,16 +95,28 @@ test('a nest id alone cannot read or write a canvas, and a token cannot override
   const wrongToken = decide({ token: newCanvasToken(), recordToken: token });
   assert.equal(wrongToken.status, 401);
 
-  const stranger = decide({
+  const nestMemberFinishingGate = decide({
     user: other,
     ownership: null,
     token,
     recordToken: token,
     tokenExpires: soon,
+    recordEmail: '',
   });
-  assert.equal(stranger.allow, false);
-  assert.equal(stranger.status, 403);
-  assert.deepEqual(canvasDenial(stranger), { error: 'Not allowed' });
+  assert.equal(nestMemberFinishingGate.allow, true);
+  assert.equal(nestMemberFinishingGate.via, 'capability');
+
+  const strangerOnBoundRead = decide({
+    user: other,
+    ownership: null,
+    token,
+    recordToken: token,
+    tokenExpires: soon,
+    recordEmail: 'owner@example.com',
+  });
+  assert.equal(strangerOnBoundRead.allow, false);
+  assert.equal(strangerOnBoundRead.status, 403);
+  assert.deepEqual(canvasDenial(strangerOnBoundRead), { error: 'Not allowed' });
 
   for (const ownership of ['link', 'read', 'email']) {
     const signedInOwner = decide({ user: owner, ownership, token: '' });
@@ -194,7 +206,13 @@ test('a course launch token cannot attach an arbitrary assessment', () => {
 });
 
 test('a paid retake requires a strong owner and does not accept an email-only match', () => {
-  const denied = decide({ user: other, ownership: null, token: 'c'.repeat(64), recordToken: 'c'.repeat(64) });
+  const denied = decide({
+    user: other,
+    ownership: null,
+    token: 'c'.repeat(64),
+    recordToken: 'c'.repeat(64),
+    recordEmail: 'owner@example.com',
+  });
   assert.equal(retakeDecision(denied).allow, false);
   assert.equal(retakeDecision(denied).status, 403);
 
@@ -488,7 +506,7 @@ test('Bridge status and check-in need this session, not a couple id', () => {
 test('the assessment worker wires every private route through the same decisions', () => {
   const workerPath = "/Users/lukehaythorpe/Library/Mobile Documents/com~apple~CloudDocs/_LLC Buisiness Files/Lil' Bird/lilbird site/Deep-profile Cursor Project/lilbird-assessment.js";
   const worker = readFileSync(workerPath, 'utf8');
-  assert.match(worker, /const WORKER_VERSION = 'v8\.8\.0-canvas-checkin'/);
+  assert.match(worker, /const WORKER_VERSION = 'v8\.8\.3-nest-link-primary'/);
   assert.match(worker, /createCanvasShellDecision/);
   assert.match(worker, /emptyCanvasRecord/);
   assert.match(worker, /verifiedAssessmentNestIds/);

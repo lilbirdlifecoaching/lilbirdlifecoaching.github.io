@@ -3264,7 +3264,7 @@
 // ═══════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════
-const DEEP_PROFILE_BUILD = 'v8.1.0-20261013-read-owner';
+const DEEP_PROFILE_BUILD = 'v8.1.1-20261109-nest-link';
 const WORKER_URL     = 'https://lilbird-assessment.cwwq46sn7m.workers.dev';
 const SUPABASE_URL   = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
 const SUPABASE_ANON  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
@@ -3974,8 +3974,11 @@ async function unlockFullRead(){
 
     if(launchToken){ _postCourseLink(nestId).catch(err => console.warn('Course link unhandled:', err)); }
     readOwnerEmail = emailVal;
-    _linkToNestIfLoggedIn(nestId, emailVal).catch(err => console.warn('Nest link unhandled:', err));
-
+    try {
+      await _linkToNestIfLoggedIn(nestId, emailVal);
+    } catch (err) {
+      console.warn('Nest link unhandled:', err);
+    }
 
     renderResults(profileData);
     const emailNote = document.getElementById('results-email-note');

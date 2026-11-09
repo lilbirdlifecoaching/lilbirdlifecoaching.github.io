@@ -21,8 +21,10 @@
  *   This keeps current members able to open a read. It was forgeable before
  *   this patch, so it is not strong enough to create a new link, copy paid
  *   status, or write nest_owner_emails.
- * - capability: unexpired token bound to this read, and only while the caller
- *   is signed out. A signed-in non-owner is refused even with a valid token.
+ * - capability: unexpired token bound to this read. Works while signed out.
+ *   Also works while signed in when the read has no email yet, so a Nest
+ *   member can finish the email gate on a quiz they just took. A signed-in
+ *   caller is refused when the read is already bound to someone else.
  */
 
 /** Proofs written only after an independent check. A missing value stays legacy. */
@@ -87,15 +89,35 @@ export function tokenMatches(presented, expected) {
   return mismatch === 0;
 }
 
-export function canvasAccessDecision({ user, ownership, token, recordToken, tokenExpires, now, recordExists }) {
+export function canvasAccessDecision({
+  user,
+  ownership,
+  token,
+  recordToken,
+  tokenExpires,
+  now,
+  recordExists,
+  recordEmail = '',
+}) {
   const signedIn = !!user?.id;
   const fresh = tokenMatches(token, recordToken) && capabilityStillValid(tokenExpires, now);
   const knownOwner = ownership === 'link' || ownership === 'read' || ownership === 'email';
+  const bound = String(recordEmail || '').trim().toLowerCase();
+  const caller = String(user?.email || '').trim().toLowerCase();
   if (signedIn && knownOwner && recordExists) {
     return { allow: true, via: 'owner', ownership };
   }
-  if (!signedIn && fresh && recordExists) {
-    return { allow: true, via: 'capability', ownership: null };
+  if (fresh && recordExists) {
+    if (!signedIn) {
+      return { allow: true, via: 'capability', ownership: null };
+    }
+    // Creating browser, still on the email gate (Nest session open).
+    if (!bound) {
+      return { allow: true, via: 'capability', ownership: null };
+    }
+    if (caller && bound === caller) {
+      return { allow: true, via: 'capability', ownership: ownership || 'email' };
+    }
   }
   if (signedIn && ownership === 'legacy' && recordExists) {
     return {

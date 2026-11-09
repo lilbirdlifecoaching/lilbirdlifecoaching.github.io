@@ -44,26 +44,35 @@ begin
   if v_current is null then
     insert into public.deep_profile_links (user_id, nest_id, completed_at, last_seen_at, ownership_proof)
     values (v_uid, v_nest, now(), now(), 'owner_email');
-    insert into public.nest_reads (user_id, nest_id, is_primary)
-    values (v_uid, v_nest, true)
-    on conflict (user_id, nest_id) do update set is_primary = true;
   elsif v_current = v_nest then
     update public.deep_profile_links
       set last_seen_at = now(),
           ownership_proof = coalesce(ownership_proof, 'owner_email')
       where user_id = v_uid;
   else
+    -- Confirmed read becomes the one Nest shows; keep the previous id in nest_reads.
+    update public.deep_profile_links
+      set nest_id = v_nest,
+          completed_at = now(),
+          last_seen_at = now(),
+          ownership_proof = coalesce(ownership_proof, 'owner_email')
+      where user_id = v_uid;
     insert into public.nest_reads (user_id, nest_id, is_primary)
-    values (v_uid, v_nest, false)
+    values (v_uid, v_current, false)
     on conflict (user_id, nest_id) do nothing;
   end if;
+
+  update public.nest_reads set is_primary = false where user_id = v_uid;
+  insert into public.nest_reads (user_id, nest_id, is_primary)
+  values (v_uid, v_nest, true)
+  on conflict (user_id, nest_id) do update set is_primary = true;
 
   insert into public.user_entitlements (user_id, product, granted_by, active)
   values (v_uid, 'inner_compass', 'profile_link', true)
   on conflict (user_id, product) do update
     set active = true, granted_at = now();
 
-  return jsonb_build_object('nest_id', coalesce(v_current, v_nest), 'added', v_nest);
+  return jsonb_build_object('nest_id', v_nest, 'previous_nest_id', v_current, 'added', v_nest);
 end;
 $$;
 
