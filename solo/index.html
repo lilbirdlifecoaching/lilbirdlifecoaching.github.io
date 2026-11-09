@@ -994,7 +994,7 @@
   <link rel="stylesheet" href="/css/lilbird-solo-theme.css?v=20260922b" />
   <link rel="stylesheet" href="/css/lilbird-solo-journal.css?v=20261106s6" />
   <link rel="stylesheet" href="/css/lilbird-parchment.css?v=20261106p6" />
-  <link rel="stylesheet" href="/css/lilbird-solo-open-book.css?v=20261106e" />
+  <link rel="stylesheet" href="/css/lilbird-solo-open-book.css?v=20261109a" />
   <link rel="stylesheet" href="/css/lilbird-solo-home-book.css?v=20261106a" />
   <link rel="stylesheet" href="/css/lilbird-course-world.css?v=20261106a" />
   <script>document.documentElement.classList.add('solo-journal');</script>
@@ -2555,7 +2555,8 @@
           var isDone = openedTools[k] || false;
           var snapHtml = (isDone && snapData) ? ('<div class="tool-item-snap">' + renderToolSnapshot(k, snapData).replace('<div class="tool-snapshot">', '').replace(/<\/div>\s*$/, '') + '</div>') : '';
           var doneStyle = isDone ? ' style="color:var(--session-col);opacity:1"' : '';
-          return '<div role="button" tabindex="0" onkeydown="if(event.key===&quot;Enter&quot;||event.key===&quot; &quot;){event.preventDefault();this.click()}" class="tool-item clickable' + (isDone ? ' tool-done' : '') + '" data-tool-key="' + (k||'') + '" onclick="' + oc + '"><span class="tool-dot"></span><span>' + t.name + '</span><span class="tool-tag"' + doneStyle + '>' + (isDone ? 'Saved' : t.tag) + '</span></div>' + snapHtml;
+          var iconHtml = k ? '<svg class="tool-icon" aria-hidden="true" focusable="false"><use href="/solo/assets/tool-icons.svg#' + k + '"></use></svg>' : '';
+          return '<div role="button" tabindex="0" onkeydown="if(event.key===&quot;Enter&quot;||event.key===&quot; &quot;){event.preventDefault();this.click()}" class="tool-item clickable' + (isDone ? ' tool-done' : '') + '" data-tool-key="' + (k||'') + '" onclick="' + oc + '">' + iconHtml + '<span>' + t.name + '</span><span class="tool-tag"' + doneStyle + '>' + (isDone ? 'Saved' : t.tag) + '</span></div>' + snapHtml;
         }).join('') + '</div></div>' : '';
 
       const videoHtml = (session.videoKey || session.narratedMedia)
