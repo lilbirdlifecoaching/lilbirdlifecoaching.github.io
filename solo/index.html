@@ -994,7 +994,9 @@
   <link rel="stylesheet" href="/css/lilbird-solo-theme.css?v=20260922b" />
   <link rel="stylesheet" href="/css/lilbird-solo-journal.css?v=20261106s6" />
   <link rel="stylesheet" href="/css/lilbird-parchment.css?v=20261106p6" />
-  <link rel="stylesheet" href="/css/lilbird-solo-open-book.css?v=20261106d" />
+  <link rel="stylesheet" href="/css/lilbird-solo-open-book.css?v=20261106e" />
+  <link rel="stylesheet" href="/css/lilbird-solo-home-book.css?v=20261106a" />
+  <link rel="stylesheet" href="/css/lilbird-course-world.css?v=20261106a" />
   <script>document.documentElement.classList.add('solo-journal');</script>
   <!-- Google Tag Manager -->
   <script src="/lilbird-gtm-id.js"></script>
@@ -1209,7 +1211,8 @@
 
   <div id="view-dashboard" class="view">
     <nav class="dash-nav">
-      <div class="nav-brand"><img class="nav-bird-img" src="/bird-logo.png" alt="" width="32" height="32" data-logo-dark="/bird-logo.png" data-logo-light="/bird-logo-teal.png" /><div class="nav-title">lil' bird</div></div>
+      <div class="nav-brand"><img class="nav-bird-img" src="/bird-logo.png" alt="" width="32" height="32" data-logo-dark="/bird-logo.png" data-logo-light="/bird-logo-teal.png" /><div class="nav-title">lil’ bird<small class="solo-brand-sub">Your Nest</small></div></div>
+      <nav class="journey-product-nav" aria-label="Your Nest"><a href="/nest/">Nest</a><a href="/solo/" aria-current="page">Solo Course</a></nav>
       <div class="nav-right">
         <button type="button" class="theme-toggle" aria-pressed="true" aria-label="Switch to night mode">
           <span class="theme-toggle-track" aria-hidden="true">
@@ -1226,17 +1229,25 @@
         <button class="btn-ghost" id="btn-signout">Sign out</button>
       </div>
     </nav>
-    <div class="dash-body">
-      <div class="dash-welcome">
-        <div class="dash-eyebrow">your sessions</div>
-        <h2 id="dash-greeting">Welcome.</h2>
-        <p id="dash-subtext">Eight sessions at your pace. Conversation, a short video, and tools for each one.</p>
+    <header class="book-course-header"><img src="/nest/assets/lilbird-kit/icons/open-book-watercolor.webp" alt="" /><div><h2>The Solo Course</h2><p>Eight sessions to find clarity, build confidence, and take your next steps.</p></div><div id="dash-book-progress" class="book-progress-strip" aria-label="Course progress"></div></header>
+    <div class="home-book-main">
+      <aside class="book-rail" aria-label="Solo course navigation"><a href="/nest/">⌂ &nbsp; Home</a><a href="/nest/?tab=journey">♧ &nbsp; My Journey</a><a href="/deep-profile.html">♡ &nbsp; Understand myself</a><a href="/nest/?tab=ask">♧ &nbsp; My Guide</a><div class="book-rail-title">▤ &nbsp; Solo Course</div><nav id="dash-book-session-list" class="book-session-list" aria-label="Your sessions"></nav><img class="book-rail-bird" src="/nest/assets/lilbird-kit/icons/yellow-bird-perched.webp" alt="" /></aside>
+      <div class="dash-body home-book-spread">
+        <section class="home-book-left" aria-labelledby="home-book-title">
+          <div class="home-book-eyebrow">Your Solo journal</div>
+          <h1 id="home-book-title">Your next chapter.</h1>
+          <div class="dash-welcome">
+            <h2 id="dash-greeting">Welcome.</h2>
+            <p id="dash-subtext">Eight sessions at your pace. Conversation, a short video, and tools for each one.</p>
+          </div>
+          <div class="dash-progress" id="dash-progress" style="display:none;">
+            <div class="progress-meta"><span class="progress-label">Course progress</span><span class="progress-count" id="progress-count">0 of 8 sessions</span></div>
+            <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+          </div>
+          <div class="home-book-illustration" aria-hidden="true"></div>
+        </section>
+        <main id="dash-content" class="home-book-right" aria-label="Your Solo course"></main>
       </div>
-      <div class="dash-progress" id="dash-progress" style="display:none;">
-        <div class="progress-meta"><span class="progress-label">Course progress</span><span class="progress-count" id="progress-count">0 of 8 sessions</span></div>
-        <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
-      </div>
-      <div id="dash-content"></div>
     </div>
   </div>
 
@@ -1244,8 +1255,9 @@
     <nav class="session-nav">
       <div class="session-nav-left">
         <img class="session-nav-bird-img" id="session-nav-bird" src="/bird-logo.png" alt="" width="32" height="32" data-logo-dark="/bird-logo.png" data-logo-light="/bird-logo-teal.png" />
-        <span class="session-nav-label">lil’ bird</span>
+        <span class="session-nav-label">lil’ bird<small class="solo-brand-sub">Your Nest</small></span>
       </div>
+      <nav class="journey-product-nav" aria-label="Your Nest"><a href="/nest/">Nest</a><a href="/solo/" aria-current="page">Solo Course</a></nav>
       <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;justify-content:flex-end">
         <button type="button" class="theme-toggle" aria-pressed="true" aria-label="Switch to night mode">
           <span class="theme-toggle-track" aria-hidden="true">
@@ -1262,9 +1274,9 @@
         <button class="btn-back-dash" id="btn-back-dash">← My sessions</button>
       </div>
     </nav>
-    <header class="book-course-header"><img src="/nest/assets/lilbird-kit/icons/open-book-watercolor.webp" alt="" /><div><h2>The Solo Course</h2><p>Eight sessions to find clarity, build confidence, and take your next steps.</p></div><div id="book-progress" aria-label="Course progress"></div></header>
+    <header class="book-course-header"><img src="/nest/assets/lilbird-kit/icons/open-book-watercolor.webp" alt="" /><div><h2>The Solo Course</h2><p>Eight sessions to find clarity, build confidence, and take your next steps.</p></div><div id="book-progress" class="book-progress-strip" aria-label="Course progress"></div></header>
     <div class="session-main">
-      <aside class="book-rail" aria-label="Solo course navigation"><a href="/nest/">⌂ &nbsp; Home</a><a href="/nest/?tab=journey">♧ &nbsp; My Journey</a><a href="/deep-profile.html">♡ &nbsp; Understand myself</a><a href="/nest/?tab=ask">♧ &nbsp; My Guide</a><div class="book-rail-title">▤ &nbsp; Solo Course</div><nav id="book-session-list" aria-label="Your sessions"></nav><img class="book-rail-bird" src="/nest/assets/lilbird-kit/icons/yellow-bird-perched.webp" alt="" /></aside>
+      <aside class="book-rail" aria-label="Solo course navigation"><a href="/nest/">⌂ &nbsp; Home</a><a href="/nest/?tab=journey">♧ &nbsp; My Journey</a><a href="/deep-profile.html">♡ &nbsp; Understand myself</a><a href="/nest/?tab=ask">♧ &nbsp; My Guide</a><div class="book-rail-title">▤ &nbsp; Solo Course</div><nav id="book-session-list" class="book-session-list" aria-label="Your sessions"></nav><img class="book-rail-bird" src="/nest/assets/lilbird-kit/icons/yellow-bird-perched.webp" alt="" /></aside>
       <div class="session-info" id="session-info" role="region" aria-label="Session information" tabindex="-1"></div>
       <div class="session-chat-col">
         <div class="book-overview">
@@ -1335,7 +1347,7 @@
   <script>
     const SUPABASE_URL  = 'https://mebqqzbuwkogdxvnihrq.supabase.co';
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYnFxemJ1d2tvZ2R4dm5paHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MTMzMjAsImV4cCI6MjA5MzQ4OTMyMH0.AzBotw2siyolNEbzd9cp4VT9FjBrGetiZxGOZsOGZVU';
-    const SOLO_SHELL_BUILD = 'v1.18b-open-book-20261106';
+    const SOLO_SHELL_BUILD = 'v1.19-continuous-book-review-20261106';
     const WORKER_URL    = 'https://worker-solo.cwwq46sn7m.workers.dev';
     console.info("lil' bird Solo shell", SOLO_SHELL_BUILD, '| worker:', WORKER_URL);
     // Stripe publishable key — safe to ship in client code.
@@ -1518,6 +1530,7 @@
     function showView(id) {
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
       document.getElementById(id).classList.add('active');
+      document.body.classList.toggle('solo-course-world', id === 'view-dashboard' || id === 'view-session');
       if (id !== 'view-session') {
         setSessionInfoOpen(false);
       }
@@ -1528,7 +1541,7 @@
         document.documentElement.scrollTop = 0;
         document.body.scrollTop = 0;
       }
-      if (id === 'view-landing' || id === 'view-auth' || id === 'view-post-purchase') {
+      if (id === 'view-landing' || id === 'view-auth' || id === 'view-post-purchase' || id === 'view-dashboard') {
         window.scrollTo(0, 0);
       }
       syncSessionInfoChrome();
@@ -1829,7 +1842,7 @@
       var tabs = [{ id: 'plan', label: 'Your plan' }, { id: 'takeaways', label: 'Takeaways' }, { id: 'sessions', label: 'Sessions' }];
       var html = '<div class="complete-tabs" role="tablist">';
       tabs.forEach(function (t) {
-        html += '<button type="button" class="complete-tab' + (activeTab === t.id ? ' active' : '') + '" data-complete-tab="' + t.id + '" role="tab">' + t.label + '</button>';
+        html += '<button type="button" class="complete-tab' + (activeTab === t.id ? ' active' : '') + '" data-complete-tab="' + t.id + '" role="tab" aria-selected="' + (activeTab === t.id ? 'true' : 'false') + '">' + t.label + '</button>';
       });
       html += '</div>';
       return html;
@@ -2079,6 +2092,11 @@
     }
 
     function renderDashboard() {
+      var courseFocus = hasSoloAccess() ? getSoloFocus() : { kind: 'none' };
+      var bookState = !hasSoloAccess() ? 'access' : isCourseComplete() ? 'complete' : courseFocus.kind;
+      document.getElementById('view-dashboard').setAttribute('data-course-state', bookState);
+      document.getElementById('home-book-title').textContent = bookState === 'complete' ? 'Your full flight.' : bookState === 'start' ? 'Your first flight.' : bookState === 'waiting' ? 'Room to reflect.' : 'Your next chapter.';
+      renderBookCourseNavigation('dash-book-session-list', 'dash-book-progress', courseFocus.session ? courseFocus.session.number : null);
       const name = userProfile?.full_name?.split(' ')[0] || '';
       const hour = new Date().getHours();
       const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
@@ -2093,7 +2111,8 @@
       const completed = sessionData.filter(s => s.status === 'complete').length;
       document.getElementById('dash-progress').style.display = 'block';
       if (isCourseComplete()) {
-        document.getElementById('dash-subtext').style.display = 'none';
+        document.getElementById('dash-subtext').style.display = '';
+        document.getElementById('dash-subtext').textContent = 'Your Full Flight Plan, the insights you gathered, and every session. All here whenever you need them.';
         document.querySelector('.progress-label').textContent = 'Course complete';
         document.getElementById('progress-count').textContent = '8 of 8 sessions';
         document.getElementById('progress-fill').style.width = '100%';
@@ -2463,6 +2482,30 @@
       return '';
     }
 
+    function renderBookCourseNavigation(listId, progressId, currentNumber) {
+      var list = document.getElementById(listId), progress = document.getElementById(progressId);
+      if (!list || !progress) return;
+      list.replaceChildren();
+      progress.replaceChildren();
+      SESSIONS.forEach(function (item) {
+        var row = sessionData.find(function (p) { return p.session_number === item.number; });
+        var complete = row && row.status === 'complete';
+        var button = document.createElement('button');
+        button.type = 'button'; button.disabled = !hasSoloAccess() || !canOpenSession(item.number);
+        button.setAttribute('aria-label', item.title + ': ' + (row ? row.status.replace('_', ' ') : 'locked'));
+        button.className = complete ? 'book-session-complete' : '';
+        if (item.number === currentNumber) { button.classList.add('book-session-current'); button.setAttribute('aria-current', 'step'); }
+        var marker = document.createElement('span'); marker.textContent = complete ? '✓' : String(item.number);
+        marker.className = 'book-step'; marker.setAttribute('aria-hidden', 'true');
+        button.appendChild(marker); button.appendChild(document.createTextNode(item.title));
+        button.addEventListener('click', function () { openSession(item.number); });
+        list.appendChild(button);
+        var step = document.createElement('span'); step.className = 'book-progress-step' + (complete ? ' complete' : '') + (item.number === currentNumber ? ' current' : '');
+        step.textContent = complete ? '✓' : String(item.number); step.setAttribute('aria-label', item.title + ': ' + (row ? row.status.replace('_', ' ') : 'locked'));
+        progress.appendChild(step);
+      });
+    }
+
     // ── OPEN SESSION ──────────────────────────────────────────
     async function openSession(sessionNumber) {
       // Keep in-flight chat saves and embedded tool work attached to their session.
@@ -2541,24 +2584,7 @@
       if (toolsPanel) toolsSlot.appendChild(toolsPanel);
       else toolsSlot.innerHTML = '<p class="book-no-tools">This session begins with a conversation. Take your time.</p>';
       document.getElementById('book-continue').textContent = 'Continue ' + (session.number === 0 ? 'orientation' : 'Session ' + session.number) + ' →';
-      document.getElementById('book-session-list').replaceChildren();
-      document.getElementById('book-progress').replaceChildren();
-      SESSIONS.forEach(function (item) {
-        var row = sessionData.find(function (p) { return p.session_number === item.number; });
-        var complete = row && row.status === 'complete';
-        var button = document.createElement('button');
-        button.type = 'button'; button.disabled = !canOpenSession(item.number);
-        button.className = complete ? 'book-session-complete' : '';
-        if (item.number === session.number) { button.classList.add('book-session-current'); button.setAttribute('aria-current', 'step'); }
-        var marker = document.createElement('span'); marker.textContent = complete ? '✓' : String(item.number);
-        marker.className = 'book-step'; marker.setAttribute('aria-hidden', 'true');
-        button.appendChild(marker); button.appendChild(document.createTextNode(item.title));
-        button.addEventListener('click', function () { openSession(item.number); });
-        document.getElementById('book-session-list').appendChild(button);
-        var step = document.createElement('span'); step.className = 'book-progress-step' + (complete ? ' complete' : '') + (item.number === session.number ? ' current' : '');
-        step.textContent = complete ? '✓' : String(item.number); step.setAttribute('aria-label', item.title + ': ' + (row ? row.status.replace('_', ' ') : 'locked'));
-        document.getElementById('book-progress').appendChild(step);
-      });
+      renderBookCourseNavigation('book-session-list', 'book-progress', session.number);
       var sessionList = document.getElementById('book-session-list');
       var currentStep = sessionList.querySelector('[aria-current="step"]');
       const closeInfo = document.getElementById('btn-close-session-info');

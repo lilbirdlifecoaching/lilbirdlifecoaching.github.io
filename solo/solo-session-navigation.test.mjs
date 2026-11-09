@@ -5,12 +5,13 @@ import vm from 'node:vm';
 
 // Exercise the actual shell function, including asynchronous hydration and timers.
 const html = fs.readFileSync(new URL('index.html', import.meta.url), 'utf8');
-const source = html.slice(html.indexOf('    async function openSession(sessionNumber)'), html.indexOf("    document.getElementById('book-continue').addEventListener"));
+const navigationSource = html.slice(html.indexOf('    function renderBookCourseNavigation('), html.indexOf('    // ── OPEN SESSION'));
+const source = navigationSource + html.slice(html.indexOf('    async function openSession(sessionNumber)'), html.indexOf("    document.getElementById('book-continue').addEventListener"));
 function fixture({ deferredMemory = false } = {}) {
   const timers = [], rendered = [], pending = [], elements = new Map();
   function element() {
     const classes = new Set();
-    return { style: {}, disabled: false, value: '', innerHTML: '', classList: { add: c => classes.add(c), remove: c => classes.delete(c), contains: c => classes.has(c) }, setAttribute() {}, addEventListener() {}, appendChild() {}, replaceChildren() {}, focus() {}, querySelector() { return null; } };
+    return { children: [], attributes: {}, style: {}, disabled: false, value: '', innerHTML: '', classList: { add: c => classes.add(c), remove: c => classes.delete(c), contains: c => classes.has(c) }, setAttribute(name,value) { this.attributes[name]=value; }, addEventListener() {}, appendChild(child) { this.children.push(child); }, replaceChildren() { this.children=[]; }, focus() {}, querySelector() { return null; } };
   }
   const doc = {
     documentElement: { style: { setProperty() {} } },
@@ -80,4 +81,20 @@ test('delayed tool and completion cues cannot leak into another session', async 
   f.timers.forEach(fn => fn());
   assert.equal(toolCards, 1);
   assert.equal(f.doc.getElementById('complete-panel').classList.contains('visible'), true);
+});
+
+test('shared book navigation denies access even when old course rows are complete', () => {
+ const f=fixture();f.context.hasSoloAccess=()=>false;f.context.sessionData.forEach(row=>row.status='complete');
+ f.context.renderBookCourseNavigation('home-nav','home-progress',null);
+ assert.equal(f.doc.getElementById('home-nav').children.length,3);
+ assert.equal(f.doc.getElementById('home-nav').children.every(button=>button.disabled),true);
+});
+test('home and session navigation apply the same unlock and current-session state', () => {
+ const f=fixture();f.context.canOpenSession=number=>number<2;
+ f.context.renderBookCourseNavigation('home-nav','home-progress',1);
+ f.context.renderBookCourseNavigation('session-nav','session-progress',1);
+ const home=f.doc.getElementById('home-nav').children, session=f.doc.getElementById('session-nav').children;
+ assert.deepEqual(home.map(b=>b.disabled),[false,false,true]);
+ assert.deepEqual(home.map(b=>b.disabled),session.map(b=>b.disabled));
+ assert.equal(home[1].attributes['aria-current'],'step');
 });
