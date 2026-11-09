@@ -1231,7 +1231,7 @@
     </nav>
     <header class="book-course-header"><img src="/nest/assets/lilbird-kit/icons/open-book-watercolor.webp" alt="" /><div><h2>The Solo Course</h2><p>Eight sessions to find clarity, build confidence, and take your next steps.</p></div><div id="dash-book-progress" class="book-progress-strip" aria-label="Course progress"></div></header>
     <div class="home-book-main">
-      <aside class="book-rail" aria-label="Solo course navigation"><a href="/nest/">⌂ &nbsp; Home</a><a href="/nest/?tab=journey">♧ &nbsp; My Journey</a><a href="/deep-profile.html">♡ &nbsp; Understand myself</a><a href="/nest/?tab=ask">♧ &nbsp; My Guide</a><div class="book-rail-title">▤ &nbsp; Solo Course</div><nav id="dash-book-session-list" class="book-session-list" aria-label="Your sessions"></nav><img class="book-rail-bird" src="/nest/assets/lilbird-kit/icons/yellow-bird-perched.webp" alt="" /></aside>
+      <aside class="book-rail" aria-label="Solo course navigation"><a href="/nest/">⌂ &nbsp; Home</a><a href="/nest/?tab=journey">♧ &nbsp; My Journey</a><div class="book-rail-group" data-rail-group="understand"><button type="button" class="book-rail-parent" aria-expanded="false">♡ &nbsp; Understand myself</button><div class="book-rail-sub"><a href="/nest/?tab=canvas">Life Canvas</a><a class="book-rail-ic" data-ic-link href="/nest/?tab=profile">Inner Compass</a></div></div><a href="/nest/?tab=ask">♧ &nbsp; My Guide</a><div class="book-rail-title">▤ &nbsp; Solo Course</div><nav id="dash-book-session-list" class="book-session-list" aria-label="Your sessions"></nav><img class="book-rail-bird" src="/nest/assets/lilbird-kit/icons/yellow-bird-perched.webp" alt="" /></aside>
       <div class="dash-body home-book-spread">
         <section class="home-book-left" aria-labelledby="home-book-title">
           <div class="home-book-eyebrow">Your Solo journal</div>
@@ -1276,7 +1276,7 @@
     </nav>
     <header class="book-course-header"><img src="/nest/assets/lilbird-kit/icons/open-book-watercolor.webp" alt="" /><div><h2>The Solo Course</h2><p>Eight sessions to find clarity, build confidence, and take your next steps.</p></div><div id="book-progress" class="book-progress-strip" aria-label="Course progress"></div></header>
     <div class="session-main">
-      <aside class="book-rail" aria-label="Solo course navigation"><a href="/nest/">⌂ &nbsp; Home</a><a href="/nest/?tab=journey">♧ &nbsp; My Journey</a><a href="/deep-profile.html">♡ &nbsp; Understand myself</a><a href="/nest/?tab=ask">♧ &nbsp; My Guide</a><div class="book-rail-title">▤ &nbsp; Solo Course</div><nav id="book-session-list" class="book-session-list" aria-label="Your sessions"></nav><img class="book-rail-bird" src="/nest/assets/lilbird-kit/icons/yellow-bird-perched.webp" alt="" /></aside>
+      <aside class="book-rail" aria-label="Solo course navigation"><a href="/nest/">⌂ &nbsp; Home</a><a href="/nest/?tab=journey">♧ &nbsp; My Journey</a><div class="book-rail-group" data-rail-group="understand"><button type="button" class="book-rail-parent" aria-expanded="false">♡ &nbsp; Understand myself</button><div class="book-rail-sub"><a href="/nest/?tab=canvas">Life Canvas</a><a class="book-rail-ic" data-ic-link href="/nest/?tab=profile">Inner Compass</a></div></div><a href="/nest/?tab=ask">♧ &nbsp; My Guide</a><div class="book-rail-title">▤ &nbsp; Solo Course</div><nav id="book-session-list" class="book-session-list" aria-label="Your sessions"></nav><img class="book-rail-bird" src="/nest/assets/lilbird-kit/icons/yellow-bird-perched.webp" alt="" /></aside>
       <div class="session-info" id="session-info" role="region" aria-label="Session information" tabindex="-1"></div>
       <div class="session-chat-col">
         <div class="book-overview">
@@ -1474,6 +1474,35 @@
     //      via GET /get-profile?nestId=… with the signed-in session. A nest id alone is not access.
     const ASSESSMENT_WORKER_URL = 'https://lilbird-assessment.cwwq46sn7m.workers.dev';
     let deepProfileState = { loaded: false, nestId: null, profile: null };
+
+    function innerCompassRailHref() {
+      if (deepProfileState.nestId) {
+        return '/inner-compass/?nest=' + encodeURIComponent(deepProfileState.nestId) + '&from=solo';
+      }
+      // No linked read yet — land on Nest's Inner Compass area, not the bare assessment intro.
+      return '/nest/?tab=profile';
+    }
+
+    function syncUnderstandRail() {
+      const href = innerCompassRailHref();
+      document.querySelectorAll('[data-ic-link]').forEach((el) => {
+        el.setAttribute('href', href);
+      });
+    }
+
+    function bindUnderstandRail() {
+      document.querySelectorAll('.book-rail-group[data-rail-group="understand"]').forEach((group) => {
+        if (group.dataset.bound === '1') return;
+        group.dataset.bound = '1';
+        const parent = group.querySelector('.book-rail-parent');
+        if (!parent) return;
+        parent.addEventListener('click', () => {
+          const open = group.classList.toggle('is-open');
+          parent.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+      });
+      syncUnderstandRail();
+    }
 
     function isMobileSessionLayout() {
       return window.matchMedia('(max-width: 768px)').matches;
@@ -1689,6 +1718,7 @@
     });
 
     document.getElementById('btn-signout').addEventListener('click', async () => { await sb.auth.signOut(); showView('view-landing'); });
+    bindUnderstandRail();
 
     async function loadDashboard() {
       showView('view-loading');
@@ -1881,23 +1911,27 @@
           .select('nest_id')
           .eq('user_id', currentUser.id)
           .maybeSingle();
-        if (link.error || !link.data) { deepProfileState = { loaded: true, nestId: null, profile: null }; return; }
-        const nestId = link.data.nest_id;
-        const res = await fetch(ASSESSMENT_WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(nestId), { headers: await workerHeaders() });
-        const payload = await res.json().catch(() => ({}));
-        if (!res.ok) {
-          const note = payload && payload.recovery === 'confirm-results-email'
-            ? 'Sign in with the email that received this read, or write hello@lilbird.life from that address.'
-            : '';
-          deepProfileState = { loaded: true, nestId, profile: null, note };
-          return;
+        if (link.error || !link.data) {
+          deepProfileState = { loaded: true, nestId: null, profile: null };
+        } else {
+          const nestId = link.data.nest_id;
+          const res = await fetch(ASSESSMENT_WORKER_URL + '/get-profile?nestId=' + encodeURIComponent(nestId), { headers: await workerHeaders() });
+          const payload = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            const note = payload && payload.recovery === 'confirm-results-email'
+              ? 'Sign in with the email that received this read, or write hello@lilbird.life from that address.'
+              : '';
+            deepProfileState = { loaded: true, nestId, profile: null, note };
+          } else {
+            const profile = parseAssessmentProfile(payload);
+            deepProfileState = { loaded: true, nestId, profile };
+          }
         }
-        const profile = parseAssessmentProfile(payload);
-        deepProfileState = { loaded: true, nestId, profile };
       } catch (e) {
         console.warn('Deep profile fetch failed:', e);
         deepProfileState = { loaded: true, nestId: null, profile: null };
       }
+      syncUnderstandRail();
     }
 
     async function refreshDeepProfileForDashboard() {
@@ -2610,6 +2644,7 @@
       document.getElementById('chat-input').value = '';
       document.getElementById('btn-send').disabled = true;
       showView('view-session');
+      void loadDeepProfileLink();
       const loadedContext = await loadSessionContext(sessionNumber);
       if (!isCurrent()) return;
       sessionContext = loadedContext;

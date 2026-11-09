@@ -1861,9 +1861,9 @@
         return `
           <article class="product-card" data-product="nest_plus">
             <p class="eyebrow">nest plus</p>
-            <h3>The Intensive workbook, on your own time</h3>
+            <h3>lil' bird guide</h3>
             <span class="status-badge">${escapeHtml(src)}</span>
-            <p>lil' bird guide is the next best thing to being in the room with Luke. Life Canvas, the full Inner Compass read, Relationship Dynamic, and the Roots &amp; Wings workbook are here too.</p>
+            <p>The next best thing to being in the room with Luke. Life Canvas, the full Inner Compass read, Relationship Dynamic, and Roots &amp; Wings are here too.</p>
             <div class="btn-row">
               <button type="button" class="btn btn-gold" data-open-canvas>Life Canvas →</button>
               <a class="btn btn-outline" href="${workbookHref('life-change')}">Roots &amp; Wings</a>
@@ -1876,8 +1876,8 @@
         <article class="product-card locked" data-product="nest_plus">
           <span class="lock-pill"><i class="ti ti-lock"></i> $7.99/month</span>
           <p class="eyebrow">nest plus</p>
-          <h3>The Intensive workbook, on your own time</h3>
-          <p>lil' bird guide is the next best thing to being in the room with Luke. Life Canvas, the full Inner Compass read, Relationship Dynamic, and the Roots &amp; Wings workbook are here too. Cancel anytime. Included with coaching or the Intensive.</p>
+          <h3>lil' bird guide</h3>
+          <p>The next best thing to being in the room with Luke. Life Canvas, the full Inner Compass read, Relationship Dynamic, and Roots &amp; Wings come with it. Cancel anytime. Included with coaching or the Intensive.</p>
           <div class="btn-row"><button type="button" class="btn btn-ember" data-upgrade="nest_plus">Add Nest Plus · $7.99/month →</button></div>
         </article>`;
     }
@@ -2386,7 +2386,12 @@
         <a class="btn btn-outline full" href="${escapeHtml(link)}">Open tool →</a>`;
       return;
     }
-    el.innerHTML = '';
+    el.innerHTML = `
+      <p class="sidebar-eyebrow">relationship dynamic · nest plus</p>
+      <h4>How do you fit with someone close?</h4>
+      <p>Use your wiring to understand a partner, friend, family member or colleague. Unlocks with Nest Plus.</p>
+      <button type="button" class="btn btn-ember full" id="btn-sidebar-rd-plus">Unlock with Nest Plus · $7.99/month →</button>`;
+    el.querySelector('#btn-sidebar-rd-plus')?.addEventListener('click', (e) => void startUpgrade('nest_plus', e.currentTarget));
   }
 
   function renderNavPlan() {
@@ -2875,8 +2880,8 @@
       el.classList.remove('ember');
       el.innerHTML = `
         <p class="sidebar-eyebrow">Nest Plus · $7.99/month</p>
-        <h4>The Intensive workbook, on your own time</h4>
-        <p>lil' bird guide, Life Canvas, the full Inner Compass read, Relationship Dynamic, and Roots &amp; Wings. Cancel anytime.</p>
+        <h4>lil' bird guide</h4>
+        <p>The next best thing to being in the room with Luke. Life Canvas, the full Inner Compass read, Relationship Dynamic, and Roots &amp; Wings. Cancel anytime.</p>
         <button type="button" class="btn btn-ember full" id="btn-sidebar-plus">Add Nest Plus · $7.99/month →</button>`;
       el.querySelector('#btn-sidebar-plus')?.addEventListener('click', (e) => void startUpgrade('nest_plus', e.currentTarget));
       return;
