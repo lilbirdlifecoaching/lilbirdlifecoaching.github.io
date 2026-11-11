@@ -1,9 +1,5 @@
 (function () {
   document.documentElement.classList.remove('no-js');
-  var fallback = document.querySelector('.lci-movement-fallback');
-  if (fallback) fallback.setAttribute('hidden', '');
-
-  var DISCOVERY = '/book.html#discovery';
 
   /* —— Is this you? —— */
   var chips = Array.prototype.slice.call(document.querySelectorAll('[data-fit-chip]'));
@@ -14,7 +10,7 @@
   function updateFit() {
     var n = chips.filter(function (c) { return c.getAttribute('aria-pressed') === 'true'; }).length;
     if (!countEl) return;
-    if (n === 0) countEl.textContent = 'Nothing to get right here. Just notice what lands.';
+    if (n === 0) countEl.textContent = 'No wrong answers. Tap what fits.';
     else if (n === 1) countEl.textContent = 'One so far. Anything else?';
     else countEl.textContent = n + ' of 5. You are not the only one.';
 
@@ -55,8 +51,13 @@
     });
     panels.forEach(function (panel, i) {
       var on = i === index;
-      panel.hidden = !on;
-      panel.setAttribute('aria-hidden', on ? 'false' : 'true');
+      if (on) {
+        panel.removeAttribute('hidden');
+        panel.setAttribute('aria-hidden', 'false');
+      } else {
+        panel.setAttribute('hidden', '');
+        panel.setAttribute('aria-hidden', 'true');
+      }
     });
   }
 
@@ -81,6 +82,7 @@
   var payPlan = document.getElementById('pay-plan');
   var priceMain = document.getElementById('price-main');
   var priceSub = document.getElementById('price-sub');
+  var priceSave = document.getElementById('price-save');
   var enrolBtn = document.getElementById('enrol-cta');
 
   function setPlan(plan) {
@@ -88,7 +90,11 @@
     if (payFull) payFull.setAttribute('aria-pressed', full ? 'true' : 'false');
     if (payPlan) payPlan.setAttribute('aria-pressed', full ? 'false' : 'true');
     if (priceMain) priceMain.textContent = full ? '$4,999' : '$1,799';
-    if (priceSub) priceSub.textContent = full ? 'one payment' : 'a month, for 3 months';
+    if (priceSub) priceSub.textContent = full ? 'one payment' : 'a month, for 3 months ($5,397 total)';
+    if (priceSave) {
+      priceSave.hidden = !full;
+      priceSave.textContent = 'Save $398 vs three monthly payments';
+    }
     if (enrolBtn) {
       enrolBtn.textContent = full ? 'Enrol — pay in full' : 'Enrol — 3 payments';
       enrolBtn.href = full ? '/intensive/enrol.html?plan=full' : '/intensive/enrol.html?plan=three';
@@ -98,6 +104,37 @@
   if (payFull) payFull.addEventListener('click', function () { setPlan('full'); });
   if (payPlan) payPlan.addEventListener('click', function () { setPlan('plan'); });
   setPlan('full');
+
+  /* —— End-of-year countdown for $4,999 —— */
+  var countdown = document.getElementById('price-countdown');
+  var endedNote = document.getElementById('price-ended');
+  var cdDays = document.getElementById('cd-days');
+  var cdHours = document.getElementById('cd-hours');
+  var cdMins = document.getElementById('cd-mins');
+  var deadline = new Date('2026-12-31T23:59:59-08:00').getTime();
+
+  function pad(n) { return n < 10 ? '0' + n : String(n); }
+
+  function tickCountdown() {
+    var left = deadline - Date.now();
+    if (left <= 0) {
+      if (countdown) countdown.hidden = true;
+      if (endedNote) endedNote.hidden = false;
+      return false;
+    }
+    var mins = Math.floor(left / 60000);
+    var days = Math.floor(mins / (60 * 24));
+    var hours = Math.floor((mins % (60 * 24)) / 60);
+    var minutes = mins % 60;
+    if (cdDays) cdDays.textContent = pad(days);
+    if (cdHours) cdHours.textContent = pad(hours);
+    if (cdMins) cdMins.textContent = pad(minutes);
+    return true;
+  }
+
+  if (countdown && tickCountdown()) {
+    setInterval(tickCountdown, 30000);
+  }
 
   /* —— FAQ accordion —— */
   var items = Array.prototype.slice.call(document.querySelectorAll('[data-faq-item]'));
@@ -138,10 +175,14 @@
           io.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-    reveals.forEach(function (el) { io.observe(el); });
+    }, { threshold: 0.08, rootMargin: '0px 0px -8% 0px' });
+    reveals.forEach(function (el) {
+      var rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.92 && rect.bottom > 0) {
+        el.classList.add('is-in');
+      } else {
+        io.observe(el);
+      }
+    });
   }
-
-  /* Keep discovery anchors consistent if needed */
-  void DISCOVERY;
 })();
