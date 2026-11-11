@@ -52,6 +52,63 @@
     return body;
   }
 
+  function bookingWhen(iso) {
+    if (!iso) return '';
+    try {
+      return new Intl.DateTimeFormat('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        timeZoneName: 'short'
+      }).format(new Date(iso));
+    } catch (e) {
+      return new Date(iso).toLocaleString();
+    }
+  }
+
+  function bookingKindLabel(kind) {
+    if (kind === 'awaiting_payment') return 'Waiting for payment';
+    if (kind === 'waiting_for_you') return 'Waiting for you';
+    if (kind === 'cancelled') return 'Cancelled';
+    return 'Confirmed';
+  }
+
+  function paintBookings(home) {
+    const el = document.getElementById('desk-bookings');
+    if (!el) return;
+    if (home.calError) {
+      el.innerHTML = '<p class="desk-empty">' + escapeHtml(home.calError) + '</p>';
+      return;
+    }
+    const rows = home.bookings || [];
+    if (!rows.length) {
+      el.innerHTML = '<p class="desk-empty">No upcoming Cal.com sessions right now.</p>';
+      return;
+    }
+    el.innerHTML = rows.map((row) => {
+      const who = [row.name, row.email].filter(Boolean).join(' · ') || 'Guest';
+      const actions = [];
+      if (row.meetingUrl) {
+        actions.push('<a class="btn btn-gold" href="' + escapeHtml(row.meetingUrl) + '" target="_blank" rel="noopener">Join Meet</a>');
+      }
+      if (row.calUrl) {
+        actions.push('<a class="btn btn-outline" href="' + escapeHtml(row.calUrl) + '" target="_blank" rel="noopener">Open in Cal.com</a>');
+      }
+      return (
+        '<div class="desk-booking">' +
+          '<div class="desk-booking-main">' +
+            '<p class="desk-booking-when">' + escapeHtml(bookingWhen(row.startsAt)) + '</p>' +
+            '<p class="desk-booking-who"><strong>' + escapeHtml(row.type || 'Session') + '</strong> · ' + escapeHtml(who) + '</p>' +
+            '<p class="desk-meta">' + escapeHtml(bookingKindLabel(row.kind)) + (row.meetingUrl ? '' : ' · Meet link not ready yet') + '</p>' +
+          '</div>' +
+          (actions.length ? '<div class="desk-booking-actions">' + actions.join('') + '</div>' : '') +
+        '</div>'
+      );
+    }).join('');
+  }
+
   function paint(home) {
     const session = home.session;
     if (session) {
@@ -62,6 +119,8 @@
       document.getElementById('live-cap').value = session.capacity || 15;
       document.getElementById('live-status').value = session.status || 'scheduled';
     }
+    paintBookings(home);
+
     const roster = document.getElementById('desk-roster');
     roster.innerHTML = (home.roster || []).map((row) =>
       '<div class="desk-row"><span>' + escapeHtml(row.email || '') + '</span><span class="desk-meta">' + escapeHtml(rosterStatus(row.status)) + (row.note ? ' · ' + escapeHtml(row.note) : '') + '</span></div>'
@@ -163,7 +222,7 @@
         capacity: Number(document.getElementById('live-cap').value),
         status: document.getElementById('live-status').value
       });
-      say('Live saved.', 'success');
+      say('Room saved.', 'success');
       await load();
     } catch (err) { say(err.message, 'error'); }
   });

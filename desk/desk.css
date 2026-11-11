@@ -34,7 +34,18 @@
 .desk-person p { margin: 0.2rem 0; }
 .desk-page .auth-card { max-width: 420px; }
 .desk-page .younger-you-status { margin-top: 0.4rem; }
+.desk-actions { display: flex; flex-wrap: wrap; gap: 0.55rem; align-items: center; margin-top: 0.35rem; }
+.desk-booking {
+  display: flex; justify-content: space-between; gap: 0.85rem; align-items: flex-start;
+  padding: 0.7rem 0; border-bottom: 1px solid rgba(245,200,66,0.12);
+}
+.desk-booking:last-child { border-bottom: 0; }
+.desk-booking-when { margin: 0 0 0.15rem; color: var(--gold); font-size: 0.95rem; }
+.desk-booking-who { margin: 0 0 0.2rem; }
+.desk-booking-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: flex-end; }
 @media (max-width: 640px) {
   .desk-live-grid, .desk-split { grid-template-columns: 1fr; }
   .desk-live-grid .span-2, .desk-split .span-2 { grid-column: auto; }
+  .desk-booking { flex-direction: column; }
+  .desk-booking-actions { justify-content: flex-start; }
 }

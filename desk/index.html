@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/nest/nest-styles.css?v=35" />
-  <link rel="stylesheet" href="./desk.css?v=2" />
+  <link rel="stylesheet" href="./desk.css?v=3" />
   <script src="/js/vendor/supabase-js-2.117.3.js"></script>
 </head>
 <body class="nest-page">
@@ -32,34 +32,47 @@
     </form>
 
     <div id="desk-app" class="hidden">
-      <p class="desk-lead">Two parts. <strong>The live</strong> is the group call. <strong>Support</strong> is the Nest: people, payments, and accounts.</p>
+      <p class="desk-lead">Three parts. <strong>Upcoming</strong> is your Cal.com calendar. <strong>Group live</strong> is the Nest room. <strong>Support</strong> is people, payments, and Nest accounts.</p>
+
+      <section class="desk-band" aria-labelledby="band-upcoming">
+        <p class="eyebrow">1:1 sessions</p>
+        <h2 id="band-upcoming">Upcoming</h2>
+        <p>Pulled from Cal.com. Join Meet when the link is ready. Waiting-for-payment means they picked a time but have not paid yet.</p>
+        <article class="desk-card">
+          <div id="desk-bookings"></div>
+        </article>
+      </section>
 
       <section class="desk-band" aria-labelledby="band-live">
-        <p class="eyebrow">the call</p>
-        <h2 id="band-live">The live</h2>
-        <p>The meeting link, the door, who is in the room, and who asked to hear when it opens.</p>
+        <p class="eyebrow">nest group call</p>
+        <h2 id="band-live">Group live</h2>
+        <p>One Nest group call at a time. Set the time and meeting link, then open the room when you are ready.</p>
 
         <article class="desk-card">
-          <h3>The door</h3>
-          <p class="desk-help">Scheduled hides Join. Open shows Join, and access is checked at that moment. Ended closes the door.</p>
+          <h3>Set up the room</h3>
+          <p class="desk-help"><strong>Not open yet</strong> hides Join on the Nest. <strong>Open</strong> shows Join and checks access when they tap it. <strong>Closed</strong> ends the room.</p>
           <form id="desk-session" class="desk-live-grid">
             <label>Starts <input id="live-start" type="datetime-local" required /></label>
             <label>Seats <input id="live-cap" type="number" min="2" max="40" value="15" /></label>
             <label class="span-2">Meeting link <input id="live-url" type="url" placeholder="https://meet.google.com/abc-defg-hij" /></label>
-            <label>Door
+            <label>Room
               <select id="live-status">
-                <option value="scheduled">Scheduled</option>
+                <option value="scheduled">Not open yet</option>
                 <option value="live">Open</option>
-                <option value="ended">Ended</option>
+                <option value="ended">Closed</option>
               </select>
             </label>
-            <div class="span-2"><button class="btn btn-gold" type="submit">Save the live</button></div>
+            <div class="span-2 desk-actions">
+              <button class="btn btn-gold" type="submit">Save room</button>
+              <a class="btn btn-outline" href="https://meet.google.com/new" target="_blank" rel="noopener">New Google Meet</a>
+              <a class="btn btn-outline" href="https://app.cal.com" target="_blank" rel="noopener">Open Cal.com</a>
+            </div>
           </form>
         </article>
 
         <article class="desk-card">
-          <h3>Who is in the room</h3>
-          <p class="desk-help">Join adds them here. Taking someone out closes the door for them on this live only.</p>
+          <h3>Who joined</h3>
+          <p class="desk-help">People who tapped Join for this room. Remove closes the door for them on this live only.</p>
           <div id="desk-roster"></div>
           <form id="desk-remove" class="desk-split">
             <label>Their Nest email <input id="remove-email" type="email" placeholder="name@email.com" /></label>
@@ -69,16 +82,16 @@
         </article>
 
         <article class="desk-card">
-          <h3>Asked to hear when it opens</h3>
-          <p class="desk-help">People who tapped Tell me when it opens on the Nest.</p>
+          <h3>Waiting for Nest Premium</h3>
+          <p class="desk-help">People who tapped “Tell me when it opens” on the Nest.</p>
           <div id="desk-wait"></div>
         </article>
       </section>
 
       <section class="desk-band" aria-labelledby="band-support">
-        <p class="eyebrow">the nest</p>
+        <p class="eyebrow">accounts</p>
         <h2 id="band-support">Support</h2>
-        <p>Look up a Nest, follow payment trouble and notes from the Nest, merge two emails, and add someone who helps on the desk.</p>
+        <p>Look up a Nest, clear payment trouble, merge two emails, and add someone who can use this desk.</p>
 
         <article class="desk-card">
           <h3>Look up a Nest</h3>
@@ -92,7 +105,7 @@
 
         <article class="desk-card">
           <h3>Needs a person</h3>
-          <p class="desk-help">Failed payments, unfinished checkouts, card disputes, Nest Plus set to end, a payment that did not unlock, two Nest Plus charges after a merge, and notes sent with Tell the desk. Mail to hello@lilbird.life still arrives in that inbox.</p>
+          <p class="desk-help">Failed payments, unfinished checkouts, disputes, Nest Plus ending, unlock gaps, double Nest Plus after a merge, and notes from “Tell the desk.” Mail to hello@lilbird.life still lands in that inbox.</p>
           <div id="desk-alerts"></div>
         </article>
 
@@ -119,6 +132,6 @@
       </section>
     </div>
   </main>
-  <script src="./desk.js?v=2"></script>
+  <script src="./desk.js?v=3"></script>
 </body>
 </html>
