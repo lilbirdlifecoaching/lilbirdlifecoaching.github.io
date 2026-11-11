@@ -420,3 +420,47 @@ input:focus { outline: none; border-color: rgba(245, 200, 66, 0.4); }
   margin: 0.35rem 0 0;
   max-width: 28rem;
 }
+
+.plan-fieldset {
+  border: 1px solid var(--dark-border);
+  border-radius: 12px;
+  padding: 0.9rem 1rem 0.35rem;
+  margin: 1rem 0 1.1rem;
+}
+
+.plan-fieldset legend {
+  padding: 0 0.35rem;
+  color: var(--gold);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.plan-option {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.7rem 0.15rem;
+  border-bottom: 1px solid rgba(245, 200, 66, 0.1);
+  cursor: pointer;
+}
+
+.plan-option:last-of-type { border-bottom: 0; }
+
+.plan-option input {
+  margin-top: 0.3rem;
+}
+
+.plan-option strong {
+  display: block;
+  color: var(--text-main);
+  font-weight: 500;
+}
+
+.plan-option small {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--text-muted);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}

@@ -134,7 +134,7 @@
       },
       locked: {
         title: 'Work with Luke',
-        body: 'Start with a First Flight session ($149), book a single coaching session ($249), or enrol in the Life Change Intensive, all from these cards.',
+        body: 'Start with a First Flight session ($149), book a single coaching session ($349), or enrol in the Life Change Intensive, all from these cards.',
         tip: '» Pick the card that fits'
       }
     }

@@ -1494,7 +1494,7 @@
       });
       steps.push({
         done: false,
-        text: 'Or book a single coaching session · $249',
+        text: 'Or book a single coaching session · $349',
         href: '/coaching/book.html?from=nest'
       });
       steps.push({
@@ -1948,7 +1948,7 @@
           <p class="eyebrow">à la carte</p>
           <h3>Coaching session</h3>
           <p>One focused session when something specific needs working through. Book anytime from your Nest, no package required.</p>
-          <div class="btn-row"><a class="btn btn-ember" href="${href}">Book coaching · $249 →</a></div>
+          <div class="btn-row"><a class="btn btn-ember" href="${href}">Book coaching · $349 →</a></div>
         </article>`;
     }
 
@@ -2853,7 +2853,7 @@
         <p>Your plan and takeaways live on the Solo dashboard. Book a session with Luke anytime below.</p>
         <a class="btn btn-outline full" href="/solo/?view=plan">Open your plan →</a>
         <a class="btn btn-ember full" href="/first-flight/book.html?code=IMREADY">Book First Flight · $149</a>
-        <a class="btn btn-outline full" href="${coachingHref}">Book coaching · $249</a>`;
+        <a class="btn btn-outline full" href="${coachingHref}">Book coaching · $349</a>`;
         return;
       }
       if (p.state === 'start') {
@@ -2863,7 +2863,7 @@
         <p>Begin with ${escapeHtml(p.next)}. Prefer a live session? Book from your Nest.</p>
         <a class="btn btn-outline full" href="/solo/">Start Session 0 →</a>
         <a class="btn btn-ember full" href="/first-flight/book.html?code=IMREADY">Book First Flight · $149</a>
-        <a class="btn btn-outline full" href="${coachingHref}">Book coaching · $249</a>`;
+        <a class="btn btn-outline full" href="${coachingHref}">Book coaching · $349</a>`;
         return;
       }
       el.innerHTML = `
@@ -2872,7 +2872,7 @@
         <p>Next: ${escapeHtml(p.next)}. Prefer a live session? Book from your Nest.</p>
         <a class="btn btn-outline full" href="/solo/">Continue Solo Course →</a>
         <a class="btn btn-ember full" href="/first-flight/book.html?code=IMREADY">Book First Flight · $149</a>
-        <a class="btn btn-outline full" href="${coachingHref}">Book coaching · $249</a>`;
+        <a class="btn btn-outline full" href="${coachingHref}">Book coaching · $349</a>`;
       return;
     }
 
@@ -2893,7 +2893,7 @@
       <h4>When you want Luke, just you</h4>
       <p>First Flight is one session. Coaching is there when something specific needs the hour. The Intensive is the full eight.</p>
       <a class="btn btn-outline full" href="/first-flight/book.html?code=IMREADY">First Flight · $149 →</a>
-      <a class="btn btn-outline full" href="${coachingHref}">Coaching · $249 →</a>
+      <a class="btn btn-outline full" href="${coachingHref}">Coaching · $349 →</a>
       <a class="btn btn-outline full" href="/intensive/enrol.html?from=nest">Life Change Intensive →</a>`;
   }
 

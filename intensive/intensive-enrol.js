@@ -151,8 +151,31 @@
       '</p></div>';
   }
 
+  function selectedPayPlan() {
+    const picked = document.querySelector('input[name="pay-plan"]:checked');
+    return picked && picked.value === 'three' ? 'three' : 'full';
+  }
+
+  function syncPayNote() {
+    const note = document.getElementById('enrol-pay-note');
+    const title = document.getElementById('checkout-title');
+    if (selectedPayPlan() === 'three') {
+      if (note) note.textContent = 'Next: secure Stripe checkout ($1,799 today, then $1,799 for two more months). Nest unlocks after the first payment. Then set up Nest and book session one.';
+      if (title) title.textContent = '» Payment plan · $1,799';
+    } else {
+      if (note) note.textContent = 'Next: secure Stripe checkout ($4,999). After pay you\'ll set up Nest and book session one. The links are in your email and on the next page.';
+      if (title) title.textContent = '» Payment · $4,999';
+    }
+  }
+
+  document.querySelectorAll('input[name="pay-plan"]').forEach((el) => {
+    el.addEventListener('change', syncPayNote);
+  });
+  syncPayNote();
+
   async function startCheckout(userId, email, signerName) {
     openCheckoutModal();
+    syncPayNote();
 
     try {
       const stripe = getStripe();
@@ -163,6 +186,7 @@
           user_id: userId,
           email,
           signer_name: signerName,
+          plan: selectedPayPlan(),
           promo_code: activePromoCode || normalisePromoCode(promoInput?.value) || null
         })
       });

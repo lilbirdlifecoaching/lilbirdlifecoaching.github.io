@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./intensive-enrol.css?v=5" />
+  <link rel="stylesheet" href="./intensive-enrol.css?v=6" />
   <link rel="stylesheet" href="/css/lilbird-booking-theme.css" />
   <script src="https://js.stripe.com/v3/"></script>
   <script src="/js/vendor/supabase-js-2.117.3.js"></script>
@@ -39,7 +39,7 @@
   </header>
 
   <main class="wrap">
-    <p class="eyebrow">life change intensive · $4,999</p>
+    <p class="eyebrow">life change intensive · $4,999 or 3×$1,799</p>
     <h1>Three steps.<br/><em>You're in control.</em></h1>
     <p class="lead">
       Read the agreement so expectations are clear. Pay securely. Then set up your Nest, where your booking and workbook live. No need to wait on Luke.
@@ -99,6 +99,24 @@
           <span>I have read the Life Change Intensive Client Agreement &amp; Terms of Engagement (Version 2.0), including the refund policy (Section 6) and my responsibilities (Section 10). I understand this is eight coaching sessions at the fee shown at checkout, and I agree to all terms.</span>
         </label>
 
+        <fieldset class="plan-fieldset">
+          <legend>How would you like to pay?</legend>
+          <label class="plan-option">
+            <input type="radio" name="pay-plan" value="full" checked />
+            <span>
+              <strong>Pay in full · $4,999</strong>
+              <small>One payment. Saves $398 vs the payment plan.</small>
+            </span>
+          </label>
+          <label class="plan-option">
+            <input type="radio" name="pay-plan" value="three" />
+            <span>
+              <strong>3 payments · $1,799 / month</strong>
+              <small>$5,397 total. Nest unlocks after the first payment for the year.</small>
+            </span>
+          </label>
+        </fieldset>
+
         <div class="promo-block">
           <label for="promo-input">Promo code (optional)</label>
           <div class="promo-input-wrap">
@@ -114,7 +132,7 @@
           <button id="btn-continue" class="btn btn-gold" type="submit">» Continue to payment</button>
           <a class="btn btn-outline" href="mailto:hello@lilbird.life">Questions?</a>
         </div>
-        <p class="fine-print">Next: secure Stripe checkout ($4,999). After pay you'll set up Nest and book session one. The links are in your email and on the next page.</p>
+        <p class="fine-print" id="enrol-pay-note">Next: secure Stripe checkout ($4,999). After pay you'll set up Nest and book session one. The links are in your email and on the next page.</p>
       </form>
     </section>
   </main>
@@ -133,7 +151,7 @@
     </div>
   </div>
 
-  <script src="./intensive-enrol.js?v=7"></script>
+  <script src="./intensive-enrol.js?v=8"></script>
   <script src="/js/lilbird-theme.js"></script>
   <script src="/js/lilbird-theme-nav.js"></script>
 </body>
