@@ -171,6 +171,15 @@
   document.querySelectorAll('input[name="pay-plan"]').forEach((el) => {
     el.addEventListener('change', syncPayNote);
   });
+
+  (function applyPlanFromQuery() {
+    try {
+      var plan = new URLSearchParams(window.location.search).get('plan');
+      if (plan !== 'three' && plan !== 'full') return;
+      var radio = document.querySelector('input[name="pay-plan"][value="' + plan + '"]');
+      if (radio) radio.checked = true;
+    } catch (e) {}
+  })();
   syncPayNote();
 
   async function startCheckout(userId, email, signerName) {

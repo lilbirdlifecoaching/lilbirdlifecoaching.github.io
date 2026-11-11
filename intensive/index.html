@@ -1,228 +1,499 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script>
-    (function(){
-      var k='lilbird-theme', s=null;
-      try{s=localStorage.getItem(k);}catch(e){}
-      var t=(s==='light'||s==='dark')?s:'light';
-      document.documentElement.setAttribute('data-theme', t);
-      document.documentElement.style.colorScheme=t;
-    })();
-  </script>
-  <meta name="theme-color" content="#1e2028" />
+  <meta name="theme-color" content="#F6F0E4" />
   <meta name="robots" content="index, follow" />
-  <meta name="description" content="The Life Change Intensive: 8 weeks from “what now?” to a next chapter you believe in. For capable people in transition who’ve been living by duty and output. $4,999 or 3×$1,799." />
-  <meta property="og:title" content="Life Change Intensive · lil' bird" />
-  <meta property="og:description" content="You've been so good at what's expected of you, you forgot what you want. An 8-week one-to-one coaching journey with Luke." />
+  <meta name="description" content="The Life Change Intensive: an 8-week one-to-one coaching journey for capable people in transition. Online or in person. From “what now?” to a next chapter you believe in." />
+  <meta property="og:title" content="Life Change Intensive — 8-week transition coaching | lil' bird" />
+  <meta property="og:description" content="You've been so good at what's expected of you, you forgot what you want. An 8-week coaching journey with Luke." />
   <meta property="og:url" content="https://lilbird.life/intensive/" />
   <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://lilbird.life/luke-head-edit.png" />
   <link rel="canonical" href="https://lilbird.life/intensive/" />
-  <link rel="stylesheet" href="/css/lilbird-tokens.css" />
-  <link rel="stylesheet" href="/css/lilbird-theme-chrome.css" />
-  <title>Life Change Intensive · lil' bird</title>
+  <title>Life Change Intensive — 8-week transition coaching | lil' bird</title>
   <link rel="icon" type="image/png" href="/bird-logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./intensive-landing.css?v=20261111c" />
-  <link rel="stylesheet" href="/css/lilbird-booking-theme.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./intensive-landing.css?v=20261111d" />
   <script src="/lilbird-gtm-id.js"></script>
   <script src="/lilbird-gtm.js"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "Life Change Intensive",
+    "description": "An 8-week, one-to-one coaching journey for capable people in the middle of a transition. Online or in person.",
+    "brand": { "@type": "Brand", "name": "lil' bird" },
+    "offers": {
+      "@type": "Offer",
+      "priceCurrency": "USD",
+      "price": "4999",
+      "availability": "https://schema.org/InStock",
+      "url": "https://lilbird.life/intensive/"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is this therapy?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. Coaching looks forward at where you're headed. If something comes up that needs a clinician, I'll tell you and help you find one."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How much time will it take?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "One session a week or every other week, plus a little reflection between. Most people finish in 8–12 weeks."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Online or in person?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Either. Online works anywhere. In person is available in the Bay Area and Melbourne."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What if I'm not sure I'm ready?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Book a free 30-minute call. No pitch — just a conversation to see if it fits. Or start with a single First Flight session, credited in full if you continue."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What if it isn't working for me?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Tell me. We'll talk honestly and adjust together. The terms are set out in your coaching agreement."
+        }
+      }
+    ]
+  }
+  </script>
 </head>
 <body class="lci-page">
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NG8ZFNX2" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
-  <header class="top-bar">
-    <a class="wordmark" href="/">lil' bird</a>
-    <div class="top-bar-actions">
-      <a class="back" href="/book.html">← all formats</a>
+  <header class="lci-header">
+    <div class="lci-wrap lci-header-inner">
+      <a class="lci-wordmark" href="/">lil' bird</a>
+      <nav class="lci-nav" aria-label="Page sections">
+        <a href="#how">How it works</a>
+        <a href="#stories">Stories</a>
+        <a href="#investment">Investment</a>
+        <a class="lb-btn lb-btn-ink lb-btn-sm" href="/book.html#discovery">Book a free call</a>
+      </nav>
     </div>
   </header>
 
   <main>
     <section class="lci-hero" aria-labelledby="lci-hero-title">
-      <div class="lci-hero-media" aria-hidden="true">
-        <img src="/images/pathfinder/tier-dive-in.jpg" alt="" width="1600" height="1000" decoding="async" />
-        <div class="lci-hero-veil"></div>
-      </div>
-      <div class="lci-hero-inner">
-        <p class="brand-mark">lil' bird</p>
-        <p class="eyebrow">Life Change Intensive · 8 weeks</p>
-        <h1 id="lci-hero-title">You've been so good at what's expected of you, you forgot what you want.</h1>
-        <p class="lede">
-          An 8-week, one-to-one coaching journey for capable people in the middle of a transition. Together we'll look back at your story, look honestly at who you are now, and walk out with a clear next chapter — and the confidence to start it.
-        </p>
-        <div class="lci-cta-row">
-          <a class="btn btn-gold" href="https://cal.com/luke-haythorpe/30min">Book a free discovery call</a>
-          <a class="btn btn-outline" href="/intensive/enrol.html">Enrol</a>
+      <div class="lci-wrap lci-hero-inner">
+        <p class="lci-kicker">The Life Change Intensive · 8 weeks · online or in person</p>
+        <h1 id="lci-hero-title">You've been so good at what's expected of you, <em>you forgot what you want.</em></h1>
+        <div class="lci-hero-row">
+          <p class="lci-lead">An 8-week, one-to-one coaching journey for capable people in the middle of a transition. We look back at your story, look honestly at who you are now, and walk out with a clear next chapter — and the confidence to start it.</p>
+          <div class="lci-hero-cta">
+            <div class="lci-hero-cta-row">
+              <a class="lb-btn lb-btn-teal" href="/book.html#discovery">Book a free discovery call</a>
+              <a class="lb-text-link" href="#how">See how it works</a>
+            </div>
+            <p class="lci-meta">30 minutes · no pitch · $4,999 or 3 payments of $1,799</p>
+          </div>
         </div>
-        <p class="hero-meta">Online, anywhere · $4,999 or 3 payments of $1,799</p>
       </div>
     </section>
 
-    <div class="lci-landing">
-      <section class="lci-section" aria-labelledby="lci-fit">
-        <h2 id="lci-fit">Is this you?</h2>
-        <p class="section-lede">You're more than what you produce. If two or more of these feel true, this was built for you.</p>
-        <ul class="fit-list">
-          <li>You're good at your work, and Sunday night still feels heavy.</li>
-          <li>You're in a transition — a move, a role change, a season ending — and you don't know what's next.</li>
-          <li>You've been living by what you <em>should</em> do for so long that “what do I want?” feels like a strange question.</li>
-          <li>People see what you produce. You're not sure they see you.</li>
-          <li>You haven't let yourself dream in a long time.</li>
-        </ul>
-      </section>
+    <section class="lci-statement lci-reveal" aria-label="Core message">
+      <div class="lci-wrap lci-statement-inner">
+        <p class="lci-statement-line">You are more than <em>what you produce.</em></p>
+        <p class="lci-statement-side">The people I work with are engineers, creatives, teachers and leaders. Good at their work. Quietly wondering who they are underneath it.</p>
+      </div>
+    </section>
 
-      <section class="lci-section" aria-labelledby="lci-changes">
-        <h2 id="lci-changes">What changes</h2>
-        <p class="section-lede">By the end of eight weeks, you'll:</p>
-        <ol class="change-list">
-          <li>
-            <strong>Know your story</strong>
-            <span>The highs, the turns, and the thread that runs through them.</span>
-          </li>
-          <li>
-            <strong>See yourself clearly</strong>
-            <span>How you're wired, what drains you, what makes you come alive.</span>
-          </li>
-          <li>
-            <strong>Have permission to want something</strong>
-            <span>A vision that's yours, not just your duty.</span>
-          </li>
-          <li>
-            <strong>Walk out with your Full Flight Plan</strong>
-            <span>A living document of who you are, where you're headed, and your next three moves.</span>
-          </li>
-        </ol>
-        <blockquote class="lci-quote">
-          <p>“I uncovered blind spots, gained practical tools, and felt recognised for who I was becoming — not just what I was producing. A powerful experience for anyone ready to grow.”</p>
-          <cite>Nathan Dunn, Mechanical Engineering Manager, Lam Research</cite>
-        </blockquote>
-      </section>
-
-      <section class="lci-section" aria-labelledby="lci-how">
-        <h2 id="lci-how">How it works</h2>
-        <p class="section-lede">Three movements. Eight sessions. A first win in week one.</p>
-        <div class="movement-list">
-          <article class="movement">
-            <p class="movement-label">Look back</p>
-            <h3>First Flight · Story</h3>
-            <p>Name where you are and see the pattern in where you've been.</p>
-          </article>
-          <article class="movement">
-            <p class="movement-label">Look in</p>
-            <h3>Identity · Rhythms · Relationships</h3>
-            <p>Understand how you're wired, design rhythms that fit you, and see who's in your corner.</p>
-          </article>
-          <article class="movement">
-            <p class="movement-label">Look forward</p>
-            <h3>Vision · Transitions · Full Flight</h3>
-            <p>Choose what matters most, take the next step, and pull it all into your plan.</p>
-          </article>
-        </div>
-        <p class="section-note">Each session runs 90–120 minutes, live with Luke, online or in person. No scripts or slide decks — just real conversation and tools you keep.</p>
-        <blockquote class="lci-quote">
-          <p>“One welcome surprise was the lack of tracking toward specific professional goals — the exercises focused on deeper themes and passions in life. An important breakthrough was realising the calling didn't have to be about duty. It was OK to ask, ‘Ed, what do you want?’ I'd recommend this to anyone at a transition in life.”</p>
-          <cite>Ed Barker, VP of Engineering</cite>
-        </blockquote>
-      </section>
-
-      <section class="lci-section" aria-labelledby="lci-includes">
-        <h2 id="lci-includes">Everything included</h2>
-        <ul class="include-list">
-          <li>
-            <span class="mark" aria-hidden="true">»</span>
-            <div><strong>8 live one-to-one sessions with Luke</strong><span>12–16 hours together across the journey.</span></div>
-          </li>
-          <li>
-            <span class="mark" aria-hidden="true">»</span>
-            <div><strong>Your private Nest</strong><span>Booking, notes, the Roots &amp; Wings material, and every tool from your sessions.</span></div>
-          </li>
-          <li>
-            <span class="mark" aria-hidden="true">»</span>
-            <div><strong>The Life Change workbook</strong><span>Yours to keep and work through at your pace.</span></div>
-          </li>
-          <li>
-            <span class="mark" aria-hidden="true">»</span>
-            <div><strong>Your Full Flight Plan</strong><span>Who you are, where you're headed, and your next three moves.</span></div>
-          </li>
-          <li>
-            <span class="mark" aria-hidden="true">»</span>
-            <div><strong>Bonus: 12 months of Nest Plus</strong><span>So the guide, Life Canvas, and tools keep going after you finish.</span></div>
-          </li>
-          <li>
-            <span class="mark" aria-hidden="true">»</span>
-            <div><strong>Bonus: First Flight credited in full</strong><span>If you've already had one, that fee comes off your Intensive.</span></div>
-          </li>
-        </ul>
-      </section>
-
-      <section class="lci-section" aria-labelledby="lci-commit">
-        <h2 id="lci-commit">My commitment to you</h2>
-        <p class="prose">
-          I'm with you for the whole journey. If something isn't working, tell me — we'll talk about it honestly and adjust the approach together. The full terms are in your coaching agreement, which you'll sign before we start.
-        </p>
-      </section>
-
-      <section class="lci-section" aria-labelledby="lci-invest">
-        <h2 id="lci-invest">Investment</h2>
-        <div class="invest-block">
-          <p class="invest-price">$4,999 <span>or 3 monthly payments of $1,799</span></p>
-          <p class="invest-note">Previously $7,500. This is founding pricing while the practice grows — available for anyone who enrols by <strong>31 January 2027</strong>; after that the price goes up.</p>
-          <div class="lci-cta-row">
-            <a class="btn btn-gold" href="https://cal.com/luke-haythorpe/30min">Book a free discovery call</a>
-            <a class="btn btn-outline" href="/intensive/enrol.html">Enrol now</a>
+    <section class="lci-fit lci-reveal" aria-labelledby="lci-fit-title">
+      <div class="lci-wrap lci-fit-inner">
+        <div class="lci-fit-copy">
+          <p class="lci-kicker">Is this you?</p>
+          <h2 id="lci-fit-title">Tap anything that sounds like your life right now.</h2>
+          <p class="lci-fit-count" id="fit-count">Nothing to get right here. Just notice what lands.</p>
+          <div class="lci-fit-card" id="fit-card" hidden>
+            <p>This was built for you.</p>
+            <p>You don't have to have it figured out to start. That's what the first conversation is for.</p>
+            <a class="lb-btn lb-btn-cream lb-btn-sm" href="/book.html#discovery">Book a free discovery call</a>
           </div>
         </div>
-        <p class="section-note immersion-note">
-          Prefer to do this in person, away from everyday life? The <a href="/intensive/immersion/">Life Change Immersion</a> is three days and two nights in a forest, beach or desert setting in California, lodging and meals included: $12,000.
-        </p>
-        <blockquote class="lci-quote">
-          <p>“Luke possesses an uncanny and uncommon ability to build immediate trust and safety.”</p>
-          <cite>Andrew Robinson, Partner, GiANT Worldwide</cite>
-        </blockquote>
-      </section>
-
-      <section class="lci-section" aria-labelledby="lci-faq">
-        <h2 id="lci-faq">Questions</h2>
-        <dl class="faq-list">
-          <div>
-            <dt>Is this therapy?</dt>
-            <dd>No. Coaching looks forward at where you're headed. If something comes up that needs a clinician, I'll tell you and help you find one.</dd>
-          </div>
-          <div>
-            <dt>How much time will it take?</dt>
-            <dd>One session a week or every other week, plus a little reflection between. Most people finish in 8–12 weeks.</dd>
-          </div>
-          <div>
-            <dt>What if I'm not sure I'm ready?</dt>
-            <dd>Book a free 30-minute call. No pitch, just a conversation to see if it fits.</dd>
-          </div>
-          <div>
-            <dt>What if it isn't working for me?</dt>
-            <dd>Tell me. We'll talk honestly and adjust together. The terms are set out in your coaching agreement.</dd>
-          </div>
-        </dl>
-      </section>
-
-      <section class="lci-section lci-close" aria-labelledby="lci-close">
-        <h2 id="lci-close">You don't have to figure out what's next on your own.</h2>
-        <div class="lci-cta-row">
-          <a class="btn btn-gold" href="https://cal.com/luke-haythorpe/30min">Book a free discovery call</a>
-          <a class="btn btn-outline" href="/intensive/enrol.html">Enrol</a>
+        <div class="lci-fit-list" role="group" aria-label="Statements that may fit you">
+          <button type="button" class="lci-chip" data-fit-chip aria-pressed="false">
+            <span class="lci-chip-mark" aria-hidden="true"></span>
+            <span class="lci-chip-text">I'm good at my work, and Sunday night still feels heavy.</span>
+          </button>
+          <button type="button" class="lci-chip" data-fit-chip aria-pressed="false">
+            <span class="lci-chip-mark" aria-hidden="true"></span>
+            <span class="lci-chip-text">I'm in a transition — a move, a role change, a season ending — and I don't know what's next.</span>
+          </button>
+          <button type="button" class="lci-chip" data-fit-chip aria-pressed="false">
+            <span class="lci-chip-mark" aria-hidden="true"></span>
+            <span class="lci-chip-text">I've lived by what I should do for so long that "what do I want?" feels like a strange question.</span>
+          </button>
+          <button type="button" class="lci-chip" data-fit-chip aria-pressed="false">
+            <span class="lci-chip-mark" aria-hidden="true"></span>
+            <span class="lci-chip-text">People see what I produce. I'm not sure they see me.</span>
+          </button>
+          <button type="button" class="lci-chip" data-fit-chip aria-pressed="false">
+            <span class="lci-chip-mark" aria-hidden="true"></span>
+            <span class="lci-chip-text">I haven't let myself dream in a long time.</span>
+          </button>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <footer class="lci-foot">
-        <a href="/">lilbird.life</a> · <a href="/book.html">All formats</a> · <a href="/first-flight/book.html?code=IMREADY">First Flight</a>
-      </footer>
-    </div>
+    <section class="lci-changes lci-reveal" aria-labelledby="lci-changes-title">
+      <div class="lci-wrap">
+        <div class="lci-changes-panel">
+          <div class="lci-changes-head">
+            <h2 id="lci-changes-title">What changes in eight weeks</h2>
+            <p class="lci-changes-note">In my clients' own words, before and after.</p>
+          </div>
+          <div class="lci-changes-grid">
+            <div class="lci-change-tile">
+              <p class="lci-change-before">"I haven't let myself dream in years."</p>
+              <hr class="lci-change-rule" />
+              <p class="lci-change-after">Dreaming again, with a plan to go with it</p>
+            </div>
+            <div class="lci-change-tile">
+              <p class="lci-change-before">"Everyone sees what I produce, not who I am."</p>
+              <hr class="lci-change-rule" />
+              <p class="lci-change-after">Recognised for who you're becoming</p>
+            </div>
+            <div class="lci-change-tile">
+              <p class="lci-change-before">"I keep doing what I should."</p>
+              <hr class="lci-change-rule" />
+              <p class="lci-change-after">Permission to ask what <em>you</em> want</p>
+            </div>
+            <div class="lci-change-tile">
+              <p class="lci-change-before">"I'm in a transition and I don't know what's next."</p>
+              <hr class="lci-change-rule" />
+              <p class="lci-change-after">A clear vision and one next step you believe in</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lci-how lci-reveal" id="how" aria-labelledby="lci-how-title">
+      <div class="lci-wrap">
+        <div class="lci-how-intro">
+          <p class="lci-kicker">How it works</p>
+          <h2 id="lci-how-title">Three movements. Eight sessions. One next chapter.</h2>
+        </div>
+
+        <div class="lci-path">
+          <div class="lci-path-line" aria-hidden="true"></div>
+          <div class="lci-tabs" role="tablist" aria-label="The three movements">
+            <button type="button" class="lci-tab" role="tab" id="tab-0" data-movement-tab aria-controls="panel-0" aria-selected="true">
+              <span class="lci-tab-dot">01</span>
+              <span class="lci-tab-label">Look back</span>
+            </button>
+            <button type="button" class="lci-tab" role="tab" id="tab-1" data-movement-tab aria-controls="panel-1" aria-selected="false" tabindex="-1">
+              <span class="lci-tab-dot">02</span>
+              <span class="lci-tab-label">Look in</span>
+            </button>
+            <button type="button" class="lci-tab" role="tab" id="tab-2" data-movement-tab aria-controls="panel-2" aria-selected="false" tabindex="-1">
+              <span class="lci-tab-dot">03</span>
+              <span class="lci-tab-label">Look forward</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="lci-movement-live">
+          <div class="lci-movement-panel" id="panel-0" role="tabpanel" data-movement-panel aria-labelledby="tab-0">
+            <div class="lci-movement-copy">
+              <p class="lci-kicker lci-kicker-on-dark">Look back · weeks 1–2</p>
+              <h3>See the pattern in where you've been.</h3>
+              <p>We name where you are right now, then trace the highs, pivots and formative moments of your story — the good, the hard, and the people who shaped you. You leave week one with a first win.</p>
+            </div>
+            <div class="lci-movement-sessions">
+              <p class="lci-sessions-label">Sessions</p>
+              <div class="lci-session-row"><span class="lci-session-n">1</span><span class="lci-session-name">First Flight</span></div>
+              <div class="lci-session-row"><span class="lci-session-n">2</span><span class="lci-session-name">Story</span></div>
+            </div>
+          </div>
+          <div class="lci-movement-panel" id="panel-1" role="tabpanel" data-movement-panel aria-labelledby="tab-1" hidden>
+            <div class="lci-movement-copy">
+              <p class="lci-kicker lci-kicker-on-dark">Look in · weeks 3–5</p>
+              <h3>Understand how you're wired.</h3>
+              <p>We get clear on who you are underneath the roles — what drains you, what makes you come alive, the rhythms that actually fit you, and who is in your corner.</p>
+            </div>
+            <div class="lci-movement-sessions">
+              <p class="lci-sessions-label">Sessions</p>
+              <div class="lci-session-row"><span class="lci-session-n">3</span><span class="lci-session-name">Identity &amp; Insight</span></div>
+              <div class="lci-session-row"><span class="lci-session-n">4</span><span class="lci-session-name">Life Rhythms &amp; Routines</span></div>
+              <div class="lci-session-row"><span class="lci-session-n">5</span><span class="lci-session-name">Relationships &amp; Community</span></div>
+            </div>
+          </div>
+          <div class="lci-movement-panel" id="panel-2" role="tabpanel" data-movement-panel aria-labelledby="tab-2" hidden>
+            <div class="lci-movement-copy">
+              <p class="lci-kicker lci-kicker-on-dark">Look forward · weeks 6–8</p>
+              <h3>Choose what comes next — and start it.</h3>
+              <p>We name what matters most, work through the transition you're in, and pull everything into your Full Flight Plan with a next step you believe in.</p>
+            </div>
+            <div class="lci-movement-sessions">
+              <p class="lci-sessions-label">Sessions</p>
+              <div class="lci-session-row"><span class="lci-session-n">6</span><span class="lci-session-name">Vision &amp; Goals</span></div>
+              <div class="lci-session-row"><span class="lci-session-n">7</span><span class="lci-session-name">Working Through Transitions</span></div>
+              <div class="lci-session-row"><span class="lci-session-n">8</span><span class="lci-session-name">Full Flight</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lci-movement-fallback">
+          <div class="lci-movement-panel">
+            <div class="lci-movement-copy">
+              <p class="lci-kicker lci-kicker-on-dark">Look back · weeks 1–2</p>
+              <h3>See the pattern in where you've been.</h3>
+              <p>We name where you are right now, then trace the highs, pivots and formative moments of your story — the good, the hard, and the people who shaped you. You leave week one with a first win.</p>
+            </div>
+            <div class="lci-movement-sessions">
+              <p class="lci-sessions-label">Sessions</p>
+              <div class="lci-session-row"><span class="lci-session-n">1</span><span class="lci-session-name">First Flight</span></div>
+              <div class="lci-session-row"><span class="lci-session-n">2</span><span class="lci-session-name">Story</span></div>
+            </div>
+          </div>
+          <div class="lci-movement-panel">
+            <div class="lci-movement-copy">
+              <p class="lci-kicker lci-kicker-on-dark">Look in · weeks 3–5</p>
+              <h3>Understand how you're wired.</h3>
+              <p>We get clear on who you are underneath the roles — what drains you, what makes you come alive, the rhythms that actually fit you, and who is in your corner.</p>
+            </div>
+            <div class="lci-movement-sessions">
+              <p class="lci-sessions-label">Sessions</p>
+              <div class="lci-session-row"><span class="lci-session-n">3</span><span class="lci-session-name">Identity &amp; Insight</span></div>
+              <div class="lci-session-row"><span class="lci-session-n">4</span><span class="lci-session-name">Life Rhythms &amp; Routines</span></div>
+              <div class="lci-session-row"><span class="lci-session-n">5</span><span class="lci-session-name">Relationships &amp; Community</span></div>
+            </div>
+          </div>
+          <div class="lci-movement-panel">
+            <div class="lci-movement-copy">
+              <p class="lci-kicker lci-kicker-on-dark">Look forward · weeks 6–8</p>
+              <h3>Choose what comes next — and start it.</h3>
+              <p>We name what matters most, work through the transition you're in, and pull everything into your Full Flight Plan with a next step you believe in.</p>
+            </div>
+            <div class="lci-movement-sessions">
+              <p class="lci-sessions-label">Sessions</p>
+              <div class="lci-session-row"><span class="lci-session-n">6</span><span class="lci-session-name">Vision &amp; Goals</span></div>
+              <div class="lci-session-row"><span class="lci-session-n">7</span><span class="lci-session-name">Working Through Transitions</span></div>
+              <div class="lci-session-row"><span class="lci-session-n">8</span><span class="lci-session-name">Full Flight</span></div>
+            </div>
+          </div>
+        </div>
+
+        <p class="lci-how-note">Each session runs 90–120 minutes, live with me. No scripts or slide decks — real conversation, and tools you keep.</p>
+      </div>
+    </section>
+
+    <section class="lci-stories lci-reveal" id="stories" aria-labelledby="lci-stories-title">
+      <h2 id="lci-stories-title" class="visually-hidden" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0">Stories</h2>
+      <div class="lci-wrap lci-stories-inner">
+        <figure class="lci-quote-feature">
+          <blockquote>"I uncovered blind spots, gained practical tools, and felt recognised for <em>who I was becoming — not just what I was producing.</em>"</blockquote>
+          <figcaption class="lci-quote-person">
+            <img src="/Testimonials/Nathan-D.jpeg" alt="" width="104" height="104" loading="lazy" decoding="async" />
+            <span><strong>Nathan Dunn</strong><span>Mechanical Engineering Manager, Lam Research</span></span>
+          </figcaption>
+        </figure>
+        <div class="lci-quote-grid">
+          <figure class="lci-quote-card">
+            <blockquote>"An important breakthrough was realising the calling didn't have to be about duty. It was OK to ask, 'Ed, what do <em>you</em> want?' I'd recommend this to anyone at a transition in life."</blockquote>
+            <figcaption class="lci-quote-person">
+              <img src="/Testimonials/Ed-B.jpeg" alt="" width="88" height="88" loading="lazy" decoding="async" />
+              <span><strong>Ed Barker</strong><span>VP of Engineering</span></span>
+            </figcaption>
+          </figure>
+          <figure class="lci-quote-card">
+            <blockquote>"I was dealing with a tough transition — moving across the country, figuring out my career path. Luke asked me to dream, something I hadn't done in a long time."</blockquote>
+            <figcaption class="lci-quote-person">
+              <img src="/Testimonials/Wanda-L-web.jpg" alt="" width="88" height="88" loading="lazy" decoding="async" />
+              <span><strong>Wanda L</strong><span>Marketing and brand consultant</span></span>
+            </figcaption>
+          </figure>
+          <figure class="lci-quote-card">
+            <blockquote>"Luke possesses an uncanny and uncommon ability to build immediate trust and safety."</blockquote>
+            <figcaption class="lci-quote-person">
+              <img src="/Testimonials/Andrew-R.jpeg" alt="" width="88" height="88" loading="lazy" decoding="async" />
+              <span><strong>Andrew Robinson</strong><span>Partner, GiANT Worldwide</span></span>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="lci-includes lci-reveal" aria-labelledby="lci-includes-title">
+      <div class="lci-wrap">
+        <h2 id="lci-includes-title">Everything you walk away with</h2>
+        <div class="lci-includes-grid">
+          <div class="lci-outcome">
+            <p class="lci-kicker">The outcome</p>
+            <div>
+              <h3>Your Full Flight Plan</h3>
+              <p>A living document of who you are, where you're headed, and your next three moves. Yours to keep.</p>
+            </div>
+          </div>
+          <div class="lci-include-tile">
+            <p class="lci-include-num">8</p>
+            <strong>Live one-to-one sessions</strong>
+            <p>12–16 hours together, online or in person.</p>
+          </div>
+          <div class="lci-include-tile">
+            <strong>Your private Nest</strong>
+            <p>Booking, notes, the Roots &amp; Wings material and every tool from your sessions, in one place.</p>
+          </div>
+          <div class="lci-include-tile">
+            <strong>The Life Change workbook</strong>
+            <p>Prompts and reflections to carry the work between sessions.</p>
+          </div>
+          <div class="lci-include-tile lci-include-bonus">
+            <p class="lci-kicker">Bonus</p>
+            <strong>12 months of Nest Plus</strong>
+            <p>After you finish, so the work keeps going. Plus your First Flight fee credited in full.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lci-guide lci-reveal" aria-labelledby="lci-guide-title">
+      <div class="lci-wrap lci-guide-inner">
+        <div class="lci-guide-photo">
+          <img src="/luke-head-edit.png" alt="Luke Haythorpe, founder of lil' bird coaching" width="880" height="1100" loading="lazy" decoding="async" />
+        </div>
+        <div class="lci-guide-copy">
+          <p class="lci-kicker">Your guide</p>
+          <h2 id="lci-guide-title">I've been lost too.</h2>
+          <p class="lci-guide-body">There was a season when I honestly forgot who I was. A coach walked alongside me and helped me find my way back. I built lil' bird to do the same for others — to help you see how you're wired, honour your story, and remember what makes you, you.</p>
+          <p class="lci-guide-meta">Luke Haythorpe · GiANT Worldwide certified · Bay Area, Melbourne and online</p>
+          <p class="lci-guide-quote">"Judgement doesn't exist with him and he has no agenda." — Goodwyn D, entrepreneur</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="lci-invest lci-reveal" id="investment" aria-labelledby="lci-invest-title">
+      <div class="lci-wrap">
+        <div class="lci-invest-intro">
+          <p class="lci-kicker lci-kicker-on-dark">Investment</p>
+          <h2 id="lci-invest-title">One investment. A next chapter you believe in.</h2>
+        </div>
+        <div class="lci-invest-row">
+          <div class="lci-invest-main">
+            <div class="lci-invest-top">
+              <p class="lci-invest-title">The Life Change Intensive</p>
+              <div class="lci-plan-toggle" role="group" aria-label="Payment option">
+                <button type="button" id="pay-full" aria-pressed="true">Pay in full</button>
+                <button type="button" id="pay-plan" aria-pressed="false">3 payments</button>
+              </div>
+            </div>
+            <div class="lci-price-row">
+              <p class="lci-price-main" id="price-main">$4,999</p>
+              <p class="lci-price-sub" id="price-sub">one payment</p>
+            </div>
+            <p class="lci-rate-note">Current rate for enrolments before <strong>31 March 2027</strong>. From 31 March 2027, <strong>$7,500</strong>.</p>
+            <div class="lci-invest-actions">
+              <a class="lb-btn lb-btn-teal" id="enrol-cta" href="/intensive/enrol.html?plan=full">Enrol — pay in full</a>
+              <a class="lb-btn lb-btn-outline" href="/book.html#discovery">Talk it through first</a>
+            </div>
+            <hr class="lci-invest-rule" />
+            <p class="lci-commit"><strong>My commitment to you:</strong> I'm with you for the whole journey. If something isn't working, tell me — we'll talk about it honestly and adjust together. Full terms are in your coaching agreement.</p>
+          </div>
+          <aside class="lci-immersion">
+            <div class="lci-immersion-top">
+              <p class="lci-kicker lci-kicker-on-dark">Prefer to get away?</p>
+              <h3>The Life Change Immersion</h3>
+              <p>The whole journey as a 48-hour on-site retreat — Friday evening to Sunday noon — in a forest, beach or desert setting in California. Lodging and meals included.</p>
+            </div>
+            <div>
+              <p class="lci-immersion-price">$12,000</p>
+              <a class="lci-immersion-link" href="/book.html#discovery">Ask about the Immersion</a>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="lci-faq lci-reveal" aria-labelledby="lci-faq-title">
+      <div class="lci-wrap lci-faq-inner">
+        <h2 id="lci-faq-title">Questions</h2>
+        <div class="lci-faq-list">
+          <div class="lci-faq-item is-open" data-faq-item>
+            <button type="button" class="lci-faq-q" data-faq-q aria-expanded="true">
+              <span>Is this therapy?</span>
+              <span class="lci-faq-sign" data-faq-sign aria-hidden="true">−</span>
+            </button>
+            <p class="lci-faq-a" data-faq-a>No. Coaching looks forward at where you're headed. If something comes up that needs a clinician, I'll tell you and help you find one.</p>
+          </div>
+          <div class="lci-faq-item" data-faq-item>
+            <button type="button" class="lci-faq-q" data-faq-q aria-expanded="false">
+              <span>How much time will it take?</span>
+              <span class="lci-faq-sign" data-faq-sign aria-hidden="true">+</span>
+            </button>
+            <p class="lci-faq-a" data-faq-a hidden>One session a week or every other week, plus a little reflection between. Most people finish in 8–12 weeks.</p>
+          </div>
+          <div class="lci-faq-item" data-faq-item>
+            <button type="button" class="lci-faq-q" data-faq-q aria-expanded="false">
+              <span>Online or in person?</span>
+              <span class="lci-faq-sign" data-faq-sign aria-hidden="true">+</span>
+            </button>
+            <p class="lci-faq-a" data-faq-a hidden>Either. Online works anywhere. In person is available in the Bay Area and Melbourne.</p>
+          </div>
+          <div class="lci-faq-item" data-faq-item>
+            <button type="button" class="lci-faq-q" data-faq-q aria-expanded="false">
+              <span>What if I'm not sure I'm ready?</span>
+              <span class="lci-faq-sign" data-faq-sign aria-hidden="true">+</span>
+            </button>
+            <p class="lci-faq-a" data-faq-a hidden>Book a free 30-minute call. No pitch — just a conversation to see if it fits. Or start with a single First Flight session, credited in full if you continue.</p>
+          </div>
+          <div class="lci-faq-item" data-faq-item>
+            <button type="button" class="lci-faq-q" data-faq-q aria-expanded="false">
+              <span>What if it isn't working for me?</span>
+              <span class="lci-faq-sign" data-faq-sign aria-hidden="true">+</span>
+            </button>
+            <p class="lci-faq-a" data-faq-a hidden>Tell me. We'll talk honestly and adjust together. The terms are set out in your coaching agreement.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lci-close lci-reveal" aria-labelledby="lci-close-title">
+      <div class="lci-wrap lci-close-inner">
+        <h2 id="lci-close-title">You don't have to figure out what's next <em>on your own.</em></h2>
+        <a class="lb-btn lb-btn-cream" href="/book.html#discovery">Book a free discovery call</a>
+        <p class="lci-meta">30 minutes · no pitch · just a conversation</p>
+      </div>
+    </section>
   </main>
 
-  <script src="/js/lilbird-theme.js"></script>
-  <script src="/js/lilbird-theme-nav.js"></script>
+  <footer class="lci-footer">
+    <div class="lci-wrap lci-footer-inner">
+      <span>lil' bird life coaching · Coaching is not therapy.</span>
+      <span class="lci-footer-links">
+        <a href="/">Home</a>
+        <a href="/format.html">All ways to work with me</a>
+      </span>
+    </div>
+  </footer>
+
+  <script src="./intensive-landing.js?v=20261111e"></script>
 </body>
 </html>
