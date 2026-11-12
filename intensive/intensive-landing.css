@@ -3,27 +3,28 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --ink: #1E2028;
-  --paper: #F6F0E4;
-  --card: #FBF7EE;
-  --line: #E2D8C3;
-  --sand: #E9E0CD;
-  --teal: #2F6B66;
-  --teal-dark: #1E4A46;
-  --teal-mist: #E7EFEC;
-  --teal-tint: #DCE7E3;
-  --gold-text: #85601C;
-  --gold: #D9AE5B;
-  --gold-tint: #F6E7C8;
-  --muted: #5A5650;
-  --body: #3D3A35;
-  --muted-dark: #C9C2B4;
-  --quiet-dark: #B9B2A4;
-  --slate-2: #2A2D37;
+  --ink: #14161C;
+  --paper: #FFFCF6;
+  --card: #FFFFFF;
+  --line: #E8DFD0;
+  --sand: #F0E6D4;
+  --teal: #0E7C70;
+  --teal-dark: #0A5C54;
+  --teal-deep: #0B4F48;
+  --teal-mist: #DDF3EF;
+  --teal-tint: #C8EBE5;
+  --gold-text: #9A6A12;
+  --gold: #E5B23A;
+  --gold-tint: #FFE9B8;
+  --muted: #5C574F;
+  --body: #2F2C28;
+  --muted-dark: #D2CBC0;
+  --quiet-dark: #B8B0A4;
+  --slate-2: #22252F;
   --slate-line: #3B3F4B;
-  --path-line: #C9BB9C;
-  --outcome-kicker: #F2D79B;
-  --bonus-kicker: #6E4F15;
+  --path-line: #D2C4A4;
+  --outcome-kicker: #FFE08A;
+  --bonus-kicker: #7A5710;
 }
 
 html { scroll-behavior: smooth; }
@@ -47,10 +48,10 @@ a:focus-visible {
 }
 
 .lci-wrap {
-  max-width: 1240px;
+  max-width: 1180px;
   margin: 0 auto;
-  padding-left: clamp(20px, 5vw, 72px);
-  padding-right: clamp(20px, 5vw, 72px);
+  padding-left: clamp(24px, 6vw, 88px);
+  padding-right: clamp(24px, 6vw, 88px);
 }
 
 .lci-kicker {
@@ -82,7 +83,7 @@ a:focus-visible {
 
 .lb-btn:hover { transform: translateY(-1px); }
 
-.lb-btn-teal { background: var(--teal); color: #fff !important; }
+.lb-btn-teal { background: var(--teal); color: #fff !important; box-shadow: 0 0 0 0 transparent; }
 .lb-btn-teal:hover { background: var(--teal-dark); color: #fff !important; }
 
 .lb-btn-ink { background: var(--ink); color: var(--paper) !important; }
@@ -156,23 +157,39 @@ a:focus-visible {
 
 /* —— Hero —— */
 .lci-hero {
-  padding: clamp(32px, 6vw, 72px) 0 clamp(64px, 9vw, 120px);
+  position: relative;
+  padding: clamp(48px, 8vw, 100px) 0 clamp(88px, 12vw, 160px);
+  overflow: hidden;
+}
+
+.lci-hero::before {
+  content: "";
+  position: absolute;
+  right: -12%;
+  top: -20%;
+  width: min(58vw, 640px);
+  height: min(58vw, 640px);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(14, 124, 112, 0.14) 0%, rgba(229, 178, 58, 0.08) 42%, transparent 70%);
+  pointer-events: none;
 }
 
 .lci-hero-inner {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: clamp(28px, 4vw, 44px);
 }
 
 .lci-hero h1 {
   margin: 0;
-  max-width: 1080px;
+  max-width: 15ch;
   font-family: "Playfair Display", Georgia, serif;
   font-weight: 400;
-  font-size: clamp(44px, 7.4vw, 104px);
-  line-height: 1.02;
-  letter-spacing: -0.02em;
+  font-size: clamp(48px, 8vw, 112px);
+  line-height: 0.98;
+  letter-spacing: -0.03em;
 }
 
 .lci-hero h1 em {
@@ -185,7 +202,8 @@ a:focus-visible {
   flex-wrap: wrap;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 32px;
+  gap: clamp(28px, 5vw, 56px);
+  margin-top: clamp(8px, 2vw, 24px);
 }
 
 .lci-lead {
@@ -218,9 +236,9 @@ a:focus-visible {
 
 /* —— Statement —— */
 .lci-statement {
-  background: var(--ink);
+  background: var(--teal-deep);
   color: var(--paper);
-  padding: clamp(56px, 8vw, 104px) 0;
+  padding: clamp(72px, 10vw, 128px) 0;
 }
 
 .lci-statement-inner {
@@ -245,14 +263,14 @@ a:focus-visible {
 .lci-statement-side {
   margin: 0;
   max-width: 360px;
-  font-size: 17px;
-  line-height: 1.6;
-  color: var(--muted-dark);
+  font-size: 18px;
+  line-height: 1.65;
+  color: rgba(255, 252, 246, 0.82);
 }
 
 /* —— Is this you —— */
 .lci-fit {
-  padding: clamp(64px, 9vw, 120px) 0;
+  padding: clamp(88px, 12vw, 160px) 0;
 }
 
 .lci-fit-inner {
@@ -370,7 +388,7 @@ a:focus-visible {
 
 /* —— From / to —— */
 .lci-changes {
-  padding: 0 0 clamp(64px, 9vw, 120px);
+  padding: 0 0 clamp(88px, 12vw, 160px);
 }
 
 .lci-changes-panel {
@@ -412,12 +430,19 @@ a:focus-visible {
 }
 
 .lci-change-tile {
-  padding: 24px;
+  padding: clamp(24px, 3vw, 32px);
   border-radius: 18px;
   background: var(--paper);
+  border: 1px solid transparent;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.lci-change-tile:hover {
+  border-color: var(--teal-tint);
+  background: #fff;
 }
 
 .lci-change-before {
@@ -444,7 +469,7 @@ a:focus-visible {
 
 /* —— How it works —— */
 .lci-how {
-  padding: 0 0 clamp(64px, 9vw, 120px);
+  padding: 0 0 clamp(88px, 12vw, 160px);
 }
 
 .lci-how-intro {
@@ -509,12 +534,14 @@ a:focus-visible {
   background: var(--paper);
   color: var(--ink);
   border: 2px solid var(--path-line);
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
 .lci-tab[aria-selected="true"] .lci-tab-dot {
   background: var(--teal);
   color: #fff;
   border-color: var(--teal);
+  transform: scale(1.06);
 }
 
 .lci-tab-label {
@@ -613,7 +640,7 @@ a:focus-visible {
 
 /* —— Stories —— */
 .lci-stories {
-  padding: 0 0 clamp(64px, 9vw, 120px);
+  padding: 0 0 clamp(88px, 12vw, 160px);
 }
 
 .lci-stories-inner {
@@ -624,9 +651,10 @@ a:focus-visible {
 
 .lci-quote-feature {
   margin: 0;
-  padding: clamp(32px, 5vw, 72px);
+  padding: clamp(40px, 6vw, 80px);
   border-radius: 28px;
   background: var(--teal-mist);
+  border-left: 6px solid var(--teal);
   display: flex;
   flex-direction: column;
   gap: 28px;
@@ -693,7 +721,7 @@ a:focus-visible {
 
 /* —— Includes —— */
 .lci-includes {
-  padding: 0 0 clamp(64px, 9vw, 120px);
+  padding: 0 0 clamp(88px, 12vw, 160px);
 }
 
 .lci-includes h2 {
@@ -782,7 +810,7 @@ a:focus-visible {
 
 /* —— Meet Luke —— */
 .lci-guide {
-  padding: 0 0 clamp(64px, 9vw, 120px);
+  padding: 0 0 clamp(88px, 12vw, 160px);
 }
 
 .lci-guide-inner {
@@ -843,7 +871,7 @@ a:focus-visible {
 .lci-invest {
   background: var(--ink);
   color: var(--paper);
-  padding: clamp(64px, 9vw, 120px) 0;
+  padding: clamp(88px, 12vw, 160px) 0;
 }
 
 .lci-invest-intro {
@@ -1077,7 +1105,7 @@ a:focus-visible {
 
 /* —— FAQ —— */
 .lci-faq {
-  padding: clamp(64px, 9vw, 120px) 0;
+  padding: clamp(88px, 12vw, 160px) 0;
 }
 
 .lci-faq-inner {
@@ -1143,7 +1171,7 @@ a:focus-visible {
 .lci-close {
   background: var(--ink);
   color: var(--paper);
-  padding: clamp(72px, 10vw, 140px) 0 clamp(64px, 9vw, 100px);
+  padding: clamp(96px, 14vw, 180px) 0 clamp(80px, 11vw, 120px);
   text-align: center;
 }
 
@@ -1225,6 +1253,10 @@ a:focus-visible {
   html { scroll-behavior: auto; }
   .lb-btn { transition: none; }
   .lb-btn:hover { transform: none; }
+  .lci-tab-dot { transition: none; }
+  .lci-tab[aria-selected="true"] .lci-tab-dot { transform: none; }
+  .lci-change-tile { transition: none; }
   .lci-fit-card.is-open { animation: none; }
   .lci-reveal { opacity: 1; transform: none; transition: none; }
+  .lci-hero::before { display: none; }
 }
