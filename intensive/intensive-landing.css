@@ -425,8 +425,14 @@ a:focus-visible {
 
 .lci-changes-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: 1fr;
   gap: 16px;
+}
+
+@media (min-width: 720px) {
+  .lci-changes-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .lci-change-tile {

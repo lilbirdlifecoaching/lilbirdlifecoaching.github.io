@@ -96,7 +96,7 @@
       priceSave.textContent = 'Save $398 vs three monthly payments';
     }
     if (enrolBtn) {
-      enrolBtn.textContent = full ? 'Enrol — pay in full' : 'Enrol — 3 payments';
+      enrolBtn.textContent = full ? 'Enrol · pay in full' : 'Enrol · 3 payments';
       enrolBtn.href = full ? '/intensive/enrol.html?plan=full' : '/intensive/enrol.html?plan=three';
     }
   }
