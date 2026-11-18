@@ -20,9 +20,40 @@ If a change touches pricing, booking, worker logic, or public copy, log it here.
 
 ---
 
+## 2026-11-16 (site check)
+
+- `deployed` Coaching price raised from $249 to $349 (commit 9b15116, 11 Nov). Live on index.html, book.html, format.html, coaching/book.html, chat.js and the Nest.
+- `deployed` First Flight $149 (with IMREADY) is now described as for first-time customers (commit 02b2b10).
+- `deployed` Life Change Intensive: pay in full $4,999, or a payment plan of 3 × $1,799 monthly, with Nest unlocked after the first charge (intensive/enrol.html, intensive-enrol.js).
+- `deployed` The Intensive page says $4,999 holds until 31 Dec 2026, then $7,500.
+- `deployed` Intensive landing rebuilt as an editorial / discovery-call page, framed as eight sessions (commits 8bca4c0 to 7c896a7, 11–12 Nov).
+- `deployed` Life Change Immersion: $12,000 for one person, +$1,500 per additional guest, max 4. This replaces the older "+$2k/guest" note from 2026-09-25.
+- `deployed` Live worker versions confirmed 16 Nov: worker-solo `v1.38-health-nov14`, lilbird-assessment `v8.8.5-health`, lilbird-chat `v2.2-health-ping`. All three `/health` routes return `ok:true`. Models reported: `claude-sonnet-4-6` (all three) and `claude-haiku-4-5-20251001` (assessment and chat).
+- Older `built in repo` labels from May–Oct are believed deployed (live worker versions are newer). Re-label them when next verified.
+- `deployed` R2 public dev URL for workbooks: off in Cloudflare (R2 › solo-course-videos › Settings; confirmed 14 Nov).
+
+## 2026-11-14 (Cursor)
+
+- `deployed` Cal.com event `coaching-session` (id 6304327) length set from 60 → **45 minutes** (API v2 `cal-api-version: 2026-06-12`). Availability, confirmation, and location left unchanged.
+- `deployed` R2 bucket `solo-course-videos`: public development URL (`r2.dev`) confirmed **off**. Repo grep found no `r2.dev` links. Workbook viewer still calls `/workbook-content`. Closes the open item from 2026-10-01.
+- `deployed` Stripe read-only confirm (worker-solo secrets → Stripe Prices API): coaching checkout `price_1UaeyJGAu36WZ7DdFKwPcMpk` = **$349**; Intensive 3-payment `price_1UaeyKGAu36WZ7Ddnc7P88D8` = **3 × $1,799**/mo; pay-in-full `price_1UJGf9GAu36WZ7DdSRYbGqkT` = **$4,999**. No Stripe products/prices edited.
+- `deployed` `lilbird-chat` **`v2.2-health-ping`**: GET `/ping` + `/health` (no Origin, no AI); CORS Allow-Headers includes `Authorization`; nest-guide.js + journey modules synced (6 Nov career-path section 3 present). `/ping` → `v2.2-health-ping`; `/health` → `claude-haiku-4-5-20251001`, `claude-sonnet-4-6`.
+- `deployed` `worker-solo` **`v1.38-health-nov14`**: GET `/health` → `claude-sonnet-4-6` (ping still reports version).
+- `deployed` `lilbird-assessment` **`v8.8.5-health`**: GET `/health` → `claude-haiku-4-5-20251001`, `claude-sonnet-4-6`.
+- `built in repo` `llms.txt`: coaching $349; Intensive “or 3 payments of $1,799”; Journal link to how-to-get-unstuck article.
+
+## 2026-11-11 (Cursor)
+
+- `deployed` Coaching price raised to $349 (all pages, chat.js, Nest).
+- `deployed` Intensive 3-payment plan: 3 × $1,799 ($5,397 total), Nest unlocked after first charge. Pay in full stays $4,999.
+- `deployed` Intensive $4,999 rate holds until 31 Dec 2026, then $7,500.
+- `deployed` Immersion: +$1,500 per extra guest (replaces the +$2k in the 2026-09-25 entry).
+- `deployed` worker-solo live at `v1.37-pricing-plans`; lilbird-assessment live at `v8.8.4-nest-plus-gate` (both confirmed via `/ping` on 14 Nov).
+- Intensive landing rebuilt (editorial layout, eight sessions framing, year-end countdown).
+
 ## 2026-11-06 (Claude)
 
-- `deployed` + `needs worker redeploy` Cursor deployed lilbird-chat and worker-solo (14:51 PT). Live check: urgent redundancy message → coaching card shown (good). "Give me one practical thing" → still asked a question first, twice, and used an em dash. Tightened `nest/nest-guide.js`: step rule outranks "stay underneath", reply opens with the move, may use their own words as job-listing search terms, worked example, Career Crossroads offerable after one career message, em dashes stripped server-side. Needs one more lilbird-chat redeploy (section 3 of the Cursor note).
+- `deployed` Cursor deployed lilbird-chat and worker-solo (14:51 PT). Live check: urgent redundancy message → coaching card shown (good). "Give me one practical thing" → still asked a question first, twice, and used an em dash. Tightened `nest/nest-guide.js`: step rule outranks "stay underneath", reply opens with the move, may use their own words as job-listing search terms, worked example, Career Crossroads offerable after one career message, em dashes stripped server-side. **Follow-up redeploy done 14 Nov** (`lilbird-chat` `v2.2-health-ping` with section 3 nest-guide.js).
 
 - `built in repo` **Career-change path** (from the six-persona review; ~50% of visitors expected to have career concerns). Search now finds tools for career, job, redundancy, laid off, return to work, purpose, and results rank best match first. New Journey tool **Career Crossroads** (`career-crossroads`, Work & Purpose): constraints → energising tasks → two things to look into → what you don't know yet (optional) → one information-finding step with a day. Entry points: strip under the Nest Home quick paths, featured card atop Journey "Find a tool", homepage **fifth rock** ("I want to change careers, but I don't know where to start.") → new article `/articles/how-to-get-unstuck-in-your-career.html` (in articles index + sitemap). Guide: AI labelled under the portrait and composer; prompt gives one small find-out step when asked, never suggests careers, and offers 1:1 coaching (card → `/book.html#coaching`) once when work/money pressure is urgent. Transition Map last prompt now "What small thing will you do this week?". Life Canvas "Today" → "Latest check-in". `needs worker deploy`: see `docs/CURSOR-DEPLOY-2026-11-06-career-path.md` (lilbird-chat + worker-solo).
 
@@ -112,7 +143,7 @@ If a change touches pricing, booking, worker logic, or public copy, log it here.
 ## 2026-10-01
 
 ### Security pass, 5 Voices retired, email sequence + unsubscribe
-- **Status:** `built in repo` (nothing below is live until deployed)
+- **Status:** `deployed (superseded, confirmed by live /ping 2026-11-14)` — worker-solo past `v1.17-auth-gates` (live `v1.38-health-nov14`); assessment past `v7.5.0-sequence-security` (live `v8.8.5-health`).
 - **Supabase:** run `nest/security-hardening-2026-10.sql`. Browsers can no longer write `user_entitlements`, `lci_sessions`, `intensive_enrolments`, or paid columns on `course_users`; `get_user_id_by_email` / `initialise_sessions` locked to service role; `initialise_lci_sessions` requires the caller's own paid Intensive.
 - **worker-solo `v1.17-auth-gates`:** `/chat`, `/summarise`, `/session-email`, `/notify-illustrator` need a logged-in Solo buyer; `/nest-welcome-email` and intensive contract need login; email comes from the login, not the request body. Solo videos served via 6-hour signed links from private R2 (`/solo-video-url`, `/solo-video`). Stripe webhook rejects unknown products and unpaid sessions. Intensive enrol can't overwrite an already-paid account.
 - **Assessment worker `v7.5.0-sequence-security`:** pay-what-you-want / promo / `/create-payment-intent` removed; `paid` can no longer be set from the browser; CORS limited to lilbird.life + orangery.solutions; per-IP rate limits on AI and email routes (only active when deployed with wrangler); 5 Voices removed from prompts and stored profiles.
@@ -131,24 +162,24 @@ If a change touches pricing, booking, worker logic, or public copy, log it here.
 - $27 online workbook access decided: $27 buyers + Intensive only.
 
 ### Paid tiers: free read · $2 full read + Nest · Nest Plus · $27 workbook
-- **Status:** `built in repo`, not deployed (waiting on Stripe prices + Luke's OK). Worker and pages must ship together.
+- **Status:** `deployed (superseded, confirmed by live /ping 2026-11-14)` — worker-solo past `v1.18-nest-tiers` (live `v1.38-health-nov14`); assessment past `v8.0.0-paid-tiers` (live `v8.8.5-health`). R2 public `r2.dev` URL turned off 14 Nov.
 - **Assessment worker `v8.0.0-paid-tiers`:** the full read stays on the server. Unpaid reads return the two types, a short teaser and the list of locked sections. `/analyze` refuses to overwrite an existing read. Email is frozen once a read is paid. Paid owners get 3 retakes per purchase. Relationship Dynamic needs Nest Plus. Slider answers have their own prompt section. Emails 3, 6, 9, 10 updated.
 - **worker-solo `v1.18-nest-tiers`:** `/inner-compass-checkout` ($2 plus optional +$5 Nest Plus / +$27 workbook, hosted Stripe Checkout), `/nest-upgrade-checkout` (logged in), `/workbook-content` (protected workbooks from private R2). The webhook grants `inner_compass` / `nest_plus` / `lcs_workbook`, links the read, flags it paid and sends an unlock email. Coaching purchases now grant `coaching`, which includes Nest Plus. Now deployed with `solo/wrangler.toml` (R2 + KV bindings, `keep_vars = true`). Needs `STRIPE_IC_PRICE_ID`, `STRIPE_NEST_PLUS_PRICE_ID`, `STRIPE_WORKBOOK_PRICE_ID`.
 - **Supabase:** `nest/security-hardening-2026-10-part3.sql`. Linking a read no longer grants anything, and a read linked to another account can't be taken over.
 - **deep-profile.html `v8.0.0`:** 31 sliders plus 3 short text boxes plus the Life Canvas replace the chat. Email shows the free read, which carries the $2 offer with tick-boxes. After checkout the page polls until unlocked. The in-page Relationship Dynamic is Nest Plus only.
 - **Nest:** plan badge (Nest / Nest Plus / Intensive), Nest Plus and workbook cards with "Included with…" or locked price labels, upgrade buttons, the tour adapts to access, plus a one-time "New:" step after an unlock. Fixed a missing `catch` in the dashboard loader.
-- **Workbooks:** uploaded to R2 `solo-course-videos/workbooks/`; public copies removed; links go to `/workbooks/view.html?w=first-flight|life-change`. **R2 public dev URL is still on — turn it off at deploy.**
+- **Workbooks:** uploaded to R2 `solo-course-videos/workbooks/`; public copies removed; links go to `/workbooks/view.html?w=first-flight|life-change`. R2 public `r2.dev` URL was on at the time; **turned off 14 Nov**.
 - **Homepage:** one main CTA (Inner Compass, free, about 15 min), quiz as a text link, "Two ways forward" replaces the pricing strip, coaching removed from the homepage.
 - **Removed from site:** `relationship-dynamic-orangery.html`, unused root `nest-client.js`.
 
 ## 2026-09-25
 
 ### Life Change Immersion landing + enquiry
-- New `/intensive/immersion/` — 3 days / 2 nights, $12,000 (+$2k/guest, max 4), Forest/Beach/Desert, enquiry-only (no Stripe).
+- New `/intensive/immersion/` — 3 days / 2 nights, $12,000 (+$2k/guest at the time; **now +$1,500/guest as of 2026-11-11**), Forest/Beach/Desert, enquiry-only (no Stripe).
 - Intensive page: “Two ways to take the Intensive” (session arc $4,999 vs Immersion).
 - Homepage Intensive card: quiet “Also: 3-day Immersion from $12,000 →”.
 - Worker: `POST /immersion-enquiry` → email Luke + confirm enquirer. Version `v1.16-immersion-enquiry`.
-- **Status:** `built in repo`
+- **Status:** `deployed (superseded, confirmed by live /ping 2026-11-14)` for the worker enquiry path (live worker-solo past `v1.16`); Pages immersion copy later updated for +$1,500/guest.
 - **Deploy Pages:** `intensive/immersion/*`, `intensive/index.html`, `intensive/intensive-landing.css?v=20260925a`, `index.html`, `css/lilbird-home.css?v=20260925a`, `sitemap.xml`
 - **Redeploy Cloudflare:** paste `solo/worker-solo.js` to `worker-solo` (enquiry form fails until this ships)
 

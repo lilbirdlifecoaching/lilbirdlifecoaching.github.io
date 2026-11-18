@@ -2,7 +2,7 @@
 
 **Repo path:** `docs/CLAUDE-HANDOFF.md` (with `docs/LILBIRD-MASTER.md` and `docs/LILBIRD-UPDATE-LOG.md`). Cloud agents and scheduled checks read the GitHub repo, not iCloud. When the iCloud originals change, copy those three files into `docs/` again before relying on them here.
 
-**Last updated:** 2026-07-14 (First Flight Stripe → Cal.com — **built in repo, deploy pending**)  
+**Last updated:** 2026-11-16 (site check: prices + worker versions)  
 **Purpose:** Lock Claude to the latest repo truth, deploy rules, product decisions, and what was just shipped. Treat this file as authoritative over older chat memory.
 
 ---
@@ -33,11 +33,12 @@ Rules:
 | **Homepage** | `v1.2.0-20260528-conversion-pass` | View source on https://lilbird.life/ (comment line 2) |
 | **Day/night theme bundle** | `v1.1.0-20260617-site-wide-theme` + conversion CSS | Toggle on home; Phase 1 pages follow `localStorage` key `lilbird-theme` |
 | **Inner Compass HTML** | `v7.1.0-20260528-phase2-conversion` | View source or console on https://lilbird.life/deep-profile.html |
-| **Assessment worker** | `v7.1.0-nest-next-discovery` (ping) | `GET https://lilbird-assessment.cwwq46sn7m.workers.dev/ping` |
+| **Assessment worker** | `v8.8.5-health` | `GET https://lilbird-assessment.cwwq46sn7m.workers.dev/ping` or `/health` |
 | Solo shell | `v1.7-glow-compare-20260530` | Console on https://lilbird.life/solo/ |
-| Solo worker | `v1.10-coaching-checkout` (repo) | `GET https://worker-solo.cwwq46sn7m.workers.dev/ping` — redeploy if ping still shows older |
+| Solo worker | `v1.38-health-nov14` | `GET https://worker-solo.cwwq46sn7m.workers.dev/ping` or `/health` |
+| lilbird-chat | `v2.2-health-ping` | `GET https://lilbird-chat.cwwq46sn7m.workers.dev/ping` or `/health` |
 | First Flight book | `/first-flight/book.html` | Stripe → `/first-flight/booked.html` → Cal.com |
-| Coaching book | `/coaching/book.html` | Stripe `$249` (`price_1TssDPGAu36WZ7DdGYCWUP5m`) → `/coaching/booked.html` → Cal.com |
+| Coaching book | `/coaching/book.html` | Stripe `$349` (`price_1UaeyJGAu36WZ7DdFKwPcMpk`) → `/coaching/booked.html` → Cal.com |
 
 **Status:** Phase 1 + 2 confirmed live earlier. **First Flight pay→Cal.com** is built in repo — needs Cloudflare worker-solo paste + `STRIPE_FIRST_FLIGHT_PRICE_ID` + GitHub Pages upload of `first-flight/` and link updates.
 
@@ -49,7 +50,7 @@ These came from a 10-panel critique + Luke’s explicit choices. Claude should t
 
 | Decision | Choice |
 |----------|--------|
-| **Primary CTA (cold traffic)** | **Free discovery call** (`calendly.com/lilbirdlifecoaching/30min`) — not First Flight, not pathfinder |
+| **Primary CTA (cold traffic)** | **Free discovery call** (`cal.com/luke-haythorpe/30min`) — not First Flight, not pathfinder |
 | **First Flight booking** | **Stripe on `/first-flight/book.html`**, then **Cal.com** `luke-haythorpe/first-flight-intro-session` (no Cal payment). Price id `price_1TsqwuGAu36WZ7DdhQCViEPa`. Promo **IMREADY** → $149. Do not restore Calendly payment for First Flight. |
 | **Faith / ministry** | **Texture, not feature** on homepage — listening skill without ministry branding; fuller story on `about-luke.html` |
 | **Intensive pricing on site** | **Not on homepage** — scope and investment discussed on discovery call (sticker-shock avoidance) |
