@@ -486,6 +486,21 @@ a:focus-visible {
   margin-bottom: 36px;
 }
 
+.lci-how-lede {
+  margin: 12px 0 0;
+  max-width: 40rem;
+  font-size: clamp(17px, 1.5vw, 19px);
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.lci-solo-sub {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--muted-dark);
+}
+
 .lci-how-intro h2 {
   margin: 0;
   font-family: "Playfair Display", Georgia, serif;

@@ -20,6 +20,12 @@ If a change touches pricing, booking, worker logic, or public copy, log it here.
 
 ---
 
+## 2026-11-25 (Cursor)
+
+- `built in repo` **Intensive repositioned:** in-person **group Intensive** is the main offer ($2,499 · 6–8 people · 48h California immersion, lodging + meals); one-to-one eight-session Intensive ($4,999 / 3×$1,799) is the sideline. Copy speaks to restlessness about the status quo, big jumps, meaning/purpose/clarity/confidence; AI/role fear held with optimism toward a life you never want to leave.
+- `built in repo` Pages: `intensive/index.html`, `intensive/immersion/*`, `intensive-landing.css?v=20261125a`, `index.html`, `book.html`, `format.html`, `llms.txt`.
+- `deployed` worker-solo **`v1.40-group-intensive`**: immersion enquiry seats 1–2 at $2,499 each (was 1–4 at $12k +$2k/guest).
+
 ## 2026-11-16 (site check)
 
 - `deployed` Coaching price raised from $249 to $349 (commit 9b15116, 11 Nov). Live on index.html, book.html, format.html, coaching/book.html, chat.js and the Nest.

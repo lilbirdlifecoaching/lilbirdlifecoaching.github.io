@@ -43,8 +43,8 @@
     var timing = (document.getElementById('imm-timing').value || '').trim();
     var message = (document.getElementById('imm-message').value || '').trim();
 
-    if (!name || !email || !setting || !timing || !(partySize >= 1 && partySize <= 4)) {
-      showError('Please fill in name, email, setting, party size, and rough timing.');
+    if (!name || !email || !setting || !timing || !(partySize >= 1 && partySize <= 2)) {
+      showError('Please fill in name, email, setting, seats, and rough timing.');
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
